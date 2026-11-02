@@ -76,7 +76,7 @@ Models are small because Draco compression and aggressive decimation work well o
 
 - 50 structures, 8 movements, 9 citations, 11 action rows. Every row has `checked_by` set to null, so none has been checked by a person.
 - Coverage: 8 working rows, 2 stretched, 1 pinched. Role changes with joint angle are shown for the piriformis (primary external rotator from 0 to 45 degrees of flexion, secondary from 60 to 75, then a secondary internal rotator at 90 to 105) and the obturator externus (primary external rotator from 75 degrees).
-- Every quote in a `says` field was checked by a reviewer against the source text.
+- Every quote in a `says` field was compared with its source text in an automated review, not by a person. `checked_by` is still null on every row until a person checks it.
 
 ### How long it took and how hard sources were to find
 
@@ -98,7 +98,7 @@ Wall-clock time per row was not recorded, so I cannot give a measured figure. Wh
 5. **Two cited papers are non-commercial.** Ito 2025 is CC BY-NC 4.0 and Groh 2009 is CC BY-NC (version not stated). We only quote a short sentence as evidence, which is probably fine, but the owner should decide the policy before v1.
 6. **Some doc sites were unreachable from the build container:** vite.dev, the React Three Fiber and drei docs, docs.blender.org, glTF Transform and Ajv. The spec says to check current docs, so package-shipped README files, type definitions and local API introspection were used instead. The code runs and the tests pass, so the risk is small, but the owner can allow those hosts in the session network settings for next time (**medium** that nothing was missed).
 7. **The Terminologia Anatomica CSV in Z-Anatomy has errors.** The posterior cruciate ligament has the wrong Latin term and several muscles only carry short forms. Latin names need a check before they are shown prominently.
-8. **Gluteus maximus is hard to tap from the back.** A larger muscle covers the gluteus medius and the visible part is small. This is a strong argument for peelable layers in Phase 1.
+8. **Gluteus medius is hard to tap from the back.** The gluteus maximus covers most of it and the visible part is small. This is a strong argument for peelable layers in Phase 1.
 9. **Several things in the app are rough on purpose.** The canvas is blank while the model loads. The render loop always runs. There is no code splitting.
 
 ## Recommended changes

@@ -17,11 +17,38 @@ npm install
 npm run dev      # starts the viewer, open the address it prints
 npm run build    # writes the finished site to apps/web/dist/
 npm test         # runs all the tests
+npm run validate      # checks the knowledge base in data/
+npm run check-models  # checks the meshes in models/ against data/
+```
+
+The Python tests for the mesh pipeline need pytest in a local virtual environment:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install pytest
+npm run test:py
 ```
 
 Open the viewer, drag to turn the model and tap a structure to see its name. Add `?perf=1` to the address to see how long the page took to become usable.
 
 The build works from any folder. Copy the contents of `apps/web/dist/` to any web server.
+
+### Rebuilding the models
+
+You only need this to change the meshes. The finished files in `models/` are committed, so the app and the checks work without it. Run these from the repo root:
+
+```bash
+bash pipeline/get-blender.sh      # downloads Blender into tools/blender/
+bash pipeline/fetch-sources.sh    # downloads BodyParts3D and Z-Anatomy into sources/ and checks them
+.venv/bin/python pipeline/assets/bp3d_inventory.py
+tools/blender/blender -b --factory-startup -P pipeline/assets/za_inventory_blender.py
+tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blender.py -- \
+    --region hip --source bp3d --out models/hip.glb
+tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blender.py -- \
+    --region hip --source z-anatomy --out models/hip-z-anatomy.glb
+```
+
+Why each mesh comes from the source it does is explained in [docs/phase0/mesh-source-decision.md](docs/phase0/mesh-source-decision.md).
 
 ## License
 

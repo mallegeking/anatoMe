@@ -156,7 +156,7 @@ Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 7. Tap 5 different structures and note whether the right name appears each time.
 8. Do the two extra tap checks listed in the measurement sheet.
 
-The pass mark is: interactive within 5000 ms on all or most runs, and no stutter when rotating.
+The pass mark is the same as in the measurement sheet: the median of the 3 numbers (the middle one) is under 5000 ms, and the model does not stutter when you rotate it.
 
 ## Fallback: serve through a small local web server
 
