@@ -1,4 +1,4 @@
-# Checks the knowledge base, the meshes and the tests on every push and pull request.
+# Checks the knowledge base, the meshes, the tests and the app build on every push and pull request.
 name: CI
 
 on:
@@ -28,7 +28,11 @@ jobs:
       - name: Node tests
         run: npm test
 
-      - uses: actions/setup-python@v5
+      # Type-checks and builds the app. It uses the committed models/ folder, so it needs no sources/ or tools/.
+      - name: Build the app
+        run: npm run build
+
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
