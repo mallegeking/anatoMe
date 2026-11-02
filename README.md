@@ -10,7 +10,18 @@ The project is in its Phase 0 spike. This phase checks that the data pipeline an
 
 ## How to run it
 
-Coming in a later Phase 0 task.
+You need Node.js 22 or newer.
+
+```bash
+npm install
+npm run dev      # starts the viewer, open the address it prints
+npm run build    # writes the finished site to apps/web/dist/
+npm test         # runs all the tests
+```
+
+Open the viewer, drag to turn the model and tap a structure to see its name. Add `?perf=1` to the address to see how long the page took to become usable.
+
+The build works from any folder. Copy the contents of `apps/web/dist/` to any web server.
 
 ## License
 

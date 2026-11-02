@@ -1,0 +1,14 @@
+{
+  "side.left": "{label} (left)",
+  "side.right": "{label} (right)",
+  "info.tapHint": "Tap a structure to see its name",
+  "error.modelLoad": "The 3D model could not be loaded. Check your connection and reload the page.",
+  "loading.model": "Loading the 3D model",
+  "credits.title": "Credits",
+  "credits.bodyparts3d": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
+  "credits.zanatomy": "Z-Anatomy - The libre 3D atlas of anatomy - CC-BY-SA 4.0",
+  "credits.threejs": "three.js, MIT License",
+  "credits.draco": "Draco, Apache License 2.0",
+  "about.educational": "anatoMe is for learning how the body moves. It is not a diagnostic tool and not medical advice.",
+  "perf.interactive": "Interactive after {ms} ms"
+}
