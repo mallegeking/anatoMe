@@ -9,7 +9,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Playwright is not a dependency of this repo, so we load it the way it is installed on this machine.
-// If this line fails on your own computer, run "npm i -D playwright" in apps/web and then "npx playwright install chromium".
+// If this line fails on your own computer, run "npm i --no-save playwright" and then "npx playwright install chromium" in the repo root.
+// "--no-save" keeps package.json and the lockfile unchanged.
 const { chromium } = createRequire(import.meta.url)("playwright");
 
 const LIMIT_MS = 5000;

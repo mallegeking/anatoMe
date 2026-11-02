@@ -63,10 +63,10 @@ Check it quickly with `ls apps/web/dist`. You must see `index.html` directly in 
 
 ## 3. Copy to the homelab
 
-First make the target folder on the homelab, one time only. Replace the placeholders, then run:
+First make the target folder on the homelab, one time only. Replace the placeholders, then run this on your dev machine. The `-t` lets `sudo` ask for your password, which it cannot do over SSH without it.
 
 ```bash
-ssh <homelab-user>@<homelab-host> 'sudo mkdir -p /srv/anatome && sudo chown <homelab-user>: /srv/anatome'
+ssh -t <homelab-user>@<homelab-host> 'sudo mkdir -p /srv/anatome && sudo chown <homelab-user>: /srv/anatome'
 ```
 
 Now copy the site. Note the slash at the end of `apps/web/dist/`. It means "the contents of this folder".
@@ -148,7 +148,7 @@ The point of this step is to check two things on the real phone: the model is us
 Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 
 1. Open Chrome on the Galaxy A23.
-2. Clear the site's stored data so Chrome loads everything from scratch. In Chrome tap the three dots, then Settings, then Privacy and security, then Delete browsing data. On the Advanced tab choose time range "All time", tick "Cookies and site data" and "Cached images and files", and press Delete data. Menu names move around between Chrome versions, so look for the same words.
+2. Clear the stored data for this one address only, so Chrome loads everything from scratch and you stay signed in to your other sites. In Chrome tap the three dots, then Settings, then Site settings, then All sites. Search for `<machine-name>.<tailnet>.ts.net`, tap the result, then tap "Clear & reset" and confirm. Menu names move around between Chrome versions, so look for the same words. Do not use "Delete browsing data" for this, it clears every site.
 3. Type this address into Chrome: `https://<machine-name>.<tailnet>.ts.net/?perf=1`. The `?perf=1` at the end shows a small box with a text like "Interactive after 2100 ms".
 4. Wait for the hip to appear. Write down the number in the box.
 5. Repeat steps 2 to 4 two more times, so you have 3 numbers.
@@ -158,11 +158,72 @@ Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 
 The pass mark is: interactive within 5000 ms on all or most runs, and no stutter when rotating.
 
+## Fallback: serve through a small local web server
+
+Use this only if `tailscale serve /srv/anatome` shows a list of files or a blank page instead of the app. The Tailscale docs do not say whether a folder target serves `index.html`, so this might be needed. Here a tiny web server that comes with Python serves the folder on the homelab itself, and Tailscale just passes traffic to it. Your phone address stays the same.
+
+You need Python 3 on the homelab. Check with `python3 --version`.
+
+### Fallback step A: turn off the folder handler
+
+```bash
+sudo tailscale serve --https=443 off
+```
+
+### Fallback step B: keep the small web server running with systemd
+
+Create the file `/etc/systemd/system/anatome-web.service` on the homelab. For example run `sudo nano /etc/systemd/system/anatome-web.service`, paste this in, save, and exit. Replace `<homelab-user>` with your Linux user. The server only listens on `127.0.0.1`, which means only the homelab itself can reach it, and Tailscale is what makes it reachable from your phone.
+
+```ini
+[Unit]
+Description=anatoMe static site on localhost
+After=network.target
+
+[Service]
+User=<homelab-user>
+ExecStart=/usr/bin/python3 -m http.server 8080 --bind 127.0.0.1 --directory /srv/anatome
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+If `which python3` prints a path other than `/usr/bin/python3`, use that path in `ExecStart`. Then start it and make it start at every boot:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now anatome-web.service
+```
+
+Check that it works from the homelab itself. This should print the start of the page, beginning with `<!doctype html>`:
+
+```bash
+curl -s http://127.0.0.1:8080/ | head -n 3
+```
+
+### Fallback step C: point Tailscale at it
+
+```bash
+sudo tailscale serve --bg http://127.0.0.1:8080
+tailscale serve status
+```
+
+The address is the same as before: `https://<machine-name>.<tailnet>.ts.net/`. Updating the site works as before (steps 2 and 3). Nothing needs a restart.
+
+### Fallback: stop everything
+
+```bash
+sudo tailscale serve --https=443 off
+sudo systemctl disable --now anatome-web.service
+```
+
+To remove it completely, also run `sudo rm /etc/systemd/system/anatome-web.service` and `sudo systemctl daemon-reload`.
+
 ## If something goes wrong
 
 | What you see | What to try |
 | --- | --- |
 | The phone says it cannot find the site | Check that Tailscale is switched on in the phone app and shows the homelab as connected. Check MagicDNS is on. |
 | Certificate warning | HTTPS certificates are not enabled yet. Do step 1.2, then run `sudo tailscale serve --bg /srv/anatome` again. |
-| Blank page or a list of files | Run `ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'`. You must see `index.html` directly inside, not inside a subfolder. Then check the file permissions in step 4. |
+| Blank page or a list of files | Run `ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'`. You must see `index.html` directly inside, not inside a subfolder. Then check the file permissions in step 4. If the files are fine but you still see a list instead of the app, use the fallback section above. |
 | Page loads but no model | The `models` folder is missing on the homelab. Run the `rsync` command from step 3 again. |
