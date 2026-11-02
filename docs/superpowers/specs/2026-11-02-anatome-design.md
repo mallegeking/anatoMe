@@ -194,15 +194,17 @@ Effort assumes part-time weekends. Estimates beyond Phase 1 are rough and get re
 
 | Phase | Content | Effort | Gate to pass before the next phase |
 | --- | --- | --- | --- |
-| 0. Spike | See task list below | 1 to 2 weekends (medium) | The hip region loads quickly on the owner's phone |
-| 1. Hip atlas | Hip, pelvis and thigh (down to and including the knee joint, because several thigh muscles attach below it) with search, info panel and peelable layers. Data schema in place. First sourced action rows for the hip. Credits screen. | 4 to 8 weekends (medium) | It helps the owner understand their own hip |
-| 2. Movement explorer, area lookup and notebook | Stretched and pinched rows for the hip where sources exist. Joint-angle control changes highlighting only (the model does not bend). Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 1 to 3 months part-time (low to medium) | The owner's physio has reviewed the hip data |
+| 0. Spike | See task list below | Done except the phone gate, pending owner measurement (updated 2026-11-02, was 1 to 2 weekends) | The hip region loads quickly on the owner's phone |
+| 1. Hip atlas | Hip, pelvis and thigh (down to and including the knee joint, because several thigh muscles attach below it) with search, info panel and peelable layers. Data schema in place. First sourced action rows for the hip. Credits screen. | 3 to 6 weekends (medium, updated 2026-11-02, was 4 to 8) | It helps the owner understand their own hip |
+| 2. Movement explorer, area lookup and notebook | Stretched and pinched rows for the hip where sources exist. Joint-angle control changes highlighting only (the model does not bend). Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 2 to 4 months part-time (low, updated 2026-11-02, was 1 to 3) | The owner's physio has reviewed the hip data |
 | 3. Publish v1 | Make the repo public. README with educational framing up front, CONTRIBUTING.md, a process for data corrections from physios and students. Re-check every license page, including the ones blocked during design. | 1 to 2 weekends (medium) | |
 | 4. Whole body, region by region | Spine and neck, shoulder girdle, upper limb, knee and ankle. Each region ships on its own once its data is reviewed. German UI. | Months (low) | Name mapping works for one full region beyond the hip |
 | 5. Simulation playback | OpenSim activations computed offline for common exercises, animated over the 3D model | Several months (low) | |
 | 6. Your own movement (stretch goal) | See section 10 | Open-ended | |
 
 Shona UI comes after German, timing open.
+
+**Phase 0 result (2026-11-02):** done except the phone gate, which is pending owner measurement on the Galaxy A23. The provisional signal is a Playwright pre-check (4x CPU throttle, phone-sized viewport) with a median of 1457 ms against the 5000 ms limit. Rotation smoothness is not covered by that check. Reasons for the changed estimates: the mesh pipeline, schema, validator, CI and a tap-to-name viewer already exist, which shortens Phase 1 (medium). Source hunting and review for the 11 action rows was slow and open sources for stretched and pinched loads are thin, which lengthens Phase 2 (low). Details are in `docs/phase0/spike-report.md`. Phases 3 to 6 are unchanged.
 
 ### Phase 0 task list
 
@@ -240,3 +242,10 @@ Kept in `docs/ideas.md`, which is the running list across sessions.
 - Verify the EU medical device rules for the educational framing before the notebook is built (Phase 2) and again before v1 is published. Claude summarises the rules and sources. This is research, not legal advice.
 - Shona anatomy terminology availability, when Shona is added.
 - How the physio reviews: in person on the owner's phone, or through Tailscale sharing. Decide when she is approached.
+- Added 2026-11-02, from the Phase 0 spike (details in `docs/phase0/spike-report.md`):
+  - Phone gate: the owner measures on the Galaxy A23 and fills in `docs/phase0/phone-measurements.md`.
+  - The action row has no field for "only in some hip shapes" (for example labrum pinching mainly in pincer-type hips). Decide before more rows are written.
+  - No meniscus structure type exists, so the two menisci are deferred to Phase 1.
+  - Two required structures have no mesh in either source: quadriceps tendon and patellar ligament. Psoas minor (optional) is also missing.
+  - OpenStax Anatomy and Physiology 2e is now CC BY-NC-SA with a no-LLM clause. Rows cite the CC BY 4.0 OERI remix on LibreTexts instead. The owner confirms this is acceptable.
+  - Two cited papers are non-commercial (Ito 2025, Groh 2009) and are used only as short evidence quotes. Decide the policy for such sources before v1.
