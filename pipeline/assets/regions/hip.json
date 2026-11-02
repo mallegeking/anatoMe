@@ -1,0 +1,565 @@
+{
+  "region": "hip",
+  "targets": [
+    {
+      "sid": "hip-bone",
+      "type": "bone",
+      "english": "Hip bone",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:hip bone|os coxae)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sacrum",
+      "type": "bone",
+      "english": "Sacrum",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:sacrum)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "coccyx",
+      "type": "bone",
+      "english": "Coccyx",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:coccyx)$"
+      ],
+      "required": true,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "femur",
+      "type": "bone",
+      "english": "Femur",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:femur)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "patella",
+      "type": "bone",
+      "english": "Patella",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:patella)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "tibia",
+      "type": "bone",
+      "english": "Tibia",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:tibia)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fibula",
+      "type": "bone",
+      "english": "Fibula",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:fibula)$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "gluteus-maximus",
+      "type": "muscle",
+      "english": "Gluteus maximus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gluteus maximus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "gluteus-medius",
+      "type": "muscle",
+      "english": "Gluteus medius",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gluteus medius)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "gluteus-minimus",
+      "type": "muscle",
+      "english": "Gluteus minimus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gluteus minimus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "tensor-fasciae-latae",
+      "type": "muscle",
+      "english": "Tensor fasciae latae",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:tensor fasciae latae)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "piriformis",
+      "type": "muscle",
+      "english": "Piriformis",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:piriformis)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "superior-gemellus",
+      "type": "muscle",
+      "english": "Superior gemellus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gemellus superior|superior gemellus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "inferior-gemellus",
+      "type": "muscle",
+      "english": "Inferior gemellus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gemellus inferior|inferior gemellus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "obturator-internus",
+      "type": "muscle",
+      "english": "Obturator internus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:obturator internus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "obturator-externus",
+      "type": "muscle",
+      "english": "Obturator externus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:obturator externus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "quadratus-femoris",
+      "type": "muscle",
+      "english": "Quadratus femoris",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:quadratus femoris)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "iliacus",
+      "type": "muscle",
+      "english": "Iliacus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:iliacus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "psoas-major",
+      "type": "muscle",
+      "english": "Psoas major",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:psoas major)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "pectineus",
+      "type": "muscle",
+      "english": "Pectineus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:pectineus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "adductor-longus",
+      "type": "muscle",
+      "english": "Adductor longus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:adductor longus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "adductor-brevis",
+      "type": "muscle",
+      "english": "Adductor brevis",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:adductor brevis)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "adductor-magnus",
+      "type": "muscle",
+      "english": "Adductor magnus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:adductor magnus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "gracilis",
+      "type": "muscle",
+      "english": "Gracilis",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:gracilis)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sartorius",
+      "type": "muscle",
+      "english": "Sartorius",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:sartorius)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rectus-femoris",
+      "type": "muscle",
+      "english": "Rectus femoris",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:rectus femoris)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "vastus-lateralis",
+      "type": "muscle",
+      "english": "Vastus lateralis",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:vastus lateralis)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "vastus-medialis",
+      "type": "muscle",
+      "english": "Vastus medialis",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:vastus medialis)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "vastus-intermedius",
+      "type": "muscle",
+      "english": "Vastus intermedius",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:vastus intermedius)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "biceps-femoris-long-head",
+      "type": "muscle",
+      "english": "Biceps femoris, long head",
+      "patterns": [
+        "^long head of (?:(?:left|right) )?biceps femoris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "biceps-femoris-short-head",
+      "type": "muscle",
+      "english": "Biceps femoris, short head",
+      "patterns": [
+        "^short head of (?:(?:left|right) )?biceps femoris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "semitendinosus",
+      "type": "muscle",
+      "english": "Semitendinosus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:semitendinosus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "semimembranosus",
+      "type": "muscle",
+      "english": "Semimembranosus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:semimembranosus)(?: muscle)?$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "iliotibial-tract",
+      "type": "tendon",
+      "english": "Iliotibial tract",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:iliotibial (?:tract|band))$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "quadriceps-tendon",
+      "type": "tendon",
+      "english": "Quadriceps tendon",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:quadriceps (?:femoris )?tendon|tendon of (?:the )?quadriceps(?: femoris)?)$"
+      ],
+      "required": true,
+      "source": null
+    },
+    {
+      "sid": "patellar-ligament",
+      "type": "tendon",
+      "english": "Patellar ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:patellar (?:ligament|tendon)|ligament of (?:the )?patella)$"
+      ],
+      "required": true,
+      "source": null
+    },
+    {
+      "sid": "iliofemoral-ligament",
+      "type": "ligament",
+      "english": "Iliofemoral ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:(?:(?:transverse|descending) part of )?iliofemoral ligament)$"
+      ],
+      "required": true,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "pubofemoral-ligament",
+      "type": "ligament",
+      "english": "Pubofemoral ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:pubofemoral ligament)$"
+      ],
+      "required": true,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "ischiofemoral-ligament",
+      "type": "ligament",
+      "english": "Ischiofemoral ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:ischiofemoral ligament)$"
+      ],
+      "required": true,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "psoas-minor",
+      "type": "muscle",
+      "english": "Psoas minor",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:psoas minor)(?: muscle)?$"
+      ],
+      "required": false,
+      "source": null
+    },
+    {
+      "sid": "ligament-of-head-of-femur",
+      "type": "ligament",
+      "english": "Ligament of the head of the femur",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:ligament of (?:the )?head of (?:the )?femur|ligamentum teres(?: of femur)?)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "transverse-acetabular-ligament",
+      "type": "ligament",
+      "english": "Transverse acetabular ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:transverse acetabular ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "sacrotuberous-ligament",
+      "type": "ligament",
+      "english": "Sacrotuberous ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:sacrotuberous ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "sacrospinous-ligament",
+      "type": "ligament",
+      "english": "Sacrospinous ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:sacrospinous ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "inguinal-ligament",
+      "type": "ligament",
+      "english": "Inguinal ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:inguinal ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "acetabular-labrum",
+      "type": "labrum",
+      "english": "Acetabular labrum",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:acetabular labrum)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "hip-joint-capsule",
+      "type": "capsule",
+      "english": "Hip joint capsule",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:articular capsule of (?:the )?hip joint|capsule of (?:the )?hip joint|hip joint capsule)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "trochanteric-bursa",
+      "type": "bursa",
+      "english": "Trochanteric bursa of gluteus maximus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:trochanteric bursa of gluteus maximus(?: muscle)?)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "iliopectineal-bursa",
+      "type": "bursa",
+      "english": "Iliopectineal bursa",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:\\(?iliopectineal bursa\\)?)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "ischial-bursa",
+      "type": "bursa",
+      "english": "Ischial bursa of gluteus maximus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:(?:sciatic|ischial) bursa of gluteus maximus(?: muscle)?)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "anterior-cruciate-ligament",
+      "type": "ligament",
+      "english": "Anterior cruciate ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:anterior cruciate ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "posterior-cruciate-ligament",
+      "type": "ligament",
+      "english": "Posterior cruciate ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:posterior cruciate ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "medial-collateral-ligament",
+      "type": "ligament",
+      "english": "Medial (tibial) collateral ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:(?:(?:superficial|deep) part of )?tibial collateral ligament|medial collateral ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "lateral-collateral-ligament",
+      "type": "ligament",
+      "english": "Lateral (fibular) collateral ligament",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:fibular collateral ligament|lateral collateral ligament)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "medial-meniscus",
+      "type": "labrum",
+      "english": "Medial meniscus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:medial meniscus)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    },
+    {
+      "sid": "lateral-meniscus",
+      "type": "labrum",
+      "english": "Lateral meniscus",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:lateral meniscus)$"
+      ],
+      "required": false,
+      "source": "z-anatomy"
+    }
+  ]
+}
