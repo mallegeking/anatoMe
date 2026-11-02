@@ -1,0 +1,8 @@
+node_modules/
+dist/
+sources/
+tools/
+.venv/
+apps/web/public/models/
+*.log
+.superpowers/

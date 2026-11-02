@@ -1,0 +1,9 @@
+Each model file in this folder has its own license. The license of every file is listed in models/manifest.json.
+
+Files based on BodyParts3D are licensed under CC BY 4.0.
+https://creativecommons.org/licenses/by/4.0/
+
+Files based on Z-Anatomy are licensed under CC BY-SA 4.0.
+https://creativecommons.org/licenses/by-sa/4.0/
+
+The required credit text for each source is in ATTRIBUTION.md at the root of this repository.
