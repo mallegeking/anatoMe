@@ -19,6 +19,11 @@ function skipThreeDracoDefaults(): Plugin {
 export default defineConfig({
   base: "./",
   plugins: [react(), skipThreeDracoDefaults()],
+  build: {
+    // Writes the licence texts of every npm library inside the bundle to dist/third-party-licenses.txt.
+    // The Credits screen links to it. A .txt name lets every web server show it as plain text.
+    license: { fileName: "third-party-licenses.txt" },
+  },
   test: {
     environment: "jsdom",
   },

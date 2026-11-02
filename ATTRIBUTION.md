@@ -7,7 +7,8 @@ anatoMe builds on the work of others. This page lists every source, its license 
 | BodyParts3D | 3D anatomy meshes | CC BY 4.0 | BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International | https://lifesciencedb.jp/bp3d/ |
 | Z-Anatomy | 3D anatomy meshes | CC BY-SA 4.0 | Z-Anatomy - The libre 3D atlas of anatomy - CC-BY-SA 4.0 | https://www.z-anatomy.com/ |
 | three.js | 3D rendering library | MIT | three.js, MIT License | https://threejs.org/ |
-| Draco decoder | Mesh decompression | Apache 2.0 | Draco, Apache License 2.0 | https://github.com/google/draco |
+| Draco decoder | Mesh decompression | Apache 2.0, full text in `apps/web/public/draco/LICENSE` (shipped next to the decoder) | Draco, Apache License 2.0 | https://github.com/google/draco |
+| Other npm libraries bundled into the app (React, React Three Fiber, drei, camera-controls, zustand and their helpers) | App framework and 3D helpers | MIT | The build writes every bundled library with its licence text to `third-party-licenses.txt` next to the app, linked from the Credits screen | `apps/web/dist/third-party-licenses.txt` after `npm run build` |
 
 ## Model files
 
@@ -29,3 +30,8 @@ Older BodyParts3D OBJ file headers mention CC BY-SA 2.1 Japan. The license page 
 - Code is MIT, see `LICENSE`.
 - Our own data is CC BY 4.0, see `data/LICENSE`.
 - Each mesh file has its own license, recorded in `models/manifest.json` and explained in `models/LICENSE`.
+- Short quotations in the `says` fields under `data/` keep the license of their source, listed in `data/citations.yaml`.
+
+## Note on React Three Fiber
+
+The npm package of `@react-three/fiber` ships no license file, so `third-party-licenses.txt` names it as MIT without the text. Its license is the MIT License, Copyright (c) 2019-2025 Poimandres, see https://github.com/pmndrs/react-three-fiber/blob/master/LICENSE.
