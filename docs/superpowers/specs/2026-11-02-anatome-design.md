@@ -55,7 +55,7 @@ anatoMe is a free, open-source, browser-based 3D anatomy explorer. It answers tw
 ## 3. Constraints
 
 - **Static files only.** Meshes, knowledge base and any simulation output are built ahead of time. The app is static files that can be hosted anywhere. No backend.
-- **Phone first.** The app must load and run smoothly on the owner's own phone, which is the reference "mid-range phone" for every performance gate.
+- **Phone first.** The reference device for every performance gate is the owner's Samsung Galaxy A23 (Android, Chrome). It sits at the lower end of mid-range, which makes it a good test. Target **(builder's call)**: the hip region is interactive within 5 seconds of opening the page on home Wi-Fi, and rotating it does not stutter.
 - **Time.** The owner works on this part-time on weekends. Claude writes the code. The owner reads code and asks when something is unclear.
 - **Code comments.** Short, plain, friendly comments wherever something is not obvious, written for a reader who knows code but not this codebase.
 - **Docs and comments style.** Plain language. No em dashes. No semicolons.
@@ -78,6 +78,11 @@ anatoMe is a free, open-source, browser-based 3D anatomy explorer. It answers tw
 | Physio reviewer | The owner has a physio in mind and will approach her once there is something to show (end of Phase 1 or during Phase 2) |
 | Repo visibility | Private now, public at Phase 3 |
 | Video input | Wanted later (Phase 6, see section 10). Not part of v1. |
+| What "a movement loads a structure" means | Three load types from the first data row: working (muscles), stretched, pinched. For the hip, working muscles get filled first. Stretched and pinched rows are added where good sources exist. |
+| Joint-angle control | The 3D model stays still in Phase 2. Only the highlighting changes with the angle. Bones-only bending is on the ideas list for later. |
+| Data sources | Open-access papers and openly licensed sources for now. The owner may borrow textbooks from a friend, which would then be added as sources. |
+| Reference phone | Samsung Galaxy A23 (Android) |
+| Homelab | Reachable from outside the home network through Tailscale |
 
 ## 5. Prior art (checked 2026-11-02)
 
@@ -152,7 +157,7 @@ Everything heavy runs offline. The app only loads static files.
 | Text and translations | All UI text in language files from day one. English only at launch. | Adding German and Shona later is translation, not code changes | High |
 | Search | Client-side index over structure names (English and Latin at launch, German later) | No server | Medium |
 | On-device storage | Browser storage (IndexedDB) for the symptom notebook | Never leaves the device | High |
-| Hosting during development | Owner's homelab (static files) | GitHub Pages needs a paid plan for private repos | High |
+| Hosting during development | Owner's homelab (static files), reached through Tailscale. Tailscale's built-in HTTPS for tailnet hostnames (`tailscale serve`) is the likely way to get HTTPS, check current Tailscale docs. Deploys are done by hand at first **(builder's call)**. No hostnames or keys go into the repo. | GitHub Pages needs a paid plan for private repos. HTTPS is needed later for camera access. | Medium-high |
 | Hosting after v1 | GitHub Pages (free once public) and/or homelab | | High |
 | App type | Plain web app at launch. Installable offline app (PWA) later. | Keeps v1 simple. Offline use is on the ideas list. | Medium |
 
@@ -165,16 +170,17 @@ The knowledge base is the heart of the project. It lives as YAML files in `data/
 | Structure | id, Terminologia Anatomica (Latin) term, English name, FMA id if available, type (bone, muscle, tendon, ligament, joint, capsule, labrum, bursa, nerve), region, mesh references (left and right) | One record per thing you can click |
 | Attachment | muscle, bone landmark, origin or insertion | Explains why a muscle moves what it moves |
 | Movement | joint, axis, direction (for example hip, transverse axis, internal rotation) | The shared vocabulary |
-| Action | muscle, movement, role (primary or secondary), condition, confidence (high, medium, low), citations (one or more) | Who does what, and when |
+| Action | structure (any type, not only muscles), movement, load type (working, stretched, pinched), role (primary or secondary), condition, confidence (high, medium, low), citations (one or more), checked_by | What a movement does to each structure, and when |
 | Exercise | name, phases, each phase as a set of joint movements with angle ranges | Lets people start from "squat" |
 | Region map | body surface area, structures beneath it ordered by depth | Powers "tap where it hurts" |
 | Citation | source, page or URL, license, short quote or summary of what the source says | Every action row points to at least one |
 | Symptom log | movement or exercise, painful or not, notes, date | Stored only on the user's device. Never in the repo, never sent anywhere. |
 
-**Two rules that must hold from the first row** (medium-high confidence they are needed, retrofitting means rewriting every row):
+**Three rules that must hold from the first row** (medium-high confidence they are needed, retrofitting means rewriting every row):
 
 1. **Condition is structured, not free text** **(builder's call on the exact shape)**. A condition is a joint angle range, for example "hip flexion between 60 and 120 degrees". This is what drives the joint-angle control. Example: piriformis acts as an external rotator with the hip straight, and its rotation role changes once the hip bends past roughly 60 to 90 degrees.
 2. **Movements and exercise phases are described as joint angles.** This lets the joint-angle control, and later video input (Phase 6), plug into the same data without rewriting it.
+3. **Every action row has a load type.** Working means a muscle is producing or resisting force. Stretched means tissue is put under tension (for example the hip's external rotators and the ischiofemoral ligament during internal rotation). Pinched means tissue is compressed (for example the front of the acetabular labrum in deep flexion with internal rotation). Ligaments, capsule, labrum and bursae only ever appear as stretched or pinched.
 
 **Who writes and checks data rows** **(builder's call):** Claude drafts rows, but only from sources it can actually open and read (open-access papers, openly licensed textbooks, sources the owner provides). Each citation records what the source says, so it can be checked. Each row has a `checked_by` field that stays empty until a person (the owner, later the physio) has looked at the source. The app can show unchecked rows differently. No citation is ever written from memory.
 
@@ -190,7 +196,7 @@ Effort assumes part-time weekends. Estimates beyond Phase 1 are rough and get re
 | --- | --- | --- | --- |
 | 0. Spike | See task list below | 1 to 2 weekends (medium) | The hip region loads quickly on the owner's phone |
 | 1. Hip atlas | Hip, pelvis and thigh (down to and including the knee joint, because several thigh muscles attach below it) with search, info panel and peelable layers. Data schema in place. First sourced action rows for the hip. Credits screen. | 4 to 8 weekends (medium) | It helps the owner understand their own hip |
-| 2. Movement explorer, area lookup and notebook | Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 1 to 3 months part-time (low to medium) | The owner's physio has reviewed the hip data |
+| 2. Movement explorer, area lookup and notebook | Stretched and pinched rows for the hip where sources exist. Joint-angle control changes highlighting only (the model does not bend). Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 1 to 3 months part-time (low to medium) | The owner's physio has reviewed the hip data |
 | 3. Publish v1 | Make the repo public. README with educational framing up front, CONTRIBUTING.md, a process for data corrections from physios and students. Re-check every license page, including the ones blocked during design. | 1 to 2 weekends (medium) | |
 | 4. Whole body, region by region | Spine and neck, shoulder girdle, upper limb, knee and ankle. Each region ships on its own once its data is reviewed. German UI. | Months (low) | Name mapping works for one full region beyond the hip |
 | 5. Simulation playback | OpenSim activations computed offline for common exercises, animated over the 3D model | Several months (low) | |
@@ -204,8 +210,8 @@ Shona UI comes after German, timing open.
 2. **Inventory and choose the mesh source.** Download both BodyParts3D and Z-Anatomy. List the hip, pelvis and thigh structures in each: names, structure type, triangle counts, file sizes. Check that muscles, tendons and ligaments around the hip are present as separate meshes. **Rule (builder's call):** use BodyParts3D if it covers the hip muscles, major tendons and hip ligaments well enough to click them individually. Otherwise use Z-Anatomy. Mixing is allowed: if BodyParts3D is good for most structures but missing some (for example ligaments), take only the missing ones from Z-Anatomy and keep them in separate files. `models/` then holds a manifest listing each file's source and license, so most files stay CC BY 4.0 and only the Z-Anatomy files are CC BY-SA 4.0. Write the comparison and the decision into `docs/`.
 3. **Export the hip region to glTF** with a Blender script (decimate, Draco). Read free-muscles' script first.
 4. **Load it in a minimal app** (Vite, React Three Fiber). Click a structure to show its name.
-5. **Measure on the owner's phone**: time from opening the page to the model being interactive, and smoothness when rotating. Hosted on the homelab. Record the numbers in `docs/`.
-6. **Draft the JSON Schema** from section 8 and write **10 sourced hip action rows**, including at least one with a joint-angle condition, as a test of the format. Validate them in CI.
+5. **Measure on the Samsung Galaxy A23**: time from opening the page to the model being interactive, and smoothness when rotating. Hosted on the homelab, opened through Tailscale. Record the numbers in `docs/`. Gate: interactive within 5 seconds on home Wi-Fi, no stutter when rotating.
+6. **Draft the JSON Schema** from section 8 and write **10 sourced hip action rows** from open-access sources, including at least one with a joint-angle condition and at least one stretched or pinched row, as a test of the format. Validate them in CI.
 7. **Review the roadmap** against what the spike revealed and adjust effort estimates.
 
 ## 10. Later ideas (not in v1)
@@ -213,6 +219,7 @@ Shona UI comes after German, timing open.
 Kept in `docs/ideas.md`, which is the running list across sessions.
 
 - **Video input (Phase 6).** Record a movement on the phone. The app tracks the joints, works out joint angles, matches them to movements in the knowledge base, and lights up the structures involved. This is lighter than the original plan's "estimate muscle loads from video" and fits the joint-angle data model. Runs entirely on the device, the video never leaves the phone. Some movements, especially rotation along the leg, are hard to see in a single phone video (medium-low confidence). Study Stanford's OpenCap project before building anything here.
+- Bones-only bending: the thigh bone visibly rotates with the joint-angle control while muscles fade or highlight.
 - German UI, then Shona UI.
 - Installable offline app (PWA).
 - Peripheral nerves.
@@ -232,3 +239,4 @@ Kept in `docs/ideas.md`, which is the running list across sessions.
 - Re-check these pages from a session that can reach them: the DBCLS BodyParts3D license page, the OpenSim full-body model license on simtk.org, AnatomyScope. Network settings changed mid-session but the hosts were still blocked.
 - Verify the EU medical device rules for the educational framing before the notebook is built (Phase 2) and again before v1 is published. Claude summarises the rules and sources. This is research, not legal advice.
 - Shona anatomy terminology availability, when Shona is added.
+- How the physio reviews: in person on the owner's phone, or through Tailscale sharing. Decide when she is approached.

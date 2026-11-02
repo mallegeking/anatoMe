@@ -16,6 +16,10 @@ Record a movement with the phone camera. The app tracks the joints, works out jo
 - German UI after the English launch.
 - Shona UI after German. Check how many anatomy terms have settled Shona equivalents and decide a fallback (English or Latin) for the rest.
 
+## Bending model
+
+When the joint-angle control moves, the thigh bone visibly rotates while muscles fade or highlight. Full muscle deformation is much more work and stays out of scope for now.
+
 ## Offline use
 
 Make the app installable and usable offline (PWA), for example at the gym.
