@@ -104,7 +104,7 @@ What anatoMe adds: the "why" layer. Joint-level movements, role changes with joi
 | Source | License | Notes | Confidence |
 | --- | --- | --- | --- |
 | [Z-Anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy) | CC BY-SA 4.0 | Non-commercial parts: inner ear (CC BY-NC-SA 4.0) and kidney (CC BY-NC 4.0). Brain white matter parts list no license. None are musculoskeletal, so none are ever imported. | High |
-| BodyParts3D (DBCLS) | **CC BY 4.0** since 2025-02-27 | The original plan said CC BY-SA 2.1 Japan, which is outdated. Old OBJ file headers and Z-Anatomy's credits still mention the old license. Requested credit: "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International". | Medium-high. Confirmed through Human Atlas's attribution file and search results. The DBCLS page itself was blocked in this session and must be checked before v1. |
+| BodyParts3D (DBCLS) | **CC BY 4.0** since 2025-02-27 | The original plan said CC BY-SA 2.1 Japan, which is outdated. Old OBJ file headers and Z-Anatomy's credits still mention the old license. Requested credit: "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International". | High. DBCLS license page read directly on 2026-11-02 (last updated 2025/02/27). Re-check before v1. |
 | OpenSim engine | Apache 2.0 | Models bundled with OpenSim keep their own licenses. | High |
 | OpenSim full-body model (Rajagopal) | Unknown | Only matters in Phase 5. Check before use. | n/a |
 | Wikipedia text in Z-Anatomy | CC BY-SA 3.0 | Z-Anatomy warns some definitions contain machine-translation errors. We write our own descriptions. | High |
@@ -236,7 +236,7 @@ Kept in `docs/ideas.md`, which is the running list across sessions.
 
 ## 12. Open items
 
-- Re-check these pages from a session that can reach them: the DBCLS BodyParts3D license page, the OpenSim full-body model license on simtk.org, AnatomyScope. Network settings changed mid-session but the hosts were still blocked.
+- Re-check these pages from a session that can reach them: the OpenSim full-body model license on simtk.org, AnatomyScope. (The DBCLS BodyParts3D license page was confirmed on 2026-11-02.)
 - Verify the EU medical device rules for the educational framing before the notebook is built (Phase 2) and again before v1 is published. Claude summarises the rules and sources. This is research, not legal advice.
 - Shona anatomy terminology availability, when Shona is added.
 - How the physio reviews: in person on the owner's phone, or through Tailscale sharing. Decide when she is approached.
