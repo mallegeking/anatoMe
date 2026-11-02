@@ -59,23 +59,44 @@
       says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
   checked_by: null
 
+# Piriformis external rotation shrinks as the hip bends (Ito 2025, Table 2, N m):
+# 0.40 at 0°, 0.40 at 15°, 0.32 at 30°, 0.24 at 45°, 0.13 at 60°, 0.05 at 75°.
+# Primary up to 45° where it is still sizable, secondary at 60° to 75° where it is small.
+# The study measured every 15°, so nothing is claimed between 45° and 60°.
 - id: piriformis-hip-external-rotation
   structure: piriformis
   movement: hip-external-rotation
   load: working
   role: primary
   when:
-    - {angle: hip.flexion, min: 0, max: 75}
+    - {angle: hip.flexion, min: 0, max: 45}
   confidence: medium
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Lateral Rotators, row Piriformis
       says: "Piriformis is listed among the lateral rotators, target motion direction: lateral rotation."
     - ref: ito-2025
-      locator: Abstract, and 3. Results, paragraph on external rotation torque (Table 2, Figure 4A)
-      says: "External rotation torque of the piriformis, obturator internus, and conjoined tendon peaked at 15° hip flexion, and then decreased as the hip flexed. ... The piriformis switched its function from external to internal rotation of the hip between 75° and 90° of flexion."
+      locator: Abstract, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), row Piriformis
+      says: "External rotation torque of the piriformis, obturator internus, and conjoined tendon peaked at 15° hip flexion, and then decreased as the hip flexed. Table 2, piriformis: 0.40 ± 0.17 at 0°, 0.40 ± 0.18 at 15°, 0.32 ± 0.10 at 30°, 0.24 ± 0.06 at 45°."
   checked_by: null
 
+- id: piriformis-hip-external-rotation-flexed
+  structure: piriformis
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  when:
+    - {angle: hip.flexion, min: 60, max: 75}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
+      says: "Table 2, piriformis: 0.13 ± 0.04 at 60°, 0.05 ± 0.03 at 75°. Obturator externus at the same angles: 0.54 ± 0.18 and 0.58 ± 0.20."
+  checked_by: null
+
+# role secondary is a judgment, no source says it. Ito's Table 2 torques here are very
+# small (-0.02 and -0.06 N m, minus means internal rotation) and the textbook does not
+# list piriformis as an internal rotator.
 - id: piriformis-hip-internal-rotation
   structure: piriformis
   movement: hip-internal-rotation
@@ -86,8 +107,8 @@
   confidence: medium
   citations:
     - ref: ito-2025
-      locator: 3. Results, paragraph on external rotation torque (Table 2, Figure 4A), and 4. Discussion. Hips were tested from 0° to 105° of flexion.
-      says: "The piriformis switched its function from external to internal rotation of the hip between 75° and 90° of flexion."
+      locator: 3. Results, paragraph on external rotation torque, and Table 2 (external rotation torque, mean ± SD, N m), row Piriformis. Hips were tested from 0° to 105° of flexion.
+      says: "The piriformis switched its function from external to internal rotation of the hip between 75° and 90° of flexion. Table 2, piriformis: −0.02 ± 0.02 at 90°, −0.06 ± 0.03 at 105°."
   checked_by: null
 
 - id: obturator-externus-hip-external-rotation
@@ -111,6 +132,8 @@
   structure: ischiofemoral-ligament
   movement: hip-internal-rotation
   load: stretched
+  when:
+    - {angle: hip.flexion, min: 0, max: 60}
   confidence: medium
   citations:
     - ref: baba-2022
