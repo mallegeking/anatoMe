@@ -119,13 +119,20 @@ export function validateDataDir(dir: string): ValidationResult {
 
 // The ids of every structure in dir/structures, for the model check.
 // Returns an empty set when a file cannot be read, validateDataDir reports why.
-export function loadStructureIds(dir: string): Set<string> {
-  const ids = new Set<string>();
+// What the mesh check needs to know about each structure.
+export type StructureInfo = { type: string; english: string };
+
+// Reads data/structures into a map from structure id to its type and english name.
+export function loadStructures(dir: string): Map<string, StructureInfo> {
+  const structures = new Map<string, StructureInfo>();
   for (const file of listYaml(dir, "structures")) {
     const rows = readYaml(dir, file, []);
-    if (Array.isArray(rows)) for (const r of rows) if (r && typeof r.id === "string") ids.add(r.id);
+    if (!Array.isArray(rows)) continue;
+    for (const r of rows) {
+      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english) });
+    }
   }
-  return ids;
+  return structures;
 }
 
 function compileSchemas(): Record<Kind, ValidateFunction> {

@@ -1,13 +1,14 @@
 // Checks that the meshes in models/ match the knowledge base.
 // Every mesh node carries glTF extras (sid, label, side, kind, source). The sid must be a
-// structure id from data/structures, and each file must be listed with a license we allow.
+// structure id from data/structures, the kind and label must match that structure's type and
+// english name, and each file must be listed with the license its source uses.
 
 import { existsSync, statSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { NodeIO, type Document } from "@gltf-transform/core";
 import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
-import type { ValidationError, ValidationResult } from "./validate.ts";
+import type { StructureInfo, ValidationError, ValidationResult } from "./validate.ts";
 
 export type { ValidationResult };
 
@@ -15,6 +16,9 @@ export const EXTRAS_KEYS = ["sid", "label", "side", "kind", "source"] as const;
 
 // Mesh licenses that fit the project (see the design spec, section 6). No non-commercial ones.
 export const ALLOWED_LICENSES = new Set(["CC-BY-4.0", "CC-BY-SA-4.0"]);
+
+// The license each mesh source publishes under. A file from one of these must carry exactly this one.
+export const SOURCE_LICENSES: Record<string, string> = { bp3d: "CC-BY-4.0", "z-anatomy": "CC-BY-SA-4.0" };
 
 type ManifestFile = { path: string; source: string; license: string };
 type Manifest = { regions: Record<string, { files: ManifestFile[] }> };
@@ -35,7 +39,11 @@ export function manifestFiles(modelsDir: string): (ManifestFile & { region: stri
   return Object.entries(manifest.regions).flatMap(([region, r]) => r.files.map((f) => ({ ...f, region })));
 }
 
-export async function checkModelMapping(modelsDir: string, structureIds: Set<string>): Promise<ValidationResult> {
+// structures maps each structure id to its type and english name, from data/structures.
+export async function checkModelMapping(
+  modelsDir: string,
+  structures: Map<string, StructureInfo>,
+): Promise<ValidationResult> {
   const errors: ValidationError[] = [];
   let files: ReturnType<typeof manifestFiles>;
   try {
@@ -49,6 +57,10 @@ export async function checkModelMapping(modelsDir: string, structureIds: Set<str
     const at = `regions.${f.region}`;
     if (!ALLOWED_LICENSES.has(f.license)) {
       errors.push({ file: "manifest.json", path: at, message: `license ${f.license} of ${f.path} is not allowed` });
+    }
+    const expected = SOURCE_LICENSES[f.source];
+    if (expected !== undefined && f.license !== expected) {
+      errors.push({ file: "manifest.json", path: at, message: `${f.source} files must be ${expected}, ${f.path} says ${f.license}` });
     }
     const full = join(modelsDir, f.path);
     if (!existsSync(full)) {
@@ -76,8 +88,19 @@ export async function checkModelMapping(modelsDir: string, structureIds: Set<str
         errors.push({ file: f.path, path: name, message: `side must be l, r or empty, not ${extras.side}` });
       }
       const sid = extras.sid;
-      if (typeof sid === "string" && sid !== "" && !structureIds.has(sid)) {
+      if (sid !== undefined && sid !== null && typeof sid !== "string") {
+        errors.push({ file: f.path, path: name, message: `sid must be text, not ${JSON.stringify(sid)}` });
+      }
+      const structure = typeof sid === "string" ? structures.get(sid) : undefined;
+      if (typeof sid === "string" && sid !== "" && !structure) {
         errors.push({ file: f.path, path: name, message: `unknown structure id ${sid}` });
+      }
+      // The app shows the label and colours by kind, so both must agree with the knowledge base.
+      if (structure && extras.kind !== undefined && extras.kind !== structure.type) {
+        errors.push({ file: f.path, path: name, message: `kind ${String(extras.kind)} but ${sid} is a ${structure.type}` });
+      }
+      if (structure && extras.label !== undefined && extras.label !== structure.english) {
+        errors.push({ file: f.path, path: name, message: `label ${String(extras.label)} but ${sid} is called ${structure.english}` });
       }
       // A mesh from another source would carry the wrong license, so the sources must agree.
       if (extras.source !== undefined && extras.source !== f.source) {

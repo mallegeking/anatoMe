@@ -5,7 +5,7 @@ import { Document, NodeIO } from "@gltf-transform/core";
 import { afterAll, expect, test } from "vitest";
 import { checkModelMapping, modelStats, type ValidationResult } from "../src/checkModels.ts";
 
-type Extras = Record<string, string | undefined>;
+type Extras = Record<string, unknown>;
 const BASE: Extras = { sid: "femur", label: "Femur", side: "l", kind: "bone", source: "bp3d" };
 
 // Writes a glb with one single-triangle mesh node per entry. An entry overrides the base
@@ -54,25 +54,28 @@ async function dirWithLicense(license: string) {
   return d;
 }
 
+// The structures the checks know about, with the type and english name the meshes must match.
+const femur = new Map([["femur", { type: "bone", english: "Femur" }]]);
+
 function expectError(result: ValidationResult, pattern: RegExp) {
   expect(result.ok).toBe(false);
   const lines = result.errors.map((e) => `${e.file} ${e.path}: ${e.message}`);
   expect(lines.some((l) => pattern.test(l)), lines.join("\n")).toBe(true);
 }
 
-test("passes when every sid is known", async () => expect((await checkModelMapping(await dir([{ sid: "femur" }]), new Set(["femur"]))).ok).toBe(true));
-test("fails on unknown sid", async () => expectError(await checkModelMapping(await dir([{ sid: "femurr" }]), new Set(["femur"])), /unknown structure id femurr/));
-test("fails on missing extras key", async () => expectError(await checkModelMapping(await dir([{ sid: "femur", side: undefined }]), new Set(["femur"])), /missing side/));
-test("fails on manifest file that does not exist", async () => expectError(await checkModelMapping(dirWithMissingFile(), new Set()), /not found/));
-test("fails on unknown license", async () => expectError(await checkModelMapping(await dirWithLicense("CC-BY-NC-4.0"), new Set(["femur"])), /license/));
+test("passes when every sid is known", async () => expect((await checkModelMapping(await dir([{ sid: "femur" }]), femur)).ok).toBe(true));
+test("fails on unknown sid", async () => expectError(await checkModelMapping(await dir([{ sid: "femurr" }]), femur), /unknown structure id femurr/));
+test("fails on missing extras key", async () => expectError(await checkModelMapping(await dir([{ sid: "femur", side: undefined }]), femur), /missing side/));
+test("fails on manifest file that does not exist", async () => expectError(await checkModelMapping(dirWithMissingFile(), new Map()), /not found/));
+test("fails on unknown license", async () => expectError(await checkModelMapping(await dirWithLicense("CC-BY-NC-4.0"), femur), /license/));
 
 test("fails when a mesh source differs from its file's source", async () =>
-  expectError(await checkModelMapping(await dir([{ source: "z-anatomy" }]), new Set(["femur"])), /source z-anatomy/));
+  expectError(await checkModelMapping(await dir([{ source: "z-anatomy" }]), femur), /source z-anatomy/));
 
 test("fails on a glb that cannot be read", async () => {
   const d = makeDir([entry()]);
   writeFileSync(join(d, "test.glb"), "not a glb");
-  expectError(await checkModelMapping(d, new Set(["femur"])), /cannot read glb/);
+  expectError(await checkModelMapping(d, femur), /cannot read glb/);
 });
 
 test("modelStats counts mesh nodes, triangles and bytes", async () => {
@@ -84,6 +87,22 @@ test("modelStats counts mesh nodes, triangles and bytes", async () => {
 });
 
 test("a midline mesh has an empty side and passes", async () =>
-  expect((await checkModelMapping(await dir([{ sid: "femur", side: "" }]), new Set(["femur"]))).ok).toBe(true));
+  expect((await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur)).ok).toBe(true));
 test("fails on a side that is not l, r or empty", async () =>
-  expectError(await checkModelMapping(await dir([{ side: "left" }]), new Set(["femur"])), /side must be/));
+  expectError(await checkModelMapping(await dir([{ side: "left" }]), femur), /side must be/));
+
+test("fails on a sid that is not text", async () =>
+  expectError(await checkModelMapping(await dir([{ sid: 7 }]), femur), /sid must be text/));
+
+test("fails when a z-anatomy file is not CC-BY-SA-4.0", async () => {
+  const d = makeDir([{ path: "test.glb", source: "z-anatomy", license: "CC-BY-4.0" }]);
+  await writeGlb(join(d, "test.glb"), [{ source: "z-anatomy" }]);
+  expectError(await checkModelMapping(d, femur), /z-anatomy files must be CC-BY-SA-4.0/);
+});
+test("fails when a bp3d file is not CC-BY-4.0", async () =>
+  expectError(await checkModelMapping(await dirWithLicense("CC-BY-SA-4.0"), femur), /bp3d files must be CC-BY-4.0/));
+
+test("fails when a mesh kind differs from the structure type", async () =>
+  expectError(await checkModelMapping(await dir([{ kind: "muscle" }]), femur), /kind muscle but femur is a bone/));
+test("fails when a mesh label differs from the structure name", async () =>
+  expectError(await checkModelMapping(await dir([{ label: "Thigh bone" }]), femur), /label Thigh bone but femur is called Femur/));

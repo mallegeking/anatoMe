@@ -5,7 +5,7 @@
 
 import { join } from "node:path";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
-import { loadStructureIds, validateDataDir, type ValidationResult } from "./validate.ts";
+import { loadStructures, validateDataDir, type ValidationResult } from "./validate.ts";
 
 // The most triangles one region may have, so it stays smooth on a phone.
 const TRIANGLE_BUDGET = 150_000;
@@ -24,8 +24,8 @@ async function main(args: string[]): Promise<number> {
   }
   if (command === "check-models" && rest.length === 2) {
     const [modelsDir, dataDir] = rest;
-    const ids = loadStructureIds(dataDir);
-    const result = await checkModelMapping(modelsDir, ids);
+    const structures = loadStructures(dataDir);
+    const result = await checkModelMapping(modelsDir, structures);
     if (!result.ok) return report(result);
 
     // Print size numbers per file and check the budget per region.
@@ -41,7 +41,7 @@ async function main(args: string[]): Promise<number> {
       console.log(`region ${region}: ${triangles} triangles (budget ${TRIANGLE_BUDGET})${over ? " OVER BUDGET" : ""}`);
       if (over) code = 1;
     }
-    if (code === 0) console.log(`every mesh maps to one of ${ids.size} structures`);
+    if (code === 0) console.log(`every mesh maps to one of ${structures.size} structures`);
     return code;
   }
   console.error("usage: cli.ts validate <dataDir> | check-models <modelsDir> <dataDir>");
