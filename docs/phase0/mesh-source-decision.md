@@ -121,3 +121,37 @@ To move Z-Anatomy parts onto the BodyParts3D bones, invert it: scale by 1.0139 a
 - Z-Anatomy ligament, capsule and bursa meshes have Subdivision Surface or Solidify modifiers. Export the evaluated mesh, not the base mesh.
 - Z-Anatomy objects are parented to group helpers. Use the world matrix when exporting.
 - `Iliotibial tract` is heavy in both sources (17,172 faces per side in BodyParts3D, 48,612 in Z-Anatomy). It is a BodyParts3D target, so budget for decimation.
+
+## Export result (2026-11-02)
+
+Path taken: **mixed sources**, as planned above. `models/hip.glb` holds the BodyParts3D meshes and `models/hip-z-anatomy.glb` holds the Z-Anatomy meshes, moved onto the BodyParts3D bones.
+
+How the Z-Anatomy meshes were lined up: `pipeline/assets/build_region_blender.py` fits a uniform scale, rotation and shift for each side separately. It uses the hip bone and femur of that side in both sources and an ICP loop (pair every Z-Anatomy vertex with the closest point on the BodyParts3D surface, fit, repeat), starting from the global move in the alignment section. The fit code is in `pipeline/assets/meshfit.py`.
+
+| Side | Scale | Rotation | Shift (m) | ICP rms before and after |
+| --- | --- | --- | --- | --- |
+| Left | 1.0264 | 3.48 degrees | (-0.0111, -0.1368, -0.0685) | 5.2 mm to 2.2 mm |
+| Right | 1.0263 | 3.53 degrees | (+0.0113, -0.1368, -0.0683) | 5.4 mm to 2.2 mm |
+
+The shift looks larger than the global one because the small rotation turns around the world origin, which is about 0.85 m below the hip joints.
+
+How well the hip joints line up. "Head centre error" is the distance between the centres of spheres fitted to the femoral head in each source. The two "mean distance" columns are the average distance from the moved Z-Anatomy vertices to the BodyParts3D surface, on the femoral head and on the acetabulum.
+
+| Side | Move used | Head centre error | Femoral head mean distance | Acetabulum mean distance |
+| --- | --- | --- | --- | --- |
+| Left | global start | 8.0 mm | 4.0 mm | 3.6 mm |
+| Left | per-side fit | **1.7 mm** | 1.5 mm | 1.3 mm |
+| Right | global start | 8.5 mm | 4.5 mm | 3.3 mm |
+| Right | per-side fit | **1.5 mm** | 1.5 mm | 1.2 mm |
+
+Both sides are within the 5 mm limit, so the sources were mixed. The fitted femoral head radius is 22.9 mm in BodyParts3D and 24.5 mm in Z-Anatomy after the fit, so the two heads differ a little in size as well.
+
+What was exported:
+
+| File | Meshes | Triangles | Size |
+| --- | --- | --- | --- |
+| `models/hip.glb` (BodyParts3D, CC BY 4.0) | 65 (11 bone, 52 muscle, 2 tendon) | 30,497 | 199,960 bytes |
+| `models/hip-z-anatomy.glb` (Z-Anatomy, CC BY-SA 4.0) | 34 (24 ligament, 6 bursa, 2 capsule, 2 labrum) | 5,051 | 59,784 bytes |
+| Total | 99 | 35,548 | 259,744 bytes |
+
+The check pictures `docs/phase0/export-check-front.png` and `export-check-back.png` look at the right hip joint with muscles hidden. The capsule, the hip ligaments, the sacrotuberous and sacrospinous ligaments and the bursae sit on the BodyParts3D bones, and nothing floats. The labrum is almost fully hidden between the femoral head and the acetabulum, which is where it belongs. A similar look at the right knee (not committed) showed the cruciate and collateral ligaments in place on the BodyParts3D femur, tibia and fibula.

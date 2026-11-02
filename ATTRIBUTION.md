@@ -9,6 +9,17 @@ anatoMe builds on the work of others. This page lists every source, its license 
 | three.js | 3D rendering library | MIT | three.js, MIT License | https://threejs.org/ |
 | Draco decoder | Mesh decompression | Apache 2.0 | Draco, Apache License 2.0 | https://github.com/google/draco |
 
+## Model files
+
+These are the 3D model files in `models/`, where each one comes from, and its license. `models/manifest.json` holds the same list for the app.
+
+| File | Source | License | What is in it |
+| --- | --- | --- | --- |
+| `models/hip.glb` | BodyParts3D | CC BY 4.0 | Hip region bones, muscles and the iliotibial tract (65 meshes) |
+| `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments (34 meshes) |
+
+Changes we made to the source meshes: we reduced the number of triangles, removed materials, texture coordinates and colours, and converted them to glTF with Draco compression. The Z-Anatomy meshes were also scaled, turned and moved (a separate fit for each side) so they sit on the BodyParts3D bones. Built by `pipeline/assets/build_region_blender.py`.
+
 ## A note on BodyParts3D licensing
 
 Older BodyParts3D OBJ file headers mention CC BY-SA 2.1 Japan. The license page of the Database Center for Life Science (updated 2025/02/27) supersedes those headers. It states CC BY 4.0, so we follow the license page.

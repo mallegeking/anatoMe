@@ -6,3 +6,4 @@ tools/
 apps/web/public/models/
 *.log
 .superpowers/
+__pycache__/

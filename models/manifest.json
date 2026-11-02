@@ -1,0 +1,10 @@
+{
+  "regions": {
+    "hip": {
+      "files": [
+        {"path": "hip.glb", "source": "bp3d", "license": "CC-BY-4.0"},
+        {"path": "hip-z-anatomy.glb", "source": "z-anatomy", "license": "CC-BY-SA-4.0"}
+      ]
+    }
+  }
+}
