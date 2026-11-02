@@ -1,13 +1,24 @@
-import { useGLTF } from "@react-three/drei";
-import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { useFrame, useLoader, useThree, type ThreeEvent } from "@react-three/fiber";
 import type CameraControlsImpl from "camera-controls";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, type Object3D } from "three";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { markInteractive } from "../perf/loadTimer";
 import { pickHit, shouldSelect, type PickedHit } from "./pick";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
 const DRACO_PATH = `${import.meta.env.BASE_URL}draco/`;
+
+// One Draco decoder for every file. It starts its helper workers on first use.
+const draco = new DRACOLoader().setDecoderPath(DRACO_PATH);
+
+// We use three's own GLTFLoader here, not the one inside drei.
+// When the decoder cannot be downloaded, this one reports the failure, so the error boundary can show it.
+// The copy inside drei waits forever in that case and the screen stays blank.
+function addDraco(loader: GLTFLoader) {
+  loader.setDRACOLoader(draco);
+}
 
 // Calm colours by kind of tissue. The files carry no materials, so we make plain ones here.
 const KIND_COLORS = {
@@ -45,12 +56,14 @@ type Props = {
   selected: Object3D | null;
   // Called after a tap on the model. null means the tap hit nothing with a name.
   onSelect: (hit: PickedHit | null) => void;
+  // Called once, when the model is drawn and the controls work.
+  onReady: () => void;
 };
 
-export function RegionModel({ urls, selected, onSelect }: Props) {
-  // useGLTF with a list of urls loads all of them in parallel. The 2nd argument is the Draco decoder folder.
-  // The 3rd turns off Meshopt, which these files do not use.
-  const gltfs = useGLTF(urls, DRACO_PATH, false);
+export function RegionModel({ urls, selected, onSelect, onReady }: Props) {
+  // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
+  // A failed load is thrown, so the error boundary around the viewer catches it.
+  const gltfs = useLoader(GLTFLoader, urls, addDraco);
   const materials = useMemo(makeMaterials, []);
   const [ready, setReady] = useState(false);
   const reported = useRef(false);
@@ -90,6 +103,7 @@ export function RegionModel({ urls, selected, onSelect }: Props) {
     if (ready && !reported.current) {
       reported.current = true;
       markInteractive();
+      onReady();
     }
   });
 

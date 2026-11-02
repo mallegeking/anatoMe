@@ -1,12 +1,13 @@
 import { CameraControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import type { Object3D } from "three";
 import type { Translate } from "../i18n/t";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
 import { shouldSelect, type PickedHit, type PickedStructure } from "./pick";
 import { RegionModel } from "./RegionModel";
+import { useLoadWatchdog } from "./useLoadWatchdog";
 
 type Props = { region: string; t: Translate; onPick: (p: PickedStructure | null) => void };
 
@@ -37,6 +38,14 @@ function Scene({ region, onPick }: { region: string; onPick: Props["onPick"] }) 
   const urls = useRegionUrls(region);
   const [selected, setSelected] = useState<Object3D | null>(null);
   const downAt = useRef<[number, number]>([0, 0]);
+  const ready = useRef(false);
+  const isReady = useCallback(() => ready.current, []);
+  const markReady = useCallback(() => {
+    ready.current = true;
+  }, []);
+
+  // If the model is still not ready after about 20 s, show the load error instead of a blank screen.
+  useLoadWatchdog(isReady);
 
   function select(hit: PickedHit | null) {
     setSelected(hit ? hit.object : null);
@@ -65,7 +74,7 @@ function Scene({ region, onPick }: { region: string; onPick: Props["onPick"] }) 
       <directionalLight position={[-1, -0.5, -2]} intensity={0.6} />
       <CameraControls makeDefault minDistance={0.15} maxDistance={4} />
       <Suspense fallback={null}>
-        {urls && <RegionModel urls={urls} selected={selected} onSelect={select} />}
+        {urls && <RegionModel urls={urls} selected={selected} onSelect={select} onReady={markReady} />}
       </Suspense>
     </Canvas>
   );
