@@ -4,7 +4,7 @@ Date: 2026-11-02. Inputs: `docs/phase0/mesh-inventory.md`, `pipeline/assets/regi
 
 ## Result in one paragraph
 
-Use BodyParts3D for everything it has and Z-Anatomy for the rest. BodyParts3D covers all the bones except the separate coccyx, and all the muscles, plus the iliotibial tract. It has no ligaments, capsules, labrum, bursae or menisci. Z-Anatomy fills in 20 targets. Two required structures have no mesh in either source and stay as known gaps. This means the hip mesh set is a mix, and the Z-Anatomy files in it are CC BY-SA 4.0.
+Use BodyParts3D for everything it has and Z-Anatomy for the rest. BodyParts3D covers all the bones (its sacrum mesh also contains the coccyx), all the muscles, and the iliotibial tract. It has no ligaments, capsules, labrum or bursae. Z-Anatomy fills in 17 targets. Two required structures have no mesh in either source and stay as known gaps. The two menisci are deferred to Phase 1. This means the hip mesh set is a mix, and the Z-Anatomy files in it are CC BY-SA 4.0.
 
 ## The rule that was applied
 
@@ -12,20 +12,22 @@ Use BodyParts3D for everything it has and Z-Anatomy for the rest. BodyParts3D co
 2. A `required` target BodyParts3D lacks but Z-Anatomy has gets `"source": "z-anatomy"`.
 3. Optional targets follow the same rule if either source has them, otherwise `null`.
 4. A `required` target found in neither source is listed below as a gap. No geometry is invented.
+5. Exception: a structure already contained in another chosen mesh gets `null` and a note. This applies only to the coccyx (see below).
 
 The outcome is stored in the `source` field of every target in `pipeline/assets/regions/hip.json`.
 
 ## Counts
 
-There are 56 targets (39 required and 17 optional).
+There are 54 targets (39 required and 15 optional).
 
 | Source | Targets | Required | Optional | Meshes (left and right) | Faces | Size |
 | --- | --- | --- | --- | --- | --- | --- |
 | BodyParts3D | 33 | 33 | 0 | 65 | 219,388 | 15.6 MB of raw OBJ |
-| Z-Anatomy | 20 | 4 | 16 | 43 | 8,226 base faces (about 19,300 after modifiers) | about 0.4 MB estimated, not measured |
-| No mesh anywhere | 3 | 2 | 1 | 0 | 0 | 0 |
+| Z-Anatomy | 17 | 3 | 14 | 38 | 6,968 base faces (about 16,400 after modifiers) | about 0.35 MB estimated, not measured |
+| No mesh anywhere (known gaps) | 3 | 2 | 1 | 0 | 0 | 0 |
+| Already inside the BodyParts3D sacrum mesh (coccyx) | 1 | 1 | 0 | 0 | 0 | 0 |
 
-Every BodyParts3D target has one mesh for each side, except the sacrum, which is one midline mesh. BodyParts3D stores the right side as `FJxxxx` and the left side as `FJxxxxM`.
+The coccyx is counted on its own row because its `source` is `null` without being a gap. Every BodyParts3D target has one mesh for each side, except the sacrum, which is one midline mesh. BodyParts3D stores the right side as `FJxxxx` and the left side as `FJxxxxM`.
 
 How BodyParts3D represents the hip bone: **one mesh per side** (FJ3152 right, FJ3288 left), not split into ilium, ischium and pubis.
 
@@ -33,14 +35,13 @@ How BodyParts3D represents the hip bone: **one mesh per side** (FJ3152 right, FJ
 
 Collections used: "1: Skeletal system", "3: Joints" and "4: Muscular system". Nothing else was read. In particular the inner ear, kidney and brain white matter parts are not touched, and the "2: Muscular insertions" collection is not used for any target.
 
-Required (4):
+Required (3):
 
-- coccyx (see the note on the coccyx below)
 - iliofemoral ligament (two meshes per side, descending part and transverse part)
 - pubofemoral ligament
 - ischiofemoral ligament
 
-Optional (16):
+Optional (14):
 
 - ligament of the head of the femur
 - transverse acetabular ligament
@@ -56,10 +57,12 @@ Optional (16):
 - posterior cruciate ligament
 - medial collateral ligament (two meshes per side, superficial and deep part of the tibial collateral ligament)
 - lateral collateral ligament (fibular collateral ligament)
-- medial meniscus
-- lateral meniscus
 
-There is no `meniscus` structure type in the data model, so the two menisci use the type `labrum` for now. This is a placeholder to revisit when the type list is next touched.
+The Z-Anatomy coccyx is not used (see the note on the coccyx below).
+
+## Deferred to Phase 1
+
+- **Medial meniscus and lateral meniscus.** The spec's structure types (bone, muscle, tendon, ligament, joint, capsule, labrum, bursa, nerve) have no meniscus type. They were removed from `hip.json` and will be added when the type list is extended. Z-Anatomy has `Medial meniscus` and `Lateral meniscus` meshes (CC BY-SA 4.0) and BodyParts3D has none.
 
 ## Known gaps
 
@@ -76,11 +79,11 @@ These stay in `hip.json` with `"source": null`. The Phase 0 data layer can still
 
 ## Note on the coccyx
 
-The rule gives the coccyx to Z-Anatomy because BodyParts3D has no coccyx concept. But the BodyParts3D sacrum mesh (FJ3393) appears to already contain it. It is one connected piece, and its height of 14.4 cm matches the Z-Anatomy sacrum and coccyx together (15.1 cm) and not the sacrum alone (11.5 cm). Exporting the Z-Anatomy coccyx on top of the BodyParts3D sacrum would draw the same bone twice. I kept the rule's outcome in `hip.json` so that the choice stays visible, but the likely better call is to set the coccyx to `null` and note that it lives inside the sacrum mesh. The owner or controller should decide before the export step.
+The coccyx target has `"source": null` because it is **already included in the BodyParts3D sacrum mesh FJ3393**. BodyParts3D has no separate coccyx concept, but the sacrum mesh is one connected piece 14.4 cm tall (z from 0.7828 to 0.9272 m). The Z-Anatomy sacrum alone is 11.5 cm tall and the Z-Anatomy sacrum and coccyx together are 15.1 cm. So the BodyParts3D mesh matches sacrum plus coccyx and not the sacrum alone. The Z-Anatomy coccyx (`Coccyx`, 1,066 faces) is not exported, because it would draw the same bone twice. This is not a gap: the bone is there, it just cannot be picked on its own. If the viewer later needs to highlight the coccyx separately, that would need a split of the sacrum mesh or the Z-Anatomy coccyx, and the share-alike cost would then apply.
 
 ## Alignment of the two sources
 
-Needed because 20 targets come from Z-Anatomy and sit on BodyParts3D bones. Method: take the left femur in both sources, convert BodyParts3D from millimetres to metres, and compare bounding boxes in the files' own coordinates (no axis change). Z-Anatomy world boxes were read in Blender. BodyParts3D boxes were read from the OBJ vertices.
+Needed because 17 targets come from Z-Anatomy and sit on BodyParts3D bones. Method: take the left femur in both sources, convert BodyParts3D from millimetres to metres, and compare bounding boxes in the files' own coordinates (no axis change). Z-Anatomy world boxes were read in Blender. BodyParts3D boxes were read from the OBJ vertices.
 
 Left femur, metres:
 
@@ -96,7 +99,7 @@ Findings:
 - **Not aligned.** The Z-Anatomy femur sits about **0.10 m further along +y** and **0.056 m higher in z** (centre offsets, x offset is -0.001 m). The sources use different origins.
 - **The body shapes differ.** The femur is 2.5 percent shorter in Z-Anatomy and 24 percent deeper front to back. The tibia is 6 percent shorter. The hip bone is 4 percent taller but 7 percent narrower. One scale and shift cannot fit every bone.
 
-Best simple fit over the left femur, hip bone and sacrum with coccyx (uniform scale s and shift t, Z-Anatomy position = s times BodyParts3D position + t):
+Best simple fit over the left femur, hip bone and the Z-Anatomy sacrum plus coccyx (the combined box matches the BodyParts3D sacrum, which includes the coccyx) (uniform scale s and shift t, Z-Anatomy position = s times BodyParts3D position + t):
 
 - s = 0.9863
 - t = (-0.0009, +0.0902, +0.0626) metres
@@ -107,14 +110,14 @@ To move Z-Anatomy parts onto the BodyParts3D bones, invert it: scale by 1.0139 a
 ## What this means for licenses
 
 - **BodyParts3D files are CC BY 4.0.** 33 targets, 65 mesh files. They need the BodyParts3D credit text from `ATTRIBUTION.md`.
-- **Z-Anatomy files are CC BY-SA 4.0.** These 20 targets (43 mesh files) would be CC BY-SA 4.0: coccyx, iliofemoral, pubofemoral and ischiofemoral ligaments, ligament of head of femur, transverse acetabular, sacrotuberous, sacrospinous, inguinal, acetabular labrum, hip joint capsule, trochanteric, iliopectineal and ischial bursae, anterior and posterior cruciate, medial and lateral collateral, medial and lateral menisci. Any file derived from them (a resized, merged or re-exported copy) stays CC BY-SA 4.0.
+- **Z-Anatomy files are CC BY-SA 4.0.** These 17 targets (38 mesh files) would be CC BY-SA 4.0: iliofemoral, pubofemoral and ischiofemoral ligaments, ligament of head of femur, transverse acetabular, sacrotuberous, sacrospinous, inguinal, acetabular labrum, hip joint capsule, trochanteric, iliopectineal and ischial bursae, anterior and posterior cruciate, medial and lateral collateral. Any file derived from them (a resized, merged or re-exported copy) stays CC BY-SA 4.0.
 - **Keep the licenses apart by file.** If the pipeline exports one mesh file per structure, only the Z-Anatomy files carry share-alike and the BodyParts3D files stay CC BY 4.0. If it bakes everything into one combined file, that whole file should be treated as CC BY-SA 4.0. This is my reading, not legal advice, and it matters for `models/LICENSE`.
 - **Our own data stays CC BY 4.0.** The knowledge base in `data/` only refers to meshes by id, so it is not an adaptation of Z-Anatomy.
-- **Dropping the 16 optional Z-Anatomy targets would shrink the share-alike part to 4 required targets** (coccyx and three hip ligaments), or to 3 if the coccyx is set to `null`. They are still needed for the ischiofemoral and iliofemoral stretch cases in the Phase 0 scenario.
+- **Dropping the 14 optional Z-Anatomy targets would shrink the share-alike part to the 3 required hip ligaments** (iliofemoral, pubofemoral, ischiofemoral). They are still needed for the ischiofemoral and iliofemoral stretch cases in the Phase 0 scenario.
 - **License text caveat from the spec.** BodyParts3D OBJ file headers still print the old CC BY-SA 2.1 Japan text. The DBCLS page read on 2026-11-02 says CC BY 4.0 since 2025-02-27, as recorded in the design spec.
 
 ## Notes for the export step
 
-- Z-Anatomy ligament, capsule, bursa and meniscus meshes have Subdivision Surface or Solidify modifiers. Export the evaluated mesh, not the base mesh.
+- Z-Anatomy ligament, capsule and bursa meshes have Subdivision Surface or Solidify modifiers. Export the evaluated mesh, not the base mesh.
 - Z-Anatomy objects are parented to group helpers. Use the world matrix when exporting.
 - `Iliotibial tract` is heavy in both sources (17,172 faces per side in BodyParts3D, 48,612 in Z-Anatomy). It is a BodyParts3D target, so budget for decimation.

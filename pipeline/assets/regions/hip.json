@@ -29,7 +29,7 @@
         "^(?:(?:left|right) )?(?:coccyx)$"
       ],
       "required": true,
-      "source": "z-anatomy"
+      "source": null
     },
     {
       "sid": "femur",
@@ -537,26 +537,6 @@
       "english": "Lateral (fibular) collateral ligament",
       "patterns": [
         "^(?:(?:left|right) )?(?:fibular collateral ligament|lateral collateral ligament)$"
-      ],
-      "required": false,
-      "source": "z-anatomy"
-    },
-    {
-      "sid": "medial-meniscus",
-      "type": "labrum",
-      "english": "Medial meniscus",
-      "patterns": [
-        "^(?:(?:left|right) )?(?:medial meniscus)$"
-      ],
-      "required": false,
-      "source": "z-anatomy"
-    },
-    {
-      "sid": "lateral-meniscus",
-      "type": "labrum",
-      "english": "Lateral meniscus",
-      "patterns": [
-        "^(?:(?:left|right) )?(?:lateral meniscus)$"
       ],
       "required": false,
       "source": "z-anatomy"
