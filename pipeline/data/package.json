@@ -1,0 +1,24 @@
+{
+  "name": "@anatome/data-pipeline",
+  "private": true,
+  "type": "module",
+  "description": "Checks the knowledge base in data/ and the mesh mapping in models/.",
+  "scripts": {
+    "test": "tsc --noEmit -p . && vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "ajv": "^8.20.0",
+    "draco3dgltf": "^1.5.9",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/draco3dgltf": "^1.4.3",
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

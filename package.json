@@ -1,5 +1,13 @@
 {
   "name": "anatome",
   "private": true,
-  "workspaces": []
+  "workspaces": [
+    "pipeline/data"
+  ],
+  "scripts": {
+    "validate": "tsx pipeline/data/src/cli.ts validate data",
+    "check-models": "tsx pipeline/data/src/cli.ts check-models models data",
+    "test": "npm test --workspaces --if-present",
+    "test:py": ".venv/bin/pytest pipeline/assets/tests -q"
+  }
 }

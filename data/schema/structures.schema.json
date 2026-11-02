@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Structures",
+  "description": "One record per thing you can click. The id is the sid in the glTF extras of its left and right meshes.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "type", "english", "region"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "type": {
+        "enum": ["bone", "muscle", "tendon", "ligament", "joint", "capsule", "labrum", "bursa", "nerve"]
+      },
+      "english": { "type": "string", "minLength": 1 },
+      "latin": { "type": "string", "minLength": 1 },
+      "fma": { "type": "string", "pattern": "^FMA[0-9]+$" },
+      "region": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+    }
+  }
+}

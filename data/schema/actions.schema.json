@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Actions",
+  "description": "What a movement does to a structure, and when. Cross references, the role rule and the load-type rule are checked in pipeline/data/src/validate.ts.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "structure", "movement", "load", "confidence", "citations", "checked_by"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "structure": { "type": "string", "minLength": 1 },
+      "movement": { "type": "string", "minLength": 1 },
+      "load": { "enum": ["working", "stretched", "pinched"] },
+      "role": { "enum": ["primary", "secondary"] },
+      "when": {
+        "description": "Joint angle ranges in degrees. All entries must hold at once.",
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["angle", "min", "max"],
+          "properties": {
+            "angle": { "type": "string", "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$" },
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        }
+      },
+      "confidence": { "enum": ["high", "medium", "low"] },
+      "citations": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref", "locator", "says"],
+          "properties": {
+            "ref": { "type": "string", "minLength": 1 },
+            "locator": { "type": "string", "minLength": 1 },
+            "says": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "checked_by": {
+        "description": "Null until a person has read the sources. Then the name of that person.",
+        "type": ["string", "null"],
+        "minLength": 1
+      }
+    }
+  }
+}

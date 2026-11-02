@@ -1,0 +1,65 @@
+# Sources that action rows point to. Each one was opened and read on 2026-11-02.
+# license is copied as the source states it. access open means anyone can read it for free.
+- id: oeri-human-anatomy-10-7
+  title: "Human Anatomy (OERI), 10.7: Appendicular Muscles of the Pelvic Girdle and Lower Limbs"
+  authors: Whitney Menefee, Julie Jenks, Chiara Mazzasette, Kim-Leiloni Nguyen (ASCCC Open Educational Resources Initiative), adapted from OpenStax Anatomy and Physiology
+  year: 2025
+  url: https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_(OERI)/10%3A_Muscular_System/10.07%3A_Appendicular_Muscles_of_the_Pelvic_Girdle_and_Lower_Limbs
+  license: CC BY 4.0
+  access: open
+- id: contreras-2015
+  title: A comparison of two gluteus maximus EMG maximum voluntary isometric contraction positions
+  authors: Contreras B, Vigotsky AD, Schoenfeld BJ, Beardsley C, Cronin J
+  year: 2015
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4582950/
+  license: CC BY 4.0
+  access: open
+- id: schenkel-2018
+  title: No difference in flexion power despite iliopsoas fatty degeneration in healed hip fractures with large lesser trochanter displacement
+  authors: Schenkel M, Kaniewska M, Bühler T, Anderson S, Eid K
+  year: 2018
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6132924/
+  license: CC BY 4.0
+  access: open
+- id: osullivan-2010
+  title: Electromyographic analysis of the three subdivisions of gluteus medius during weight-bearing exercises
+  authors: O'Sullivan K, Smith SM, Sainsbury D
+  year: 2010
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2912252/
+  license: CC BY 2.0
+  access: open
+- id: ito-2025
+  title: Comparison of External Rotation Torque of Short External Rotator Muscles in Hip Flexion Position
+  authors: Ito Y, Suzuki D, Kizawa F, Kanaizumi A, Hiraiwa T, Tamura T, Kawaguchi Y, Nagoya S
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12329630/
+  license: CC BY-NC 4.0
+  access: open
+- id: baba-2022
+  title: "Impacts of external rotators and the ischiofemoral ligament on preventing excessive internal hip rotation: a cadaveric study"
+  authors: Baba K, Chiba D, Mori Y, Kuwahara Y, Kogure A, Sugaya T, Kamata K, Oizumi I, Suzuki T, Kurishima H, Hamada S, Itoi E, Aizawa T
+  year: 2022
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8725321/
+  license: CC BY 4.0
+  access: open
+- id: ng-2019
+  title: Hip Joint Capsular Anatomy, Mechanics, and Surgical Management
+  authors: Ng KCG, Jeffers JRT, Beaulé PE
+  year: 2019
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7406151/
+  license: CC BY 4.0
+  access: open
+- id: groh-2009
+  title: A comprehensive review of hip labral tears
+  authors: Groh MM, Herrera J
+  year: 2009
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2697339/
+  license: Creative Commons Attribution Noncommercial License (version not stated)
+  access: open
+- id: van-arkel-2015
+  title: The envelope of passive motion allowed by the capsular ligaments of the hip
+  authors: van Arkel RJ, Amis AA, Jeffers JR
+  year: 2015
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4655836/
+  license: CC BY 4.0
+  access: open

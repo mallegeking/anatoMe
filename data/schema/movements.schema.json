@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Movements",
+  "description": "One movement per direction of each degree of freedom, for example hip.rotation in the positive direction is hip internal rotation.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "dof", "direction", "english"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "dof": { "type": "string", "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$" },
+      "direction": { "enum": ["positive", "negative"] },
+      "english": { "type": "string", "minLength": 1 }
+    }
+  }
+}

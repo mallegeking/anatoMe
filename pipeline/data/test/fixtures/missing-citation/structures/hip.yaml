@@ -1,0 +1,3 @@
+- {id: femur, type: bone, english: Femur, region: hip}
+- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip}
+- {id: ischiofemoral-ligament, type: ligament, english: Ischiofemoral ligament, region: hip}
