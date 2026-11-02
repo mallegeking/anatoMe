@@ -55,8 +55,11 @@ INVENTORY = {
 # This keeps the inner ear, kidney and brain white matter parts out for good.
 ZA_COLLECTIONS = ["1: Skeletal system", "3: Joints", "4: Muscular system"]
 
-# Decimation, same starting values as free-muscles' build-anatomy.py.
-BONE_RATIO, OTHER_RATIO, MIN_FACES = 0.12, 0.14, 120
+# Decimation. Muscles and the floor are free-muscles' starting values (build-anatomy.py).
+# Bones keep 60 percent, not free-muscles' 12, because BodyParts3D bones start out
+# light (the hip bone has 2,374 triangles) and looked too coarse for a learning viewer.
+# The whole hip region still stays far under TRIANGLE_BUDGET.
+BONE_RATIO, OTHER_RATIO, MIN_FACES = 0.6, 0.14, 120
 TRIANGLE_BUDGET = 150_000  # for all files of the region together
 
 # Rough Z-Anatomy to BodyParts3D move from docs/phase0/mesh-source-decision.md
@@ -347,7 +350,22 @@ def report(objs):
         print(f"WARNING over the {TRIANGLE_BUDGET} triangle budget for the region")
 
 
+def clear_scene_properties(scene):
+    """Drop the scene's own custom properties so they do not become glTF scene extras.
+
+    Startup.blend carries add-on settings (MeasureIt, stored views, theme flags).
+    Object properties, which hold our mesh extras, are not touched.
+    """
+    for key in list(scene.keys()):
+        del scene[key]
+    system = scene.bl_system_properties_get()
+    if system is not None:
+        for key in list(system.keys()):
+            del system[key]
+
+
 def export(objs, out):
+    clear_scene_properties(bpy.context.scene)
     for o in bpy.context.view_layer.objects:
         o.select_set(False)
     for o in objs:

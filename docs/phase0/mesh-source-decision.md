@@ -150,8 +150,10 @@ What was exported:
 
 | File | Meshes | Triangles | Size |
 | --- | --- | --- | --- |
-| `models/hip.glb` (BodyParts3D, CC BY 4.0) | 65 (11 bone, 52 muscle, 2 tendon) | 30,497 | 199,960 bytes |
-| `models/hip-z-anatomy.glb` (Z-Anatomy, CC BY-SA 4.0) | 34 (24 ligament, 6 bursa, 2 capsule, 2 labrum) | 5,051 | 59,784 bytes |
-| Total | 99 | 35,548 | 259,744 bytes |
+| `models/hip.glb` (BodyParts3D, CC BY 4.0) | 65 (11 bone, 52 muscle, 2 tendon) | 43,378 | 234,228 bytes |
+| `models/hip-z-anatomy.glb` (Z-Anatomy, CC BY-SA 4.0) | 34 (24 ligament, 6 bursa, 2 capsule, 2 labrum) | 5,051 | 49,556 bytes |
+| Total | 99 | 48,429 | 283,784 bytes |
+
+Decimation keeps 60 percent of the triangles on bones and 14 percent on everything else, with no mesh under 120 triangles. The total stays far under the 150,000 triangle budget for the region.
 
 The check pictures `docs/phase0/export-check-front.png` and `export-check-back.png` look at the right hip joint with muscles hidden. The capsule, the hip ligaments, the sacrotuberous and sacrospinous ligaments and the bursae sit on the BodyParts3D bones, and nothing floats. The labrum is almost fully hidden between the femoral head and the acetabulum, which is where it belongs. A similar look at the right knee (not committed) showed the cruciate and collateral ligaments in place on the BodyParts3D femur, tibia and fibula.

@@ -87,8 +87,13 @@ def main():
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
-    scene.cycles.samples = 32
-    scene.render.resolution_x = scene.render.resolution_y = 900
+    # Few samples, the denoiser and 600 px keep each PNG near 250 KB.
+    scene.cycles.samples = 16
+    scene.cycles.use_denoising = True
+    scene.render.resolution_x = scene.render.resolution_y = 600
+    scene.render.image_settings.color_mode = "RGB"
+    scene.render.image_settings.color_depth = "8"
+    scene.render.image_settings.compression = 100
     if scene.world is None:
         scene.world = bpy.data.worlds.new("World")
     scene.world.color = (0.25, 0.25, 0.28)
