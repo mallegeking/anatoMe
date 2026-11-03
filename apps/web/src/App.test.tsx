@@ -33,11 +33,13 @@ test("tapping the model closes the search list", async () => {
   expect(screen.queryByTestId("search-results")).toBeNull();
 });
 
-test("a data failure shows the error and keeps the credits and the educational line", async () => {
+test("a data failure shows the data message and keeps the credits and the educational line", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 404 })));
   render(<App />);
-  expect((await screen.findByRole("alert")).textContent).toBe(en["error.modelLoad"]);
+  // The model is fine here, so the message must not blame it.
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  expect(screen.queryByText(en["error.modelLoad"])).toBeNull();
   expect(screen.getByText(en["credits.title"])).toBeTruthy();
   expect(screen.getByText(en["about.educational"])).toBeTruthy();
 });

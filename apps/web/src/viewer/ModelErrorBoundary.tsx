@@ -7,6 +7,8 @@ type Props = {
   children: ReactNode;
   // Shown below the message, outside the alert. The app uses it to keep the credits reachable.
   extra?: ReactNode;
+  // The en.json key of the message for a failed load. The model message unless said otherwise.
+  messageKey?: string;
 };
 type State = { failed: false | "load" | "webgl" };
 
@@ -27,7 +29,7 @@ export class ModelErrorBoundary extends Component<Props, State> {
     if (!this.state.failed) return this.props.children;
     const message = (
       <div className="model-error" role="alert">
-        {this.props.t(this.state.failed === "webgl" ? "error.webgl" : "error.modelLoad")}
+        {this.props.t(this.state.failed === "webgl" ? "error.webgl" : (this.props.messageKey ?? "error.modelLoad"))}
       </div>
     );
     if (this.props.extra === undefined) return message;

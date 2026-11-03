@@ -112,7 +112,7 @@ export function App() {
   }, [selection]);
 
   // The viewer and the panel each catch their own failures, so the rest of the screen and the credits stay.
-  // A failure to load the data ends in the same readable error as a model failure.
+  // A failure to load the data gets its own message in the panel, because the model may be fine.
   // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
   return (
     <ModelErrorBoundary
@@ -149,7 +149,7 @@ export function App() {
               {notice}
             </p>
           )}
-          <ModelErrorBoundary t={t}>
+          <ModelErrorBoundary t={t} messageKey="error.dataLoad">
             <Suspense fallback={<Hint t={t} />}>
               <PanelArea
                 selection={selection}

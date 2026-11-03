@@ -3,6 +3,7 @@
   "side.right": "{label} (right)",
   "info.tapHint": "Tap a structure to see its name",
   "error.modelLoad": "The 3D model could not be loaded. Check your connection and reload the page.",
+  "error.dataLoad": "The information about the structures could not be loaded. Check your connection and reload the page.",
   "loading.model": "Loading the 3D model",
   "credits.title": "Credits",
   "credits.bodyparts3d": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",

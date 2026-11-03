@@ -83,7 +83,9 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
   const scenes = useMemo(() => gltfs.map((g) => g.scene), [gltfs]);
 
   // useLoader only gets past its first line once every file is in, so reaching this point means the load finished.
-  useEffect(() => onLoaded(), [scenes, onLoaded]);
+  useEffect(() => {
+    onLoaded();
+  }, [scenes, onLoaded]);
 
   // Give every mesh a plain material by kind.
   useEffect(() => {

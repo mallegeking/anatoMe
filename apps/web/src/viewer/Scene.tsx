@@ -5,6 +5,7 @@ import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
 import { shouldClear, type Selection } from "./pick";
+import { redrawWhenBack } from "./redraw";
 import { RegionModel } from "./RegionModel";
 
 export type SceneProps = {
@@ -64,6 +65,14 @@ function SteadyClock() {
   return null;
 }
 
+// Asks for a frame when the WebGL context comes back or the page shows again, see redraw.ts.
+function RedrawWhenBack() {
+  const canvas = useThree((state) => state.gl.domElement);
+  const invalidate = useThree((state) => state.invalidate);
+  useEffect(() => redrawWhenBack(canvas, invalidate), [canvas, invalidate]);
+  return null;
+}
+
 export default function Scene({ region, selection, focus, isVisibleSid, onSelect, onLoaded }: SceneProps) {
   const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
@@ -78,6 +87,8 @@ export default function Scene({ region, selection, focus, isVisibleSid, onSelect
     if (shouldClear(moved)) onSelect(null);
   }
 
+  // Do not give this Canvas a custom eventSource. The check in handleClick relies on R3F's own click listener
+  // sitting on the Canvas div, so it runs before React's onClick and the model has marked its clicks by then.
   return (
     <Canvas
       // Draw only when something changes, so the phone's graphics chip can rest while nothing moves.
@@ -95,6 +106,7 @@ export default function Scene({ region, selection, focus, isVisibleSid, onSelect
       <directionalLight position={[1, 2, 2]} intensity={1.8} />
       <directionalLight position={[-1, -0.5, -2]} intensity={0.6} />
       <SteadyClock />
+      <RedrawWhenBack />
       <CameraControls makeDefault minDistance={0.15} maxDistance={4} />
       <Suspense fallback={null}>
         {urls && (

@@ -29,7 +29,7 @@ function newLoad() {
 
 vi.mock("@react-three/fiber", async () => {
   const { Group } = await import("three");
-  const state = { controls: { fitToBox: () => Promise.resolve() }, invalidate: () => {}, clock: { getDelta: () => 0 } };
+  const state = { controls: { fitToBox: () => Promise.resolve() }, invalidate: () => {}, clock: { getDelta: () => 0 }, gl: { domElement: document.createElement("canvas") } };
   return {
     // A plain box in place of the 3D canvas.
     Canvas: ({ children }: { children: ReactNode }) => <div data-testid="canvas">{children}</div>,
