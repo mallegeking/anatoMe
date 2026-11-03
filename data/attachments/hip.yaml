@@ -1,0 +1,1027 @@
+# Where each hip muscle starts (origin) and ends (insertion). One row per end.
+# Every row was drafted from the cited sources on 2026-11-03, with each source open while writing.
+# All rows wait for the owner to check them against the cited source.
+# Each citation is marked quote when says is the source's own words, or summary when it is our own
+# short summary. We only quote sources whose licence fits CC BY 4.0. The OERI tables are summarised
+# in sentences, the same way as in actions/hip.yaml.
+# landmark is plain words. The app adds "of the <bone>" after it.
+# Known gaps:
+# Psoas major starts on the last thoracic and the lumbar vertebrae, which are not in the hip model,
+# so it has no origin row.
+# Rows name bones only. Parts that start on a ligament or on fascia have no row of their own, for
+# example the gluteus maximus and piriformis fibres from the sacrotuberous ligament.
+
+# Gluteus maximus
+
+- id: gluteus-maximus-origin-ilium
+  muscle: gluteus-maximus
+  end: origin
+  bone: hip-bone
+  landmark: back of the ilium, at the posterior gluteal line and iliac crest
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Origin column
+      says: "The table gives the origin of gluteus maximus as the dorsal ilium, the sacrum and the coccyx."
+      says_kind: summary
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "It originates in the posterior gluteal line of the ilium, the iliac crest, and the aponeurosis of the erector spinae ..."
+      says_kind: quote
+  checked_by: null
+
+- id: gluteus-maximus-origin-sacrum
+  muscle: gluteus-maximus
+  end: origin
+  bone: sacrum
+  landmark: back surface of the lower part
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Origin column
+      says: "The table gives the origin of gluteus maximus as the dorsal ilium, the sacrum and the coccyx."
+      says_kind: summary
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "on the dorsal surface of the lower portion of the sacrum and the lateral aspect of the coccyx"
+      says_kind: quote
+  checked_by: null
+
+# The coccyx has no mesh of its own. It is part of the sacrum mesh, so this row uses bone sacrum.
+- id: gluteus-maximus-origin-coccyx
+  muscle: gluteus-maximus
+  end: origin
+  bone: sacrum
+  landmark: side of the coccyx, just below the tip
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Origin column
+      says: "The table gives the origin of gluteus maximus as the dorsal ilium, the sacrum and the coccyx."
+      says_kind: summary
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "on the dorsal surface of the lower portion of the sacrum and the lateral aspect of the coccyx"
+      says_kind: quote
+  checked_by: null
+
+- id: gluteus-maximus-insertion-gluteal-tuberosity
+  muscle: gluteus-maximus
+  end: insertion
+  bone: femur
+  landmark: gluteal tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Insertion column
+      says: "The table gives the insertion of gluteus maximus as the gluteal tuberosity of the femur and the iliotibial tract."
+      says_kind: summary
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "The deep fibers of the lower portion are inserted in the gluteal tuberosity, between the vastus lateralis and adductor magnus"
+      says_kind: quote
+  checked_by: null
+
+# The iliotibial tract is fascia, not bone. This row names the bone where the tract ends.
+- id: gluteus-maximus-insertion-iliotibial-tract
+  muscle: gluteus-maximus
+  end: insertion
+  bone: tibia
+  landmark: iliotibial tract, which ends on Gerdy's tubercle
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Insertion column
+      says: "The table gives the insertion of gluteus maximus as the gluteal tuberosity of the femur and the iliotibial tract."
+      says_kind: summary
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "The fibers of the upper portion of the muscle join the superficial fibers of the lower portion to form a thick tendinous lamina that crosses the greater trochanter and inserts into the iliotibial tract of the fascia lata."
+      says_kind: quote
+    - ref: bedard-2025
+      locator: 1. Introduction
+      says: "The iliotibial band (ITB) is formed by the union of the aponeuroses of the gluteus maximus and the tensor fascia lata muscles. ... distally, inserts on the tubercle of iliotibial band (tITB)"
+      says_kind: quote
+    - ref: bedard-2025
+      locator: Abstract, and 4. Discussion
+      says: "The abstract places the tubercle of the iliotibial band on the tibia. The Discussion calls the same point Gerdy's tubercle, with the same 3.92 mm shift that the Results give for the tubercle of the iliotibial band."
+      says_kind: summary
+  checked_by: null
+
+# Gluteus medius and minimus
+
+- id: gluteus-medius-origin
+  muscle: gluteus-medius
+  end: origin
+  bone: hip-bone
+  landmark: outer surface of the ilium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus medius, Origin column
+      says: "The table gives the origin of gluteus medius as the lateral surface of the ilium."
+      says_kind: summary
+  checked_by: null
+
+- id: gluteus-medius-insertion
+  muscle: gluteus-medius
+  end: insertion
+  bone: femur
+  landmark: greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus medius, Insertion column
+      says: "The table gives the insertion of gluteus medius as the greater trochanter of the femur."
+      says_kind: summary
+    - ref: pinheiro-2026
+      locator: 2. Material and Methods, 2.3. Gluteus Medius Muscle Measurements and Quadrant Delimitation
+      says: "the insertion of the tendon of the gluteus medius muscle in the greater trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: gluteus-minimus-origin
+  muscle: gluteus-minimus
+  end: origin
+  bone: hip-bone
+  landmark: outer surface of the ilium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus minimus, Origin column
+      says: "The table gives the origin of gluteus minimus as the external surface of the ilium."
+      says_kind: summary
+  checked_by: null
+
+- id: gluteus-minimus-insertion
+  muscle: gluteus-minimus
+  end: insertion
+  bone: femur
+  landmark: greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus minimus, Insertion column
+      says: "The table gives the insertion of gluteus minimus as the greater trochanter of the femur."
+      says_kind: summary
+  checked_by: null
+
+# Tensor fasciae latae
+
+- id: tensor-fasciae-latae-origin
+  muscle: tensor-fasciae-latae
+  end: origin
+  bone: hip-bone
+  landmark: anterior superior iliac spine and the front of the iliac crest
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Tensor fascia lata, Origin column
+      says: "The table gives the origin of tensor fasciae latae as the anterior aspect of the iliac crest and the anterior superior iliac spine."
+      says_kind: summary
+  checked_by: null
+
+# The iliotibial tract is fascia, not bone. This row names the bone where the tract ends.
+- id: tensor-fasciae-latae-insertion
+  muscle: tensor-fasciae-latae
+  end: insertion
+  bone: tibia
+  landmark: iliotibial tract, which ends on Gerdy's tubercle
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Tensor fascia lata, Insertion column
+      says: "The table gives the insertion of tensor fasciae latae as the iliotibial tract."
+      says_kind: summary
+    - ref: bedard-2025
+      locator: 1. Introduction
+      says: "The iliotibial band (ITB) is formed by the union of the aponeuroses of the gluteus maximus and the tensor fascia lata muscles. ... distally, inserts on the tubercle of iliotibial band (tITB)"
+      says_kind: quote
+    - ref: bedard-2025
+      locator: Abstract, and 4. Discussion
+      says: "The abstract places the tubercle of the iliotibial band on the tibia. The Discussion calls the same point Gerdy's tubercle, with the same 3.92 mm shift that the Results give for the tubercle of the iliotibial band."
+      says_kind: summary
+  checked_by: null
+
+# Lateral rotators
+
+- id: piriformis-origin
+  muscle: piriformis
+  end: origin
+  bone: sacrum
+  landmark: front surface
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Piriformis, Origin column
+      says: "The table gives the origin of piriformis as the anterolateral surface of the sacrum."
+      says_kind: summary
+    - ref: kenanidis-2025
+      locator: Introduction
+      says: "The piriformis muscle (PM) has a pyramidal shape and originates from the anterior surface of the sacrum."
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "It originates from the anterior surface of the sacrum and the sacrotuberous ligament and inserts onto the superior border of the greater trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: piriformis-insertion
+  muscle: piriformis
+  end: insertion
+  bone: femur
+  landmark: upper border of the greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Piriformis, Insertion column
+      says: "The table gives the insertion of piriformis as the greater trochanter of the femur."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "It originates from the anterior surface of the sacrum and the sacrotuberous ligament and inserts onto the superior border of the greater trochanter of the femur"
+      says_kind: quote
+    - ref: kenanidis-2025
+      locator: Discussion
+      says: "However, modern research indicates that the PM insertion point is higher and on the GT medial side, away from the typical site of the GT osteotomy"
+      says_kind: quote
+  checked_by: null
+
+- id: superior-gemellus-origin
+  muscle: superior-gemellus
+  end: origin
+  bone: hip-bone
+  landmark: ischial spine
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Superior gemellus, Origin column
+      says: "The table gives the origin of superior gemellus as the ischial spine."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The SG arises from the ischial spine, whereas the inferior gemellus originates from the ischial tuberosity"
+      says_kind: quote
+  checked_by: null
+
+- id: superior-gemellus-insertion
+  muscle: superior-gemellus
+  end: insertion
+  bone: femur
+  landmark: medial surface of the greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Superior gemellus, Insertion column
+      says: "The table gives the insertion of superior gemellus as the greater trochanter of the femur."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The tendons of the OI and the superior and inferior gemelli converge and insert onto the medial surface of the greater trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: inferior-gemellus-origin
+  muscle: inferior-gemellus
+  end: origin
+  bone: hip-bone
+  landmark: ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Inferior gemellus, Origin column
+      says: "The table gives the origin of inferior gemellus as the ischial tuberosity."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The SG arises from the ischial spine, whereas the inferior gemellus originates from the ischial tuberosity"
+      says_kind: quote
+  checked_by: null
+
+- id: inferior-gemellus-insertion
+  muscle: inferior-gemellus
+  end: insertion
+  bone: femur
+  landmark: medial surface of the greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Inferior gemellus, Insertion column
+      says: "The table gives the insertion of inferior gemellus as the greater trochanter of the femur."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The tendons of the OI and the superior and inferior gemelli converge and insert onto the medial surface of the greater trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: obturator-internus-origin
+  muscle: obturator-internus
+  end: origin
+  bone: hip-bone
+  landmark: inner surface around the obturator foramen
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Obturator internus, Origin column
+      says: "The table gives the origin of obturator internus as the inner surface of the obturator membrane, the greater sciatic notch and the margins of the obturator foramen."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The OI muscle originates from the pelvic surface of the obturator membrane and the surrounding bony margins of the obturator foramen"
+      says_kind: quote
+  checked_by: null
+
+- id: obturator-internus-insertion
+  muscle: obturator-internus
+  end: insertion
+  bone: femur
+  landmark: medial surface of the greater trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Obturator internus, Insertion column
+      says: "The table gives the insertion of obturator internus as the greater trochanter, in front of piriformis."
+      says_kind: summary
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The tendons of the OI and the superior and inferior gemelli converge and insert onto the medial surface of the greater trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: obturator-externus-origin
+  muscle: obturator-externus
+  end: origin
+  bone: hip-bone
+  landmark: outer surface around the obturator foramen
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Obturator externus, Origin column
+      says: "The table gives the origin of obturator externus as the outer surfaces of the obturator membrane, pubis and ischium, and the margins of the obturator foramen."
+      says_kind: summary
+    - ref: abouzaid-2026
+      locator: Introduction
+      says: "The obturator externus muscle originates from the external surface of the obturator foramen and membrane and inserts into the trochanteric fossa"
+      says_kind: quote
+  checked_by: null
+
+- id: obturator-externus-insertion
+  muscle: obturator-externus
+  end: insertion
+  bone: femur
+  landmark: trochanteric fossa
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Obturator externus, Insertion column
+      says: "The table gives the insertion of obturator externus as the trochanteric fossa of the posterior femur."
+      says_kind: summary
+    - ref: abouzaid-2026
+      locator: Introduction
+      says: "The obturator externus muscle originates from the external surface of the obturator foramen and membrane and inserts into the trochanteric fossa"
+      says_kind: quote
+  checked_by: null
+
+- id: quadratus-femoris-origin
+  muscle: quadratus-femoris
+  end: origin
+  bone: hip-bone
+  landmark: lateral edge of the ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Quadratus femoris, Origin column
+      says: "The table gives the origin of quadratus femoris as the ischial tuberosity."
+      says_kind: summary
+    - ref: sanchez-montoya-2025
+      locator: 1. Introduction
+      says: "The muscle originates from the lateral border of the ischial tuberosity and inserts onto the intertrochanteric crest of the femur"
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The QF originates from the lateral border of the ischial tuberosity and inserts onto the quadrate tubercle of the intertrochanteric crest of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: quadratus-femoris-insertion
+  muscle: quadratus-femoris
+  end: insertion
+  bone: femur
+  landmark: intertrochanteric crest
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Quadratus femoris, Insertion column
+      says: "The table gives the insertion of quadratus femoris as the trochanteric crest of the femur."
+      says_kind: summary
+    - ref: sanchez-montoya-2025
+      locator: 1. Introduction
+      says: "The muscle originates from the lateral border of the ischial tuberosity and inserts onto the intertrochanteric crest of the femur"
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Introduction
+      says: "The QF originates from the lateral border of the ischial tuberosity and inserts onto the quadrate tubercle of the intertrochanteric crest of the femur"
+      says_kind: quote
+  checked_by: null
+
+# Iliopsoas
+
+- id: iliacus-origin-ilium
+  muscle: iliacus
+  end: origin
+  bone: hip-bone
+  landmark: iliac fossa and iliac crest
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, Origin column
+      says: "The table gives the origin of iliacus as the iliac fossa, the iliac crest and the lateral sacrum."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "The IL, originating from the iliac fossa and the anterior inferior iliac spine, terminated mainly via the insertion tendon and partly directly without the tendon on the lesser trochanter."
+      says_kind: quote
+  checked_by: null
+
+- id: iliacus-origin-sacrum
+  muscle: iliacus
+  end: origin
+  bone: sacrum
+  landmark: lateral part
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, Origin column
+      says: "The table gives the origin of iliacus as the iliac fossa, the iliac crest and the lateral sacrum."
+      says_kind: summary
+  checked_by: null
+
+- id: iliacus-insertion
+  muscle: iliacus
+  end: insertion
+  bone: femur
+  landmark: lesser trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, Insertion column
+      says: "The table gives the insertion of iliacus as the lesser trochanter of the femur."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "The IL, originating from the iliac fossa and the anterior inferior iliac spine, terminated mainly via the insertion tendon and partly directly without the tendon on the lesser trochanter."
+      says_kind: quote
+  checked_by: null
+
+- id: psoas-major-insertion
+  muscle: psoas-major
+  end: insertion
+  bone: femur
+  landmark: lesser trochanter
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Psoas major, Insertion column
+      says: "The table gives the insertion of psoas major as the lesser trochanter of the femur."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "converged to form the insertion tendon ending on the lesser trochanter of the femur"
+      says_kind: quote
+  checked_by: null
+
+# Adductors
+
+- id: pectineus-origin
+  muscle: pectineus
+  end: origin
+  bone: hip-bone
+  landmark: pectineal line on the pubis
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Pectineus, Origin column
+      says: "The table gives the origin of pectineus as the pectineal line of the pubis."
+      says_kind: summary
+  checked_by: null
+
+- id: pectineus-insertion
+  muscle: pectineus
+  end: insertion
+  bone: femur
+  landmark: line from the lesser trochanter down to the linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Pectineus, Insertion column
+      says: "The table gives the insertion of pectineus as running from the lesser trochanter to the linea aspera, on the back of the femur."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-longus-origin
+  muscle: adductor-longus
+  end: origin
+  bone: hip-bone
+  landmark: pubis, near the pubic symphysis
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus, Origin column
+      says: "The table gives the origin of adductor longus as the pubis near the pubic symphysis."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-longus-insertion
+  muscle: adductor-longus
+  end: insertion
+  bone: femur
+  landmark: linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus, Insertion column
+      says: "The table gives the insertion of adductor longus as the linea aspera."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-brevis-origin
+  muscle: adductor-brevis
+  end: origin
+  bone: hip-bone
+  landmark: body and inferior ramus of the pubis
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis, Origin column
+      says: "The table gives the origin of adductor brevis as the body of the pubis and the inferior ramus of the pubis."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-brevis-insertion
+  muscle: adductor-brevis
+  end: insertion
+  bone: femur
+  landmark: linea aspera, above adductor longus
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis, Insertion column
+      says: "The table gives the insertion of adductor brevis as the linea aspera, above adductor longus."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-magnus-origin-rami
+  muscle: adductor-magnus
+  end: origin
+  bone: hip-bone
+  landmark: pubic and ischial rami
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Origin column
+      says: "The table gives the origin of adductor magnus as the ischial rami, the pubic rami and the ischial tuberosity."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-magnus-origin-ischial-tuberosity
+  muscle: adductor-magnus
+  end: origin
+  bone: hip-bone
+  landmark: ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Origin column
+      says: "The table gives the origin of adductor magnus as the ischial rami, the pubic rami and the ischial tuberosity."
+      says_kind: summary
+    - ref: obey-2016
+      locator: Opening section of the main text before Methods, and Results, Gross Anatomy and Morphology
+      says: "The ischiocondylar part of adductor magnus arises from the ischial tuberosity. In every specimen its origin lay below and medial to the conjoint and semimembranosus tendons of the hamstrings."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-magnus-insertion-linea-aspera
+  muscle: adductor-magnus
+  end: insertion
+  bone: femur
+  landmark: linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Insertion column
+      says: "The table gives the insertion of adductor magnus as the linea aspera and the adductor tubercle of the femur."
+      says_kind: summary
+  checked_by: null
+
+- id: adductor-magnus-insertion-adductor-tubercle
+  muscle: adductor-magnus
+  end: insertion
+  bone: femur
+  landmark: adductor tubercle
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Insertion column
+      says: "The table gives the insertion of adductor magnus as the linea aspera and the adductor tubercle of the femur."
+      says_kind: summary
+  checked_by: null
+
+- id: gracilis-origin
+  muscle: gracilis
+  end: origin
+  bone: hip-bone
+  landmark: body and inferior ramus of the pubis
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Medial Compartment of Thigh, row Gracilis, Origin column
+      says: "The table gives the origin of gracilis as the inferior ramus, the body of the pubis and the ischial ramus."
+      says_kind: summary
+    - ref: landfald-2026
+      locator: 1. Introduction
+      says: "It originates from the inferior pubic ramus and inserts onto the medial surface of the tibia, forming part of the pes anserinus together with the sartorius and semitendinosus tendons"
+      says_kind: quote
+  checked_by: null
+
+- id: gracilis-insertion
+  muscle: gracilis
+  end: insertion
+  bone: tibia
+  landmark: upper medial surface
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Medial Compartment of Thigh, row Gracilis, Insertion column
+      says: "The table gives the insertion of gracilis as the medial surface of the tibia."
+      says_kind: summary
+    - ref: landfald-2026
+      locator: 1. Introduction
+      says: "It originates from the inferior pubic ramus and inserts onto the medial surface of the tibia, forming part of the pes anserinus together with the sartorius and semitendinosus tendons"
+      says_kind: quote
+    - ref: zhong-2018
+      locator: Results, The morphology of the pes anserinus under anatomic observation
+      says: "The pes anserinus consisted of semitendinosus, gracilis, and sartorius tendons at the anteromedial surface of the tibia."
+      says_kind: quote
+  checked_by: null
+
+# Sartorius and quadriceps
+
+- id: sartorius-origin
+  muscle: sartorius
+  end: origin
+  bone: hip-bone
+  landmark: anterior superior iliac spine
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), row Sartorius, Origin column
+      says: "The table gives the origin of sartorius as the anterior superior iliac spine."
+      says_kind: summary
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "Sartorius is a long strap muscle that originates from the anterior superior iliac spine, and inserts on the upper medial surface of the tibia."
+      says_kind: quote
+  checked_by: null
+
+- id: sartorius-insertion
+  muscle: sartorius
+  end: insertion
+  bone: tibia
+  landmark: upper medial surface
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), row Sartorius, Insertion column
+      says: "The table gives the insertion of sartorius as the medial aspect of the proximal tibia."
+      says_kind: summary
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "Sartorius is a long strap muscle that originates from the anterior superior iliac spine, and inserts on the upper medial surface of the tibia."
+      says_kind: quote
+    - ref: zhong-2018
+      locator: Results, The morphology of the pes anserinus under anatomic observation
+      says: "The pes anserinus consisted of semitendinosus, gracilis, and sartorius tendons at the anteromedial surface of the tibia."
+      says_kind: quote
+  checked_by: null
+
+- id: rectus-femoris-origin-anterior-inferior-iliac-spine
+  muscle: rectus-femoris
+  end: origin
+  bone: hip-bone
+  landmark: anterior inferior iliac spine
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Rectus femoris, Origin column
+      says: "The table gives the origin of rectus femoris as the anterior inferior iliac spine and the superior margin of the acetabulum."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "The rectus femoris originated at the anterior inferior iliac spine and the upper part of the acetabulum and inserted onto the tibial tuberosity through the patella."
+      says_kind: quote
+  checked_by: null
+
+- id: rectus-femoris-origin-acetabulum
+  muscle: rectus-femoris
+  end: origin
+  bone: hip-bone
+  landmark: upper margin of the acetabulum
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Rectus femoris, Origin column
+      says: "The table gives the origin of rectus femoris as the anterior inferior iliac spine and the superior margin of the acetabulum."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "The rectus femoris originated at the anterior inferior iliac spine and the upper part of the acetabulum and inserted onto the tibial tuberosity through the patella."
+      says_kind: quote
+    - ref: perez-lloveras-2026
+      locator: Discussion, about the reflected head of the rectus femoris
+      says: "Because the tendon originates from the superior acetabular region and is closely related to the anterior capsule"
+      says_kind: quote
+  checked_by: null
+
+# The quadriceps tendon and patellar ligament are not modelled. These rows name the bones they end on.
+- id: rectus-femoris-insertion-patella
+  muscle: rectus-femoris
+  end: insertion
+  bone: patella
+  landmark: quadriceps tendon, which attaches to the upper pole
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+    - ref: thamrongskulsiri-2025
+      locator: Materials and methods, Surgical techniques
+      says: "The graft was then freed from its attachment at the superior pole of the patella"
+      says_kind: quote
+  checked_by: null
+
+- id: rectus-femoris-insertion-tibial-tuberosity
+  muscle: rectus-femoris
+  end: insertion
+  bone: tibia
+  landmark: patellar ligament, which ends on the tibial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Results, Anatomy of the iliopsoas and rectus femoris
+      says: "The rectus femoris originated at the anterior inferior iliac spine and the upper part of the acetabulum and inserted onto the tibial tuberosity through the patella."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-lateralis-origin
+  muscle: vastus-lateralis
+  end: origin
+  bone: femur
+  landmark: greater trochanter, intertrochanteric line and linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Vastus lateralis, Origin column
+      says: "The table gives the origin of vastus lateralis as the greater trochanter, the intertrochanteric line and the linea aspera (spelled linea apera in the table)."
+      says_kind: summary
+  checked_by: null
+
+- id: vastus-lateralis-insertion-patella
+  muscle: vastus-lateralis
+  end: insertion
+  bone: patella
+  landmark: quadriceps tendon, which attaches to the upper pole
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+    - ref: thamrongskulsiri-2025
+      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
+      says: "The graft was then freed from its attachment at the superior pole of the patella"
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-lateralis-insertion-tibial-tuberosity
+  muscle: vastus-lateralis
+  end: insertion
+  bone: tibia
+  landmark: patellar ligament, which ends on the tibial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-medialis-origin
+  muscle: vastus-medialis
+  end: origin
+  bone: femur
+  landmark: intertrochanteric line and linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Vastus medialis, Origin column
+      says: "The table gives the origin of vastus medialis as the linea aspera and the intertrochanteric line."
+      says_kind: summary
+  checked_by: null
+
+- id: vastus-medialis-insertion-patella
+  muscle: vastus-medialis
+  end: insertion
+  bone: patella
+  landmark: quadriceps tendon, which attaches to the upper pole
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+    - ref: thamrongskulsiri-2025
+      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
+      says: "The graft was then freed from its attachment at the superior pole of the patella"
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-medialis-insertion-tibial-tuberosity
+  muscle: vastus-medialis
+  end: insertion
+  bone: tibia
+  landmark: patellar ligament, which ends on the tibial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-intermedius-origin
+  muscle: vastus-intermedius
+  end: origin
+  bone: femur
+  landmark: upper part of the shaft
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Vastus intermedius, Origin column
+      says: "The table gives the origin of vastus intermedius as the proximal shaft of the femur."
+      says_kind: summary
+  checked_by: null
+
+- id: vastus-intermedius-insertion-patella
+  muscle: vastus-intermedius
+  end: insertion
+  bone: patella
+  landmark: quadriceps tendon, which attaches to the upper pole
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+    - ref: thamrongskulsiri-2025
+      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
+      says: "The graft was then freed from its attachment at the superior pole of the patella"
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-intermedius-insertion-tibial-tuberosity
+  muscle: vastus-intermedius
+  end: insertion
+  bone: tibia
+  landmark: patellar ligament, which ends on the tibial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
+      says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
+      says_kind: quote
+  checked_by: null
+
+# Hamstrings. The OERI table has one row for biceps femoris and does not split the two heads,
+# so the head of each row comes from the papers.
+
+- id: biceps-femoris-long-head-origin
+  muscle: biceps-femoris-long-head
+  end: origin
+  bone: hip-bone
+  landmark: ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, Origin column
+      says: "The table gives the origin of biceps femoris, without splitting the heads, as the ischial tuberosity, the linea aspera and the distal femur."
+      says_kind: summary
+    - ref: bogacka-wojcik-2025
+      locator: Introduction
+      says: "The BFlh shares a common proximal origin with the semitendinosus (ST) muscle on the ischial tuberosity"
+      says_kind: quote
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The long head of the biceps femoris (BFlh), the ST, and the semimembranosus share a common proximal origin from the ischial tuberosity, whereas the short head of the BF arises from the linea aspera of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: biceps-femoris-long-head-insertion-fibula
+  muscle: biceps-femoris-long-head
+  end: insertion
+  bone: fibula
+  landmark: head
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, Insertion column
+      says: "The table gives the insertion of biceps femoris, without splitting the heads, as the head of the fibula and the lateral condyle of the tibia."
+      says_kind: summary
+    - ref: bogacka-wojcik-2025
+      locator: Results, Distal tendon and distal myotendinous junction (MTJd)
+      says: "The distal tendon inserted into the fibular head and was common to both long and short heads of the biceps femoris."
+      says_kind: quote
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The BFlh inserts onto the head of the fibula and the lateral tibial condyle."
+      says_kind: quote
+  checked_by: null
+
+- id: biceps-femoris-long-head-insertion-tibia
+  muscle: biceps-femoris-long-head
+  end: insertion
+  bone: tibia
+  landmark: lateral condyle
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, Insertion column
+      says: "The table gives the insertion of biceps femoris, without splitting the heads, as the head of the fibula and the lateral condyle of the tibia."
+      says_kind: summary
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The BFlh inserts onto the head of the fibula and the lateral tibial condyle."
+      says_kind: quote
+  checked_by: null
+
+- id: biceps-femoris-short-head-origin
+  muscle: biceps-femoris-short-head
+  end: origin
+  bone: femur
+  landmark: lateral lip of the linea aspera
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, Origin column
+      says: "The table gives the origin of biceps femoris, without splitting the heads, as the ischial tuberosity, the linea aspera and the distal femur."
+      says_kind: summary
+    - ref: bogacka-wojcik-2025
+      locator: Introduction
+      says: "The short head (BFsh) originates ... from the lateral lip of the linea aspera and the lateral femoral intermuscular septum"
+      says_kind: quote
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The long head of the biceps femoris (BFlh), the ST, and the semimembranosus share a common proximal origin from the ischial tuberosity, whereas the short head of the BF arises from the linea aspera of the femur"
+      says_kind: quote
+  checked_by: null
+
+- id: biceps-femoris-short-head-insertion
+  muscle: biceps-femoris-short-head
+  end: insertion
+  bone: fibula
+  landmark: head
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, Insertion column
+      says: "The table gives the insertion of biceps femoris, without splitting the heads, as the head of the fibula and the lateral condyle of the tibia."
+      says_kind: summary
+    - ref: bogacka-wojcik-2025
+      locator: Results, Distal tendon and distal myotendinous junction (MTJd)
+      says: "The distal tendon inserted into the fibular head and was common to both long and short heads of the biceps femoris."
+      says_kind: quote
+  checked_by: null
+
+- id: semitendinosus-origin
+  muscle: semitendinosus
+  end: origin
+  bone: hip-bone
+  landmark: ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semitendinosus, Origin column
+      says: "The table gives the origin of semitendinosus as the ischial tuberosity."
+      says_kind: summary
+    - ref: miguel-perez-2024
+      locator: 1. Introduction, first paragraph. This zone is the ischial tuberosity named in the sentence before.
+      says: "The semimembranosus (SMB), the long head of the biceps femoris (LHBF) and the semitendinosus (ST) muscles, forming the hamstrings muscles, have their proximal attachment in this zone"
+      says_kind: quote
+    - ref: bogacka-wojcik-2025
+      locator: Introduction
+      says: "The BFlh shares a common proximal origin with the semitendinosus (ST) muscle on the ischial tuberosity"
+      says_kind: quote
+  checked_by: null
+
+- id: semitendinosus-insertion
+  muscle: semitendinosus
+  end: insertion
+  bone: tibia
+  landmark: upper medial surface
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semitendinosus, Insertion column
+      says: "The table gives the insertion of semitendinosus as the upper shaft of the tibia."
+      says_kind: summary
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "the ST muscle inserts onto the upper anteromedial tibia as part of the pes anserinus, along with the sartorius and gracilis tendons"
+      says_kind: quote
+    - ref: zhong-2018
+      locator: Results, The morphology of the pes anserinus under anatomic observation
+      says: "The pes anserinus consisted of semitendinosus, gracilis, and sartorius tendons at the anteromedial surface of the tibia."
+      says_kind: quote
+  checked_by: null
+
+- id: semimembranosus-origin
+  muscle: semimembranosus
+  end: origin
+  bone: hip-bone
+  landmark: ischial tuberosity
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semimembranosus, Origin column
+      says: "The table gives the origin of semimembranosus as the ischial tuberosity."
+      says_kind: summary
+    - ref: miguel-perez-2024
+      locator: 3. Results
+      says: "The SMB and LHBF originated at the lateral side of the ischial tuberosity"
+      says_kind: quote
+    - ref: kikuchi-2025
+      locator: Introduction
+      says: "The SM arises from a superolateral on the ischial tuberosity and a sacrotuberous ligament."
+      says_kind: quote
+  checked_by: null
+
+# The OERI table also lists the lateral condyle of the femur here. No other source we opened says so,
+# so no row was written for it.
+- id: semimembranosus-insertion
+  muscle: semimembranosus
+  end: insertion
+  bone: tibia
+  landmark: back of the medial condyle
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semimembranosus, Insertion column
+      says: "The table gives the medial condyle of the tibia as an insertion of semimembranosus."
+      says_kind: summary
+    - ref: kikuchi-2025
+      locator: Introduction
+      says: "Its primary insertion is the tubercle on the posterior aspect of the medial tibial condyle."
+      says_kind: quote
+  checked_by: null

@@ -1,4 +1,4 @@
-# Sources that action rows point to. Each one was opened and read on 2026-11-02.
+# Sources that action and attachment rows point to. The first group was opened and read on 2026-11-02.
 # license is copied as the source states it. access open means anyone can read it for free.
 - id: oeri-human-anatomy-10-7
   title: "Human Anatomy (OERI), 10.7: Appendicular Muscles of the Pelvic Girdle and Lower Limbs"
@@ -61,5 +61,132 @@
   authors: van Arkel RJ, Amis AA, Jeffers JR
   year: 2015
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4655836/
+  license: CC BY 4.0
+  access: open
+# Sources added for the attachment rows in attachments/hip.yaml. Each one was opened and read on 2026-11-03.
+- id: akamatsu-2017
+  title: Anatomical Basis of the Myofascial Trigger Points of the Gluteus Maximus Muscle
+  authors: Akamatsu FE, Yendo TM, Rhode C, Itezerote AM, Hojaij F, Andrade M, Hsing WT, Jacomo AL
+  year: 2017
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5733974/
+  license: CC BY 4.0
+  access: open
+- id: bedard-2025
+  title: "The Musculoskeletal Advanced Transillumination Technique (MATT): A Descriptive Proof-of-Concept Study of a New Method for the Study of the Iliotibial Tract Tested on Fresh Cadaveric Specimens"
+  authors: Bédard S, Bédard A, Gaudreault N, Izzo M, Vézina F
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12452698/
+  license: CC BY 4.0
+  access: open
+- id: pinheiro-2026
+  title: Anatomical Investigation of the Gluteus Medius Muscle Innervation and Its Topographical Correspondence With Myofascial Trigger Points
+  authors: Pinheiro RP, Macaya DAM, Itezerote AM, Saleh SO, Hojaij F, Andrade M, Jacomo AL, Jacomo FEA
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12812865/
+  license: CC BY 4.0
+  access: open
+- id: kenanidis-2025
+  title: "Piriformis preservation in total hip arthroplasty: do we have a new concept? An update on anatomy, function and clinical outcomes"
+  authors: Kenanidis E, Gkoura E, Tsamoura E, Gamie Z, Sculco P, Tsiridis E
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12061017/
+  license: CC BY 4.0
+  access: open
+- id: palmieri-2026
+  title: "Unilateral Conjoint Tendon Formation of the Piriformis, Superior Gemellus, and Tendonized Obturator Internus: A Rare Cadaveric Variation of the Deep Gluteal Region"
+  authors: Palmieri B, Ryals B, Norris L, Fourroux C, Fakoya AO
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13423186/
+  license: CC BY 4.0
+  access: open
+- id: abouzaid-2026
+  title: "Exploring the Significance of the Obturator Externus Groove as a Marker for Bipedalism: A Cadaveric Study"
+  authors: Abouzaid KA, Lichtenberg AB, Coffin MK, Imam A, Karim AY, Harwell JE, Khan AA, Rogers LS, Wu CK, Stack ER, Algoul MK, Emami SYH, Do TT, Abouzaid D, Trigg R
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13283457/
+  license: CC BY 4.0
+  access: open
+- id: sanchez-montoya-2025
+  title: "Safety and Anatomical Accuracy of Dry Needling of the Quadratus Femoris Muscle: A Cadaveric Study"
+  authors: Sánchez-Montoya M, Almazán-Polo J, Hernández NV, Cotteret C, Guerineau F, Monreal-Redondo DdG, González-de-la-Flor Á
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12346365/
+  license: CC BY 4.0
+  access: open
+- id: kumazaki-2022
+  title: Action and Contribution of the Iliopsoas and Rectus Femoris as Hip Flexor Agonists Examined with Anatomical Analysis
+  authors: Kumazaki T, Takahashi T, Nakano T, Sakai T
+  year: 2022
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11250012/
+  license: Creative Commons Attribution License (CC BY), version not stated
+  access: open
+- id: perez-lloveras-2026
+  title: Anchor-Free Capsular Augmentation Using the Reflected Head of the Rectus Femoris in Hip Arthroscopy
+  authors: Pérez Lloveras GO, Pérez Dávila R, Mengelle D, Moews LD, Escobar GE
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13651428/
+  license: CC BY 4.0
+  access: open
+- id: obey-2016
+  title: "Anatomy of the Adductor Magnus Origin: Implications for Proximal Hamstring Injuries"
+  authors: Obey MR, Broski SM, Spinner RJ, Collins MS, Krych AJ
+  year: 2016
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4714133/
+  license: CC BY-NC-ND 3.0
+  access: open
+- id: landfald-2026
+  title: "The Gracilis Muscle Reappraised: An Integrative Synthesis of Anatomy, Embryology, Imaging, and Surgical Applications"
+  authors: Landfald IC, Aragonés P, Pilewski D, Olewnik Ł
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13116401/
+  license: CC BY 4.0
+  access: open
+- id: zhong-2018
+  title: The anatomical and imaging study of pes anserinus and its clinical application
+  authors: Zhong S, Wu B, Wang M, Wang X, Yan Q, Fan X, Hu Y, Han Y, Li Y
+  year: 2018
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5908566/
+  license: CC BY 4.0
+  access: open
+- id: burnet-2004
+  title: The Anatomy of Sartorius Muscle and its Implications for Sarcoma Radiotherapy
+  authors: Burnet NG, Bennett-Britton T, Hoole ACF, Jefferies SJ, Parkin IG
+  year: 2004
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2395605/
+  license: Creative Commons Attribution License, version not stated
+  access: open
+- id: thamrongskulsiri-2025
+  title: "Superficial band of the quadriceps tendon harvested with a minimally invasive technique provides adequate graft dimensions: a cadaveric study"
+  authors: Thamrongskulsiri N, Khwanjaipanich V, Limskul D, Tanpowpong T, Kuptniratsaikul S, Itthipanichpong T
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12266663/
+  license: CC BY 4.0
+  access: open
+- id: miguel-perez-2024
+  title: "Anatomical Relationships of the Proximal Attachment of the Hamstring Muscles with Neighboring Structures: From Ultrasound, Anatomical and Histological Findings to Clinical Implications"
+  authors: Miguel-Pérez M, Iglesias-Chamorro P, Ortiz-Miguel S, Ortiz-Sagristà JC, Möller I, Blasi J, Agullò J, Martinoli C, Pérez-Bellmunt A
+  year: 2024
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11353185/
+  license: CC BY 4.0
+  access: open
+- id: bogacka-wojcik-2025
+  title: "Morphologic and morphometric study of the long head of the biceps femoris in male cadavers: tendon and MTJ insights for injury diagnosis"
+  authors: Bogacka-Wójcik UE, Dziedzic DW, Ciszek BM
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13541974/
+  license: CC BY 4.0
+  access: open
+- id: asonganyi-eyong-2026
+  title: Bilateral Fusion of the Semitendinosus and Long Head of the Biceps Femoris Muscles in a Male Cadaver
+  authors: Asonganyi Eyong S, Chaudry H, Borgelt L, Elisha A, Maklad A
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13332856/
+  license: CC BY 4.0
+  access: open
+- id: kikuchi-2025
+  title: "Anatomical relationship between the anterior arm of the semimembranosus tendon and the medial collateral ligament: A cadaveric study"
+  authors: Kikuchi K, Tabuchi K, Tabira Y, Watanabe K, Georgiev GP, Iwanaga J, Shane Tubbs R
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12588184/
   license: CC BY 4.0
   access: open

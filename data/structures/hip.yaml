@@ -1,6 +1,9 @@
 # One entry per structure in the hip region that has a mesh.
 # id is the sid in the glTF extras. latin is from Z-Anatomy's TA2.csv and fma from
 # the BodyParts3D parts lists, each left out when the source has none.
+# On 2026-11-03 every latin was checked against FIPAT Terminologia Anatomica 2 in the TA2 Viewer
+# (https://ta2viewer.openanatomy.org). All matched a TA2 term except the hip joint capsule, which has
+# no term of its own in TA2, so it keeps its name. The posterior cruciate ligament got its TA2 name.
 # Built from pipeline/assets/regions/hip.json on 2026-11-02.
 # depth is the layer from the skin inwards, 1 is the outermost and bones are 4. Peeling a layer
 # hides the lowest depth still shown. Added by hand on 2026-11-03. Every muscle has a depth_note
@@ -53,7 +56,7 @@
 - {id: iliopectineal-bursa, type: bursa, english: Iliopectineal bursa, latin: Bursa iliopectinea, region: hip, depth: 2}
 - {id: ischial-bursa, type: bursa, english: Ischial bursa of gluteus maximus, latin: Bursa ischiadica musculi glutei maximi, region: hip, depth: 2}
 - {id: anterior-cruciate-ligament, type: ligament, english: Anterior cruciate ligament, latin: Ligamentum cruciatum anterius, region: hip, depth: 3}
-- {id: posterior-cruciate-ligament, type: ligament, english: Posterior cruciate ligament, region: hip, depth: 3}
+- {id: posterior-cruciate-ligament, type: ligament, english: Posterior cruciate ligament, latin: Ligamentum cruciatum posterius, region: hip, depth: 3}
 - {id: medial-collateral-ligament, type: ligament, english: Medial (tibial) collateral ligament, latin: Ligamentum collaterale tibiale, region: hip, depth: 2, depth_note: "Only the pes anserinus tendons (sartorius, gracilis, semitendinosus, all depth 1) cross over it, so it sits one layer below the surface."}
 - {id: lateral-collateral-ligament, type: ligament, english: Lateral (fibular) collateral ligament, latin: Ligamentum collaterale fibulare, region: hip, depth: 3, depth_note: "Wikipedia, Fibular collateral ligament (read 2026-11-03): most of its lateral surface is covered by the biceps femoris tendon."}
 - {id: medial-meniscus, type: meniscus, english: Medial meniscus, latin: Meniscus medialis, region: hip, depth: 3}
