@@ -5,6 +5,9 @@
 # We only quote sources whose licence fits CC BY 4.0. Ito 2025 and Groh 2009 are CC BY-NC, so their
 # says were rewritten as summaries on 2026-11-03, after opening both papers again.
 # Angles in when are in degrees, see joints.yaml. All entries in when must hold at once.
+# confidence says how well the sources support the action itself, for example that a muscle turns the hip
+# outwards. It does not say how sure we are that the muscle is a main mover (primary) or a helper
+# (secondary). Wherever that ranking is our own judgment, the row asks the physio in review_note.
 
 - id: gluteus-maximus-hip-extension
   structure: gluteus-maximus
@@ -231,6 +234,7 @@
       says: "The subject squeezes her glutei, which generates hip extension and external rotation moments."
       says_kind: quote
   checked_by: null
+  review_note: "Physio: Akamatsu 2017 says gluteus maximus assists lateral rotation, so the row is secondary. Should gluteus maximus count as a main external rotator of the hip?"
 
 - id: gluteus-medius-hip-internal-rotation
   structure: gluteus-medius
@@ -261,7 +265,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus minimus
-      says: "Gluteus minimus is listed as a prime mover of the femur, target motion direction: abduction."
+      says: "Table 1 gives gluteus minimus the target motion abduction."
       says_kind: summary
     - ref: bajuri-2022
       locator: Introduction, first paragraph
@@ -386,14 +390,19 @@
 
 # Obturator internus external rotation in Ito 2025, Table 2, N m: 0.59 at 0°, 0.60 at 15°,
 # 0.59 at 30°, 0.53 at 45°, 0.43 at 60°, 0.32 at 75°, 0.20 at 90°, 0.11 at 105°.
-# It stays an external rotator over the whole range the study tested.
+# Piriformis in the same table: 0.40, 0.40, 0.32, 0.24, 0.13, 0.05, then -0.02 and -0.06.
+# It stays an external rotator over the whole range the study tested, and it beats piriformis at every angle.
+# Roles follow the piriformis rows. Piriformis is drafted primary while its torque is still sizable,
+# 0.24 N m or more (0.32 or more if the physio picks 30 degrees), and secondary at 0.13 and below.
+# By either cut-off obturator internus stays primary up to 75° (0.32) and falls below it at 90° (0.20).
+# The study measured every 15°, so nothing is claimed between 75° and 90°.
 - id: obturator-internus-hip-external-rotation
   structure: obturator-internus
   movement: hip-external-rotation
   load: working
-  role: secondary
+  role: primary
   when:
-    - {angle: hip.flexion, min: 0, max: 105}
+    - {angle: hip.flexion, min: 0, max: 75}
   confidence: medium
   citations:
     - ref: oeri-human-anatomy-10-7
@@ -405,11 +414,27 @@
       says: "Although external rotation of the femur is its primary action, the OI also contributes to abduction of the flexed hip"
       says_kind: quote
     - ref: ito-2025
-      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), row Obturator internus
-      says: "Obturator internus gave external rotation torque at every angle tested from 0° to 105° of hip flexion. It peaked at 15° and fell as the hip bent further. Table 2 gives 0.59 ± 0.20 N m at 0°, 0.53 ± 0.16 at 45°, 0.20 ± 0.09 at 90° and 0.11 ± 0.08 at 105°."
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator internus
+      says: "Obturator internus external rotation torque peaked at 15° of hip flexion and fell as the hip bent further. Table 2 gives 0.59 ± 0.20 N m at 0°, 0.59 ± 0.18 at 30°, 0.53 ± 0.16 at 45°, 0.43 ± 0.13 at 60° and 0.32 ± 0.11 at 75°. Piriformis gave less at every one of these angles, 0.40 ± 0.17 at 0° and 0.24 ± 0.06 at 45°."
       says_kind: summary
   checked_by: null
-  review_note: "Physio: Ito 2025 Table 2 gives obturator internus more external rotation torque than piriformis at every angle (0.59 vs 0.40 N m at 0 degrees, 0.53 vs 0.24 at 45). Piriformis is drafted as primary up to 45 degrees. Should obturator internus also be primary over part of the range, and up to which angle?"
+  review_note: "Physio: primary here is our reading of Ito 2025 Table 2, no source ranks the rotators. Obturator internus gives more external rotation torque than piriformis at every angle (0.59 vs 0.40 N m at 0 degrees, 0.53 vs 0.24 at 45, 0.43 vs 0.13 at 60). Its torque at 75 degrees (0.32) is still at least what piriformis has where it is drafted primary. Is primary from 0 to 75 degrees right, whichever answer you give on the piriformis 45 versus 30 question?"
+
+- id: obturator-internus-hip-external-rotation-flexed
+  structure: obturator-internus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  when:
+    - {angle: hip.flexion, min: 90, max: 105}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Obturator internus and Obturator externus
+      says: "In deep flexion obturator internus still turned the hip outwards, but less. Table 2 gives 0.20 ± 0.09 N m at 90° and 0.11 ± 0.08 at 105°. Obturator externus gave 0.58 ± 0.23 and 0.58 ± 0.22 N m at the same angles."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: secondary here is our reading of Ito 2025 Table 2. At 90 and 105 degrees obturator internus gives 0.20 and 0.11 N m, below the 0.24 N m at which piriformis is still drafted primary, and about a third or less of obturator externus (0.58). Is secondary right from 90 degrees?"
 
 # Baba 2022 cut the external rotators one by one in nine cadaver hips at 0°, 30° and 60° of flexion.
 # At 30° the ischiofemoral ligament did most of the holding.
@@ -433,27 +458,49 @@
   review_note: "Physio: Baba 2022 tested cadaver hips at 0, 30 and 60 degrees only, and its wording is cautious (might). At 30 degrees the ischiofemoral ligament held most of the rotation. Is a stretched row from 0 to 60 degrees fair, or should it be dropped?"
 
 # Obturator externus at lower flexion, Ito 2025 Table 2, N m: 0.27 at 0°, 0.35 at 15°, 0.43 at 30°,
-# 0.50 at 45°, 0.54 at 60°. The row above covers 75° to 105°. The study measured every 15°,
-# so nothing is claimed between 60° and 75°.
-- id: obturator-externus-hip-external-rotation-to-60
+# 0.50 at 45°, 0.54 at 60°. Piriformis at the same angles: 0.40, 0.40, 0.32, 0.24, 0.13.
+# Obturator externus is below piriformis at 0° and 15° and above it from 30°, about twice it at 45°.
+# The row near the top of the file covers 75° to 105° as primary. The study measured every 15°,
+# so nothing is claimed between 15° and 30° or between 60° and 75°.
+- id: obturator-externus-hip-external-rotation-to-15
   structure: obturator-externus
   movement: hip-external-rotation
   load: working
   role: secondary
   when:
-    - {angle: hip.flexion, min: 0, max: 60}
+    - {angle: hip.flexion, min: 0, max: 15}
   confidence: medium
   citations:
     - ref: ito-2025
-      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), row Obturator externus
-      says: "Obturator externus external rotation torque rose as the hip bent. Table 2 gives 0.27 ± 0.13 N m at 0°, 0.43 ± 0.14 at 30°, 0.50 ± 0.15 at 45° and 0.54 ± 0.18 at 60°."
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
+      says: "With the hip straight or a little bent, obturator externus gave less external rotation torque than piriformis. Table 2 gives obturator externus 0.27 ± 0.13 N m at 0° and 0.35 ± 0.13 at 15°, and piriformis 0.40 ± 0.17 and 0.40 ± 0.18."
       says_kind: summary
     - ref: abouzaid-2026
       locator: Discussion
       says: "Obturator externus is known to be an external rotator of the hip in flexed and neutral positions and assists in adduction of a flexed hip [10]."
       says_kind: quote
   checked_by: null
-  review_note: "Physio: this row depends on the piriformis question. Ito 2025 Table 2 shows obturator externus above piriformis from 30 degrees (0.43 vs 0.32 N m) and at 60 (0.54 vs 0.13). If piriformis is primary only up to 30 degrees, should obturator externus be primary from 30 or 45 degrees up?"
+  review_note: "Physio: secondary here is our reading of Ito 2025 Table 2, where obturator externus is below piriformis at 0 and 15 degrees (0.27 and 0.35 vs 0.40 N m). Is secondary right with the hip near straight?"
+
+- id: obturator-externus-hip-external-rotation-30-to-60
+  structure: obturator-externus
+  movement: hip-external-rotation
+  load: working
+  role: primary
+  when:
+    - {angle: hip.flexion, min: 30, max: 60}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
+      says: "Obturator externus external rotation torque rose as the hip bent and passed piriformis from 30° of flexion. Table 2 gives obturator externus 0.43 ± 0.14 N m at 30°, 0.50 ± 0.15 at 45° and 0.54 ± 0.18 at 60°, and piriformis 0.32 ± 0.10, 0.24 ± 0.06 and 0.13 ± 0.04."
+      says_kind: summary
+    - ref: abouzaid-2026
+      locator: Discussion
+      says: "Obturator externus is known to be an external rotator of the hip in flexed and neutral positions and assists in adduction of a flexed hip [10]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: primary here is our reading of Ito 2025 Table 2. From 30 degrees obturator externus gives more external rotation torque than piriformis (0.43 vs 0.32 N m at 30, 0.50 vs 0.24 at 45), so it is drafted primary from 30 degrees, whichever answer you give on the piriformis 45 versus 30 question. Is that right? If so, should this row and the 75 to 105 degree row become one row from 30 to 105?"
 
 - id: quadratus-femoris-hip-external-rotation
   structure: quadratus-femoris
@@ -509,10 +556,6 @@
     - ref: bai-2023
       locator: 5. Discussion
       says: "The pectineus muscle functions to flex and adduct the hip and internally rotate the thigh ... these functions can be performed with other muscles such as the iliopsoas, adductor magnus, brevis, and longus."
-      says_kind: quote
-    - ref: kim-2021
-      locator: Discussion, last paragraph
-      says: "The pectineus muscle has been regarded as a muscle with few variations and less isolated functional contributions than the other adductor muscle group"
       says_kind: quote
   checked_by: null
 
