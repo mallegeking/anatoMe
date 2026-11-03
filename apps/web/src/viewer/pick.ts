@@ -47,6 +47,17 @@ export function pickHit(hits: Hit[]): PickedHit | null {
   return null;
 }
 
+// Like pickHit, but skips hits on structures that are hidden.
+// Three.js still reports hits on meshes that are switched off, so we filter them out here.
+export function pickVisibleHit(hits: Hit[], isVisibleSid: (sid: string) => boolean): PickedHit | null {
+  return pickHit(
+    hits.filter((hit) => {
+      const structure = structureOf(hit.object);
+      return structure !== null && isVisibleSid(structure.sid);
+    }),
+  );
+}
+
 export function pickStructure(hits: Hit[]): PickedStructure | null {
   return pickHit(hits)?.structure ?? null;
 }

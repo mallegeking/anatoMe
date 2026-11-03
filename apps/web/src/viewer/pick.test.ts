@@ -2,7 +2,7 @@ import { Group, Mesh, type Object3D } from "three";
 import { expect, test } from "vitest";
 import { createT } from "../i18n/t";
 import en from "../i18n/en.json";
-import { formatLabel, pickStructure, shouldSelect } from "./pick";
+import { formatLabel, pickStructure, pickVisibleHit, shouldSelect } from "./pick";
 
 const t = createT(en);
 
@@ -58,3 +58,14 @@ test("right label", () =>
 
 test("unpaired label has no side", () =>
   expect(formatLabel({ sid: "sacrum", label: "Sacrum", side: "", kind: "bone" }, t)).toBe("Sacrum"));
+
+const maxMesh = mesh({ sid: "gluteus-maximus", label: "Gluteus maximus", side: "", kind: "muscle" });
+const medMesh = mesh({ sid: "gluteus-medius", label: "Gluteus medius", side: "", kind: "muscle" });
+
+test("tap skips hidden meshes", () =>
+  expect(
+    pickVisibleHit([{ object: maxMesh, distance: 1 }, { object: medMesh, distance: 2 }], (sid) => sid !== "gluteus-maximus")?.structure.sid,
+  ).toBe("gluteus-medius"));
+
+test("tap on only hidden meshes picks nothing", () =>
+  expect(pickVisibleHit([{ object: maxMesh, distance: 1 }], () => false)).toBeNull());

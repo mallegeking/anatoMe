@@ -167,3 +167,69 @@ body,
   color: var(--text);
   font: inherit;
 }
+
+.layers-toggle {
+  min-height: 44px;
+  margin: 0 0 8px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.layers-panel {
+  font-size: 0.9375rem;
+}
+
+.layers-title,
+.layers-hidden-title {
+  margin: 8px 0 4px;
+  font-size: 1.125rem;
+}
+
+.layers-hidden-title {
+  font-size: 0.9375rem;
+}
+
+.layers-panel p {
+  margin: 4px 0;
+}
+
+.layers-panel button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.layers-panel button:disabled {
+  opacity: 0.5;
+}
+
+.layers-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.layers-tissues .layers-row {
+  justify-content: flex-start;
+}
+
+.layers-tissues input {
+  width: 22px;
+  height: 22px;
+}
+
+.layers-hidden {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -5,7 +5,7 @@ import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, type Object3D } fr
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { markInteractive } from "../perf/loadTimer";
-import { pickHit, shouldSelect, type Selection } from "./pick";
+import { pickVisibleHit, shouldSelect, type Selection } from "./pick";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
 const DRACO_PATH = `${import.meta.env.BASE_URL}draco/`;
@@ -57,11 +57,13 @@ type Props = {
   // Called after a tap on the model. null means the tap hit nothing with a name.
   // The label is the name in the 3D file, for structures the data does not know.
   onSelect: (sel: Selection | null, label?: string) => void;
+  // Says whether a structure is shown. Hidden ones are switched off and ignore taps.
+  isVisibleSid: (sid: string) => boolean;
   // Called once, when the model is drawn and the controls work.
   onReady: () => void;
 };
 
-export function RegionModel({ urls, selection, onSelect, onReady }: Props) {
+export function RegionModel({ urls, selection, isVisibleSid, onSelect, onReady }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -96,6 +98,15 @@ export function RegionModel({ urls, selection, onSelect, onReady }: Props) {
     };
   }, [selection, scenes, materials]);
 
+  // Show or hide each mesh when the layers change.
+  useEffect(() => {
+    for (const scene of scenes) {
+      scene.traverse((node: Object3D) => {
+        if (node instanceof Mesh && typeof node.userData.sid === "string") node.visible = isVisibleSid(node.userData.sid);
+      });
+    }
+  }, [scenes, isVisibleSid]);
+
   // Frame the camera on everything we loaded.
   useEffect(() => {
     if (!controls) return;
@@ -118,7 +129,8 @@ export function RegionModel({ urls, selection, onSelect, onReady }: Props) {
     event.stopPropagation();
     // Dragging to rotate also ends in a click. Only a real tap selects.
     if (!shouldSelect(event.delta)) return;
-    const hit = pickHit(event.intersections);
+    // Hidden meshes still show up in the hit list, so we pass them over.
+    const hit = pickVisibleHit(event.intersections, isVisibleSid);
     onSelect(hit ? { sid: hit.structure.sid, side: hit.structure.side } : null, hit?.structure.label);
   }
 

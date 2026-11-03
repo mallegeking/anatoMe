@@ -12,6 +12,7 @@ type Props = {
   region: string;
   t: Translate;
   selection: Selection | null;
+  isVisibleSid: (sid: string) => boolean;
   onSelect: (sel: Selection | null, label?: string) => void;
 };
 
@@ -38,7 +39,7 @@ function useRegionUrls(region: string): string[] | null {
   return state?.urls ?? null;
 }
 
-function Scene({ region, selection, onSelect }: Omit<Props, "t">) {
+function Scene({ region, selection, isVisibleSid, onSelect }: Omit<Props, "t">) {
   const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
   const ready = useRef(false);
@@ -72,16 +73,16 @@ function Scene({ region, selection, onSelect }: Omit<Props, "t">) {
       <directionalLight position={[-1, -0.5, -2]} intensity={0.6} />
       <CameraControls makeDefault minDistance={0.15} maxDistance={4} />
       <Suspense fallback={null}>
-        {urls && <RegionModel urls={urls} selection={selection} onSelect={onSelect} onReady={markReady} />}
+        {urls && <RegionModel urls={urls} selection={selection} isVisibleSid={isVisibleSid} onSelect={onSelect} onReady={markReady} />}
       </Suspense>
     </Canvas>
   );
 }
 
-export function Viewer({ region, t, selection, onSelect }: Props) {
+export function Viewer({ region, t, selection, isVisibleSid, onSelect }: Props) {
   return (
     <ModelErrorBoundary t={t}>
-      <Scene region={region} selection={selection} onSelect={onSelect} />
+      <Scene region={region} selection={selection} isVisibleSid={isVisibleSid} onSelect={onSelect} />
     </ModelErrorBoundary>
   );
 }

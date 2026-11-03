@@ -41,5 +41,16 @@
   "info.pending": "More movement information for this structure is waiting for a physiotherapist's review.",
   "info.gap.quadriceps": "The shared tendon of the quadriceps muscles is not modelled yet.",
   "info.switchSide": "Show the other side",
-  "info.hide": "Hide this"
+  "info.hide": "Hide this",
+  "layers.title": "Layers",
+  "layers.bone": "Bones",
+  "layers.muscle": "Muscles",
+  "layers.soft": "Ligaments and other soft tissue",
+  "layers.peel": "Peel a layer",
+  "layers.restore": "Restore",
+  "layers.peeledCount": "{count} layers peeled",
+  "layers.hidden": "Hidden",
+  "layers.show": "Show",
+  "layers.open": "Layers",
+  "layers.close": "Close layers"
 }
