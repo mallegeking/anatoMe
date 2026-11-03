@@ -221,7 +221,7 @@ To remove it completely, also run `sudo rm /etc/systemd/system/anatome-web.servi
 
 ## Review build: show the draft rows to your physiotherapist
 
-The normal site never shows a row that nobody has checked. The review build is a second copy of the site that does show them. Every draft row is marked "Draft, not yet checked", has a row code, and a yellow banner on top says it is a review build. Your physiotherapist can open it on a phone, look at each row and tell you what to do with it.
+The normal site never shows a row that nobody has checked. The review build is a second copy of the site that does show them. Every draft row is marked "Draft, not yet checked", has a row code, and a dark amber banner with pale text on top says it is a review build. Your physiotherapist can open it on a phone, look at each row and tell you what to do with it.
 
 Do not share this copy with anyone else. It serves its own folder on its own port, so the normal site stays untouched.
 
@@ -269,11 +269,31 @@ tailscale serve status
 https://<machine-name>.<tailnet>.ts.net:8443/
 ```
 
-Send your physiotherapist this address only if they have access to your tailnet. If you use the fallback web server from the section above, the same idea works: run a second small server on another local port, for example 8081, and point `--https=8443` at `http://127.0.0.1:8081`.
+Send your physiotherapist this address only if they have access to your tailnet.
+
+If `tailscale serve` shows a list of files or a blank page for the review folder (the same problem as in the fallback section above), use a small local web server instead. You need Python 3 on the homelab. Run this on the homelab:
+
+```bash
+sudo tailscale serve --https=8443 off
+nohup python3 -m http.server 8081 --bind 127.0.0.1 --directory /srv/anatome-review > /dev/null 2>&1 &
+sudo tailscale serve --bg --https=8443 http://127.0.0.1:8081
+tailscale serve status
+```
+
+The first line clears the folder handler on port 8443. The second starts the small server in the background. It listens on `127.0.0.1` only, so only the homelab itself can reach it. The third makes Tailscale pass port 8443 to it. The address stays the same.
+
+To stop both:
+
+```bash
+sudo tailscale serve --https=8443 off
+pkill -f "http.server 8081"
+```
+
+This server does not start again after a reboot. That is fine for a short review. Run the commands again if you need it.
 
 ### R4. Stop serving the review copy
 
-When the review is done, run this on the homelab. It turns off only the port 8443 handler and leaves the normal site running:
+When the review is done, run this on the homelab. If you used the small local web server above, stop it first with `pkill -f "http.server 8081"`. It turns off only the port 8443 handler and leaves the normal site running:
 
 ```bash
 sudo tailscale serve --https=8443 off
@@ -283,13 +303,29 @@ sudo rm -r /srv/anatome-review
 ### R5. What to ask first
 
 1. The piriformis question comes first. Both piriformis rows carry a question for the reviewer. Open the review build, tap the piriformis, read the two questions in italics under the draft rows (row codes `piriformis-hip-external-rotation` and `piriformis-hip-external-rotation-flexed`), and ask your physiotherapist to answer them.
-2. Then tap "Review list" in the yellow banner. It lists every draft row grouped by structure, with its row code, its sources and its question if it has one. Go through them in order.
+2. Then tap "Review list" in the dark amber banner. It lists every draft row grouped by structure, with its row code, its sources and its question if it has one. Go through them in order.
 
 ### R6. Record the answers
 
-Do this on the dev machine, in the data files in the `data/` folder (`data/actions/hip.yaml` for movement rows, and `data/attachments/hip.yaml` for attachment rows once that file exists). Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
+Do this on the dev machine, in the data files in the `data/` folder (`data/actions/hip.yaml` for movement rows). The file `data/attachments/hip.yaml` does not exist yet, so skip attachment rows until it does. Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
 
-- The physiotherapist agrees. Set `checked_by: physio-1` and `checked_on` to the date of the check, in the form `YYYY-MM-DD`. Use the role label only, never a person's name. If you checked the row yourself, use `checked_by: owner`.
+- The physiotherapist agrees. Set `checked_by: physio-1` and add a `checked_on` line with the date of the check, in the form `YYYY-MM-DD`. Use the role label only, never a person's name. If you checked the row yourself, use `checked_by: owner`. Then delete the `review_note` line of that row, because the question is answered. A checked row that still has a note would show the note in the review build. Here is a row before and after:
+
+  Before:
+
+  ```yaml
+    checked_by: null
+    review_note: "Physio: is piriformis a main external rotator up to 45 degrees?"
+  ```
+
+  After:
+
+  ```yaml
+    checked_by: physio-1
+    checked_on: 2026-11-10
+  ```
+
+  The `checked_on` line goes directly under `checked_by`, with the same indent. The `review_note` line is gone.
 - The physiotherapist asks for a change. Edit the row to say what they asked for and leave it unchecked, so it stays a draft. Show it to them again in the next review build.
 - The row is wrong or not wanted. Delete the row.
 
@@ -305,6 +341,7 @@ It must pass with no errors. Then build the normal site as in step 2. A row with
 
 | What you see | What to try |
 | --- | --- |
+| `tailscale serve` refuses port 8443 for the review copy | Try another allowed port, for example `sudo tailscale serve --bg --https=10000 /srv/anatome-review`, and use `:10000` in the address. Run `tailscale serve status` to see what is being served on which port. To remove the failed one, repeat its flags with `off`, for example `sudo tailscale serve --https=8443 off`. |
 | The phone says it cannot find the site | Check that Tailscale is switched on in the phone app and shows the homelab as connected. Check MagicDNS is on. |
 | Certificate warning | HTTPS certificates are not enabled yet. Do step 1.2, then run `sudo tailscale serve --bg /srv/anatome` again. |
 | Blank page or a list of files | Run `ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'`. You must see `index.html` directly inside, not inside a subfolder. Then check the file permissions in step 4. If the files are fine but you still see a list instead of the app, use the fallback section above. |
