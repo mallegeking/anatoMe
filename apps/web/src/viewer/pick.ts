@@ -8,6 +8,9 @@ export type PickedStructure = {
   kind: string;
 };
 
+// What is selected: a structure id and, for paired structures, the side.
+export type Selection = { sid: string; side: "l" | "r" | "" };
+
 export type Hit = { object: Object3D; distance: number };
 export type PickedHit = { object: Object3D; structure: PickedStructure };
 

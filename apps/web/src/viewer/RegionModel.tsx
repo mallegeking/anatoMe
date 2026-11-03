@@ -5,7 +5,7 @@ import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, type Object3D } fr
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { markInteractive } from "../perf/loadTimer";
-import { pickHit, shouldSelect, type PickedHit } from "./pick";
+import { pickHit, shouldSelect, type Selection } from "./pick";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
 const DRACO_PATH = `${import.meta.env.BASE_URL}draco/`;
@@ -52,15 +52,16 @@ function makeMaterials() {
 
 type Props = {
   urls: string[];
-  // The mesh to draw lighter, or null for none.
-  selected: Object3D | null;
+  // The structure to draw lighter, or null for none.
+  selection: Selection | null;
   // Called after a tap on the model. null means the tap hit nothing with a name.
-  onSelect: (hit: PickedHit | null) => void;
+  // The label is the name in the 3D file, for structures the data does not know.
+  onSelect: (sel: Selection | null, label?: string) => void;
   // Called once, when the model is drawn and the controls work.
   onReady: () => void;
 };
 
-export function RegionModel({ urls, selected, onSelect, onReady }: Props) {
+export function RegionModel({ urls, selection, onSelect, onReady }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -80,14 +81,20 @@ export function RegionModel({ urls, selected, onSelect, onReady }: Props) {
     }
   }, [scenes, materials]);
 
-  // Draw the selected mesh lighter and put every other mesh back to normal.
+  // Draw the meshes of the selected structure (and side) lighter and put them back when it changes.
   useEffect(() => {
-    if (!(selected instanceof Mesh)) return;
-    selected.material = materials[groupOf(String(selected.userData.kind ?? ""))].selected;
+    if (!selection) return;
+    const found: Mesh[] = [];
+    for (const scene of scenes) {
+      scene.traverse((node: Object3D) => {
+        if (node instanceof Mesh && node.userData.sid === selection.sid && (node.userData.side ?? "") === selection.side) found.push(node);
+      });
+    }
+    for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].selected;
     return () => {
-      selected.material = materials[groupOf(String(selected.userData.kind ?? ""))].normal;
+      for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].normal;
     };
-  }, [selected, materials]);
+  }, [selection, scenes, materials]);
 
   // Frame the camera on everything we loaded.
   useEffect(() => {
@@ -111,7 +118,8 @@ export function RegionModel({ urls, selected, onSelect, onReady }: Props) {
     event.stopPropagation();
     // Dragging to rotate also ends in a click. Only a real tap selects.
     if (!shouldSelect(event.delta)) return;
-    onSelect(pickHit(event.intersections));
+    const hit = pickHit(event.intersections);
+    onSelect(hit ? { sid: hit.structure.sid, side: hit.structure.side } : null, hit?.structure.label);
   }
 
   return (

@@ -97,3 +97,73 @@ body,
   font: 12px ui-monospace, monospace;
   pointer-events: none;
 }
+
+.info-panel h2,
+.info-panel h3,
+.info-panel h4 {
+  margin: 8px 0 4px;
+}
+
+.info-panel h2 {
+  margin-top: 0;
+  font-size: 1.125rem;
+  overflow-wrap: anywhere;
+}
+
+.info-panel h3 {
+  font-size: 0.9375rem;
+}
+
+.info-panel h4 {
+  font-size: 0.875rem;
+}
+
+.info-panel p,
+.info-panel ul {
+  margin: 4px 0;
+}
+
+.info-panel ul {
+  padding-left: 18px;
+}
+
+.info-panel {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.review-note {
+  font-style: italic;
+}
+
+.link-button {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #8ab4f8;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.panel-actions button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}

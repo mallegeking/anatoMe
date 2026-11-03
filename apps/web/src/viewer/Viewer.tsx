@@ -1,15 +1,19 @@
 import { CameraControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import type { Object3D } from "three";
 import type { Translate } from "../i18n/t";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
-import { shouldSelect, type PickedHit, type PickedStructure } from "./pick";
+import { shouldSelect, type Selection } from "./pick";
 import { RegionModel } from "./RegionModel";
 import { useLoadWatchdog } from "./useLoadWatchdog";
 
-type Props = { region: string; t: Translate; onPick: (p: PickedStructure | null) => void };
+type Props = {
+  region: string;
+  t: Translate;
+  selection: Selection | null;
+  onSelect: (sel: Selection | null, label?: string) => void;
+};
 
 // Reads the manifest and hands back the file URLs. A failure is thrown during render so the error boundary can show it.
 function useRegionUrls(region: string): string[] | null {
@@ -34,9 +38,8 @@ function useRegionUrls(region: string): string[] | null {
   return state?.urls ?? null;
 }
 
-function Scene({ region, onPick }: { region: string; onPick: Props["onPick"] }) {
+function Scene({ region, selection, onSelect }: Omit<Props, "t">) {
   const urls = useRegionUrls(region);
-  const [selected, setSelected] = useState<Object3D | null>(null);
   const downAt = useRef<[number, number]>([0, 0]);
   const ready = useRef(false);
   const isReady = useCallback(() => ready.current, []);
@@ -47,16 +50,11 @@ function Scene({ region, onPick }: { region: string; onPick: Props["onPick"] }) 
   // If the model is still not ready after about 20 s, show the load error instead of a blank screen.
   useLoadWatchdog(isReady);
 
-  function select(hit: PickedHit | null) {
-    setSelected(hit ? hit.object : null);
-    onPick(hit ? hit.structure : null);
-  }
-
   // R3F tells us about a click on empty space but not how far the finger moved,
   // so we remember where the press began. A drag to rotate must not clear the selection.
   function handleMissed(event: MouseEvent) {
     const moved = Math.hypot(event.clientX - downAt.current[0], event.clientY - downAt.current[1]);
-    if (shouldSelect(moved)) select(null);
+    if (shouldSelect(moved)) onSelect(null);
   }
 
   return (
@@ -74,16 +72,16 @@ function Scene({ region, onPick }: { region: string; onPick: Props["onPick"] }) 
       <directionalLight position={[-1, -0.5, -2]} intensity={0.6} />
       <CameraControls makeDefault minDistance={0.15} maxDistance={4} />
       <Suspense fallback={null}>
-        {urls && <RegionModel urls={urls} selected={selected} onSelect={select} onReady={markReady} />}
+        {urls && <RegionModel urls={urls} selection={selection} onSelect={onSelect} onReady={markReady} />}
       </Suspense>
     </Canvas>
   );
 }
 
-export function Viewer({ region, t, onPick }: Props) {
+export function Viewer({ region, t, selection, onSelect }: Props) {
   return (
     <ModelErrorBoundary t={t}>
-      <Scene region={region} onPick={onPick} />
+      <Scene region={region} selection={selection} onSelect={onSelect} />
     </ModelErrorBoundary>
   );
 }
