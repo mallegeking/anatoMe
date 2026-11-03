@@ -194,7 +194,7 @@ Effort assumes part-time weekends. Estimates beyond Phase 1 are rough and get re
 
 | Phase | Content | Effort | Gate to pass before the next phase |
 | --- | --- | --- | --- |
-| 0. Spike | See task list below | Done except the phone gate, pending owner measurement (updated 2026-11-02, was 1 to 2 weekends) | The hip region loads quickly on the owner's phone |
+| 0. Spike | See task list below | Done, phone gate passed on 2026-11-03 (updated 2026-11-03, was 1 to 2 weekends) | The hip region loads quickly on the owner's phone |
 | 1. Hip atlas | Hip, pelvis and thigh (down to and including the knee joint, because several thigh muscles attach below it) with search, info panel and peelable layers. Data schema in place. First sourced action rows for the hip. Credits screen. | 3 to 6 weekends (medium, updated 2026-11-02, was 4 to 8) | It helps the owner understand their own hip |
 | 2. Movement explorer, area lookup and notebook | Stretched and pinched rows for the hip where sources exist. Joint-angle control changes highlighting only (the model does not bend). Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 2 to 4 months part-time (low, updated 2026-11-02, was 1 to 3) | The owner's physio has reviewed the hip data |
 | 3. Publish v1 | Make the repo public. README with educational framing up front, CONTRIBUTING.md, a process for data corrections from physios and students. Re-check every license page, including the ones blocked during design. | 1 to 2 weekends (medium) | |
@@ -204,7 +204,7 @@ Effort assumes part-time weekends. Estimates beyond Phase 1 are rough and get re
 
 Shona UI comes after German, timing open.
 
-**Phase 0 result (2026-11-02):** done except the phone gate, which is pending owner measurement on the Galaxy A23. The provisional signal is a Playwright pre-check (4x CPU throttle, phone-sized viewport) with a median of 1457 ms against the 5000 ms limit. Rotation smoothness is not covered by that check. Reasons for the changed estimates: the mesh pipeline, schema, validator, CI and a tap-to-name viewer already exist, which shortens Phase 1 (medium). Source hunting and review for the 11 action rows was slow and open sources for stretched and pinched loads are thin, which lengthens Phase 2 (low). Details are in `docs/phase0/spike-report.md`. Phases 3 to 6 are unchanged.
+**Phase 0 result (2026-11-02, gate updated 2026-11-03):** done. The owner measured the phone gate on the Galaxy A23 on 2026-11-03: median 783 ms to interactive against the 5000 ms limit, no stutter when rotating. The test used Firefox for Android instead of Chrome, Chrome on the phone is untested but very likely fine because the Chromium pre-check also passed (medium). Reasons for the changed estimates: the mesh pipeline, schema, validator, CI and a tap-to-name viewer already exist, which shortens Phase 1 (medium). Source hunting and review for the 11 action rows was slow and open sources for stretched and pinched loads are thin, which lengthens Phase 2 (low). Details are in `docs/phase0/spike-report.md`. Phases 3 to 6 are unchanged.
 
 ### Phase 0 task list
 

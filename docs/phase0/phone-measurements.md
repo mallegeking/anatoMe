@@ -24,7 +24,7 @@ Before each run, clear Chrome's site data and cached files. Open the address end
 | 2 |727 |yes |
 | 3 |783 |yes |
 
-Median of the three numbers (the middle one): _727_ ms
+Median of the three numbers (the middle one): _783_ ms (sorted: 727, 783, 1489)
 
 ## 2. Rotating
 
@@ -52,11 +52,11 @@ Tap a structure so its name shows. Then tap on empty space, away from the model.
 
 | Try | Did the name clear? (yes or no) |
 | --- | --- |
-| 1 | | yes
-| 2 | | yes
-| 3 | | yes
-| 4 | | yes
-| 5 | | yes
+| 1 | yes |
+| 2 | yes |
+| 3 | yes |
+| 4 | yes |
+| 5 | yes |
 
 ## 5. Quick taps on a muscle
 

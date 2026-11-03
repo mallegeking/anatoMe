@@ -26,7 +26,7 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 
 ## App
 
-- Empty-space taps clear the selection only under 3 px of finger movement, while taps on a structure select under 6 px. Check on the phone, then align the two.
+- Empty-space taps clear the selection only under 3 px of finger movement, while taps on a structure select under 6 px. On the phone (2026-11-03) all 5 empty-space taps cleared the name, so this is low priority. Align the two thresholds when the picking code is next touched.
 - Show a loading message (the `loading.model` text exists but is unused).
 - The load watchdog can fire falsely in a background tab, because animation frames pause there. Mark the model ready when it finishes loading instead.
 - The Vite plugin that skips three's unused Draco decoder copies does nothing silently if three changes its source text. Add a build warning.

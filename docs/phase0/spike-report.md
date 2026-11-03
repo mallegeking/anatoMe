@@ -4,21 +4,26 @@ Date: 2026-11-02. Covers the hip spike (plan tasks 1 to 7).
 
 ## Outcome
 
-**The spike worked. Everything is done except the phone gate, which is pending owner measurement.**
+**The spike worked. Phase 0 is done. The phone gate passed on 2026-11-03.**
 
-A browser app now loads the hip, lets you tap a structure to see its name, and reads from a validated knowledge base with 11 sourced action rows. The one thing nobody has measured is the real target device. The Samsung Galaxy A23 gate (interactive within 5000 ms, no stutter when rotating) is **pending owner measurement**. Nothing here says it passed or failed.
+A browser app now loads the hip, lets you tap a structure to see its name, and reads from a validated knowledge base with 11 sourced action rows. The owner measured it on the real target device: on the Samsung Galaxy A23 the hip was interactive after a median of 783 ms, about 6 times under the 5000 ms limit, and rotating did not stutter. The test used Firefox for Android instead of Chrome (see below).
 
 ### Phone gate
 
 | Item | Value |
 | --- | --- |
 | Gate | Median of 3 runs interactive within 5000 ms on home Wi-Fi, and no stutter when rotating for 10 seconds |
-| Status | **Pending owner measurement** |
+| Status | **Passed** (measured by the owner on 2026-11-03, results in `docs/phase0/phone-measurements.md`) |
+| Phone result | Firefox 159 on Android 14, 5 GHz Wi-Fi. Runs: 1489, 727 and 783 ms, median 783 ms. No stutter when rotating. 5 of 5 taps showed the right name. 5 of 5 empty-space taps cleared the name. Quick taps on a muscle kept it selected every time. |
 | Provisional signal | Playwright pre-check, Chromium, 4x CPU throttle, 412 x 915 viewport, cache off, 5 runs |
 | Pre-check result | Median 1457 ms (an earlier run gave 1630 ms). All runs between 1375 and 1800 ms |
 | Desktop, no throttle | 0.5 to 1.4 s (the first run after a cold start was the slowest) |
 
-What the provisional signal says: on load time, the pre-check has about 3.4 times headroom against the 5000 ms limit. My expectation is that the A23 passes the load time part (**medium**). Two things the pre-check does not cover:
+**Browser note:** the spec names Chrome as the reference browser. The owner prefers Firefox, so the gate was measured there. Chrome on the same phone was not tested. The pre-check below ran on Chromium and was also well under the limit, so Chrome is very likely fine too (**medium**). A quick Chrome run would close this gap but is not needed to move on.
+
+The text below was written before the phone test and is kept as the record of the provisional signal.
+
+What the provisional signal said: on load time, the pre-check has about 3.4 times headroom against the 5000 ms limit. My expectation is that the A23 passes the load time part (**medium**). Two things the pre-check does not cover:
 
 - **Smooth rotation.** The pre-check does not rotate anything and headless Chromium in the container has no real phone GPU. The scene is 99 meshes and 48,429 triangles with no merging, which should be fine for the A23 but is untested (**low**).
 - **Real network and real phone CPU.** The pre-check loads from localhost. A 4x slowdown is a rough stand-in for the A23 (**low**). The transfer is about 1 MB over the wire (345 kB gzipped JavaScript, the Draco decoder, 284 kB of models), so Wi-Fi time should be under a second (**medium**, not measured).
@@ -123,7 +128,7 @@ All estimates assume part-time weekends. The spike showed the plumbing is cheape
 
 | Phase | Before | After | Confidence after | Why |
 | --- | --- | --- | --- | --- |
-| 0. Spike | 1 to 2 weekends (medium) | Done except the phone gate, pending owner measurement | n/a | Seven tasks finished. Phone measurement still to do. |
+| 0. Spike | 1 to 2 weekends (medium) | Done (phone gate passed 2026-11-03) | n/a | All tasks finished. Phone median 783 ms on the Galaxy A23 in Firefox. |
 | 1. Hip atlas | 4 to 8 weekends (medium) | **3 to 6 weekends** | medium | Mesh pipeline, schema, validator, CI, credits screen, tap-to-name and 50 structure records already exist. Left to do: search, info panel, peelable layers, attachments, the two gaps and menisci. Rises back to the old range if the phone gate fails and the scene needs reworking. |
 | 2. Movement explorer, area lookup, notebook | 1 to 3 months (low to medium) | **2 to 4 months** | low | The code is the easy part. Authoring cost is the risk. Eleven rows took repeated source searches and a review fix round. Stretched and pinched rows have thin open sources. A full hip needs many more rows than 11. A schema change for hip shape is also due. Physio review time is outside our control. |
 | 3. Publish v1 | 1 to 2 weekends (medium) | unchanged | medium | Nothing in the spike changes it. License re-checks now have two known cases (OpenStax, non-commercial sources). |
