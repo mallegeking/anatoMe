@@ -211,3 +211,53 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13512343/
   license: CC BY 4.0
   access: open
+# Sources added for the action rows in actions/hip.yaml. Each one was opened and read on 2026-11-03.
+- id: szczerba-2026
+  title: Fascia Lata and Tensor Fasciae Latae in Lower-Limb Reconstruction
+  authors: Szczerba N, Waleszczyńska J, Jerka D, Bonowicz-Kozłowska K, Gagat M
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13413262/
+  license: CC BY 4.0
+  access: open
+- id: godshaw-2019
+  title: Acute Traumatic Tear of the Gluteus Medius and Gluteus Minimus in a Marathon Runner
+  authors: Godshaw B, Wong M, Ojard C, Williams G, Suri M, Jones D
+  year: 2019
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6928675/
+  license: CC BY 4.0
+  access: open
+- id: bajuri-2022
+  title: "Posttraumatic Isolated Right Gluteus Minimus Tear: A Case Report"
+  authors: Bajuri MY, Sivasamy P, Simanjuntak GRN, Azemi AF, Azman MI
+  year: 2022
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8994867/
+  license: Creative Commons Attribution License, version not stated
+  access: open
+- id: hirano-2025
+  title: "Toward a Better Understanding of Hip Adductor Function: Internal Rotation Capability Revealed by Anatomical and MRI Evaluation"
+  authors: Hirano K, Kinoshita K, Senoo A, Watanabe M
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12452323/
+  license: CC BY 4.0
+  access: open
+- id: bai-2023
+  title: "Painful and restricted hip due to myositis ossificans circumscripta of the pectineus muscle after pelvic fracture: A case report"
+  authors: Bai Q, Zou X, Yang G, Fan Y, Wang W, Zhang B, Chang X
+  year: 2023
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10145730/
+  license: CC BY 4.0
+  access: open
+- id: kim-2021
+  title: Variation of pectineus muscle forming a hiatus
+  authors: Kim H, Nam YS
+  year: 2021
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8139879/
+  license: CC BY 4.0
+  access: open
+- id: arai-2026
+  title: "Intermuscular and intramuscular distributions of sprint-induced thigh muscle activation in male sprinters: a T2-weighted MRI study"
+  authors: Arai H, Suga T, Terada M, Kusagawa Y, Kuroki K, Umeda M, Isaka T
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13623594/
+  license: CC BY 4.0
+  access: open
