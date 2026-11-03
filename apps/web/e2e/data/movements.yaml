@@ -1,0 +1,9 @@
+# One movement per direction of each degree of freedom in joints.yaml.
+- {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion}
+- {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension}
+- {id: hip-abduction, dof: hip.abduction, direction: positive, english: Hip abduction}
+- {id: hip-adduction, dof: hip.abduction, direction: negative, english: Hip adduction}
+- {id: hip-internal-rotation, dof: hip.rotation, direction: positive, english: Hip internal rotation}
+- {id: hip-external-rotation, dof: hip.rotation, direction: negative, english: Hip external rotation}
+- {id: knee-flexion, dof: knee.flexion, direction: positive, english: Knee flexion}
+- {id: knee-extension, dof: knee.flexion, direction: negative, english: Knee extension}

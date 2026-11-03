@@ -1,0 +1,7 @@
+# Test-only structures. The ids match meshes in the real hip model, so search can turn the camera to them.
+# Piriformis lies one layer under gluteus maximus, so choosing it in search peels exactly one layer.
+- {id: hip-bone, type: bone, english: Hip bone, region: hip, depth: 4}
+- {id: sacrum, type: bone, english: Sacrum, region: hip, depth: 4}
+- {id: femur, type: bone, english: Femur, region: hip, depth: 4}
+- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, region: hip, depth: 1, depth_note: Test value.}
+- {id: piriformis, type: muscle, english: Piriformis, latin: Musculus piriformis, region: hip, depth: 2, depth_note: Test value.}

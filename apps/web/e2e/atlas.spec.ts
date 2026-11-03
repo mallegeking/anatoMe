@@ -3,6 +3,8 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 
 // Walks the main path of the atlas in the built app on a phone-sized screen:
 // search for piriformis, choose it, read the info panel, open the credits.
+// The data comes from the test-only set in e2e/data (see scripts/e2e-prepare.mjs), not from data/,
+// so this test does not change when the physio checks real rows.
 test("search piriformis and read about it", async ({ page, baseURL }) => {
   // Remember every request, so we can check that nothing leaves the preview server.
   const hosts = new Set<string>();
@@ -23,9 +25,10 @@ test("search piriformis and read about it", async ({ page, baseURL }) => {
 
   const panel = page.getByTestId("info-panel");
   await expect(panel.getByRole("heading", { name: "Piriformis", level: 2 })).toBeVisible();
-  // Piriformis is one layer deep, so exactly one layer is peeled.
+  // In the test data piriformis lies one layer under gluteus maximus, so exactly one layer is peeled.
   await expect(page.getByRole("status").filter({ hasText: texts["search.peeledOne"].replace("{name}", "Piriformis") })).toBeVisible();
-  // Its rows are not reviewed yet, so the panel says they are waiting.
+  // The test data has one checked hip row and one row that stays unchecked on purpose.
+  await expect(panel.getByRole("heading", { name: texts["info.does.hip"] })).toBeVisible();
   await expect(panel.getByText(texts["info.pending"])).toBeVisible();
 
   await page.getByText(texts["credits.title"], { exact: true }).click();

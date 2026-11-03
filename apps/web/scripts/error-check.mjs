@@ -12,7 +12,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Playwright is not a dependency of this repo, see perf-check.mjs for how to get it on your own computer.
+// Playwright comes with @playwright/test, a dev dependency of apps/web. See perf-check.mjs for the browser download.
 const { chromium } = createRequire(import.meta.url)("playwright");
 
 const WAIT_MS = 25000;

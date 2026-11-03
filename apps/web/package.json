@@ -8,7 +8,7 @@
     "predev": "node scripts/sync-models.mjs && npm run build-data --prefix ../..",
     "dev": "vite",
     "prebuild": "node scripts/sync-models.mjs && npm run build-data --prefix ../..",
-    "build:review": "node scripts/sync-models.mjs && npm run build-data:review --prefix ../.. && tsc -b && vite build --mode review --outDir dist-review",
+    "build:review": "node scripts/sync-models.mjs && npm run build-data --prefix ../.. && tsc -b && vite build --mode review --outDir dist-review && npm run build-data:review --prefix ../..",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",

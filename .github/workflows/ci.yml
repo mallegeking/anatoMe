@@ -28,6 +28,11 @@ jobs:
       - name: Node tests
         run: npm test
 
+      # Builds the review copy first. The normal build after it, and the draft check further down,
+      # then prove on every run that review data can never reach apps/web/dist.
+      - name: Build the review copy
+        run: npm run build:review -w apps/web
+
       # Type-checks and builds the app. It uses the committed models/ folder, so it needs no sources/ or tools/.
       - name: Build the app
         run: npm run build

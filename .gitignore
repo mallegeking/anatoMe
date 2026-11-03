@@ -6,6 +6,7 @@ tools/
 apps/web/public/models/
 apps/web/public/data/
 apps/web/dist-review/
+apps/web/dist-e2e/
 *.log
 .superpowers/
 __pycache__/
