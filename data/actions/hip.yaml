@@ -1,5 +1,8 @@
 # What hip movements do to each structure, and when.
 # Every row was drafted from the cited sources on 2026-11-02 and waits for a person to check it.
+# Each citation is marked quote when says is the source's own words, or summary when it is our own short summary.
+# We only quote sources whose licence fits CC BY 4.0. Ito 2025 and Groh 2009 are CC BY-NC, so their
+# says were rewritten as summaries on 2026-11-03, after opening both papers again.
 # Angles in when are in degrees, see joints.yaml. All entries in when must hold at once.
 
 - id: gluteus-maximus-hip-extension
@@ -12,9 +15,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus maximus
       says: "Gluteus maximus is listed as a prime mover of the femur, target motion direction: extension."
+      says_kind: summary
     - ref: contreras-2015
       locator: Discussion
       says: "presumably resulting from a greater reliance upon the gluteus maximus for hip extension"
+      says_kind: quote
   checked_by: null
 
 - id: iliacus-hip-flexion
@@ -27,9 +32,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, and the section Gluteal Region Muscles That Move the Femur
       says: "The psoas major and iliacus make up the iliopsoas group. The table gives iliacus the target motions thigh flexion and lateral rotation."
+      says_kind: summary
     - ref: schenkel-2018
       locator: Introduction, and Discussion
       says: "The iliopsoas is mainly responsible for hip flexion ... the iliopsoas is the largest hip flexor."
+      says_kind: quote
   checked_by: null
 
 - id: gluteus-medius-hip-abduction
@@ -42,9 +49,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus medius
       says: "Gluteus medius is listed as a prime mover of the femur, target motion direction: abduction."
+      says_kind: summary
     - ref: osullivan-2010
       locator: Discussion
       says: "the primary action of GM is abduction and internal rotation"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-longus-hip-adduction
@@ -57,6 +66,7 @@
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus
       says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
+      says_kind: summary
   checked_by: null
 
 # Piriformis external rotation shrinks as the hip bends (Ito 2025, Table 2, N m):
@@ -75,10 +85,13 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Lateral Rotators, row Piriformis
       says: "Piriformis is listed among the lateral rotators, target motion direction: lateral rotation."
+      says_kind: summary
     - ref: ito-2025
       locator: Abstract, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), row Piriformis
-      says: "External rotation torque of the piriformis, obturator internus, and conjoined tendon peaked at 15° hip flexion, and then decreased as the hip flexed. Table 2, piriformis: 0.40 ± 0.17 at 0°, 0.40 ± 0.18 at 15°, 0.32 ± 0.10 at 30°, 0.24 ± 0.06 at 45°."
+      says: "In 15 cadaver hips, the external rotation torque of piriformis was highest at 15° of hip flexion and fell as the hip bent further. Table 2 gives piriformis 0.40 ± 0.17 N m at 0°, 0.40 ± 0.18 at 15°, 0.32 ± 0.10 at 30° and 0.24 ± 0.06 at 45°."
+      says_kind: summary
   checked_by: null
+  review_note: "Physio: is piriformis a main external rotator up to 45 degrees of hip flexion, or only up to 30? Ito 2025 Table 2 shows obturator externus larger than piriformis from 30 degrees (0.43 vs 0.32 N m) and about twice as large at 45 (0.50 vs 0.24)."
 
 - id: piriformis-hip-external-rotation-flexed
   structure: piriformis
@@ -91,8 +104,10 @@
   citations:
     - ref: ito-2025
       locator: Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
-      says: "Table 2, piriformis: 0.13 ± 0.04 at 60°, 0.05 ± 0.03 at 75°. Obturator externus at the same angles: 0.54 ± 0.18 and 0.58 ± 0.20."
+      says: "At 60° and 75° of hip flexion piriformis gave only a little external rotation torque, 0.13 ± 0.04 and 0.05 ± 0.03 N m in Table 2. Obturator externus gave 0.54 ± 0.18 and 0.58 ± 0.20 N m at the same angles."
+      says_kind: summary
   checked_by: null
+  review_note: "Physio: this row depends on the question on the 0 to 45 degree row. If piriformis is a main external rotator only up to 30 degrees, should this secondary row start at 45 instead of 60? Ito 2025 Table 2 gives piriformis 0.24 N m at 45, 0.13 at 60 and 0.05 at 75 degrees."
 
 # role secondary is a judgment, no source says it. Ito's Table 2 torques here are very
 # small (-0.02 and -0.06 N m, minus means internal rotation) and the textbook does not
@@ -108,7 +123,8 @@
   citations:
     - ref: ito-2025
       locator: 3. Results, paragraph on external rotation torque, and Table 2 (external rotation torque, mean ± SD, N m), row Piriformis. Hips were tested from 0° to 105° of flexion.
-      says: "The piriformis switched its function from external to internal rotation of the hip between 75° and 90° of flexion. Table 2, piriformis: −0.02 ± 0.02 at 90°, −0.06 ± 0.03 at 105°."
+      says: "Between 75° and 90° of hip flexion piriformis changed from turning the hip outwards to turning it inwards. Table 2 gives piriformis −0.02 ± 0.02 N m at 90° and −0.06 ± 0.03 at 105°, where minus means internal rotation."
+      says_kind: summary
   checked_by: null
 
 - id: obturator-externus-hip-external-rotation
@@ -123,9 +139,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Lateral Rotators, row Obturator externus
       says: "Obturator externus is listed among the lateral rotators, target motion direction: lateral rotation."
+      says_kind: summary
     - ref: ito-2025
       locator: Abstract
-      says: "At 75° of flexion or more in deep flexion, ranges associated with a high risk of dislocation, the obturator externus had the highest external rotation torque."
+      says: "From 75° of hip flexion upwards, the range the authors link to a high risk of dislocation, obturator externus gave the most external rotation torque of the short external rotators."
+      says_kind: summary
   checked_by: null
 
 - id: ischiofemoral-ligament-hip-internal-rotation
@@ -139,9 +157,11 @@
     - ref: baba-2022
       locator: Abstract, Conclusion. Tested at 0°, 30° and 60° of hip flexion in nine cadaver hips.
       says: "The ischiofemoral ligament primarily restricted the internal rotation of the hip joint."
+      says_kind: quote
     - ref: ng-2019
       locator: Anatomy section, first paragraph
       says: "The ischiofemoral ligament ... reinforce[s] the capsule during internal rotation in neutral positions as well as in combined flexion-adduction positions"
+      says_kind: quote
   checked_by: null
 
 - id: iliofemoral-ligament-hip-extension
@@ -153,6 +173,7 @@
     - ref: ng-2019
       locator: Anatomy section, first paragraph
       says: "The iliofemoral ligament ... forming the inverted Y-shaped ligament of Bigelow ... to reinforce the capsule during external rotation and extension."
+      says_kind: quote
   checked_by: null
 
 - id: acetabular-labrum-hip-internal-rotation
@@ -161,18 +182,23 @@
   load: pinched
   when:
     - {angle: hip.flexion, min: 90, max: 112}
+  applies_to: hips with pincer-type impingement
   confidence: low
   citations:
     - ref: groh-2009
-      locator: Etiology, paragraph on femoroacetabular impingement (FAI). Describes hips with pincer-type FAI, not every hip.
-      says: "Pincer-type FAI is the result of abutment of the femoral head–neck junction on the acetabular rim due to acetabular overcoverage causing pinching of the labrum between the femur and acetabulum."
+      locator: Etiology, paragraph on femoroacetabular impingement (FAI)
+      says: "In pincer-type FAI the acetabulum covers too much of the femoral head. The femoral head-neck junction then hits the acetabular rim and the labrum gets pinched between femur and acetabulum."
+      says_kind: summary
     - ref: groh-2009
       locator: Clinical presentation, paragraph on the anterior hip impingement test
-      says: "This is performed with the patient supine with the hip and knee at 90° of flexion. The hip is internally rotated while an adduction force is applied."
+      says: "The anterior hip impingement test, the most consistent exam finding in labral tears, starts lying on the back with hip and knee bent to 90°. The examiner then turns the hip inwards while pushing it into adduction."
+      says_kind: summary
     - ref: van-arkel-2015
       locator: 1. Introduction
       says: "in deep flexion the hip has a large range of external rotation but is at risk of impingement in internal rotation"
+      says_kind: quote
     - ref: van-arkel-2015
       locator: 3. Results, first paragraph. Gives the upper end of the when range, nine cadaver hips under 5 N m torque.
       says: "Under 5 N m torque the mean (± standard deviation) hip joint flexion was 112±10°"
+      says_kind: quote
   checked_by: null

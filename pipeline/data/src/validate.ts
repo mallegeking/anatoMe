@@ -14,21 +14,22 @@ export type ValidationResult = { ok: boolean; errors: ValidationError[] };
 // The schemas live next to the real data, also when we check a test fixture.
 const SCHEMA_DIR = fileURLToPath(new URL("../../../data/schema/", import.meta.url));
 
-type Kind = "joints" | "movements" | "structures" | "actions" | "citations";
+type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations";
 
 type Joint = { id: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
 type Structure = { id: string; type: string };
 type Citation = { id: string };
-type Action = {
-  id: string;
+// The fields every row that makes a claim has, so the review gate can check them the same way.
+type Gated = { id: string; citations: { ref: string }[]; checked_by: string | null; checked_on?: string };
+type Action = Gated & {
   structure: string;
   movement: string;
   load: "working" | "stretched" | "pinched";
   role?: string;
   when?: { angle: string; min: number; max: number }[];
-  citations: { ref: string }[];
 };
+type Attachment = Gated & { muscle: string; bone: string };
 
 // Which load types each structure type may have. Bones and joints never appear in actions.
 const ALLOWED_LOADS: Record<string, string[]> = {
@@ -39,6 +40,9 @@ const ALLOWED_LOADS: Record<string, string[]> = {
   labrum: ["stretched", "pinched"],
   bursa: ["stretched", "pinched"],
   nerve: ["stretched", "pinched"],
+  meniscus: ["stretched", "pinched"],
+  // A fascial band never works on its own, it only gets stretched.
+  fascia: ["stretched"],
 };
 
 // One rows file after loading. rows is empty when the file could not be read or failed the schema.
@@ -64,13 +68,16 @@ export function validateDataDir(dir: string): ValidationResult {
   const citations = load<Citation>("citations", "citations.yaml");
   const structures = listYaml(dir, "structures").map((f) => load<Structure>("structures", f));
   const actions = listYaml(dir, "actions").map((f) => load<Action>("actions", f));
+  // The attachments folder is optional, listYaml returns nothing when it is missing.
+  const attachments = listYaml(dir, "attachments").map((f) => load<Attachment>("attachments", f));
 
   // Ids must be unique within each kind, across all files of that kind.
+  // Actions and attachments share one id space, because the review list shows them together.
   checkUnique([joints], errors);
   checkUnique([movements], errors);
   checkUnique([citations], errors);
   checkUnique(structures, errors);
-  checkUnique(actions, errors);
+  checkUnique([...actions, ...attachments], errors);
 
   const angles = new Set(joints.rows.flatMap((j) => j.dofs.map((d) => `${j.id}.${d.id}`)));
   for (const [i, m] of movements.rows.entries()) {
@@ -108,13 +115,43 @@ export function validateDataDir(dir: string): ValidationResult {
         if (!angles.has(w.angle)) errors.push({ file, path: at(`/when/${j}/angle`), message: `unknown angle ${w.angle}` });
         if (!(w.min < w.max)) errors.push({ file, path: at(`/when/${j}`), message: "min must be less than max" });
       }
-      for (const [j, c] of a.citations.entries()) {
-        if (!citationIds.has(c.ref)) errors.push({ file, path: at(`/citations/${j}/ref`), message: `unknown citation ${c.ref}` });
-      }
+      checkGated(file, i, a, citationIds, errors);
+    }
+  }
+
+  for (const { file, rows } of attachments) {
+    for (const [i, a] of rows.entries()) {
+      checkStructureType(file, `/${i}/muscle`, "muscle", a.muscle, structureById, errors);
+      checkStructureType(file, `/${i}/bone`, "bone", a.bone, structureById, errors);
+      checkGated(file, i, a, citationIds, errors);
     }
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+// The review gate rules shared by actions and attachments: known citations, and a date once checked.
+function checkGated(file: string, i: number, row: Gated, citationIds: Set<string>, errors: ValidationError[]) {
+  for (const [j, c] of row.citations.entries()) {
+    if (!citationIds.has(c.ref)) errors.push({ file, path: `/${i}/citations/${j}/ref`, message: `unknown citation ${c.ref}` });
+  }
+  if (row.checked_by !== null && row.checked_on === undefined) {
+    errors.push({ file, path: `/${i}`, message: "checked_on is required when checked_by is set" });
+  }
+}
+
+// Checks that a field like muscle or bone points to a structure of that type.
+function checkStructureType(
+  file: string,
+  path: string,
+  type: string,
+  id: string,
+  structureById: Map<string, Structure>,
+  errors: ValidationError[],
+) {
+  const structure = structureById.get(id);
+  if (!structure) errors.push({ file, path, message: `unknown structure ${id}` });
+  else if (structure.type !== type) errors.push({ file, path, message: `${type} must be a structure of type ${type}, ${id} is a ${structure.type}` });
 }
 
 // The ids of every structure in dir/structures, for the model check.
@@ -138,7 +175,7 @@ export function loadStructures(dir: string): Map<string, StructureInfo> {
 function compileSchemas(): Record<Kind, ValidateFunction> {
   // allErrors so one run shows every problem, allowUnionTypes for checked_by (string or null).
   const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "citations"];
+  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "attachments", "citations"];
   return Object.fromEntries(
     kinds.map((k) => [k, ajv.compile(JSON.parse(readFileSync(join(SCHEMA_DIR, `${k}.schema.json`), "utf8")))]),
   ) as Record<Kind, ValidateFunction>;
@@ -182,7 +219,8 @@ function checkUnique(files: Loaded<{ id: string }>[], errors: ValidationError[])
 // Turns an Ajv error into a sentence a data author can act on.
 function friendly(e: ErrorObject): string {
   const last = e.instancePath.split("/").pop();
-  if (last === "checked_by") return "checked_by must be null or the name of the person who checked the row";
+  if (last === "checked_by") return "checked_by must be null or the role label of whoever checked the row, like physio-1";
+  if (last === "checked_on") return "checked_on must be a date like 2026-11-03";
   switch (e.keyword) {
     case "required":
       return `${(e.params as { missingProperty: string }).missingProperty} is required`;

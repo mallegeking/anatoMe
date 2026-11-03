@@ -13,6 +13,11 @@
       "movement": { "type": "string", "minLength": 1 },
       "load": { "enum": ["working", "stretched", "pinched"] },
       "role": { "enum": ["primary", "secondary"] },
+      "applies_to": {
+        "description": "Who or what the claim holds for, when a source limits it, for example hips with pincer-type impingement.",
+        "type": "string",
+        "minLength": 1
+      },
       "when": {
         "description": "Joint angle ranges in degrees. All entries must hold at once.",
         "type": "array",
@@ -35,17 +40,31 @@
         "items": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["ref", "locator", "says"],
+          "required": ["ref", "locator", "says", "says_kind"],
           "properties": {
             "ref": { "type": "string", "minLength": 1 },
             "locator": { "type": "string", "minLength": 1 },
-            "says": { "type": "string", "minLength": 1 }
+            "says": { "type": "string", "minLength": 1 },
+            "says_kind": {
+              "description": "quote when says is the source's own words (only for licences compatible with CC BY 4.0), summary when it is our own short summary.",
+              "enum": ["quote", "summary"]
+            }
           }
         }
       },
       "checked_by": {
-        "description": "Null until a person has read the sources. Then the name of that person.",
+        "description": "Null until a person has read the sources. Then a role label such as physio-1 or owner, never a name.",
         "type": ["string", "null"],
+        "minLength": 1
+      },
+      "checked_on": {
+        "description": "The date the row was checked, like 2026-11-03. Required when checked_by is set, see validate.ts.",
+        "type": "string",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+      },
+      "review_note": {
+        "description": "A question for the reviewer. Only the review build shows it.",
+        "type": "string",
         "minLength": 1
       }
     }

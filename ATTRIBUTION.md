@@ -30,7 +30,7 @@ Older BodyParts3D OBJ file headers mention CC BY-SA 2.1 Japan. The license page 
 - Code is MIT, see `LICENSE`.
 - Our own data is CC BY 4.0, see `data/LICENSE`.
 - Each mesh file has its own license, recorded in `models/manifest.json` and explained in `models/LICENSE`.
-- Short quotations in the `says` fields under `data/` keep the license of their source, listed in `data/citations.yaml`.
+- Quotes in the `says` fields under `data/` come only from sources whose license fits CC BY 4.0, each credited in `data/citations.yaml`. For other sources `says` is our own summary.
 
 ## Note on React Three Fiber
 
