@@ -21,6 +21,11 @@ export function shouldSelect(dragPx: number): boolean {
   return dragPx < TAP_SLOP_PX;
 }
 
+// A tap on empty space clears the selection. It uses the same rule, so selecting and clearing feel the same.
+export function shouldClear(dragPx: number): boolean {
+  return dragPx < TAP_SLOP_PX;
+}
+
 // Looks at the object and then its parents until one carries a structure id.
 function structureOf(object: Object3D): PickedStructure | null {
   for (let node: Object3D | null = object; node; node = node.parent) {

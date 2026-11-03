@@ -26,14 +26,14 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 
 ## App
 
-- Empty-space taps clear the selection only under 3 px of finger movement, while taps on a structure select under 6 px. On the phone (2026-11-03) all 5 empty-space taps cleared the name, so this is low priority. Align the two thresholds when the picking code is next touched.
-- Show a loading message (the `loading.model` text exists but is unused).
-- The load watchdog can fire falsely in a background tab, because animation frames pause there. Mark the model ready when it finishes loading instead.
-- The Vite plugin that skips three's unused Draco decoder copies does nothing silently if three changes its source text. Add a build warning.
-- A missing WebGL shows "check your connection". Give it its own message.
-- The educational line sits inside the collapsed credits. Make it visible before anyone else uses the app.
-- Consider `frameloop="demand"` to save battery when nothing moves.
-- `camera-controls` is imported as a type from an undeclared dependency.
+- Done 2026-11-03: taps on empty space and taps on a structure both use the 6 px rule (Phase 1 Task 8).
+- Done 2026-11-03: the loading message shows until the model is in, and the 3D code arrives as a separate download after the first screen (Phase 1 Task 8).
+- Done 2026-11-03: the model counts as ready when it finishes loading, and the watchdog waits while the tab is in the background (Phase 1 Task 8).
+- Done 2026-11-03: the Draco skip plugin warns during the build when it finds nothing to skip (Phase 1 Task 8).
+- Done 2026-11-03: a browser without WebGL gets its own message (Phase 1 Task 8).
+- Done 2026-11-03: the educational line shows above the credits without opening them (Phase 1 Task 8).
+- Done 2026-11-03: the canvas uses `frameloop="demand"` and draws only when something changes (Phase 1 Task 8).
+- Done 2026-11-03: `camera-controls` is a declared dependency (Phase 1 Task 8).
 
 ## Tooling and docs
 

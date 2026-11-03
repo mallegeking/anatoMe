@@ -16,3 +16,10 @@ test("credits show the licence deeds, the changes and the library licences", () 
   expect(screen.getByText(en["credits.modified"])).toBeTruthy();
   expect(screen.getByText(en["credits.librariesLink"]).getAttribute("href")).toMatch(/third-party-licenses\.txt$/);
 });
+
+test("educational line is visible without opening credits", () => {
+  render(<Credits t={createT(en)} />);
+  const line = screen.getByText(en["about.educational"]);
+  // Text inside a closed <details> is hidden until someone opens it, so the line must sit outside.
+  expect(line.closest("details")).toBeNull();
+});

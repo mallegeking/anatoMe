@@ -80,3 +80,11 @@ test("an unknown structure shows its file label and no data sections", () => {
   expect(screen.getByText("Mystery part")).toBeTruthy();
   expect(screen.queryByText(en["info.pending"])).toBeNull();
 });
+
+test("the punctuation around the action words comes from the text file", () => {
+  const custom = createT({ ...en, "info.actionRole": "{load} [{role}]", "info.actionWhen": "{text} / {when}", "source.label": "{kind} >" });
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle()} t={custom} onSwitchSide={() => {}} onHide={() => {}} />);
+  expect(screen.getByText("works [main] / with the hip bent between 0 and 60 degrees")).toBeTruthy();
+  fireEvent.click(screen.getAllByText(en["info.sources"])[1]);
+  expect(screen.getByText(en["source.quote"] + " >")).toBeTruthy();
+});

@@ -111,6 +111,24 @@ test("reveal restores layers at or below the target but keeps none that cover it
 test("reveal shows a hidden tissue group", () => {
   const r = revealFor(toggleTissue(initialLayers(), "soft"), iliofemoralLigament, revealFixture);
   expect(isVisible(r.state, iliofemoralLigament)).toBe(true);
+});
+
+test("reveal a ligament at depth 3 peels the muscle layers 1 and 2 in front of it", () => {
+  const r = revealFor(initialLayers(), iliofemoralLigament, revealFixture);
+  expect(r.peeledNow).toBe(2);
+  expect(r.state.peeledDepths).toEqual([1, 2]);
+  expect(isVisible(r.state, gluteusMinimus)).toBe(true);
+});
+
+test("reveal a bone at depth 4 peels every muscle layer", () => {
+  const r = revealFor(initialLayers(), femur, revealFixture);
+  expect(r.peeledNow).toBe(3);
+  expect(r.state.peeledDepths).toEqual([1, 2, 3]);
+  expect(isVisible(r.state, femur)).toBe(true);
+});
+
+test("reveal a bone peels nothing when the muscles are switched off", () => {
+  const r = revealFor(toggleTissue(initialLayers(), "muscle"), femur, revealFixture);
   expect(r.peeledNow).toBe(0);
 });
 

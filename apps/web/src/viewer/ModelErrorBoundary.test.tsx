@@ -91,3 +91,56 @@ test("the watchdog stays quiet when the model is ready in time", () => {
   act(() => vi.advanceTimersByTime(1000));
   expect(screen.queryByRole("alert")).toBeNull();
 });
+
+test("a WebGL failure inside three shows the WebGL message", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  function NoContext(): never {
+    // This is what three throws when the browser will not give it a WebGL context.
+    throw new Error("THREE.WebGLRenderer: Error creating WebGL context.");
+  }
+  render(
+    <ModelErrorBoundary t={t}>
+      <NoContext />
+    </ModelErrorBoundary>,
+  );
+  expect(screen.getByRole("alert").textContent).toBe(en["error.webgl"]);
+});
+
+test("extra content shows next to the error, outside the alert", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  render(
+    <ModelErrorBoundary t={t} extra={<p>still here</p>}>
+      <Thrower />
+    </ModelErrorBoundary>,
+  );
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  expect(screen.getByText("still here")).toBeTruthy();
+});
+
+function setHidden(hidden: boolean) {
+  Object.defineProperty(document, "hidden", { configurable: true, get: () => hidden });
+  document.dispatchEvent(new Event("visibilitychange"));
+}
+
+test("the watchdog waits while the page is in a background tab and starts afresh when it shows", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.useFakeTimers();
+  setHidden(true);
+  try {
+    render(
+      <ModelErrorBoundary t={t}>
+        <Watched ready={false} />
+      </ModelErrorBoundary>,
+    );
+    act(() => vi.advanceTimersByTime(5000));
+    expect(screen.queryByRole("alert")).toBeNull();
+    act(() => setHidden(false));
+    act(() => vi.advanceTimersByTime(999));
+    expect(screen.queryByRole("alert")).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  } finally {
+    // jsdom's own value lives on the prototype, so removing ours brings it back.
+    delete (document as { hidden?: boolean }).hidden;
+  }
+});

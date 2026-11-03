@@ -2,7 +2,7 @@ import type { BundleAction } from "./bundle";
 import type { Translate } from "../i18n/t";
 
 // Turns an angle range list into a sentence piece like "with the hip bent between 0 and 45 degrees".
-// Several ranges are joined with "and". No condition gives empty text.
+// Several ranges are joined with the "when.and" text. No condition gives empty text.
 export function describeCondition(when: BundleAction["when"], t: Translate): string {
   if (!when || when.length === 0) return "";
   return when
@@ -13,7 +13,7 @@ export function describeCondition(when: BundleAction["when"], t: Translate): str
         max: String(range.max),
       }),
     )
-    .join(" and ");
+    .reduce((first, second) => t("when.and", { first, second }));
 }
 
 export function loadWord(load: BundleAction["load"], t: Translate): string {

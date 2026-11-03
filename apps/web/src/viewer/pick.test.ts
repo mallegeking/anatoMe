@@ -2,7 +2,7 @@ import { Group, Mesh, type Object3D } from "three";
 import { expect, test } from "vitest";
 import { createT } from "../i18n/t";
 import en from "../i18n/en.json";
-import { formatLabel, pickStructure, pickVisibleHit, shouldSelect } from "./pick";
+import { formatLabel, pickStructure, pickVisibleHit, shouldClear, shouldSelect } from "./pick";
 
 const t = createT(en);
 
@@ -22,6 +22,8 @@ function childOf(userData: Record<string, unknown>): Object3D {
 
 test("a tap selects", () => expect(shouldSelect(3)).toBe(true));
 test("a drag does not select", () => expect(shouldSelect(6)).toBe(false));
+test("empty-space clear uses the same 6 px rule as selecting", () => expect(shouldClear(5)).toBe(true));
+test("a drag over empty space does not clear", () => expect(shouldClear(6)).toBe(false));
 
 test("nearest hit with a sid wins", () => {
   const near = mesh({});

@@ -31,9 +31,9 @@ export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle
             const citation = bundle.citations.find((c) => c.id === use.ref);
             return (
               <li key={i}>
-                <div>{citation ? `${citation.authors} (${citation.year}). ${citation.title}` : use.ref}</div>
+                <div>{citation ? t("source.citation", { authors: citation.authors, year: String(citation.year), title: citation.title }) : use.ref}</div>
                 <div>
-                  <strong>{t(use.says_kind === "quote" ? "source.quote" : "source.summary")}:</strong> {use.says}
+                  <strong>{t("source.label", { kind: t(use.says_kind === "quote" ? "source.quote" : "source.summary") })}</strong> {use.says}
                 </div>
                 <div className="muted">{use.locator}</div>
               </li>
@@ -46,15 +46,14 @@ export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle
 }
 
 function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: RegionBundle; t: Translate }) {
+  // For example "works (main), with the hip bent between 0 and 45 degrees". The punctuation lives in en.json.
+  const load = loadWord(action.load, t);
+  const withRole = action.role ? t("info.actionRole", { load, role: roleWord(action.role, t) }) : load;
   const when = describeCondition(action.when, t);
-  const role = action.role ? ` (${roleWord(action.role, t)})` : "";
+  const text = when ? t("info.actionWhen", { text: withRole, when }) : withRole;
   return (
     <li>
-      <div>
-        {loadWord(action.load, t)}
-        {role}
-        {when ? `, ${when}` : ""}
-      </div>
+      <div>{text}</div>
       {action.applies_to && <div className="muted">{t("info.appliesTo", { text: action.applies_to })}</div>}
       <div className="muted">{t(`confidence.${action.confidence}`)}</div>
       {bundle.mode === "review" && action.draft && <DraftMark id={action.id} note={action.review_note} t={t} />}

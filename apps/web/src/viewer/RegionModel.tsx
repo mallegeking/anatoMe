@@ -61,11 +61,14 @@ type Props = {
   onSelect: (sel: Selection | null, label?: string) => void;
   // Says whether a structure is shown. Hidden ones are switched off and ignore taps.
   isVisibleSid: (sid: string) => boolean;
-  // Called once, when the model is drawn and the controls work.
-  onReady: () => void;
+  // Called once the files have loaded. It does not wait for a drawn frame,
+  // because a tab in the background draws none and the load watchdog would fire for nothing.
+  onLoaded: () => void;
+  // Told about every click that landed on the model, so the scene does not treat it as a tap on empty space.
+  onModelClick: (event: Event) => void;
 };
 
-export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, onReady }: Props) {
+export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, onLoaded, onModelClick }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -73,8 +76,14 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
   const [ready, setReady] = useState(false);
   const reported = useRef(false);
   const controls = useThree((state) => state.controls) as CameraControlsImpl | null;
+  // The canvas only draws when asked. invalidate asks for one more frame.
+  // Every change below that should show on screen calls it.
+  const invalidate = useThree((state) => state.invalidate);
 
   const scenes = useMemo(() => gltfs.map((g) => g.scene), [gltfs]);
+
+  // useLoader only gets past its first line once every file is in, so reaching this point means the load finished.
+  useEffect(() => onLoaded(), [scenes, onLoaded]);
 
   // Give every mesh a plain material by kind.
   useEffect(() => {
@@ -83,7 +92,8 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
         if (node instanceof Mesh) node.material = materials[groupOf(String(node.userData.kind ?? ""))].normal;
       });
     }
-  }, [scenes, materials]);
+    invalidate();
+  }, [scenes, materials, invalidate]);
 
   // Draw the meshes of the selected structure (and side) lighter and put them back when it changes.
   useEffect(() => {
@@ -95,10 +105,12 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
       });
     }
     for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].selected;
+    invalidate();
     return () => {
       for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].normal;
+      invalidate();
     };
-  }, [selection, scenes, materials]);
+  }, [selection, scenes, materials, invalidate]);
 
   // Show or hide each mesh when the layers change.
   useEffect(() => {
@@ -107,16 +119,19 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
         if (node instanceof Mesh && typeof node.userData.sid === "string") node.visible = isVisibleSid(node.userData.sid);
       });
     }
-  }, [scenes, isVisibleSid]);
+    invalidate();
+  }, [scenes, isVisibleSid, invalidate]);
 
   // Frame the camera on everything we loaded.
   useEffect(() => {
     if (!controls) return;
     const box = new Box3();
     for (const scene of scenes) box.expandByObject(scene);
-    controls.fitToBox(box, false, { paddingLeft: 0.05, paddingRight: 0.05, paddingTop: 0.05, paddingBottom: 0.05 });
+    void controls.fitToBox(box, false, { paddingLeft: 0.05, paddingRight: 0.05, paddingTop: 0.05, paddingBottom: 0.05 });
+    // A jump without a glide does not wake the controls, so ask for the frame here.
+    invalidate();
     setReady(true);
-  }, [controls, scenes]);
+  }, [controls, scenes, invalidate]);
 
   // Glide the camera to the structure a search chose. Hidden meshes still count for the box.
   useEffect(() => {
@@ -128,20 +143,25 @@ export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, on
       });
     }
     if (box.isEmpty()) return;
+    // The glide wakes the controls, and they ask for frames until the camera rests.
     void controls.fitToBox(box, true, { paddingLeft: 0.02, paddingRight: 0.02, paddingTop: 0.02, paddingBottom: 0.02 });
   }, [focus, controls, scenes, ready]);
 
   // Report the time once the model has been drawn at least once with the controls ready.
+  // ready is set during a re-render, so ask for one more frame after it, or the check below might never run.
+  useEffect(() => {
+    if (ready) invalidate();
+  }, [ready, invalidate]);
   useFrame(() => {
     if (ready && !reported.current) {
       reported.current = true;
       markInteractive();
-      onReady();
     }
   });
 
   function handleClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
+    onModelClick(event.nativeEvent);
     // Dragging to rotate also ends in a click. Only a real tap selects.
     if (!shouldSelect(event.delta)) return;
     // Hidden meshes still show up in the hit list, so we pass them over.

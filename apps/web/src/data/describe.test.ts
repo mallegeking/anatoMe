@@ -17,6 +17,16 @@ test("two ranges join with and", () =>
       t,
     ),
   ).toBe("with the hip bent between 0 and 60 degrees and with the hip turned between 0 and 30 degrees"));
+test("the joining word comes from the text file", () =>
+  expect(
+    describeCondition(
+      [
+        { angle: "hip.flexion", min: 0, max: 60 },
+        { angle: "hip.rotation", min: 0, max: 30 },
+      ],
+      createT({ ...en, "when.and": "{first} plus {second}" }),
+    ),
+  ).toBe("with the hip bent between 0 and 60 degrees plus with the hip turned between 0 and 30 degrees"));
 test("no condition gives empty text", () => expect(describeCondition(undefined, t)).toBe(""));
 test("load and role words", () => {
   expect(loadWord("stretched", t)).toBe("is stretched");

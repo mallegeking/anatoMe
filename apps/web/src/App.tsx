@@ -59,12 +59,19 @@ export function App() {
   const [focus, setFocus] = useState<Selection | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
     setSelection(sel);
     setLabel(fileLabel);
     setNotice(null);
+  }
+
+  // A tap on the model also closes the search list, so the list does not hang over the model.
+  function tapModel(sel: Selection | null, fileLabel?: string) {
+    setSearchOpen(false);
+    select(sel, fileLabel);
   }
 
   // A search result: select it, make it visible, move the camera and say what was peeled.
@@ -104,19 +111,36 @@ export function App() {
     setLabel(undefined);
   }, [selection]);
 
+  // The viewer and the panel each catch their own failures, so the rest of the screen and the credits stay.
   // A failure to load the data ends in the same readable error as a model failure.
+  // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
   return (
-    <ModelErrorBoundary t={t}>
+    <ModelErrorBoundary
+      t={t}
+      extra={
+        <footer className="panel">
+          <Credits t={t} />
+        </footer>
+      }
+    >
       <main className="app">
         <ReviewBanner bundle={bundle} t={t} onOpenList={() => setReviewOpen(true)} />
-        <TopBar t={t} structures={structures} layersOpen={layersOpen} onToggleLayers={() => setLayersOpen(!layersOpen)} onChoose={chooseResult} />
+        <TopBar
+          t={t}
+          structures={structures}
+          layersOpen={layersOpen}
+          onToggleLayers={() => setLayersOpen(!layersOpen)}
+          onChoose={chooseResult}
+          open={searchOpen}
+          onOpenChange={setSearchOpen}
+        />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isVisibleSid={isVisibleSid} onSelect={select} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isVisibleSid={isVisibleSid} onSelect={tapModel} />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
@@ -125,18 +149,20 @@ export function App() {
               {notice}
             </p>
           )}
-          <Suspense fallback={<Hint t={t} />}>
-            <PanelArea
-              selection={selection}
-              label={label}
-              layersOpen={layersOpen}
-              layers={layers}
-              setLayers={setLayers}
-              onBundle={setBundle}
-              onSelect={select}
-              onHideSelected={hideSelected}
-            />
-          </Suspense>
+          <ModelErrorBoundary t={t}>
+            <Suspense fallback={<Hint t={t} />}>
+              <PanelArea
+                selection={selection}
+                label={label}
+                layersOpen={layersOpen}
+                layers={layers}
+                setLayers={setLayers}
+                onBundle={setBundle}
+                onSelect={select}
+                onHideSelected={hideSelected}
+              />
+            </Suspense>
+          </ModelErrorBoundary>
           <Credits t={t} />
         </footer>
       </main>

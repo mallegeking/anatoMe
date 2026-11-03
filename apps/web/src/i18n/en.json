@@ -59,7 +59,6 @@
   "search.peeled": "{count} layers peeled to show {name}",
   "search.peeledOne": "1 layer peeled to show {name}",
   "search.label": "Search structures",
-  "search.clear": "Clear search",
   "review.banner": "Review build. Rows marked draft have not been checked yet. Do not share this version.",
   "review.draft": "Draft, not yet checked",
   "review.list": "Review list",
@@ -67,5 +66,11 @@
   "review.note": "Question for the reviewer: {note}",
   "review.rowId": "Row code: {id}",
   "review.empty": "There are no draft rows.",
-  "review.attachment": "Attachment: {text}"
+  "review.attachment": "Attachment: {text}",
+  "error.webgl": "This browser cannot show 3D graphics. Try another browser or turn on hardware acceleration.",
+  "when.and": "{first} and {second}",
+  "info.actionRole": "{load} ({role})",
+  "info.actionWhen": "{text}, {when}",
+  "source.label": "{kind}:",
+  "source.citation": "{authors} ({year}). {title}"
 }

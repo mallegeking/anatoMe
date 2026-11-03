@@ -87,6 +87,45 @@ body,
   text-align: center;
 }
 
+/* Inside the panel the message is just a line of text. */
+.panel .model-error {
+  display: block;
+  height: auto;
+  padding: 0 0 8px;
+  text-align: left;
+}
+
+/* The last-resort error: the message fills the screen and the credits stay below it. */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.error-page .model-error {
+  flex: 1 1 auto;
+  height: auto;
+}
+
+/* Sits in the middle of the empty stage until the model is in. It lets taps through. */
+.model-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+.educational {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
 .perf-overlay {
   position: absolute;
   top: 8px;
