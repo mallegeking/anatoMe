@@ -115,10 +115,16 @@ export function validateDataDir(dir: string): ValidationResult {
         if (!angles.has(w.angle)) errors.push({ file, path: at(`/when/${j}/angle`), message: `unknown angle ${w.angle}` });
         if (!(w.min < w.max)) errors.push({ file, path: at(`/when/${j}`), message: "min must be less than max" });
       }
+      // Only a physio may say a movement claim is right. The owner may check attachments, see below.
+      if (a.checked_by !== null && !a.checked_by.startsWith("physio-")) {
+        errors.push({ file, path: at("/checked_by"), message: "action rows can only be checked by a physio, use a label like physio-1" });
+      }
       checkGated(file, i, a, citationIds, errors);
     }
   }
 
+  // Attachment rows are plain textbook facts, so the owner may check them against the cited source.
+  // The schema allows owner or a physio label there.
   for (const { file, rows } of attachments) {
     for (const [i, a] of rows.entries()) {
       checkStructureType(file, `/${i}/muscle`, "muscle", a.muscle, structureById, errors);
@@ -222,7 +228,7 @@ function checkUnique(files: Loaded<{ id: string }>[], errors: ValidationError[])
 // Turns an Ajv error into a sentence a data author can act on.
 function friendly(e: ErrorObject): string {
   const last = e.instancePath.split("/").pop();
-  if (last === "checked_by") return "checked_by must be null or the role label of whoever checked the row, like physio-1";
+  if (last === "checked_by") return "checked_by must be null, owner or a physio label like physio-1, never a name";
   if (last === "checked_on") return "checked_on must be a date like 2026-11-03";
   switch (e.keyword) {
     case "required":

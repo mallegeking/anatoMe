@@ -36,9 +36,9 @@
         }
       },
       "checked_by": {
-        "description": "Null until a person has read the sources. Then a role label such as owner, never a name.",
+        "description": "Null until a person has checked the row against its sources. Then owner or a physio role label such as physio-1, never a name.",
         "type": ["string", "null"],
-        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        "pattern": "^(owner|physio-[0-9]+)$"
       },
       "checked_on": {
         "description": "The date the row was checked, like 2026-11-03. Required when checked_by is set, see validate.ts.",

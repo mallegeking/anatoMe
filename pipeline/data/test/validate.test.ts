@@ -42,3 +42,10 @@ test("missing folder reports a missing file instead of throwing", () =>
   expectError(fx("does-not-exist"), /not found/));
 test("checked_by must be a role label, not a name", () => expectError(fx("checked-by-name"), /checked_by/));
 test("checked_on cannot be set while checked_by is null", () => expectError(fx("unchecked-with-date"), /checked_on must not be set while checked_by is null/));
+
+// checked_by holds a role label: owner or physio-<number>. A name, even written in lower case, fails.
+test("action checked_by cannot be a name in role form", () => expectError(fx("action-checked-by-lowercase-name"), /actions\/hip\.yaml \/0\/checked_by: checked_by must be null, owner or a physio label/));
+test("attachment checked_by cannot be a name in role form", () => expectError(fx("attachment-checked-by-lowercase-name"), /attachments\/hip\.yaml \/0\/checked_by: checked_by must be null, owner or a physio label/));
+// Only a physio may check action rows. Attachment rows may be checked by the owner or a physio.
+test("action rows cannot be checked by the owner", () => expectError(fx("action-checked-by-owner"), /action rows can only be checked by a physio/));
+test("attachment rows can be checked by a physio", () => expect(validateDataDir(fx("attachment-checked-by-physio")).ok).toBe(true));
