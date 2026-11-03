@@ -52,5 +52,12 @@
   "layers.hidden": "Hidden",
   "layers.show": "Show",
   "layers.open": "Layers",
-  "layers.close": "Close layers"
+  "layers.close": "Close layers",
+  "layers.peeledOne": "1 layer peeled",
+  "search.placeholder": "Search, for example piriformis",
+  "search.none": "No structure found",
+  "search.peeled": "{count} layers peeled to show {name}",
+  "search.peeledOne": "1 layer peeled to show {name}",
+  "search.label": "Search structures",
+  "search.clear": "Clear search"
 }

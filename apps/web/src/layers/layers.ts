@@ -72,3 +72,22 @@ export function toggleTissue(state: LayerState, group: TissueGroup): LayerState 
   else next.hiddenTissues.add(group);
   return next;
 }
+
+// Makes a structure visible again, however it was hidden.
+// It shows the tissue group, unhides the structure, puts back peeled layers at or below it
+// and peels the muscle layers that cover it. peeledNow counts only the layers peeled just now.
+export function revealFor(state: LayerState, target: BundleStructure, structures: BundleStructure[]): { state: LayerState; peeledNow: number } {
+  let next = copy(state);
+  next.hiddenTissues.delete(tissueOf(target.type));
+  next.hiddenIds.delete(target.id);
+  if (tissueOf(target.type) !== "muscle") return { state: next, peeledNow: 0 };
+
+  next.peeledDepths = next.peeledDepths.filter((depth) => depth < target.depth);
+  let peeledNow = 0;
+  // Peel while some visible muscle sits above the target.
+  while (structures.some((s) => tissueOf(s.type) === "muscle" && isVisible(next, s) && s.depth < target.depth)) {
+    next = peel(next, structures);
+    peeledNow++;
+  }
+  return { state: next, peeledNow };
+}

@@ -34,7 +34,7 @@ function show(state = initialLayers(), handlers: Partial<Parameters<typeof Layer
 test("panel shows the peeled count and lists hidden structures with a show button", () => {
   const onShow = vi.fn();
   show(hideStructure(peel(initialLayers(), structures), "piriformis"), { onShow });
-  expect(screen.getByText("1 layers peeled")).toBeTruthy();
+  expect(screen.getByText("1 layer peeled")).toBeTruthy();
   expect(screen.getByText("Hidden")).toBeTruthy();
   expect(screen.getByText("Piriformis")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: /Show/ }));
@@ -62,4 +62,10 @@ test("tissue checkboxes reflect and toggle the state", () => {
   fireEvent.click(bones);
   expect(onToggleTissue).toHaveBeenCalledWith("bone");
   expect(screen.getByRole("checkbox", { name: "Ligaments and other soft tissue" })).toBeTruthy();
+});
+
+test("peel is off when no visible muscle is left", () => {
+  const all = hideStructure(hideStructure(initialLayers(), "gluteus-maximus"), "piriformis");
+  show(all);
+  expect((screen.getByRole("button", { name: "Peel a layer" }) as HTMLButtonElement).disabled).toBe(true);
 });

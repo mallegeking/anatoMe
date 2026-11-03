@@ -54,6 +54,8 @@ type Props = {
   urls: string[];
   // The structure to draw lighter, or null for none.
   selection: Selection | null;
+  // Frame this structure with the camera, or null to leave the camera alone.
+  focus: Selection | null;
   // Called after a tap on the model. null means the tap hit nothing with a name.
   // The label is the name in the 3D file, for structures the data does not know.
   onSelect: (sel: Selection | null, label?: string) => void;
@@ -63,7 +65,7 @@ type Props = {
   onReady: () => void;
 };
 
-export function RegionModel({ urls, selection, isVisibleSid, onSelect, onReady }: Props) {
+export function RegionModel({ urls, selection, focus, isVisibleSid, onSelect, onReady }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -115,6 +117,19 @@ export function RegionModel({ urls, selection, isVisibleSid, onSelect, onReady }
     controls.fitToBox(box, false, { paddingLeft: 0.05, paddingRight: 0.05, paddingTop: 0.05, paddingBottom: 0.05 });
     setReady(true);
   }, [controls, scenes]);
+
+  // Glide the camera to the structure a search chose. Hidden meshes still count for the box.
+  useEffect(() => {
+    if (!focus || !controls || !ready) return;
+    const box = new Box3();
+    for (const scene of scenes) {
+      scene.traverse((node: Object3D) => {
+        if (node instanceof Mesh && node.userData.sid === focus.sid && (node.userData.side ?? "") === focus.side) box.expandByObject(node);
+      });
+    }
+    if (box.isEmpty()) return;
+    void controls.fitToBox(box, true, { paddingLeft: 0.02, paddingRight: 0.02, paddingTop: 0.02, paddingBottom: 0.02 });
+  }, [focus, controls, scenes, ready]);
 
   // Report the time once the model has been drawn at least once with the controls ready.
   useFrame(() => {

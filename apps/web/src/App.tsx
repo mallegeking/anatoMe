@@ -1,13 +1,15 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import type { BundleStructure } from "./data/bundle";
+import type { BundleStructure, RegionBundle } from "./data/bundle";
 import { useRegionData } from "./data/useRegionData";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
-import { hideStructure, initialLayers, isVisible, peel, restore, showStructure, toggleTissue, type LayerState } from "./layers/layers";
+import { hideStructure, initialLayers, isVisible, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
 import { LayersPanel } from "./layers/LayersPanel";
 import { PerfOverlay } from "./perf/PerfOverlay";
+import { selectBySearch } from "./search/search";
 import { Credits } from "./ui/Credits";
 import { Hint, RegionInfo } from "./ui/RegionInfo";
+import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
 import type { Selection } from "./viewer/pick";
@@ -21,15 +23,15 @@ type PanelAreaProps = {
   layersOpen: boolean;
   layers: LayerState;
   setLayers: (update: (state: LayerState) => LayerState) => void;
-  onStructures: (structures: BundleStructure[]) => void;
+  onBundle: (bundle: RegionBundle) => void;
   onSelect: (sel: Selection | null, label?: string) => void;
   onHideSelected: () => void;
 };
 
 // Loads the data, tells the app which structures exist, and shows the layers panel or the info panel.
-function PanelArea({ selection, label, layersOpen, layers, setLayers, onStructures, onSelect, onHideSelected }: PanelAreaProps) {
+function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, onSelect, onHideSelected }: PanelAreaProps) {
   const bundle = useRegionData(REGION);
-  useEffect(() => onStructures(bundle.structures), [bundle, onStructures]);
+  useEffect(() => onBundle(bundle), [bundle, onBundle]);
   if (layersOpen) {
     return (
       <LayersPanel
@@ -51,11 +53,28 @@ export function App() {
   const [label, setLabel] = useState<string | undefined>(undefined);
   const [layers, setLayers] = useState<LayerState>(initialLayers);
   const [layersOpen, setLayersOpen] = useState(false);
-  const [structures, setStructures] = useState<BundleStructure[]>([]);
+  const [bundle, setBundle] = useState<RegionBundle | null>(null);
+  const [focus, setFocus] = useState<Selection | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
     setSelection(sel);
     setLabel(fileLabel);
+    setNotice(null);
+  }
+
+  // A search result: select it, make it visible, move the camera and say what was peeled.
+  function chooseResult(structure: BundleStructure) {
+    if (!bundle) return;
+    const { state, peeledNow } = revealFor(layers, structure, structures);
+    const sel = selectBySearch(structure.id, bundle);
+    setLayers(state);
+    setSelection(sel);
+    setLabel(undefined);
+    setFocus({ ...sel });
+    setLayersOpen(false);
+    setNotice(peeledNow === 0 ? null : t(peeledNow === 1 ? "search.peeledOne" : "search.peeled", { count: String(peeledNow), name: structure.english }));
   }
 
   // Structures the data does not know are always shown.
@@ -86,14 +105,17 @@ export function App() {
   return (
     <ModelErrorBoundary t={t}>
       <main className="app">
+        <TopBar t={t} structures={structures} layersOpen={layersOpen} onToggleLayers={() => setLayersOpen(!layersOpen)} onChoose={chooseResult} />
         <div className="stage">
-          <Viewer region={REGION} t={t} selection={selection} isVisibleSid={isVisibleSid} onSelect={select} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isVisibleSid={isVisibleSid} onSelect={select} />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
-          <button type="button" className="layers-toggle" aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>
-            {t(layersOpen ? "layers.close" : "layers.open")}
-          </button>
+          {notice && (
+            <p className="muted search-notice" role="status">
+              {notice}
+            </p>
+          )}
           <Suspense fallback={<Hint t={t} />}>
             <PanelArea
               selection={selection}
@@ -101,7 +123,7 @@ export function App() {
               layersOpen={layersOpen}
               layers={layers}
               setLayers={setLayers}
-              onStructures={setStructures}
+              onBundle={setBundle}
               onSelect={select}
               onHideSelected={hideSelected}
             />

@@ -233,3 +233,80 @@ body,
   padding: 0;
   list-style: none;
 }
+
+/* The top bar sits above the model, so it never covers it. */
+.top-bar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid #2c323b;
+}
+
+.top-bar-row {
+  display: flex;
+  gap: 8px;
+}
+
+.top-bar .layers-toggle {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.search-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #14171c;
+  color: var(--text);
+  font: inherit;
+}
+
+/* The list floats over the model only while it is open. */
+.search-drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 50dvh;
+  overflow-y: auto;
+  background: var(--panel);
+  border-bottom: 1px solid #2c323b;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.search-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-results button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 0;
+  border-top: 1px solid #2c323b;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.search-none {
+  margin: 0;
+  padding: 12px 16px;
+  color: var(--muted);
+}
+
+.search-notice {
+  margin: 0 0 8px;
+}

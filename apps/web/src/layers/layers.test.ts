@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { BundleStructure } from "../data/bundle";
-import { hideStructure, initialLayers, isVisible, peel, restore, showStructure, tissueOf, toggleTissue } from "./layers";
+import { hideStructure, initialLayers, isVisible, peel, restore, revealFor, showStructure, tissueOf, toggleTissue } from "./layers";
 
 const gluteusMaximus: BundleStructure = { id: "gluteus-maximus", type: "muscle", english: "Gluteus maximus", depth: 1 };
 const gluteusMedius: BundleStructure = { id: "gluteus-medius", type: "muscle", english: "Gluteus medius", depth: 2 };
@@ -72,4 +72,55 @@ test("functions do not change the state they are given", () => {
   hideStructure(start, "femur");
   toggleTissue(start, "bone");
   expect(start).toEqual(initialLayers());
+});
+
+// revealFor
+const obturatorInternus: BundleStructure = { id: "obturator-internus", type: "muscle", english: "Obturator internus", depth: 2 };
+const obturatorExternus: BundleStructure = { id: "obturator-externus", type: "muscle", english: "Obturator externus", depth: 3 };
+const revealFixture = [...fixture, obturatorInternus, obturatorExternus];
+
+test("reveal a deep muscle peels the layers above", () => {
+  const r = revealFor(initialLayers(), gluteusMinimus, revealFixture);
+  expect(r.peeledNow).toBe(2);
+  expect(isVisible(r.state, gluteusMinimus)).toBe(true);
+  expect(revealFor(initialLayers(), obturatorExternus, revealFixture).peeledNow).toBe(2);
+});
+
+test("reveal a muscle one layer down peels one layer", () => {
+  const r = revealFor(initialLayers(), obturatorInternus, revealFixture);
+  expect(r.peeledNow).toBe(1);
+  expect(isVisible(r.state, gluteusMaximus)).toBe(false);
+  expect(isVisible(r.state, obturatorInternus)).toBe(true);
+});
+
+test("reveal a superficial muscle restores peeled layers", () => {
+  const peeled = peel(peel(initialLayers(), revealFixture), revealFixture);
+  const r = revealFor(peeled, gluteusMaximus, revealFixture);
+  expect(isVisible(r.state, gluteusMaximus)).toBe(true);
+  expect(r.peeledNow).toBe(0);
+});
+
+test("reveal restores layers at or below the target but keeps none that cover it", () => {
+  const peeled = peel(peel(initialLayers(), revealFixture), revealFixture);
+  const r = revealFor(peeled, gluteusMedius, revealFixture);
+  expect(isVisible(r.state, gluteusMedius)).toBe(true);
+  expect(r.state.peeledDepths).toEqual([1]);
+  expect(r.peeledNow).toBe(0);
+});
+
+test("reveal shows a hidden tissue group", () => {
+  const r = revealFor(toggleTissue(initialLayers(), "soft"), iliofemoralLigament, revealFixture);
+  expect(isVisible(r.state, iliofemoralLigament)).toBe(true);
+  expect(r.peeledNow).toBe(0);
+});
+
+test("reveal unhides a structure hidden one by one", () => {
+  const r = revealFor(hideStructure(initialLayers(), "femur"), femur, revealFixture);
+  expect(isVisible(r.state, femur)).toBe(true);
+});
+
+test("reveal leaves the old state alone", () => {
+  const before = initialLayers();
+  revealFor(before, gluteusMinimus, revealFixture);
+  expect(before.peeledDepths).toEqual([]);
 });
