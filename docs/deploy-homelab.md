@@ -40,15 +40,20 @@ npm ci
 npm run build
 ```
 
-The finished site is in `apps/web/dist/`. It should look like this. The two `index-<hash>` file names have a different random part on every build, that is fine.
+The finished site is in `apps/web/dist/`. It should look like this. The three file names with `<hash>` have a different random part on every build, that is fine.
 
 ```text
 apps/web/dist/
   index.html
+  third-party-licenses.txt
   assets/
     index-<hash>.js
     index-<hash>.css
+    Scene-<hash>.js
+  data/
+    hip.json
   draco/
+    LICENSE
     draco_decoder.js
     draco_decoder.wasm
     draco_wasm_wrapper.js
@@ -60,6 +65,14 @@ apps/web/dist/
 ```
 
 Check it quickly with `ls apps/web/dist`. You must see `index.html` directly in that folder, not inside another folder.
+
+Then check that no unchecked row got into the build. Run this from the same top folder:
+
+```bash
+node scripts/check-no-drafts.mjs
+```
+
+Expected output: `apps/web/dist/data: 1 bundle(s), no drafts`. If it prints anything else, do not copy the site. Run `npm run build` again and repeat the check.
 
 ## 3. Copy to the homelab
 
@@ -87,7 +100,7 @@ After the copy, `/srv/anatome` on the homelab should look exactly like the tree 
 ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'
 ```
 
-Expected output: `assets  draco  index.html  models`
+Expected output: `assets  data  draco  index.html  models  third-party-licenses.txt`
 
 ## 4. Serve it with Tailscale
 
@@ -143,7 +156,7 @@ You can run `tailscale serve status` again to confirm that nothing is served.
 
 ## 5. Open it on the phone and measure
 
-The point of this step is to check two things on the real phone: the model is usable within 5 seconds, and rotating it does not stutter. Write your numbers into `docs/phase0/phone-measurements.md`.
+The point of this step is to check two things on the real phone: the model is usable within 5 seconds, and rotating it does not stutter. Write your numbers into `docs/phase1/phone-measurements.md`. The Phase 0 sheet in `docs/phase0/` keeps your first results.
 
 Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 
@@ -154,7 +167,7 @@ Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 5. Repeat steps 2 to 4 two more times, so you have 3 numbers.
 6. Rotate the model with one finger for 10 seconds. Note whether it stutters (yes or no).
 7. Tap 5 different structures and note whether the right name appears each time.
-8. Do the two extra tap checks listed in the measurement sheet.
+8. Do the other checks listed in the measurement sheet: quick taps, search, layers, the info panel and the side switch.
 
 The pass mark is the same as in the measurement sheet: the median of the 3 numbers (the middle one) is under 5000 ms, and the model does not stutter when you rotate it.
 
@@ -234,9 +247,9 @@ npm ci
 npm run build:review -w apps/web
 ```
 
-The finished review site is in `apps/web/dist-review/`. It has the same layout as `apps/web/dist/` in step 2, with `index.html` directly inside. It also has a `data` folder that holds the draft rows.
+The finished review site is in `apps/web/dist-review/`. It has the same layout as `apps/web/dist/` in step 2, with `index.html` directly inside. Its `data` folder holds the draft rows.
 
-Building the normal site afterwards is safe. `npm run build` compiles the data again in normal mode, and `node scripts/check-no-drafts.mjs` checks that no draft row got into `apps/web/dist/`.
+The draft rows are written straight into `apps/web/dist-review/data/`, after the rest of the review site is built. They never go into `apps/web/public/data/`, the folder the normal site and `npm run dev` read from. So building the normal site afterwards is safe, and so is a dev server that is still running. Step 2 ends with `node scripts/check-no-drafts.mjs`, which checks that no draft row got into `apps/web/dist/`.
 
 ### R2. Copy it to its own folder on the homelab
 
@@ -293,12 +306,14 @@ This server does not start again after a reboot. That is fine for a short review
 
 ### R4. Stop serving the review copy
 
-When the review is done, run this on the homelab. If you used the small local web server above, stop it first with `pkill -f "http.server 8081"`. It turns off only the port 8443 handler and leaves the normal site running:
+When the review is done, run these on the homelab. If you used the small local web server above, first stop it with `pkill -f "http.server 8081"`.
 
 ```bash
 sudo tailscale serve --https=8443 off
 sudo rm -r /srv/anatome-review
 ```
+
+The first command stops Tailscale serving the review copy on port 8443. The normal site on port 443 keeps running. The second command deletes the review files from the homelab.
 
 ### R5. What to ask first
 
@@ -307,9 +322,16 @@ sudo rm -r /srv/anatome-review
 
 ### R6. Record the answers
 
-Do this on the dev machine, in the data files in the `data/` folder (`data/actions/hip.yaml` for movement rows). The file `data/attachments/hip.yaml` does not exist yet, so skip attachment rows until it does. Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
+Do this on the dev machine, in the data files in the `data/` folder. There are two kinds of rows:
 
-- The physiotherapist agrees. Set `checked_by: physio-1` and add a `checked_on` line with the date of the check, in the form `YYYY-MM-DD`. Use the role label only, never a person's name. If you checked the row yourself, use `checked_by: owner`. Then delete the `review_note` line of that row, because the question is answered. A checked row that still has a note would show the note in the review build. Here is a row before and after:
+- **Action rows** in `data/actions/hip.yaml` say what a movement does to a structure. Only your physiotherapist can check these. `npm run validate` refuses an action row with `checked_by: owner`.
+- **Attachment rows** in `data/attachments/hip.yaml` (63 rows) say where a muscle starts and ends. These are plain textbook facts, so you can check them yourself against the cited source, without the physiotherapist. Open the source (the "Open the source" link under "Sources" in the review build, or the `url` in `data/citations.yaml`), go to the place the row's `locator` names, and compare it with the row's `bone` and `landmark`. If they match, mark the row as checked with `checked_by: owner`, as shown below. If they do not match, fix the row or ask your physiotherapist.
+
+`checked_by` takes only two kinds of label: `owner` (you) or `physio-1` (your physiotherapist, `physio-2` for a second one). Never a person's name. `npm run validate` refuses anything else.
+
+Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
+
+- The check passes. Set `checked_by: physio-1` for an action row the physiotherapist agreed with, or `checked_by: owner` for an attachment row you checked against its source. Add a `checked_on` line with the date of the check, in the form `YYYY-MM-DD`. Then delete the `review_note` line of that row if it has one, because the question is answered. A checked row that still has a note would show the note in the review build. Here is an action row before and after:
 
   Before:
 
@@ -326,7 +348,7 @@ Do this on the dev machine, in the data files in the `data/` folder (`data/actio
   ```
 
   The `checked_on` line goes directly under `checked_by`, with the same indent. The `review_note` line is gone.
-- The physiotherapist asks for a change. Edit the row to say what they asked for and leave it unchecked, so it stays a draft. Show it to them again in the next review build.
+- The physiotherapist asks for a change, or the source says something else. Edit the row to say what is right and leave it unchecked, so it stays a draft. Show action rows to the physiotherapist again in the next review build.
 - The row is wrong or not wanted. Delete the row.
 
 When you are done, run:
