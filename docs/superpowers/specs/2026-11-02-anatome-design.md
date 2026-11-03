@@ -184,6 +184,8 @@ The knowledge base is the heart of the project. It lives as YAML files in `data/
 
 **Who writes and checks data rows** **(builder's call):** Claude drafts rows, but only from sources it can actually open and read (open-access papers, openly licensed textbooks, sources the owner provides). Each citation records what the source says, so it can be checked. Each row has a `checked_by` field that stays empty until a person (the owner, later the physio) has looked at the source. The app can show unchecked rows differently. No citation is ever written from memory.
 
+**Review gate (owner's rule, added 2026-11-03):** no action row reaches the app until a person has checked it. Rows with `checked_by: null` are left out of the normal app build entirely and only appear, marked as drafts, in a separate review build for the owner and the physio. The first item for the physio is the piriformis judgment call (primary external rotator up to 45 degrees of hip flexion, or only up to 30). Details in `docs/superpowers/specs/2026-11-03-phase-1-hip-atlas-design.md`, section 2.
+
 **Sides** **(builder's call):** knowledge base entries describe one side. The mapping table links each structure to its left and right meshes.
 
 **Translations:** structure names carry a Latin term (universal) plus per-language names. Shona anatomy terms may not exist for every structure. Fallback order to be decided when Shona is added (low confidence on availability).
