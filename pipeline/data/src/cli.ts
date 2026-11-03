@@ -1,9 +1,12 @@
 // Command line entry for the data checks.
 //   validate <dataDir>                  checks the YAML knowledge base
+//   build-data <dataDir> <outDir> [--review]  validates, then writes <outDir>/<region>.json per region
 //   check-models <modelsDir> <dataDir>  checks mesh extras, licenses and the triangle budget
 // Prints one "file path: message" line per problem and exits 1 when there is any.
 
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { compileRegion, listRegions } from "./compile.ts";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
 import { loadStructures, validateDataDir, type ValidationResult } from "./validate.ts";
 
@@ -44,7 +47,24 @@ async function main(args: string[]): Promise<number> {
     if (code === 0) console.log(`every mesh maps to one of ${structures.size} structures`);
     return code;
   }
-  console.error("usage: cli.ts validate <dataDir> | check-models <modelsDir> <dataDir>");
+  if (command === "build-data") {
+    const review = rest.includes("--review");
+    const paths = rest.filter((a) => a !== "--review");
+    if (paths.length === 2) {
+      const [dataDir, outDir] = paths;
+      const code = report(validateDataDir(dataDir));
+      if (code !== 0) return code;
+      mkdirSync(outDir, { recursive: true });
+      for (const region of listRegions(dataDir)) {
+        const bundle = compileRegion(dataDir, region, review ? "review" : "normal");
+        const text = JSON.stringify(bundle);
+        writeFileSync(join(outDir, `${region}.json`), text);
+        console.log(`${region}.json (${bundle.mode}): ${text.length} bytes, ${bundle.actions.length} actions, ${bundle.attachments.length} attachments`);
+      }
+      return 0;
+    }
+  }
+  console.error("usage: cli.ts validate <dataDir> | build-data <dataDir> <outDir> [--review] | check-models <modelsDir> <dataDir>");
   return 2;
 }
 

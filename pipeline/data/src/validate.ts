@@ -138,6 +138,9 @@ function checkGated(file: string, i: number, row: Gated, citationIds: Set<string
   if (row.checked_by !== null && row.checked_on === undefined) {
     errors.push({ file, path: `/${i}`, message: "checked_on is required when checked_by is set" });
   }
+  if (row.checked_by === null && row.checked_on !== undefined) {
+    errors.push({ file, path: `/${i}`, message: "checked_on must not be set while checked_by is null" });
+  }
 }
 
 // Checks that a field like muscle or bone points to a structure of that type.

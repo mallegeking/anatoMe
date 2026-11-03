@@ -40,3 +40,5 @@ test("duplicate id across actions and attachments", () => expectError(fx("duplic
 
 test("missing folder reports a missing file instead of throwing", () =>
   expectError(fx("does-not-exist"), /not found/));
+test("checked_by must be a role label, not a name", () => expectError(fx("checked-by-name"), /checked_by/));
+test("checked_on cannot be set while checked_by is null", () => expectError(fx("unchecked-with-date"), /checked_on must not be set while checked_by is null/));

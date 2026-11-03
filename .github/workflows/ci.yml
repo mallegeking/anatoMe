@@ -32,6 +32,10 @@ jobs:
       - name: Build the app
         run: npm run build
 
+      # Fails when an unchecked row reached the normal bundle.
+      - name: Check the build has no drafts
+        run: node scripts/check-no-drafts.mjs
+
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"

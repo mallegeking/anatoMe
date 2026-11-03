@@ -4,6 +4,14 @@
   bone: femur
   landmark: gluteal tuberosity
   citations:
-    - {ref: test-book, locator: page 3, says: A third short quote., says_kind: quote}
+    - {ref: used-source, locator: page 3, says: A third short quote., says_kind: quote}
   checked_by: owner
   checked_on: 2026-11-03
+- id: piriformis-insertion-femur
+  muscle: piriformis
+  end: insertion
+  bone: femur
+  landmark: greater trochanter
+  citations:
+    - {ref: used-source, locator: page 4, says: A fourth short quote., says_kind: summary}
+  checked_by: null

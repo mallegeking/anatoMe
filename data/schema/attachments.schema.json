@@ -38,7 +38,7 @@
       "checked_by": {
         "description": "Null until a person has read the sources. Then a role label such as owner, never a name.",
         "type": ["string", "null"],
-        "minLength": 1
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
       },
       "checked_on": {
         "description": "The date the row was checked, like 2026-11-03. Required when checked_by is set, see validate.ts.",

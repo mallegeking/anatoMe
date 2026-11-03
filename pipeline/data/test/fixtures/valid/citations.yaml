@@ -1,7 +1,14 @@
-- id: test-book
+- id: used-source
   title: A test book
   authors: Test Author
   year: 2020
   url: https://example.org/book
+  license: CC BY 4.0
+  access: open
+- id: unused-source
+  title: A second test book
+  authors: Test Author
+  year: 2021
+  url: https://example.org/book2
   license: CC BY 4.0
   access: open

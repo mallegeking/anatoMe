@@ -1,0 +1,4 @@
+- id: hip
+  dofs:
+    - {id: flexion, positive: flexion, negative: extension}
+    - {id: rotation, positive: internal rotation, negative: external rotation}

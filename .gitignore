@@ -4,6 +4,8 @@ sources/
 tools/
 .venv/
 apps/web/public/models/
+apps/web/public/data/
+apps/web/dist-review/
 *.log
 .superpowers/
 __pycache__/
