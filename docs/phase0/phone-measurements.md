@@ -8,10 +8,10 @@ Pass mark for Phase 0: the model is interactive within 5000 ms, and it does not 
 
 | Item | Value |
 | --- | --- |
-| Date | |
+| Date | 03.11.2026 |
 | Phone | Samsung Galaxy A23 |
 | Firefox version (Firefox menu, Settings, About Firefox) | 159.0 (Build #2016191887),GV: 159.0-20261022150525, AS: 159.0.1, OS: Android 14 |
-| Wi-Fi band (2.4 or 5 GHz, if you know) | |
+| Wi-Fi band (2.4 or 5 GHz, if you know) | 5GHz |
 | Git commit that was deployed (run `git rev-parse --short HEAD` before building) | |
 
 ## 1. Time to interactive
