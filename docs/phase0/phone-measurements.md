@@ -10,10 +10,7 @@ Pass mark for Phase 0: the model is interactive within 5000 ms, and it does not 
 | --- | --- |
 | Date | |
 | Phone | Samsung Galaxy A23 |
-| Firefox version (Firefox menu, Settings, About Firefox) | 159.0 (Build #2016191887),
-GV: 159.0-20261022150525
-AS: 159.0.1
-OS: Android 14 |
+| Firefox version (Firefox menu, Settings, About Firefox) | 159.0 (Build #2016191887),GV: 159.0-20261022150525, AS: 159.0.1, OS: Android 14 |
 | Wi-Fi band (2.4 or 5 GHz, if you know) | |
 | Git commit that was deployed (run `git rev-parse --short HEAD` before building) | |
 
@@ -74,4 +71,4 @@ Muscle you used: ____Gluteus maximus (left)__________________
 Anything else you noticed, for example slow parts, things that looked odd, or a moment where the page froze.
 
 (write here)
-The app performed well for a first version. I used firefox instead of chrome. I'm not a big fan of chrome
+The app performed well for a first version. I used firefox instead of chrome. I'm not a big fan of chrome, hope that's okay
