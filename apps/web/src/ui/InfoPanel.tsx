@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { BundleAction, BundleCitationUse, RegionBundle } from "../data/bundle";
 import { describeCondition, loadWord, roleWord } from "../data/describe";
 import type { Translate } from "../i18n/t";
+import { DraftMark } from "../review/DraftMark";
 import type { Selection } from "../viewer/pick";
 
 type Props = {
@@ -16,7 +17,7 @@ type Props = {
 
 const QUADRICEPS = new Set(["rectus-femoris", "vastus-lateralis", "vastus-medialis", "vastus-intermedius"]);
 
-function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle: RegionBundle; t: Translate }) {
+export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle: RegionBundle; t: Translate }) {
   const [open, setOpen] = useState(false);
   if (uses.length === 0) return null;
   return (
@@ -56,7 +57,8 @@ function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: Region
       </div>
       {action.applies_to && <div className="muted">{t("info.appliesTo", { text: action.applies_to })}</div>}
       <div className="muted">{t(`confidence.${action.confidence}`)}</div>
-      {bundle.mode === "review" && action.review_note && <div className="review-note">{action.review_note}</div>}
+      {bundle.mode === "review" && action.draft && <DraftMark id={action.id} note={action.review_note} t={t} />}
+      {bundle.mode === "review" && !action.draft && action.review_note && <div className="review-note">{t("review.note", { note: action.review_note })}</div>}
       <Sources uses={action.citations} bundle={bundle} t={t} />
     </li>
   );
@@ -70,7 +72,8 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
   const boneName = (id: string) => (bundle.structures.find((s) => s.id === id)?.english ?? id).toLowerCase();
   const attachments = structure ? bundle.attachments.filter((a) => a.muscle === selection.sid) : [];
   const actions = structure ? bundle.actions.filter((a) => a.structure === selection.sid) : [];
-  const pending = structure ? (bundle.pendingByStructure[selection.sid] ?? 0) : 0;
+  // In the review build the draft rows are shown above, so the waiting line would only repeat them.
+  const pending = structure && bundle.mode !== "review" ? (bundle.pendingByStructure[selection.sid] ?? 0) : 0;
 
   // Group the rows by movement, keeping the order of the bundle's movement list.
   const groups = bundle.movements
@@ -89,6 +92,7 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
             {attachments.map((a) => (
               <li key={a.id}>
                 {t(a.end === "origin" ? "info.origin" : "info.insertion", { landmark: a.landmark, bone: boneName(a.bone) })}
+                {bundle.mode === "review" && a.draft && <DraftMark id={a.id} t={t} />}
                 <Sources uses={a.citations} bundle={bundle} t={t} />
               </li>
             ))}

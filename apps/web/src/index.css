@@ -310,3 +310,60 @@ body,
 .search-notice {
   margin: 0 0 8px;
 }
+
+/* Review build only. The banner takes its own row above the model, so it never covers it. */
+.review-banner {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #5c4400;
+  color: #fff3cd;
+  font-size: 0.8125rem;
+}
+
+.review-banner span {
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+}
+
+.review-banner button,
+.review-list-bar button {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+
+.review-stage {
+  overflow-y: auto;
+}
+
+.review-list {
+  padding: 8px 16px;
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.review-list-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.review-list ul {
+  padding-left: 18px;
+}
+
+.draft-mark {
+  margin: 4px 0;
+}
+
+.draft-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: #5c4400;
+  color: #fff3cd;
+  font-size: 0.8125rem;
+}

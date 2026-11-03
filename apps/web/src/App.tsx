@@ -5,6 +5,8 @@ import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
 import { hideStructure, initialLayers, isVisible, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
 import { LayersPanel } from "./layers/LayersPanel";
+import { ReviewBanner } from "./review/ReviewBanner";
+import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
 import { selectBySearch } from "./search/search";
 import { Credits } from "./ui/Credits";
@@ -55,6 +57,7 @@ export function App() {
   const [layersOpen, setLayersOpen] = useState(false);
   const [bundle, setBundle] = useState<RegionBundle | null>(null);
   const [focus, setFocus] = useState<Selection | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
@@ -105,8 +108,14 @@ export function App() {
   return (
     <ModelErrorBoundary t={t}>
       <main className="app">
+        <ReviewBanner bundle={bundle} t={t} onOpenList={() => setReviewOpen(true)} />
         <TopBar t={t} structures={structures} layersOpen={layersOpen} onToggleLayers={() => setLayersOpen(!layersOpen)} onChoose={chooseResult} />
-        <div className="stage">
+        {reviewOpen && bundle?.mode === "review" ? (
+          <div className="stage review-stage">
+            <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
+          </div>
+        ) : null}
+        <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
           <Viewer region={REGION} t={t} selection={selection} focus={focus} isVisibleSid={isVisibleSid} onSelect={select} />
           <PerfOverlay t={t} />
         </div>

@@ -72,7 +72,7 @@ test("normal bundle never renders a review note", () => {
 
 test("review bundle renders the review note", () => {
   show("piriformis", "", "review");
-  expect(screen.getByText("Check the angle")).toBeTruthy();
+  expect(screen.getByText(t("review.note", { note: "Check the angle" }))).toBeTruthy();
 });
 
 test("an unknown structure shows its file label and no data sections", () => {

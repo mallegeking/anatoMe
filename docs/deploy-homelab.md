@@ -219,6 +219,88 @@ sudo systemctl disable --now anatome-web.service
 
 To remove it completely, also run `sudo rm /etc/systemd/system/anatome-web.service` and `sudo systemctl daemon-reload`.
 
+## Review build: show the draft rows to your physiotherapist
+
+The normal site never shows a row that nobody has checked. The review build is a second copy of the site that does show them. Every draft row is marked "Draft, not yet checked", has a row code, and a yellow banner on top says it is a review build. Your physiotherapist can open it on a phone, look at each row and tell you what to do with it.
+
+Do not share this copy with anyone else. It serves its own folder on its own port, so the normal site stays untouched.
+
+### R1. Build it on the dev machine
+
+Run this from the top folder of the repository.
+
+```bash
+npm ci
+npm run build:review -w apps/web
+```
+
+The finished review site is in `apps/web/dist-review/`. It has the same layout as `apps/web/dist/` in step 2, with `index.html` directly inside. It also has a `data` folder that holds the draft rows.
+
+Building the normal site afterwards is safe. `npm run build` compiles the data again in normal mode, and `node scripts/check-no-drafts.mjs` checks that no draft row got into `apps/web/dist/`.
+
+### R2. Copy it to its own folder on the homelab
+
+Make the folder once (replace the placeholders):
+
+```bash
+ssh -t <homelab-user>@<homelab-host> 'sudo mkdir -p /srv/anatome-review && sudo chown <homelab-user>: /srv/anatome-review'
+```
+
+Copy the review site. Note the slash at the end of `apps/web/dist-review/`.
+
+```bash
+rsync -av --delete --chmod=D755,F644 apps/web/dist-review/ <homelab-user>@<homelab-host>:/srv/anatome-review/
+```
+
+Do not copy it into `/srv/anatome`. That folder is the normal site.
+
+### R3. Serve it on a second HTTPS port
+
+Run this on the homelab:
+
+```bash
+sudo tailscale serve --bg --https=8443 /srv/anatome-review
+tailscale serve status
+```
+
+`--https=<port>` picks the port to listen on. The Tailscale docs (https://tailscale.com/docs/reference/tailscale-cli/serve, checked 2026-11-03) allow it on `tailscale serve`, so this runs next to the normal site on port 443. The review address is:
+
+```text
+https://<machine-name>.<tailnet>.ts.net:8443/
+```
+
+Send your physiotherapist this address only if they have access to your tailnet. If you use the fallback web server from the section above, the same idea works: run a second small server on another local port, for example 8081, and point `--https=8443` at `http://127.0.0.1:8081`.
+
+### R4. Stop serving the review copy
+
+When the review is done, run this on the homelab. It turns off only the port 8443 handler and leaves the normal site running:
+
+```bash
+sudo tailscale serve --https=8443 off
+sudo rm -r /srv/anatome-review
+```
+
+### R5. What to ask first
+
+1. The piriformis question comes first. Both piriformis rows carry a question for the reviewer. Open the review build, tap the piriformis, read the two questions in italics under the draft rows (row codes `piriformis-hip-external-rotation` and `piriformis-hip-external-rotation-flexed`), and ask your physiotherapist to answer them.
+2. Then tap "Review list" in the yellow banner. It lists every draft row grouped by structure, with its row code, its sources and its question if it has one. Go through them in order.
+
+### R6. Record the answers
+
+Do this on the dev machine, in the data files in the `data/` folder (`data/actions/hip.yaml` for movement rows, and `data/attachments/hip.yaml` for attachment rows once that file exists). Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
+
+- The physiotherapist agrees. Set `checked_by: physio-1` and `checked_on` to the date of the check, in the form `YYYY-MM-DD`. Use the role label only, never a person's name. If you checked the row yourself, use `checked_by: owner`.
+- The physiotherapist asks for a change. Edit the row to say what they asked for and leave it unchecked, so it stays a draft. Show it to them again in the next review build.
+- The row is wrong or not wanted. Delete the row.
+
+When you are done, run:
+
+```bash
+npm run validate
+```
+
+It must pass with no errors. Then build the normal site as in step 2. A row with `checked_by` and `checked_on` now shows in the normal site, and the rest stays hidden.
+
 ## If something goes wrong
 
 | What you see | What to try |

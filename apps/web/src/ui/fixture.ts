@@ -1,6 +1,6 @@
 import type { RegionBundle } from "../data/bundle";
 
-// A small bundle for tests. Piriformis has one checked row and one waiting row.
+// A small bundle for tests. Piriformis has one checked row and one waiting row. The review bundle adds the waiting rows as drafts.
 export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
   const cite = [{ ref: "c1", locator: "p. 4", says: "It turns the thigh outwards.", says_kind: "quote" as const }];
   return {
@@ -16,6 +16,9 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
     movements: [{ id: "hip-ext-rot", english: "Hip external rotation", dof: "hip.rotation", direction: "positive" }],
     attachments: [
       { id: "a1", muscle: "piriformis", end: "origin", bone: "sacrum", landmark: "anterior surface", citations: cite, draft: false },
+      ...(mode === "review"
+        ? [{ id: "a2", muscle: "piriformis", end: "insertion" as const, bone: "femur", landmark: "greater trochanter", citations: cite, draft: true }]
+        : []),
     ],
     actions: [
       {
@@ -30,6 +33,20 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
         draft: false,
         ...(mode === "review" ? { review_note: "Check the angle" } : {}),
       },
+      ...(mode === "review"
+        ? [
+            {
+              id: "x2",
+              structure: "piriformis",
+              movement: "hip-ext-rot",
+              load: "stretched" as const,
+              confidence: "low" as const,
+              citations: cite,
+              draft: true,
+              review_note: "Does the piriformis turn the thigh outwards at every angle?",
+            },
+          ]
+        : []),
     ],
     citations: [{ id: "c1", title: "Hip anatomy", authors: "Smith", year: 2020, url: "https://example.org", license: "CC-BY" }],
     pendingByStructure: { piriformis: 1 },
