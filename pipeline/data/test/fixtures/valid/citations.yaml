@@ -12,3 +12,10 @@
   url: https://example.org/book2
   license: CC BY 4.0
   access: open
+- id: draft-only-source
+  title: A source only a draft row uses
+  authors: Test Author
+  year: 2022
+  url: https://example.org/book3
+  license: CC BY 4.0
+  access: open

@@ -14,3 +14,6 @@ test("review mode keeps drafts", () => expect(compileRegion(fx("valid"), "hip", 
 test("review mode keeps the review note", () => expect(compileRegion(fx("valid"), "hip", "review").actions.find(a => a.draft)?.review_note).toBeTruthy());
 test("only used citations are included", () => expect(compileRegion(fx("valid"), "hip", "normal").citations.map(c => c.id)).toEqual(["used-source"]));
 test("the real data compiles with no drafts in normal mode", () => expect(compileRegion(realDataDir, "hip", "normal").actions.some(a => a.draft)).toBe(false));
+test("a dropped row's own citation is not in normal mode", () => expect(compileRegion(fx("valid"), "hip", "normal").citations.map(c => c.id)).not.toContain("draft-only-source"));
+test("review mode includes the draft row's citation", () => expect(compileRegion(fx("valid"), "hip", "review").citations.map(c => c.id)).toContain("draft-only-source"));
+test("normal mode keeps exactly the checked attachments", () => expect(compileRegion(fx("valid"), "hip", "normal").attachments.map(a => a.id)).toEqual(["gluteus-maximus-insertion-femur"]));

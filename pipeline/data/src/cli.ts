@@ -4,7 +4,7 @@
 //   check-models <modelsDir> <dataDir>  checks mesh extras, licenses and the triangle budget
 // Prints one "file path: message" line per problem and exits 1 when there is any.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { compileRegion, listRegions } from "./compile.ts";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
@@ -55,6 +55,8 @@ async function main(args: string[]): Promise<number> {
       const code = report(validateDataDir(dataDir));
       if (code !== 0) return code;
       mkdirSync(outDir, { recursive: true });
+      // Clear old bundles first, so a stale file for another region (or an earlier review build) cannot ship.
+      for (const f of readdirSync(outDir)) if (f.endsWith(".json")) rmSync(join(outDir, f));
       for (const region of listRegions(dataDir)) {
         const bundle = compileRegion(dataDir, region, review ? "review" : "normal");
         const text = JSON.stringify(bundle);

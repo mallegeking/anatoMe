@@ -13,5 +13,5 @@
   bone: femur
   landmark: greater trochanter
   citations:
-    - {ref: used-source, locator: page 4, says: A fourth short quote., says_kind: summary}
+    - {ref: draft-only-source, locator: page 4, says: A fourth short quote., says_kind: summary}
   checked_by: null
