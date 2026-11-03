@@ -57,7 +57,7 @@
 - {id: ischial-bursa, type: bursa, english: Ischial bursa of gluteus maximus, latin: Bursa ischiadica musculi glutei maximi, region: hip, depth: 2}
 - {id: anterior-cruciate-ligament, type: ligament, english: Anterior cruciate ligament, latin: Ligamentum cruciatum anterius, region: hip, depth: 3}
 - {id: posterior-cruciate-ligament, type: ligament, english: Posterior cruciate ligament, latin: Ligamentum cruciatum posterius, region: hip, depth: 3}
-- {id: medial-collateral-ligament, type: ligament, english: Medial (tibial) collateral ligament, latin: Ligamentum collaterale tibiale, region: hip, depth: 2, depth_note: "Only the pes anserinus tendons (sartorius, gracilis, semitendinosus, all depth 1) cross over it, so it sits one layer below the surface."}
+- {id: medial-collateral-ligament, type: ligament, english: Medial (tibial) collateral ligament, latin: Ligamentum collaterale tibiale, region: hip, depth: 2, depth_note: "Our reading of the layers in this model, no source names one: only the pes anserinus tendons (sartorius, gracilis, semitendinosus, all depth 1) cross over it, so it sits one layer below the surface."}
 - {id: lateral-collateral-ligament, type: ligament, english: Lateral (fibular) collateral ligament, latin: Ligamentum collaterale fibulare, region: hip, depth: 3, depth_note: "Wikipedia, Fibular collateral ligament (read 2026-11-03): most of its lateral surface is covered by the biceps femoris tendon."}
 - {id: medial-meniscus, type: meniscus, english: Medial meniscus, latin: Meniscus medialis, region: hip, depth: 3}
 - {id: lateral-meniscus, type: meniscus, english: Lateral meniscus, latin: Meniscus lateralis, region: hip, depth: 3}

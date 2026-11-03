@@ -35,7 +35,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, and the section Gluteal Region Muscles That Move the Femur
-      says: "The psoas major and iliacus make up the iliopsoas group. The table gives iliacus the target motions thigh flexion and lateral rotation."
+      says: "The text groups iliacus with psoas major as the iliopsoas. The table gives iliacus the target motions thigh flexion and lateral rotation."
       says_kind: summary
     - ref: schenkel-2018
       locator: Introduction, and Discussion
@@ -69,7 +69,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus
-      says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
       says_kind: summary
   checked_by: null
 
@@ -531,7 +531,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Psoas major, and the section Gluteal Region Muscles That Move the Femur
-      says: "The psoas major and iliacus make up the iliopsoas group. The table gives psoas major the target motions thigh flexion and lateral rotation, and torso flexion."
+      says: "The text groups psoas major with iliacus as the iliopsoas. The table gives psoas major the target motions thigh flexion and lateral rotation, and torso flexion."
       says_kind: summary
     - ref: kumazaki-2022
       locator: Introduction, second paragraph
@@ -608,7 +608,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis
-      says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor brevis the target motions adduction and flexion."
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor brevis the target motions adduction and flexion."
       says_kind: summary
     - ref: hirano-2025
       locator: 1. Introduction, first paragraph
@@ -644,7 +644,7 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus
-      says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor magnus the target motions adduction, flexion and extension."
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor magnus the target motions adduction, flexion and extension."
       says_kind: summary
     - ref: hirano-2025
       locator: 1. Introduction, first paragraph
