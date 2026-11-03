@@ -32,6 +32,14 @@ jobs:
       - name: Build the app
         run: npm run build
 
+      # Opens the built app in a real Chromium and walks the search path. The version is the one pinned in apps/web.
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+
+      - name: End-to-end test
+        run: npm run e2e -w apps/web
+
       # Fails when an unchecked row reached the normal bundle.
       - name: Check the build has no drafts
         run: node scripts/check-no-drafts.mjs

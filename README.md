@@ -17,6 +17,7 @@ npm install
 npm run dev      # starts the viewer, open the address it prints
 npm run build    # writes the finished site to apps/web/dist/
 npm test         # runs all the tests
+npm run e2e -w apps/web  # opens the built app in a browser (run npm run build first)
 npm run validate      # checks the knowledge base in data/
 npm run check-models  # checks the meshes in models/ against data/
 ```

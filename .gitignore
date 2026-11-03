@@ -9,3 +9,4 @@ apps/web/dist-review/
 *.log
 .superpowers/
 __pycache__/
+apps/web/test-results/

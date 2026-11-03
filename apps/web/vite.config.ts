@@ -38,5 +38,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // The e2e folder belongs to Playwright, not vitest.
+    exclude: ["e2e/**", "node_modules/**", "dist/**", "dist-review/**"],
   },
 });
