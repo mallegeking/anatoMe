@@ -50,7 +50,7 @@
   muscle: gluteus-maximus
   end: origin
   bone: sacrum
-  landmark: side of the coccyx, just below the tip
+  landmark: side of the coccyx, at the lower tip
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), row Gluteus maximus, Origin column
@@ -59,6 +59,10 @@
     - ref: akamatsu-2017
       locator: 1. Introduction
       says: "on the dorsal surface of the lower portion of the sacrum and the lateral aspect of the coccyx"
+      says_kind: quote
+    - ref: oeri-human-anatomy-6-4
+      locator: Section Sacrum and Coccyx
+      says: "The coccyx, or tailbone, is derived from the fusion of four very small coccygeal vertebrae ... It articulates with the inferior tip of the sacrum."
       says_kind: quote
   checked_by: null
 
@@ -494,24 +498,32 @@
   muscle: adductor-longus
   end: origin
   bone: hip-bone
-  landmark: pubis, near the pubic symphysis
+  landmark: pubic body, next to the symphysis and below the pubic crest
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus, Origin column
       says: "The table gives the origin of adductor longus as the pubis near the pubic symphysis."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.4. Adductor Longus
+      says: "AL originates from the body of the pubis, inferior to the pubic crest and lateral to the pubic symphysis, and inserts onto the middle third of the linea aspera of the femur"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-longus-insertion
   muscle: adductor-longus
   end: insertion
   bone: femur
-  landmark: linea aspera
+  landmark: middle third of the linea aspera
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus, Insertion column
       says: "The table gives the insertion of adductor longus as the linea aspera."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.4. Adductor Longus
+      says: "AL originates from the body of the pubis, inferior to the pubic crest and lateral to the pubic symphysis, and inserts onto the middle third of the linea aspera of the femur"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-brevis-origin
@@ -524,30 +536,46 @@
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis, Origin column
       says: "The table gives the origin of adductor brevis as the body of the pubis and the inferior ramus of the pubis."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.5. Adductor Brevis Muscle
+      says: "The AB has a narrow origin from the anterior surface of the body of the pubis and the inferior ramus of the pubis and inserts onto the superior half of the medial lip of linea aspera"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-brevis-insertion
   muscle: adductor-brevis
   end: insertion
   bone: femur
-  landmark: linea aspera, above adductor longus
+  landmark: upper half of the medial lip of the linea aspera
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis, Insertion column
       says: "The table gives the insertion of adductor brevis as the linea aspera, above adductor longus."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.5. Adductor Brevis Muscle
+      says: "The AB has a narrow origin from the anterior surface of the body of the pubis and the inferior ramus of the pubis and inserts onto the superior half of the medial lip of linea aspera"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-magnus-origin-rami
   muscle: adductor-magnus
   end: origin
   bone: hip-bone
-  landmark: pubic and ischial rami
+  landmark: inferior pubic ramus and ischial ramus
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Origin column
       says: "The table gives the origin of adductor magnus as the ischial rami, the pubic rami and the ischial tuberosity."
       says_kind: summary
+    - ref: hsu-2026
+      locator: Main text, paragraph after Figure 2 on the parts of adductor magnus
+      says: "The pubofemoral portion originates from the inferior pubic ramus and the ischial ramus"
+      says_kind: quote
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.3. Adductor Magnus
+      says: "The adductor minimus part arises from the ischiopubic ramus, and the hamstring part arises from the ischial tuberosity"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-magnus-origin-ischial-tuberosity
@@ -564,6 +592,10 @@
       locator: Opening section of the main text before Methods, and Results, Gross Anatomy and Morphology
       says: "The ischiocondylar part of adductor magnus arises from the ischial tuberosity. In every specimen its origin lay below and medial to the conjoint and semimembranosus tendons of the hamstrings."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.3. Adductor Magnus
+      says: "The adductor minimus part arises from the ischiopubic ramus, and the hamstring part arises from the ischial tuberosity"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-magnus-insertion-linea-aspera
@@ -576,6 +608,10 @@
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Insertion column
       says: "The table gives the insertion of adductor magnus as the linea aspera and the adductor tubercle of the femur."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.3. Adductor Magnus
+      says: "The AM muscle inserts onto the adductor tubercle of the femur and onto the linea aspera"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-magnus-insertion-adductor-tubercle
@@ -588,6 +624,10 @@
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus, Insertion column
       says: "The table gives the insertion of adductor magnus as the linea aspera and the adductor tubercle of the femur."
       says_kind: summary
+    - ref: posnik-2025
+      locator: 4. Medial Thigh, 4.3. Adductor Magnus
+      says: "The AM muscle inserts onto the adductor tubercle of the femur and onto the linea aspera"
+      says_kind: quote
   checked_by: null
 
 - id: gracilis-origin
@@ -705,15 +745,19 @@
   muscle: rectus-femoris
   end: insertion
   bone: patella
-  landmark: quadriceps tendon, which attaches to the upper pole
+  landmark: quadriceps tendon, which attaches to the base
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
       says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
       says_kind: quote
-    - ref: thamrongskulsiri-2025
-      locator: Materials and methods, Surgical techniques
-      says: "The graft was then freed from its attachment at the superior pole of the patella"
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "These four parts converge into a single tendon that inserts into the base of the patella"
+      says_kind: quote
+    - ref: posnik-2025
+      locator: 3. Discussion, 3.3. Quadriceps Femoris
+      says: "All of those heads form a common tendon that attaches to the base of the patella"
       says_kind: quote
   checked_by: null
 
@@ -721,7 +765,7 @@
   muscle: rectus-femoris
   end: insertion
   bone: tibia
-  landmark: patellar ligament, which ends on the tibial tuberosity
+  landmark: patellar ligament, which ends on the tuberosity
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
@@ -749,15 +793,19 @@
   muscle: vastus-lateralis
   end: insertion
   bone: patella
-  landmark: quadriceps tendon, which attaches to the upper pole
+  landmark: quadriceps tendon, which attaches to the base
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
       says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
       says_kind: quote
-    - ref: thamrongskulsiri-2025
-      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
-      says: "The graft was then freed from its attachment at the superior pole of the patella"
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "These four parts converge into a single tendon that inserts into the base of the patella"
+      says_kind: quote
+    - ref: posnik-2025
+      locator: 3. Discussion, 3.3. Quadriceps Femoris
+      says: "All of those heads form a common tendon that attaches to the base of the patella"
       says_kind: quote
   checked_by: null
 
@@ -765,7 +813,7 @@
   muscle: vastus-lateralis
   end: insertion
   bone: tibia
-  landmark: patellar ligament, which ends on the tibial tuberosity
+  landmark: patellar ligament, which ends on the tuberosity
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
@@ -789,15 +837,19 @@
   muscle: vastus-medialis
   end: insertion
   bone: patella
-  landmark: quadriceps tendon, which attaches to the upper pole
+  landmark: quadriceps tendon, which attaches to the base
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
       says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
       says_kind: quote
-    - ref: thamrongskulsiri-2025
-      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
-      says: "The graft was then freed from its attachment at the superior pole of the patella"
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "These four parts converge into a single tendon that inserts into the base of the patella"
+      says_kind: quote
+    - ref: posnik-2025
+      locator: 3. Discussion, 3.3. Quadriceps Femoris
+      says: "All of those heads form a common tendon that attaches to the base of the patella"
       says_kind: quote
   checked_by: null
 
@@ -805,7 +857,7 @@
   muscle: vastus-medialis
   end: insertion
   bone: tibia
-  landmark: patellar ligament, which ends on the tibial tuberosity
+  landmark: patellar ligament, which ends on the tuberosity
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
@@ -829,15 +881,19 @@
   muscle: vastus-intermedius
   end: insertion
   bone: patella
-  landmark: quadriceps tendon, which attaches to the upper pole
+  landmark: quadriceps tendon, which attaches to the base
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
       says: "The tendon common to all four is the quadriceps tendon (patellar tendon), which inserts into the patella and continues below it as the patellar ligament. The patellar ligament attaches to the tibial tuberosity."
       says_kind: quote
-    - ref: thamrongskulsiri-2025
-      locator: Materials and methods, Surgical techniques. The graft is the superficial band of the quadriceps tendon.
-      says: "The graft was then freed from its attachment at the superior pole of the patella"
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "These four parts converge into a single tendon that inserts into the base of the patella"
+      says_kind: quote
+    - ref: posnik-2025
+      locator: 3. Discussion, 3.3. Quadriceps Femoris
+      says: "All of those heads form a common tendon that attaches to the base of the patella"
       says_kind: quote
   checked_by: null
 
@@ -845,7 +901,7 @@
   muscle: vastus-intermedius
   end: insertion
   bone: tibia
-  landmark: patellar ligament, which ends on the tibial tuberosity
+  landmark: patellar ligament, which ends on the tuberosity
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2 on the anterior compartment
@@ -1008,8 +1064,9 @@
       says_kind: quote
   checked_by: null
 
-# The OERI table also lists the lateral condyle of the femur here. No other source we opened says so,
-# so no row was written for it.
+# The OERI table also lists the lateral condyle of the femur here. That most likely means the
+# expansion of the tendon into the oblique popliteal ligament, which Kikuchi 2025 lists among the
+# semimembranosus attachments. It is soft tissue, not bone, so it has no row.
 - id: semimembranosus-insertion
   muscle: semimembranosus
   end: insertion

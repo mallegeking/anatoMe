@@ -155,13 +155,6 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2395605/
   license: Creative Commons Attribution License, version not stated
   access: open
-- id: thamrongskulsiri-2025
-  title: "Superficial band of the quadriceps tendon harvested with a minimally invasive technique provides adequate graft dimensions: a cadaveric study"
-  authors: Thamrongskulsiri N, Khwanjaipanich V, Limskul D, Tanpowpong T, Kuptniratsaikul S, Itthipanichpong T
-  year: 2025
-  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12266663/
-  license: CC BY 4.0
-  access: open
 - id: miguel-perez-2024
   title: "Anatomical Relationships of the Proximal Attachment of the Hamstring Muscles with Neighboring Structures: From Ultrasound, Anatomical and Histological Findings to Clinical Implications"
   authors: Miguel-Pérez M, Iglesias-Chamorro P, Ortiz-Miguel S, Ortiz-Sagristà JC, Möller I, Blasi J, Agullò J, Martinoli C, Pérez-Bellmunt A
@@ -188,5 +181,33 @@
   authors: Kikuchi K, Tabuchi K, Tabira Y, Watanabe K, Georgiev GP, Iwanaga J, Shane Tubbs R
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12588184/
+  license: CC BY 4.0
+  access: open
+- id: oeri-human-anatomy-6-4
+  title: "Human Anatomy (OERI), 6.4: The Vertebral Column"
+  authors: Whitney Menefee, Julie Jenks, Chiara Mazzasette, Kim-Leiloni Nguyen (ASCCC Open Educational Resources Initiative), adapted from OpenStax Anatomy and Physiology
+  year: 2025
+  url: https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_(OERI)/06%3A_Axial_Skeleton/6.04%3A_The_Vertebral_Column
+  license: CC BY 4.0
+  access: open
+- id: posnik-2025
+  title: Morphological Variability of the Thigh Muscle Traps in an Ultrasound That Awaits Clinicians
+  authors: Pośnik M, Zielinska N, Okoń A, Węgiel A, Głowacka M, Olewnik Ł
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11765969/
+  license: CC BY 4.0
+  access: open
+- id: piagkou-2025
+  title: "Systematic Review and Prevalence Meta-Analysis of Quadriceps Femoris Morphology: Significance of the Quadriceps Tendon in Anterior Cruciate Ligament Reconstruction"
+  authors: Piagkou M, Triantafyllou G, Georgiev GP, Tsakotos G, Olewnik Ł, Landfald IC, Gonera B
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12286201/
+  license: CC BY 4.0
+  access: open
+- id: hsu-2026
+  title: "Ultrasonographic Diagnosis of an Ischiocondylar Adductor Magnus Partial Tear: An Uncommon Cause of Ischial Pain"
+  authors: Hsu CY, Wu WT, Hsu YC, Chang KV, Özçakar L
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13512343/
   license: CC BY 4.0
   access: open
