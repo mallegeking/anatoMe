@@ -1,12 +1,13 @@
 import type { RegionBundle } from "../data/bundle";
 import type { Translate } from "../i18n/t";
-import { loadWord } from "../data/describe";
-import { Sources } from "../ui/InfoPanel";
+import { describeAction } from "../data/describe";
+import { ActionNotes, Sources } from "../ui/InfoPanel";
 import { DraftMark } from "./DraftMark";
 
 type Props = { bundle: RegionBundle; t: Translate; onClose: () => void };
 
 // Every draft action and attachment, grouped by structure, so the reviewer can go through them one by one.
+// Each action shows the whole claim in the same words as the info panel, plus its row code, sources and question.
 export function ReviewList({ bundle, t, onClose }: Props) {
   const name = (id: string) => bundle.structures.find((s) => s.id === id)?.english ?? id;
   const lower = (id: string) => name(id).toLowerCase();
@@ -46,9 +47,8 @@ export function ReviewList({ bundle, t, onClose }: Props) {
             ))}
             {actions.map((a) => (
               <li key={a.id}>
-                <div>
-                  {movementName(a.movement)}: {loadWord(a.load, t)}
-                </div>
+                <div>{t("review.action", { movement: movementName(a.movement), text: describeAction(a, t) })}</div>
+                <ActionNotes action={a} t={t} />
                 <DraftMark id={a.id} note={a.review_note} t={t} />
                 <Sources uses={a.citations} bundle={bundle} t={t} />
               </li>

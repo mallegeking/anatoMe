@@ -40,6 +40,8 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
               structure: "piriformis",
               movement: "hip-ext-rot",
               load: "stretched" as const,
+              when: [{ angle: "hip.flexion", min: 0, max: 30 }],
+              applies_to: "Test hips only",
               confidence: "low" as const,
               citations: cite,
               draft: true,

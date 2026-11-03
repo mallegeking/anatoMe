@@ -1,5 +1,6 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
+import type { RegionBundle } from "../data/bundle";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import { makeBundle } from "./fixture";
@@ -37,8 +38,45 @@ test("shows the waiting line when rows are pending", () => {
 
 test("a bone with no rows shows no does-heading and no waiting line", () => {
   show("femur");
-  expect(screen.queryByText(en["info.does"])).toBeNull();
+  expect(screen.queryByText(en["info.does.hip"])).toBeNull();
+  expect(screen.queryByText(en["info.does.knee"])).toBeNull();
   expect(screen.queryByText(en["info.pending"])).toBeNull();
+});
+
+test("shows the type of the structure", () => {
+  show("piriformis");
+  expect(screen.getByText(t("info.type", { type: en["type.muscle"] }))).toBeTruthy();
+});
+
+// A bundle where rectus femoris has a hip row and a knee row, and piriformis only hip rows.
+function withKneeRow(): RegionBundle {
+  const bundle = makeBundle();
+  bundle.movements.push(
+    { id: "hip-flexion", english: "Hip flexion", dof: "hip.flexion", direction: "positive" },
+    { id: "knee-extension", english: "Knee extension", dof: "knee.flexion", direction: "negative" },
+  );
+  const row = { load: "working" as const, role: "primary" as const, confidence: "high" as const, citations: [], draft: false };
+  bundle.actions.push(
+    { id: "rf-hip", structure: "rectus-femoris", movement: "hip-flexion", ...row },
+    { id: "rf-knee", structure: "rectus-femoris", movement: "knee-extension", ...row },
+  );
+  return bundle;
+}
+
+test("rows are grouped under the joint they move", () => {
+  render(<InfoPanel selection={{ sid: "rectus-femoris", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  const hip = screen.getByRole("heading", { name: en["info.does.hip"] }).parentElement!;
+  const knee = screen.getByRole("heading", { name: en["info.does.knee"] }).parentElement!;
+  expect(within(hip).getByText("Hip flexion")).toBeTruthy();
+  expect(within(hip).queryByText("Knee extension")).toBeNull();
+  expect(within(knee).getByText("Knee extension")).toBeTruthy();
+  expect(within(knee).queryByText("Hip flexion")).toBeNull();
+});
+
+test("a joint without rows gets no heading", () => {
+  render(<InfoPanel selection={{ sid: "piriformis", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  expect(screen.getByRole("heading", { name: en["info.does.hip"] })).toBeTruthy();
+  expect(screen.queryByRole("heading", { name: en["info.does.knee"] })).toBeNull();
 });
 
 test("unpaired structure has no side switch", () => {
@@ -63,6 +101,24 @@ test("sources open on tap and mark quote or summary", () => {
 test("rectus femoris shows the quadriceps tendon gap line", () => {
   show("rectus-femoris");
   expect(screen.getByText(en["info.gap.quadriceps"])).toBeTruthy();
+});
+
+test("psoas major says its origin is not modelled yet", () => {
+  show("psoas-major");
+  expect(screen.getByText(en["info.gap.psoasOrigin"])).toBeTruthy();
+  expect(screen.queryByText(en["info.gap.quadriceps"])).toBeNull();
+});
+
+test("an open source shows its link, which opens in a new tab, and its licence", () => {
+  show("piriformis");
+  fireEvent.click(screen.getAllByText(en["info.sources"])[1]);
+  expect(screen.getByText("Smith (2020). Hip anatomy")).toBeTruthy();
+  const link = screen.getByRole("link", { name: en["source.link"] });
+  expect(link.getAttribute("href")).toBe("https://example.org");
+  expect(link.getAttribute("target")).toBe("_blank");
+  expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+  expect(screen.getByText(t("source.licence", { license: "CC-BY" }))).toBeTruthy();
+  expect(screen.getByText(t("source.where", { locator: "p. 4" }))).toBeTruthy();
 });
 
 test("normal bundle never renders a review note", () => {

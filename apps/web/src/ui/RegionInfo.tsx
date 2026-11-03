@@ -8,12 +8,13 @@ type Props = {
   selection: Selection | null;
   fallbackLabel?: string;
   t: Translate;
-  onSelect: (sel: Selection | null) => void;
+  // Called with the same structure on the other side.
+  onSwitchSide: (sel: Selection) => void;
   onHide: () => void;
 };
 
 // Loads the region data and shows the panel for the selection, or the tap hint.
-export function RegionInfo({ region, selection, fallbackLabel, t, onSelect, onHide }: Props) {
+export function RegionInfo({ region, selection, fallbackLabel, t, onSwitchSide, onHide }: Props) {
   const bundle = useRegionData(region);
   if (!selection) return <Hint t={t} />;
   return (
@@ -22,7 +23,7 @@ export function RegionInfo({ region, selection, fallbackLabel, t, onSelect, onHi
       bundle={bundle}
       t={t}
       fallbackLabel={fallbackLabel}
-      onSwitchSide={() => onSelect({ sid: selection.sid, side: selection.side === "l" ? "r" : "l" })}
+      onSwitchSide={() => onSwitchSide({ sid: selection.sid, side: selection.side === "l" ? "r" : "l" })}
       onHide={onHide}
     />
   );

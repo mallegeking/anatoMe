@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
-import { describeCondition, loadWord, roleWord } from "./describe";
+import { describeAction, describeCondition, jointOf, loadWord, roleWord } from "./describe";
 
 const t = createT(en);
 
@@ -31,4 +31,20 @@ test("no condition gives empty text", () => expect(describeCondition(undefined, 
 test("load and role words", () => {
   expect(loadWord("stretched", t)).toBe("is stretched");
   expect(roleWord("secondary", t)).toBe("helper");
+});
+
+test("a whole working row reads as one sentence", () =>
+  expect(
+    describeAction(
+      { id: "x", structure: "piriformis", movement: "hip-external-rotation", load: "working", role: "primary", when: [{ angle: "hip.flexion", min: 0, max: 45 }], confidence: "high", citations: [], draft: false },
+      t,
+    ),
+  ).toBe("works (main), with the hip bent between 0 and 45 degrees"));
+test("a stretched row without a condition is just the load word", () =>
+  expect(describeAction({ id: "x", structure: "piriformis", movement: "hip-internal-rotation", load: "stretched", confidence: "low", citations: [], draft: false }, t)).toBe(
+    "is stretched",
+  ));
+test("the joint comes from the start of the dof", () => {
+  expect(jointOf({ id: "knee-flexion", english: "Knee flexion", dof: "knee.flexion", direction: "positive" })).toBe("knee");
+  expect(jointOf({ id: "hip-abduction", english: "Hip abduction", dof: "hip.abduction", direction: "positive" })).toBe("hip");
 });

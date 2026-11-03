@@ -9,7 +9,7 @@ import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
 import { selectBySearch } from "./search/search";
-import { Credits } from "./ui/Credits";
+import { Credits, EducationalLine } from "./ui/Credits";
 import { Hint, RegionInfo } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
@@ -26,12 +26,12 @@ type PanelAreaProps = {
   layers: LayerState;
   setLayers: (update: (state: LayerState) => LayerState) => void;
   onBundle: (bundle: RegionBundle) => void;
-  onSelect: (sel: Selection | null, label?: string) => void;
+  onSwitchSide: (sel: Selection) => void;
   onHideSelected: () => void;
 };
 
 // Loads the data, tells the app which structures exist, and shows the layers panel or the info panel.
-function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, onSelect, onHideSelected }: PanelAreaProps) {
+function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, onSwitchSide, onHideSelected }: PanelAreaProps) {
   const bundle = useRegionData(REGION);
   useEffect(() => onBundle(bundle), [bundle, onBundle]);
   if (layersOpen) {
@@ -47,7 +47,7 @@ function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, 
       />
     );
   }
-  return <RegionInfo region={REGION} selection={selection} fallbackLabel={label} t={t} onSelect={onSelect} onHide={onHideSelected} />;
+  return <RegionInfo region={REGION} selection={selection} fallbackLabel={label} t={t} onSwitchSide={onSwitchSide} onHide={onHideSelected} />;
 }
 
 export function App() {
@@ -72,6 +72,12 @@ export function App() {
   function tapModel(sel: Selection | null, fileLabel?: string) {
     setSearchOpen(false);
     select(sel, fileLabel);
+  }
+
+  // "Show the other side": select the same structure on the other side and turn the camera to it.
+  function switchSide(sel: Selection) {
+    select(sel);
+    setFocus({ ...sel });
   }
 
   // A search result: select it, make it visible, move the camera and say what was peeled.
@@ -114,12 +120,16 @@ export function App() {
   // The viewer and the panel each catch their own failures, so the rest of the screen and the credits stay.
   // A failure to load the data gets its own message in the panel, because the model may be fine.
   // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
+  // The educational line sits at the top of the panel, outside the part that scrolls, so it always shows.
   return (
     <ModelErrorBoundary
       t={t}
       extra={
         <footer className="panel">
-          <Credits t={t} />
+          <EducationalLine t={t} />
+          <div className="panel-scroll">
+            <Credits t={t} />
+          </div>
         </footer>
       }
     >
@@ -144,26 +154,29 @@ export function App() {
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
-          {notice && (
-            <p className="muted search-notice" role="status">
-              {notice}
-            </p>
-          )}
-          <ModelErrorBoundary t={t} messageKey="error.dataLoad">
-            <Suspense fallback={<Hint t={t} />}>
-              <PanelArea
-                selection={selection}
-                label={label}
-                layersOpen={layersOpen}
-                layers={layers}
-                setLayers={setLayers}
-                onBundle={setBundle}
-                onSelect={select}
-                onHideSelected={hideSelected}
-              />
-            </Suspense>
-          </ModelErrorBoundary>
-          <Credits t={t} />
+          <EducationalLine t={t} />
+          <div className="panel-scroll" data-testid="panel-scroll">
+            {notice && (
+              <p className="muted search-notice" role="status">
+                {notice}
+              </p>
+            )}
+            <ModelErrorBoundary t={t} messageKey="error.dataLoad">
+              <Suspense fallback={<Hint t={t} />}>
+                <PanelArea
+                  selection={selection}
+                  label={label}
+                  layersOpen={layersOpen}
+                  layers={layers}
+                  setLayers={setLayers}
+                  onBundle={setBundle}
+                  onSwitchSide={switchSide}
+                  onHideSelected={hideSelected}
+                />
+              </Suspense>
+            </ModelErrorBoundary>
+            <Credits t={t} />
+          </div>
         </footer>
       </main>
     </ModelErrorBoundary>

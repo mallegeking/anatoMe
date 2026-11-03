@@ -21,15 +21,21 @@ export class ModelErrorBoundary extends Component<Props, State> {
     return { failed: isWebGLError(error) ? "webgl" : "load" };
   }
 
+  // The en.json key of the message for this kind of failure.
+  private messageFor(failed: "load" | "webgl"): string {
+    return failed === "webgl" ? "error.webgl" : (this.props.messageKey ?? "error.modelLoad");
+  }
+
+  // The log says the same as the screen, so a data failure is not reported as a model failure.
   componentDidCatch(error: unknown) {
-    console.error("The 3D model failed to load", error);
+    console.error(this.props.t(this.messageFor(isWebGLError(error) ? "webgl" : "load")), error);
   }
 
   render() {
     if (!this.state.failed) return this.props.children;
     const message = (
       <div className="model-error" role="alert">
-        {this.props.t(this.state.failed === "webgl" ? "error.webgl" : (this.props.messageKey ?? "error.modelLoad"))}
+        {this.props.t(this.messageFor(this.state.failed))}
       </div>
     );
     if (this.props.extra === undefined) return message;

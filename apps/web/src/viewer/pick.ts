@@ -1,5 +1,4 @@
 import type { Object3D } from "three";
-import type { Translate } from "../i18n/t";
 
 export type PickedStructure = {
   sid: string;
@@ -61,14 +60,4 @@ export function pickVisibleHit(hits: Hit[], isVisibleSid: (sid: string) => boole
       return structure !== null && isVisibleSid(structure.sid);
     }),
   );
-}
-
-export function pickStructure(hits: Hit[]): PickedStructure | null {
-  return pickHit(hits)?.structure ?? null;
-}
-
-export function formatLabel(p: PickedStructure, t: Translate): string {
-  if (p.side === "l") return t("side.left", { label: p.label });
-  if (p.side === "r") return t("side.right", { label: p.label });
-  return p.label;
 }

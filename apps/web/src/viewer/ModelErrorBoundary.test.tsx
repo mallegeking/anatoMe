@@ -30,6 +30,17 @@ test("shows the load error message when a child throws", () => {
   expect(screen.getByText(en["error.modelLoad"])).toBeTruthy();
 });
 
+test("the log names the same failure as the message", () => {
+  const log = vi.spyOn(console, "error").mockImplementation(() => {});
+  render(
+    <ModelErrorBoundary t={t} messageKey="error.dataLoad">
+      <Thrower />
+    </ModelErrorBoundary>,
+  );
+  expect(log.mock.calls.some((call) => call[0] === en["error.dataLoad"])).toBe(true);
+  expect(log.mock.calls.some((call) => call[0] === en["error.modelLoad"])).toBe(false);
+});
+
 // This is how a real load fails. The loader suspends on a promise, the same way useLoader does,
 // and the promise is rejected later, for example when the Draco decoder cannot be downloaded.
 test("shows the load error message when a loading child fails later", async () => {

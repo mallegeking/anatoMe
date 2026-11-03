@@ -52,6 +52,18 @@ test("review list groups drafts by structure and shows row codes", () => {
   expect(screen.queryByText(t("review.rowId", { id: "a1" }))).toBeNull();
 });
 
+test("review list shows the whole claim of a draft row, like the info panel", () => {
+  render(<ReviewList bundle={makeBundle("review")} t={t} onClose={() => {}} />);
+  expect(screen.getByText("Hip external rotation: is stretched, with the hip bent between 0 and 30 degrees")).toBeTruthy();
+  expect(screen.getByText(t("info.appliesTo", { text: "Test hips only" }))).toBeTruthy();
+  expect(screen.getByText(en["confidence.low"])).toBeTruthy();
+});
+
+test("the punctuation between movement and claim comes from the text file", () => {
+  render(<ReviewList bundle={makeBundle("review")} t={createT({ ...en, "review.action": "{movement} >> {text}" })} onClose={() => {}} />);
+  expect(screen.getByText("Hip external rotation >> is stretched, with the hip bent between 0 and 30 degrees")).toBeTruthy();
+});
+
 test("review list close button calls onClose", () => {
   const onClose = vi.fn();
   render(<ReviewList bundle={makeBundle("review")} t={t} onClose={onClose} />);

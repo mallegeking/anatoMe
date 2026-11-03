@@ -7,7 +7,7 @@ type Props = {
   onChoose: (structure: BundleStructure) => void;
 };
 
-// The list under the search field. Each row is one structure.
+// The list under the search field. Each row is one structure: its English name and type, with the Latin name below.
 export function SearchResults({ t, results, onChoose }: Props) {
   if (results.length === 0) {
     return (
@@ -21,7 +21,10 @@ export function SearchResults({ t, results, onChoose }: Props) {
       {results.map((s) => (
         <li key={s.id}>
           <button type="button" onClick={() => onChoose(s)}>
-            <span>{s.english}</span>
+            <span className="search-result-top">
+              <span>{s.english}</span>
+              <span className="muted">{t(`type.${s.type}`)}</span>
+            </span>
             {s.latin && <span className="muted">{s.latin}</span>}
           </button>
         </li>

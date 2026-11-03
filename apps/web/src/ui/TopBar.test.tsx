@@ -73,3 +73,11 @@ test("choosing a result lets go of the field, so the phone keyboard closes", () 
   fireEvent.click(screen.getByRole("button", { name: /Piriformis/ }));
   expect(document.activeElement).not.toBe(field);
 });
+
+test("a result shows the English name, the type and the Latin name", () => {
+  const { field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  const result = screen.getByRole("button", { name: /Piriformis/ });
+  expect(result.textContent).toContain(en["type.muscle"]);
+  expect(result.textContent).toContain("Musculus piriformis");
+});

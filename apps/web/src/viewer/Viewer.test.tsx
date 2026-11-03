@@ -79,6 +79,22 @@ function show() {
   render(<Viewer region="hip" t={t} selection={null} focus={null} isVisibleSid={() => true} onSelect={() => {}} />);
 }
 
+// A model with a left and a right piriformis, like the real files.
+async function loadPiriformisPair() {
+  const { Group, Mesh } = await import("three");
+  const make = (side: "l" | "r") => {
+    const mesh = new Mesh();
+    mesh.userData = { sid: "piriformis", label: "Piriformis", side, kind: "muscle" };
+    return mesh;
+  };
+  const left = make("l");
+  const right = make("r");
+  const scene = new Group();
+  scene.add(left, right);
+  load.result = [{ scene }];
+  return { left, right };
+}
+
 // Lets the lazy scene module, the manifest and React catch up.
 async function settle() {
   for (let i = 0; i < 5; i++) {
@@ -125,4 +141,26 @@ test("a WebGL failure shows the WebGL message, not the connection message", () =
   show();
   expect(screen.getByRole("alert").textContent).toBe(en["error.webgl"]);
   expect(screen.queryByText(en["error.modelLoad"])).toBeNull();
+});
+
+test("switching to the other side lights up that side's mesh and puts the first one back", async () => {
+  withWebGL(true);
+  const { left, right } = await loadPiriformisPair();
+  const props = { region: "hip", t, isVisibleSid: () => true, onSelect: () => {} };
+  const { rerender } = render(<Viewer {...props} selection={{ sid: "piriformis", side: "l" }} focus={null} />);
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  // Both start with the same plain material, then the selected side gets the lighter one.
+  const lit = left.material;
+  const plain = right.material;
+  expect(lit).not.toBe(plain);
+
+  rerender(<Viewer {...props} selection={{ sid: "piriformis", side: "r" }} focus={{ sid: "piriformis", side: "r" }} />);
+  await settle();
+  expect(right.material).toBe(lit);
+  expect(left.material).toBe(plain);
 });

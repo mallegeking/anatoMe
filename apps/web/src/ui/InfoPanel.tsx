@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BundleAction, BundleCitationUse, RegionBundle } from "../data/bundle";
-import { describeCondition, loadWord, roleWord } from "../data/describe";
+import { describeAction, jointOf } from "../data/describe";
 import type { Translate } from "../i18n/t";
 import { DraftMark } from "../review/DraftMark";
 import type { Selection } from "../viewer/pick";
@@ -15,7 +15,15 @@ type Props = {
   onHide: () => void;
 };
 
-const QUADRICEPS = new Set(["rectus-femoris", "vastus-lateralis", "vastus-medialis", "vastus-intermedius"]);
+// One line for each structure with a part that the model does not show yet. The value is the en.json key.
+const GAP_LINES: Record<string, string> = {
+  "rectus-femoris": "info.gap.quadriceps",
+  "vastus-lateralis": "info.gap.quadriceps",
+  "vastus-medialis": "info.gap.quadriceps",
+  "vastus-intermedius": "info.gap.quadriceps",
+  // The vertebrae are not modelled, so psoas major has no origin row.
+  "psoas-major": "info.gap.psoasOrigin",
+};
 
 export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle: RegionBundle; t: Translate }) {
   const [open, setOpen] = useState(false);
@@ -32,10 +40,18 @@ export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle
             return (
               <li key={i}>
                 <div>{citation ? t("source.citation", { authors: citation.authors, year: String(citation.year), title: citation.title }) : use.ref}</div>
+                {citation && (
+                  <div className="muted">
+                    <a href={citation.url} target="_blank" rel="noopener noreferrer">
+                      {t("source.link")}
+                    </a>{" "}
+                    {t("source.licence", { license: citation.license })}
+                  </div>
+                )}
+                <div className="muted">{t("source.where", { locator: use.locator })}</div>
                 <div>
                   <strong>{t("source.label", { kind: t(use.says_kind === "quote" ? "source.quote" : "source.summary") })}</strong> {use.says}
                 </div>
-                <div className="muted">{use.locator}</div>
               </li>
             );
           })}
@@ -45,17 +61,23 @@ export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle
   );
 }
 
-function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: RegionBundle; t: Translate }) {
-  // For example "works (main), with the hip bent between 0 and 45 degrees". The punctuation lives in en.json.
-  const load = loadWord(action.load, t);
-  const withRole = action.role ? t("info.actionRole", { load, role: roleWord(action.role, t) }) : load;
-  const when = describeCondition(action.when, t);
-  const text = when ? t("info.actionWhen", { text: withRole, when }) : withRole;
+// The lines under an action's sentence: which hips it applies to, if limited, and how well supported it is.
+// The review list shows the same lines, so the reviewer sees the whole claim.
+export function ActionNotes({ action, t }: { action: BundleAction; t: Translate }) {
   return (
-    <li>
-      <div>{text}</div>
+    <>
       {action.applies_to && <div className="muted">{t("info.appliesTo", { text: action.applies_to })}</div>}
       <div className="muted">{t(`confidence.${action.confidence}`)}</div>
+    </>
+  );
+}
+
+function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: RegionBundle; t: Translate }) {
+  return (
+    <li>
+      {/* For example "works (main), with the hip bent between 0 and 45 degrees". */}
+      <div>{describeAction(action, t)}</div>
+      <ActionNotes action={action} t={t} />
       {bundle.mode === "review" && action.draft && <DraftMark id={action.id} note={action.review_note} t={t} />}
       {bundle.mode === "review" && !action.draft && action.review_note && <div className="review-note">{t("review.note", { note: action.review_note })}</div>}
       <Sources uses={action.citations} bundle={bundle} t={t} />
@@ -74,15 +96,24 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
   // In the review build the draft rows are shown above, so the waiting line would only repeat them.
   const pending = structure && bundle.mode !== "review" ? (bundle.pendingByStructure[selection.sid] ?? 0) : 0;
 
-  // Group the rows by movement, keeping the order of the bundle's movement list.
-  const groups = bundle.movements
-    .map((movement) => ({ movement, rows: actions.filter((a) => a.movement === movement.id) }))
-    .filter((g) => g.rows.length > 0);
+  // Group the rows by joint (hip, knee) and then by movement, keeping the order of the bundle's movement list.
+  // A joint gets its heading only when it has rows.
+  const joints = [...new Set(bundle.movements.map(jointOf))]
+    .map((joint) => ({
+      joint,
+      groups: bundle.movements
+        .filter((movement) => jointOf(movement) === joint)
+        .map((movement) => ({ movement, rows: actions.filter((a) => a.movement === movement.id) }))
+        .filter((g) => g.rows.length > 0),
+    }))
+    .filter((j) => j.groups.length > 0);
+  const gap = GAP_LINES[selection.sid];
 
   return (
     <section className="info-panel" data-testid="info-panel">
       <h2 className="info-name">{sideText}</h2>
       {structure?.latin && <p className="muted">{t("info.latin", { latin: structure.latin })}</p>}
+      {structure && <p className="muted">{t("info.type", { type: t(`type.${structure.type}`) })}</p>}
 
       {attachments.length > 0 && (
         <div>
@@ -99,9 +130,9 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
         </div>
       )}
 
-      {groups.length > 0 && (
-        <div>
-          <h3>{t("info.does")}</h3>
+      {joints.map(({ joint, groups }) => (
+        <div key={joint}>
+          <h3>{t(`info.does.${joint}`)}</h3>
           {groups.map(({ movement, rows }) => (
             <div key={movement.id}>
               <h4>{movement.english}</h4>
@@ -113,10 +144,10 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
             </div>
           ))}
         </div>
-      )}
+      ))}
 
       {pending > 0 && <p className="muted">{t("info.pending")}</p>}
-      {QUADRICEPS.has(selection.sid) && <p className="muted">{t("info.gap.quadriceps")}</p>}
+      {gap && <p className="muted">{t(gap)}</p>}
 
       <div className="panel-actions">
         {selection.side !== "" && (
