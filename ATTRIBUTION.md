@@ -17,7 +17,7 @@ These are the 3D model files in `models/`, where each one comes from, and its li
 | File | Source | License | What is in it |
 | --- | --- | --- | --- |
 | `models/hip.glb` | BodyParts3D | CC BY 4.0 | Hip region bones, muscles and the iliotibial tract (65 meshes) |
-| `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments (34 meshes) |
+| `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments and the two menisci (38 meshes) |
 
 Changes we made to the source meshes: we reduced the number of triangles, removed materials, texture coordinates and colours, and converted them to glTF with Draco compression. The Z-Anatomy meshes were also scaled, turned and moved (a separate fit for each side) so they sit on the BodyParts3D bones. Built by `pipeline/assets/build_region_blender.py`.
 

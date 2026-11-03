@@ -5,8 +5,8 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 ## Data and data model
 
 - Decide how a row says "only in some hip shapes" (the labrum row now keeps this in its free-text locator). Must be settled before any row reaches the app.
-- Add a meniscus structure type, then add the menisci back to the region.
-- The iliotibial tract is typed `tendon`, which allows `working` rows for a fascial band. Decide on a better type.
+- Done 2026-11-03: the `meniscus` type exists and both menisci are in the region (Phase 1 Task 2).
+- Done 2026-11-03: the iliotibial tract is typed `fascia` (Phase 1 Task 2).
 - Piriformis as `primary` external rotator up to 45 degrees is a judgment. At 45 degrees obturator externus is larger in Ito 2025 Table 2. Ask the physio.
 - `posterior-cruciate-ligament` has no Latin name because the TA2.csv entry looks wrong. Fix during the Latin review.
 - Validator tests cover the load-type rule only for ligaments. Add fixtures for capsule, labrum, bursa, bone and joint.
