@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Attachments",
+  "description": "Where each muscle starts (origin) and ends (insertion). One row per end. pipeline/data/src/validate.ts checks that muscle names a muscle and bone names a bone.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "muscle", "end", "bone", "landmark", "citations", "checked_by"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "muscle": { "type": "string", "minLength": 1 },
+      "end": { "enum": ["origin", "insertion"] },
+      "bone": { "type": "string", "minLength": 1 },
+      "landmark": {
+        "description": "The spot on the bone in plain words, for example greater trochanter.",
+        "type": "string",
+        "minLength": 1
+      },
+      "citations": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref", "locator", "says", "says_kind"],
+          "properties": {
+            "ref": { "type": "string", "minLength": 1 },
+            "locator": { "type": "string", "minLength": 1 },
+            "says": { "type": "string", "minLength": 1 },
+            "says_kind": {
+              "description": "quote when says is the source's own words (only for licences compatible with CC BY 4.0), summary when it is our own short summary.",
+              "enum": ["quote", "summary"]
+            }
+          }
+        }
+      },
+      "checked_by": {
+        "description": "Null until a person has checked the row against its sources. Then owner or a physio role label such as physio-1, never a name.",
+        "type": ["string", "null"],
+        "pattern": "^(owner|physio-[0-9]+)$"
+      },
+      "checked_on": {
+        "description": "The date the row was checked, like 2026-11-03. Required when checked_by is set, see validate.ts.",
+        "type": "string",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+      }
+    }
+  }
+}

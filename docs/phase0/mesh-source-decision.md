@@ -157,3 +157,16 @@ What was exported:
 Decimation keeps 60 percent of the triangles on bones and 14 percent on everything else, with no mesh under 120 triangles. The total stays far under the 150,000 triangle budget for the region.
 
 The check pictures `docs/phase0/export-check-front.png` and `export-check-back.png` look at the right hip joint with muscles hidden. The capsule, the hip ligaments, the sacrotuberous and sacrospinous ligaments and the bursae sit on the BodyParts3D bones, and nothing floats. The labrum is almost fully hidden between the femoral head and the acetabulum, which is where it belongs. A similar look at the right knee (not committed) showed the cruciate and collateral ligaments in place on the BodyParts3D femur, tibia and fibula.
+
+### Update 2026-11-03: menisci, fascia type and credit lines
+
+The hip region now also holds the medial and lateral menisci from Z-Anatomy (type `meniscus`, both sides, 4 meshes, 480 triangles). The iliotibial tract keeps its BodyParts3D mesh but is typed `fascia`. Both files were exported again with the same commands and the same fit, with both hip joints still within the 5 mm limit (head centre error 1.7 mm left and 1.5 mm right).
+
+| File | Meshes | Triangles | Size |
+| --- | --- | --- | --- |
+| `models/hip.glb` (BodyParts3D, CC BY 4.0) | 65 | 43,378 | 234,348 bytes |
+| `models/hip-z-anatomy.glb` (Z-Anatomy, CC BY-SA 4.0) | 38 | 5,531 | 54,824 bytes |
+| Total | 103 | 48,909 | 289,172 bytes |
+
+The export now writes each file's credit text into the glTF `asset.copyright` field, taken word for word from `ATTRIBUTION.md`. The menisci are small, so each mesh ends at the 120 triangle floor.
+

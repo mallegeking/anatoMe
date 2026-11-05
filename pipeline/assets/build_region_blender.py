@@ -364,7 +364,14 @@ def clear_scene_properties(scene):
             del system[key]
 
 
-def export(objs, out):
+# Credit text written into asset.copyright of each glb, verbatim from ATTRIBUTION.md.
+CREDITS = {
+    "bp3d": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
+    "z-anatomy": "Z-Anatomy - The libre 3D atlas of anatomy - CC-BY-SA 4.0",
+}
+
+
+def export(objs, out, source):
     clear_scene_properties(bpy.context.scene)
     for o in bpy.context.view_layer.objects:
         o.select_set(False)
@@ -376,6 +383,7 @@ def export(objs, out):
         export_format="GLB",
         use_selection=True,
         export_extras=True,
+        export_copyright=CREDITS[source],
         export_yup=True,
         export_apply=False,  # every modifier is already applied by hand
         export_materials="NONE",
@@ -418,7 +426,7 @@ def main():
                              lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices)
 
     report(objs)
-    export(objs, out)
+    export(objs, out, args.source)
 
 
 main()

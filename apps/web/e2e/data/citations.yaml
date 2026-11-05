@@ -1,0 +1,9 @@
+# A small test-only data set for the end-to-end test, see scripts/e2e-prepare.mjs.
+# Nothing here is a real source or a real claim. It never reaches a normal or review build.
+- id: e2e-source
+  title: Test source for the end-to-end check
+  authors: Test Author
+  year: 2026
+  url: https://example.org/e2e
+  license: CC BY 4.0
+  access: open

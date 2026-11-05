@@ -5,15 +5,18 @@
   role: primary
   when:
     - {angle: hip.flexion, min: 0, max: 60}
+  applies_to: Test hips only
   confidence: high
   citations:
-    - {ref: test-book, locator: page 1}
-  checked_by: null
+    - {ref: test-book, locator: page 1, says_kind: quote}
+  checked_by: physio-1
+  checked_on: 2026-11-03
 - id: ischiofemoral-ligament-hip-internal-rotation
   structure: ischiofemoral-ligament
   movement: hip-internal-rotation
   load: stretched
   confidence: medium
   citations:
-    - {ref: test-book, locator: page 2, says: Another short quote.}
+    - {ref: test-book, locator: page 2, says: Another short quote., says_kind: summary}
   checked_by: null
+  review_note: A test question for the reviewer.

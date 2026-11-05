@@ -1,0 +1,9 @@
+- id: gluteus-maximus-insertion-femur
+  muscle: gluteus-maximus
+  end: insertion
+  bone: femur
+  landmark: gluteal tuberosity
+  citations:
+    - {ref: test-book, locator: page 3, says: A third short quote., says_kind: quote}
+  checked_by: owner
+  checked_on: 2026-11-03

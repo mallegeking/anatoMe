@@ -40,15 +40,20 @@ npm ci
 npm run build
 ```
 
-The finished site is in `apps/web/dist/`. It should look like this. The two `index-<hash>` file names have a different random part on every build, that is fine.
+The finished site is in `apps/web/dist/`. It should look like this. The three file names with `<hash>` have a different random part on every build, that is fine.
 
 ```text
 apps/web/dist/
   index.html
+  third-party-licenses.txt
   assets/
     index-<hash>.js
     index-<hash>.css
+    Scene-<hash>.js
+  data/
+    hip.json
   draco/
+    LICENSE
     draco_decoder.js
     draco_decoder.wasm
     draco_wasm_wrapper.js
@@ -60,6 +65,14 @@ apps/web/dist/
 ```
 
 Check it quickly with `ls apps/web/dist`. You must see `index.html` directly in that folder, not inside another folder.
+
+Then check that no unchecked row got into the build. Run this from the same top folder:
+
+```bash
+node scripts/check-no-drafts.mjs
+```
+
+Expected output: `apps/web/dist/data: 1 bundle(s), no drafts`. If it prints anything else, do not copy the site. Run `npm run build` again and repeat the check.
 
 ## 3. Copy to the homelab
 
@@ -87,7 +100,7 @@ After the copy, `/srv/anatome` on the homelab should look exactly like the tree 
 ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'
 ```
 
-Expected output: `assets  draco  index.html  models`
+Expected output: `assets  data  draco  index.html  models  third-party-licenses.txt`
 
 ## 4. Serve it with Tailscale
 
@@ -143,7 +156,7 @@ You can run `tailscale serve status` again to confirm that nothing is served.
 
 ## 5. Open it on the phone and measure
 
-The point of this step is to check two things on the real phone: the model is usable within 5 seconds, and rotating it does not stutter. Write your numbers into `docs/phase0/phone-measurements.md`.
+The point of this step is to check two things on the real phone: the model is usable within 5 seconds, and rotating it does not stutter. Write your numbers into `docs/phase1/phone-measurements.md`. The Phase 0 sheet in `docs/phase0/` keeps your first results.
 
 Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 
@@ -154,7 +167,7 @@ Do this on home Wi-Fi, with Tailscale switched on in the phone app.
 5. Repeat steps 2 to 4 two more times, so you have 3 numbers.
 6. Rotate the model with one finger for 10 seconds. Note whether it stutters (yes or no).
 7. Tap 5 different structures and note whether the right name appears each time.
-8. Do the two extra tap checks listed in the measurement sheet.
+8. Do the other checks listed in the measurement sheet: quick taps, search, layers, the info panel and the side switch.
 
 The pass mark is the same as in the measurement sheet: the median of the 3 numbers (the middle one) is under 5000 ms, and the model does not stutter when you rotate it.
 
@@ -219,10 +232,138 @@ sudo systemctl disable --now anatome-web.service
 
 To remove it completely, also run `sudo rm /etc/systemd/system/anatome-web.service` and `sudo systemctl daemon-reload`.
 
+## Review build: show the draft rows to your physiotherapist
+
+The normal site never shows a row that nobody has checked. The review build is a second copy of the site that does show them. Every draft row is marked "Draft, not yet checked", has a row code, and a dark amber banner with pale text on top says it is a review build. Your physiotherapist can open it on a phone, look at each row and tell you what to do with it.
+
+Do not share this copy with anyone else. It serves its own folder on its own port, so the normal site stays untouched.
+
+### R1. Build it on the dev machine
+
+Run this from the top folder of the repository.
+
+```bash
+npm ci
+npm run build:review -w apps/web
+```
+
+The finished review site is in `apps/web/dist-review/`. It has the same layout as `apps/web/dist/` in step 2, with `index.html` directly inside. Its `data` folder holds the draft rows.
+
+The draft rows are written straight into `apps/web/dist-review/data/`, after the rest of the review site is built. They never go into `apps/web/public/data/`, the folder the normal site and `npm run dev` read from. So building the normal site afterwards is safe, and so is a dev server that is still running. Step 2 ends with `node scripts/check-no-drafts.mjs`, which checks that no draft row got into `apps/web/dist/`.
+
+### R2. Copy it to its own folder on the homelab
+
+Make the folder once (replace the placeholders):
+
+```bash
+ssh -t <homelab-user>@<homelab-host> 'sudo mkdir -p /srv/anatome-review && sudo chown <homelab-user>: /srv/anatome-review'
+```
+
+Copy the review site. Note the slash at the end of `apps/web/dist-review/`.
+
+```bash
+rsync -av --delete --chmod=D755,F644 apps/web/dist-review/ <homelab-user>@<homelab-host>:/srv/anatome-review/
+```
+
+Do not copy it into `/srv/anatome`. That folder is the normal site.
+
+### R3. Serve it on a second HTTPS port
+
+Run this on the homelab:
+
+```bash
+sudo tailscale serve --bg --https=8443 /srv/anatome-review
+tailscale serve status
+```
+
+`--https=<port>` picks the port to listen on. The Tailscale docs (https://tailscale.com/docs/reference/tailscale-cli/serve, checked 2026-11-03) allow it on `tailscale serve`, so this runs next to the normal site on port 443. The review address is:
+
+```text
+https://<machine-name>.<tailnet>.ts.net:8443/
+```
+
+Send your physiotherapist this address only if they have access to your tailnet.
+
+If `tailscale serve` shows a list of files or a blank page for the review folder (the same problem as in the fallback section above), use a small local web server instead. You need Python 3 on the homelab. Run this on the homelab:
+
+```bash
+sudo tailscale serve --https=8443 off
+nohup python3 -m http.server 8081 --bind 127.0.0.1 --directory /srv/anatome-review > /dev/null 2>&1 &
+sudo tailscale serve --bg --https=8443 http://127.0.0.1:8081
+tailscale serve status
+```
+
+The first line clears the folder handler on port 8443. The second starts the small server in the background. It listens on `127.0.0.1` only, so only the homelab itself can reach it. The third makes Tailscale pass port 8443 to it. The address stays the same.
+
+To stop both:
+
+```bash
+sudo tailscale serve --https=8443 off
+pkill -f "http.server 8081"
+```
+
+This server does not start again after a reboot. That is fine for a short review. Run the commands again if you need it.
+
+### R4. Stop serving the review copy
+
+When the review is done, run these on the homelab. If you used the small local web server above, first stop it with `pkill -f "http.server 8081"`.
+
+```bash
+sudo tailscale serve --https=8443 off
+sudo rm -r /srv/anatome-review
+```
+
+The first command stops Tailscale serving the review copy on port 8443. The normal site on port 443 keeps running. The second command deletes the review files from the homelab.
+
+### R5. What to ask first
+
+1. The piriformis question comes first. Both piriformis rows carry a question for the reviewer. Open the review build, tap the piriformis, read the two questions in italics under the draft rows (row codes `piriformis-hip-external-rotation` and `piriformis-hip-external-rotation-flexed`), and ask your physiotherapist to answer them.
+2. Then tap "Review list" in the dark amber banner. It lists every draft row grouped by structure, with its row code, its sources and its question if it has one. Go through them in order.
+
+### R6. Record the answers
+
+Do this on the dev machine, in the data files in the `data/` folder. There are two kinds of rows:
+
+- **Action rows** in `data/actions/hip.yaml` say what a movement does to a structure. Only your physiotherapist can check these. `npm run validate` refuses an action row with `checked_by: owner`.
+- **Attachment rows** in `data/attachments/hip.yaml` (63 rows) say where a muscle starts and ends. These are plain textbook facts, so you can check them yourself against the cited source, without the physiotherapist. Open the source (the "Open the source" link under "Sources" in the review build, or the `url` in `data/citations.yaml`), go to the place the row's `locator` names, and compare it with the row's `bone` and `landmark`. If they match, mark the row as checked with `checked_by: owner`, as shown below. If they do not match, fix the row or ask your physiotherapist.
+
+`checked_by` takes only two kinds of label: `owner` (you) or `physio-1` (your physiotherapist, `physio-2` for a second one). Never a person's name. `npm run validate` refuses anything else.
+
+Find the row by its row code: search for the code after `id:`, for example with `grep -rn "id: <row-code>" data`. For each row, do one of these:
+
+- The check passes. Set `checked_by: physio-1` for an action row the physiotherapist agreed with, or `checked_by: owner` for an attachment row you checked against its source. Add a `checked_on` line with the date of the check, in the form `YYYY-MM-DD`. Then delete the `review_note` line of that row if it has one, because the question is answered. A checked row that still has a note would show the note in the review build. Here is an action row before and after:
+
+  Before:
+
+  ```yaml
+    checked_by: null
+    review_note: "Physio: is piriformis a main external rotator up to 45 degrees?"
+  ```
+
+  After:
+
+  ```yaml
+    checked_by: physio-1
+    checked_on: 2026-11-10
+  ```
+
+  The `checked_on` line goes directly under `checked_by`, with the same indent. The `review_note` line is gone.
+- The physiotherapist asks for a change, or the source says something else. Edit the row to say what is right and leave it unchecked, so it stays a draft. Show action rows to the physiotherapist again in the next review build.
+- The row is wrong or not wanted. Delete the row.
+
+When you are done, run:
+
+```bash
+npm run validate
+```
+
+It must pass with no errors. Then build the normal site as in step 2. A row with `checked_by` and `checked_on` now shows in the normal site, and the rest stays hidden.
+
 ## If something goes wrong
 
 | What you see | What to try |
 | --- | --- |
+| `tailscale serve` refuses port 8443 for the review copy | Try another allowed port, for example `sudo tailscale serve --bg --https=10000 /srv/anatome-review`, and use `:10000` in the address. Run `tailscale serve status` to see what is being served on which port. To remove the failed one, repeat its flags with `off`, for example `sudo tailscale serve --https=8443 off`. |
 | The phone says it cannot find the site | Check that Tailscale is switched on in the phone app and shows the homelab as connected. Check MagicDNS is on. |
 | Certificate warning | HTTPS certificates are not enabled yet. Do step 1.2, then run `sudo tailscale serve --bg /srv/anatome` again. |
 | Blank page or a list of files | Run `ssh <homelab-user>@<homelab-host> 'ls /srv/anatome'`. You must see `index.html` directly inside, not inside a subfolder. Then check the file permissions in step 4. If the files are fine but you still see a list instead of the app, use the fallback section above. |

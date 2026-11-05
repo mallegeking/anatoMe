@@ -1,6 +1,13 @@
 # What hip movements do to each structure, and when.
-# Every row was drafted from the cited sources on 2026-11-02 and waits for a person to check it.
+# The first 11 rows were drafted from the cited sources on 2026-11-02, the rest on 2026-11-03.
+# Every row waits for a person to check it.
+# Each citation is marked quote when says is the source's own words, or summary when it is our own short summary.
+# We only quote sources whose licence fits CC BY 4.0. Ito 2025 and Groh 2009 are CC BY-NC, so their
+# says were rewritten as summaries on 2026-11-03, after opening both papers again.
 # Angles in when are in degrees, see joints.yaml. All entries in when must hold at once.
+# confidence says how well the sources support the action itself, for example that a muscle turns the hip
+# outwards. It does not say how sure we are that the muscle is a main mover (primary) or a helper
+# (secondary). Wherever that ranking is our own judgment, the row asks the physio in review_note.
 
 - id: gluteus-maximus-hip-extension
   structure: gluteus-maximus
@@ -12,9 +19,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus maximus
       says: "Gluteus maximus is listed as a prime mover of the femur, target motion direction: extension."
+      says_kind: summary
     - ref: contreras-2015
       locator: Discussion
       says: "presumably resulting from a greater reliance upon the gluteus maximus for hip extension"
+      says_kind: quote
   checked_by: null
 
 - id: iliacus-hip-flexion
@@ -26,10 +35,12 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Iliacus, and the section Gluteal Region Muscles That Move the Femur
-      says: "The psoas major and iliacus make up the iliopsoas group. The table gives iliacus the target motions thigh flexion and lateral rotation."
+      says: "The text groups iliacus with psoas major as the iliopsoas. The table gives iliacus the target motions thigh flexion and lateral rotation."
+      says_kind: summary
     - ref: schenkel-2018
       locator: Introduction, and Discussion
       says: "The iliopsoas is mainly responsible for hip flexion ... the iliopsoas is the largest hip flexor."
+      says_kind: quote
   checked_by: null
 
 - id: gluteus-medius-hip-abduction
@@ -42,9 +53,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus medius
       says: "Gluteus medius is listed as a prime mover of the femur, target motion direction: abduction."
+      says_kind: summary
     - ref: osullivan-2010
       locator: Discussion
       says: "the primary action of GM is abduction and internal rotation"
+      says_kind: quote
   checked_by: null
 
 - id: adductor-longus-hip-adduction
@@ -56,7 +69,8 @@
   citations:
     - ref: oeri-human-anatomy-10-7
       locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor longus
-      says: "The muscles in the medial compartment of the thigh are responsible for adducting the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor longus the target motions adduction and flexion."
+      says_kind: summary
   checked_by: null
 
 # Piriformis external rotation shrinks as the hip bends (Ito 2025, Table 2, N m):
@@ -75,10 +89,13 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Lateral Rotators, row Piriformis
       says: "Piriformis is listed among the lateral rotators, target motion direction: lateral rotation."
+      says_kind: summary
     - ref: ito-2025
       locator: Abstract, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), row Piriformis
-      says: "External rotation torque of the piriformis, obturator internus, and conjoined tendon peaked at 15° hip flexion, and then decreased as the hip flexed. Table 2, piriformis: 0.40 ± 0.17 at 0°, 0.40 ± 0.18 at 15°, 0.32 ± 0.10 at 30°, 0.24 ± 0.06 at 45°."
+      says: "In 15 cadaver hips, the external rotation torque of piriformis was highest at 15° of hip flexion and fell as the hip bent further. Table 2 gives piriformis 0.40 ± 0.17 N m at 0°, 0.40 ± 0.18 at 15°, 0.32 ± 0.10 at 30° and 0.24 ± 0.06 at 45°."
+      says_kind: summary
   checked_by: null
+  review_note: "Physio: is piriformis a main external rotator up to 45 degrees of hip flexion, or only up to 30? Ito 2025 Table 2 shows obturator externus larger than piriformis from 30 degrees (0.43 vs 0.32 N m) and about twice as large at 45 (0.50 vs 0.24)."
 
 - id: piriformis-hip-external-rotation-flexed
   structure: piriformis
@@ -91,8 +108,10 @@
   citations:
     - ref: ito-2025
       locator: Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
-      says: "Table 2, piriformis: 0.13 ± 0.04 at 60°, 0.05 ± 0.03 at 75°. Obturator externus at the same angles: 0.54 ± 0.18 and 0.58 ± 0.20."
+      says: "At 60° and 75° of hip flexion piriformis gave only a little external rotation torque, 0.13 ± 0.04 and 0.05 ± 0.03 N m in Table 2. Obturator externus gave 0.54 ± 0.18 and 0.58 ± 0.20 N m at the same angles."
+      says_kind: summary
   checked_by: null
+  review_note: "Physio: this row depends on the question on the 0 to 45 degree row. If piriformis is a main external rotator only up to 30 degrees, should this secondary row start at 45 instead of 60? Ito 2025 Table 2 gives piriformis 0.24 N m at 45, 0.13 at 60 and 0.05 at 75 degrees."
 
 # role secondary is a judgment, no source says it. Ito's Table 2 torques here are very
 # small (-0.02 and -0.06 N m, minus means internal rotation) and the textbook does not
@@ -108,7 +127,8 @@
   citations:
     - ref: ito-2025
       locator: 3. Results, paragraph on external rotation torque, and Table 2 (external rotation torque, mean ± SD, N m), row Piriformis. Hips were tested from 0° to 105° of flexion.
-      says: "The piriformis switched its function from external to internal rotation of the hip between 75° and 90° of flexion. Table 2, piriformis: −0.02 ± 0.02 at 90°, −0.06 ± 0.03 at 105°."
+      says: "Between 75° and 90° of hip flexion piriformis changed from turning the hip outwards to turning it inwards. Table 2 gives piriformis −0.02 ± 0.02 N m at 90° and −0.06 ± 0.03 at 105°, where minus means internal rotation."
+      says_kind: summary
   checked_by: null
 
 - id: obturator-externus-hip-external-rotation
@@ -123,9 +143,11 @@
     - ref: oeri-human-anatomy-10-7
       locator: Table 1 (Gluteal Region Muscles That Move the Femur), Lateral Rotators, row Obturator externus
       says: "Obturator externus is listed among the lateral rotators, target motion direction: lateral rotation."
+      says_kind: summary
     - ref: ito-2025
       locator: Abstract
-      says: "At 75° of flexion or more in deep flexion, ranges associated with a high risk of dislocation, the obturator externus had the highest external rotation torque."
+      says: "From 75° of hip flexion upwards, the range the authors link to a high risk of dislocation, obturator externus gave the most external rotation torque of the short external rotators."
+      says_kind: summary
   checked_by: null
 
 - id: ischiofemoral-ligament-hip-internal-rotation
@@ -139,9 +161,11 @@
     - ref: baba-2022
       locator: Abstract, Conclusion. Tested at 0°, 30° and 60° of hip flexion in nine cadaver hips.
       says: "The ischiofemoral ligament primarily restricted the internal rotation of the hip joint."
+      says_kind: quote
     - ref: ng-2019
       locator: Anatomy section, first paragraph
       says: "The ischiofemoral ligament ... reinforce[s] the capsule during internal rotation in neutral positions as well as in combined flexion-adduction positions"
+      says_kind: quote
   checked_by: null
 
 - id: iliofemoral-ligament-hip-extension
@@ -153,6 +177,7 @@
     - ref: ng-2019
       locator: Anatomy section, first paragraph
       says: "The iliofemoral ligament ... forming the inverted Y-shaped ligament of Bigelow ... to reinforce the capsule during external rotation and extension."
+      says_kind: quote
   checked_by: null
 
 - id: acetabular-labrum-hip-internal-rotation
@@ -161,18 +186,858 @@
   load: pinched
   when:
     - {angle: hip.flexion, min: 90, max: 112}
+  applies_to: hips with pincer-type impingement
   confidence: low
   citations:
     - ref: groh-2009
-      locator: Etiology, paragraph on femoroacetabular impingement (FAI). Describes hips with pincer-type FAI, not every hip.
-      says: "Pincer-type FAI is the result of abutment of the femoral head–neck junction on the acetabular rim due to acetabular overcoverage causing pinching of the labrum between the femur and acetabulum."
+      locator: Etiology, paragraph on femoroacetabular impingement (FAI)
+      says: "In pincer-type FAI the acetabulum covers too much of the femoral head. The femoral head-neck junction then hits the acetabular rim and the labrum gets pinched between femur and acetabulum."
+      says_kind: summary
     - ref: groh-2009
       locator: Clinical presentation, paragraph on the anterior hip impingement test
-      says: "This is performed with the patient supine with the hip and knee at 90° of flexion. The hip is internally rotated while an adduction force is applied."
+      says: "The anterior hip impingement test, the most consistent exam finding in labral tears, starts lying on the back with hip and knee bent to 90°. The examiner then turns the hip inwards while pushing it into adduction."
+      says_kind: summary
     - ref: van-arkel-2015
       locator: 1. Introduction
       says: "in deep flexion the hip has a large range of external rotation but is at risk of impingement in internal rotation"
+      says_kind: quote
     - ref: van-arkel-2015
       locator: 3. Results, first paragraph. Gives the upper end of the when range, nine cadaver hips under 5 N m torque.
       says: "Under 5 N m torque the mean (± standard deviation) hip joint flexion was 112±10°"
+      says_kind: quote
   checked_by: null
+
+# Rows below were added on 2026-11-03, one or more for every hip muscle, each with its sources open.
+# They wait for the physio like the rows above.
+# role primary is used where a source calls the muscle a main or primary mover for that movement.
+# Where no source ranks the muscle, the row asks the physio in review_note.
+# Left out on purpose: rotation by the adductors, the hamstrings and iliopsoas. Hirano 2025 says
+# textbooks and studies do not agree on adductor rotation, and the OERI table wording on these
+# rotations does not match its own Movement column. The gaps are listed in the task report.
+# The OERI tables are summarised in sentences. OERI prose is quoted, it is CC BY 4.0.
+
+# Gluteal group
+
+- id: gluteus-maximus-hip-external-rotation
+  structure: gluteus-maximus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: akamatsu-2017
+      locator: 1. Introduction
+      says: "The main action of gluteus maximus muscle is to extend the hip joint between flexed and standing positions and to assist its lateral rotation during climbing stairs"
+      says_kind: quote
+    - ref: contreras-2015
+      locator: Figure 2 caption (Standing glute squeeze)
+      says: "The subject squeezes her glutei, which generates hip extension and external rotation moments."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Akamatsu 2017 says gluteus maximus assists lateral rotation, so the row is secondary. Should gluteus maximus count as a main external rotator of the hip?"
+
+- id: gluteus-medius-hip-internal-rotation
+  structure: gluteus-medius
+  movement: hip-internal-rotation
+  load: working
+  role: secondary
+  confidence: low
+  citations:
+    - ref: pinheiro-2026
+      locator: 1. Introduction
+      says: "The gluteus medius is the primary hip abductor muscle, and its anterior fibers also assist with the internal rotation of the thigh. The posterior fibers contribute to lateral rotation"
+      says_kind: quote
+    - ref: osullivan-2010
+      locator: Background, second paragraph
+      says: "There has also been controversy over whether gluteus medius is primarily activated during medial rotation [1] or lateral rotation [21]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the app shows gluteus medius as one muscle. Pinheiro 2026 says its front fibres help turn the hip inwards and its back fibres help turn it outwards, and O'Sullivan 2010 calls the main rotation debated, although its own Discussion names abduction and internal rotation as the primary action. Is one secondary internal rotation row right? Should there also be an external rotation row, or neither?"
+
+# OERI Table 1 gives gluteus minimus the target motion abduction, but its Movement column says
+# "Brings thighs back together", which reads like adduction. Both papers say abduction.
+- id: gluteus-minimus-hip-abduction
+  structure: gluteus-minimus
+  movement: hip-abduction
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Gluteal Group, row Gluteus minimus
+      says: "Table 1 gives gluteus minimus the target motion abduction."
+      says_kind: summary
+    - ref: bajuri-2022
+      locator: Introduction, first paragraph
+      says: "The gluteus minimus and medius muscles are the main abductors of the hip joint"
+      says_kind: quote
+    - ref: godshaw-2019
+      locator: Discussion, first paragraph
+      says: "Innervated by the superior gluteal nerve, the gluteus medius and gluteus minimus aid in hip abduction and internal rotation of the thigh and leg."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the OERI table row for gluteus minimus gives the target motion abduction but describes the movement as bringing the thighs back together. We followed the target motion and both papers. Is abduction as a primary action right?"
+
+- id: gluteus-minimus-hip-internal-rotation
+  structure: gluteus-minimus
+  movement: hip-internal-rotation
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: godshaw-2019
+      locator: Discussion, first paragraph
+      says: "Innervated by the superior gluteal nerve, the gluteus medius and gluteus minimus aid in hip abduction and internal rotation of the thigh and leg."
+      says_kind: quote
+  checked_by: null
+
+- id: tensor-fasciae-latae-hip-abduction
+  structure: tensor-fasciae-latae
+  movement: hip-abduction
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "It acts as a synergist of the gluteus medius and iliopsoas in flexing and abducting the thigh."
+      says_kind: quote
+    - ref: szczerba-2026
+      locator: 4.2. The TFL
+      says: "The main mechanical function of the TFL muscle is hip abduction [12]."
+      says_kind: quote
+  checked_by: null
+
+- id: tensor-fasciae-latae-hip-flexion
+  structure: tensor-fasciae-latae
+  movement: hip-flexion
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "It acts as a synergist of the gluteus medius and iliopsoas in flexing and abducting the thigh."
+      says_kind: quote
+    - ref: szczerba-2026
+      locator: 4.2. The TFL
+      says: "However, it also assists the rectus femoris in hip flexion [42] and internal hip rotation [43]."
+      says_kind: quote
+  checked_by: null
+
+- id: tensor-fasciae-latae-hip-internal-rotation
+  structure: tensor-fasciae-latae
+  movement: hip-internal-rotation
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: szczerba-2026
+      locator: 4.2. The TFL
+      says: "However, it also assists the rectus femoris in hip flexion [42] and internal hip rotation [43]."
+      says_kind: quote
+    - ref: szczerba-2026
+      locator: "7. TFL Muscle: A Valuable Asset in Reconstructive Surgery"
+      says: "It contributes to balancing body weight, supports the non-weight-bearing limb, and assists in hip abduction, flexion, and internal rotation [19,25]."
+      says_kind: quote
+  checked_by: null
+
+# Lateral rotators
+
+- id: superior-gemellus-hip-external-rotation
+  structure: superior-gemellus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "Deep to the gluteus maximus, the piriformis, obturator internus, obturator externus, superior gemellus, inferior gemellus, and quadratus femoris laterally rotate the femur at the hip."
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Discussion, paragraph on obturator internus
+      says: "Together with the Pirif., SG, IG, and QF, it forms the deepest muscular layer of the gluteal region and contribute to external rotation and stabilization of the hip [5]."
+      says_kind: quote
+    - ref: ito-2025
+      locator: Table 1 (physiological cross-sectional area, mean ± SD, cm²)
+      says: "Superior gemellus has a small physiological cross-sectional area, 0.49 ± 0.14 cm², against 2.91 ± 0.83 for obturator internus and 1.67 ± 0.51 for piriformis. The torque study measured the gemelli only together with obturator internus."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: no source ranks superior gemellus among the external rotators. Secondary is our judgment from its small size in Ito 2025 Table 1. The row has no angle range because Ito measured the gemelli only together with obturator internus."
+
+- id: inferior-gemellus-hip-external-rotation
+  structure: inferior-gemellus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "Deep to the gluteus maximus, the piriformis, obturator internus, obturator externus, superior gemellus, inferior gemellus, and quadratus femoris laterally rotate the femur at the hip."
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Discussion, paragraph on obturator internus
+      says: "Together with the Pirif., SG, IG, and QF, it forms the deepest muscular layer of the gluteal region and contribute to external rotation and stabilization of the hip [5]."
+      says_kind: quote
+    - ref: ito-2025
+      locator: Table 1 (physiological cross-sectional area, mean ± SD, cm²)
+      says: "Inferior gemellus has a small physiological cross-sectional area, 0.53 ± 0.21 cm², against 2.91 ± 0.83 for obturator internus and 1.67 ± 0.51 for piriformis. The torque study measured the gemelli only together with obturator internus."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: no source ranks inferior gemellus among the external rotators. Secondary is our judgment from its small size in Ito 2025 Table 1. The row has no angle range because Ito measured the gemelli only together with obturator internus."
+
+# Obturator internus external rotation in Ito 2025, Table 2, N m: 0.59 at 0°, 0.60 at 15°,
+# 0.59 at 30°, 0.53 at 45°, 0.43 at 60°, 0.32 at 75°, 0.20 at 90°, 0.11 at 105°.
+# Piriformis in the same table: 0.40, 0.40, 0.32, 0.24, 0.13, 0.05, then -0.02 and -0.06.
+# It stays an external rotator over the whole range the study tested, and it beats piriformis at every angle.
+# Roles follow the piriformis rows. Piriformis is drafted primary while its torque is still sizable,
+# 0.24 N m or more (0.32 or more if the physio picks 30 degrees), and secondary at 0.13 and below.
+# By either cut-off obturator internus stays primary up to 75° (0.32) and falls below it at 90° (0.20).
+# The study measured every 15°, so nothing is claimed between 75° and 90°.
+- id: obturator-internus-hip-external-rotation
+  structure: obturator-internus
+  movement: hip-external-rotation
+  load: working
+  role: primary
+  when:
+    - {angle: hip.flexion, min: 0, max: 75}
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "Deep to the gluteus maximus, the piriformis, obturator internus, obturator externus, superior gemellus, inferior gemellus, and quadratus femoris laterally rotate the femur at the hip."
+      says_kind: quote
+    - ref: palmieri-2026
+      locator: Discussion, paragraph on obturator internus
+      says: "Although external rotation of the femur is its primary action, the OI also contributes to abduction of the flexed hip"
+      says_kind: quote
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator internus
+      says: "Obturator internus external rotation torque peaked at 15° of hip flexion and fell as the hip bent further. Table 2 gives 0.59 ± 0.20 N m at 0°, 0.59 ± 0.18 at 30°, 0.53 ± 0.16 at 45°, 0.43 ± 0.13 at 60° and 0.32 ± 0.11 at 75°. Piriformis gave less at every one of these angles, 0.40 ± 0.17 at 0° and 0.24 ± 0.06 at 45°."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: primary here is our reading of Ito 2025 Table 2, no source ranks the rotators. Obturator internus gives more external rotation torque than piriformis at every angle (0.59 vs 0.40 N m at 0 degrees, 0.53 vs 0.24 at 45, 0.43 vs 0.13 at 60). Its torque at 75 degrees (0.32) is still at least what piriformis has where it is drafted primary. Is primary from 0 to 75 degrees right, whichever answer you give on the piriformis 45 versus 30 question?"
+
+- id: obturator-internus-hip-external-rotation-flexed
+  structure: obturator-internus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  when:
+    - {angle: hip.flexion, min: 90, max: 105}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Obturator internus and Obturator externus
+      says: "In deep flexion obturator internus still turned the hip outwards, but less. Table 2 gives 0.20 ± 0.09 N m at 90° and 0.11 ± 0.08 at 105°. Obturator externus gave 0.58 ± 0.23 and 0.58 ± 0.22 N m at the same angles."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: secondary here is our reading of Ito 2025 Table 2. At 90 and 105 degrees obturator internus gives 0.20 and 0.11 N m, below the 0.24 N m at which piriformis is still drafted primary, and about a third or less of obturator externus (0.58). Is secondary right from 90 degrees?"
+
+# Baba 2022 cut the external rotators one by one in nine cadaver hips at 0°, 30° and 60° of flexion.
+# At 30° the ischiofemoral ligament did most of the holding.
+- id: obturator-internus-hip-internal-rotation
+  structure: obturator-internus
+  movement: hip-internal-rotation
+  load: stretched
+  when:
+    - {angle: hip.flexion, min: 0, max: 60}
+  confidence: low
+  citations:
+    - ref: baba-2022
+      locator: Conclusions
+      says: "The piriformis and obturator internus together might also restrict internal rotation at 0° and 60° of hip flexion."
+      says_kind: quote
+    - ref: baba-2022
+      locator: Discussion, fourth paragraph
+      says: "Furthermore, the contributions of the obturator internus to restricting internal rotation at 60° of hip flexion might be more important than the piriformis."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Baba 2022 tested cadaver hips at 0, 30 and 60 degrees only, and its wording is cautious (might). At 30 degrees the ischiofemoral ligament held most of the rotation. Is a stretched row from 0 to 60 degrees fair, or should it be dropped?"
+
+# Obturator externus at lower flexion, Ito 2025 Table 2, N m: 0.27 at 0°, 0.35 at 15°, 0.43 at 30°,
+# 0.50 at 45°, 0.54 at 60°. Piriformis at the same angles: 0.40, 0.40, 0.32, 0.24, 0.13.
+# Obturator externus is below piriformis at 0° and 15° and above it from 30°, about twice it at 45°.
+# The row near the top of the file covers 75° to 105° as primary. The study measured every 15°,
+# so nothing is claimed between 15° and 30° or between 60° and 75°.
+- id: obturator-externus-hip-external-rotation-to-15
+  structure: obturator-externus
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  when:
+    - {angle: hip.flexion, min: 0, max: 15}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
+      says: "With the hip straight or a little bent, obturator externus gave less external rotation torque than piriformis. Table 2 gives obturator externus 0.27 ± 0.13 N m at 0° and 0.35 ± 0.13 at 15°, and piriformis 0.40 ± 0.17 and 0.40 ± 0.18."
+      says_kind: summary
+    - ref: abouzaid-2026
+      locator: Discussion
+      says: "Obturator externus is known to be an external rotator of the hip in flexed and neutral positions and assists in adduction of a flexed hip [10]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: secondary here is our reading of Ito 2025 Table 2, where obturator externus is below piriformis at 0 and 15 degrees (0.27 and 0.35 vs 0.40 N m). Is secondary right with the hip near straight?"
+
+- id: obturator-externus-hip-external-rotation-30-to-60
+  structure: obturator-externus
+  movement: hip-external-rotation
+  load: working
+  role: primary
+  when:
+    - {angle: hip.flexion, min: 30, max: 60}
+  confidence: medium
+  citations:
+    - ref: ito-2025
+      locator: 3. Results, and Table 2 (external rotation torque at each hip flexion angle, mean ± SD, N m), rows Piriformis and Obturator externus
+      says: "Obturator externus external rotation torque rose as the hip bent and passed piriformis from 30° of flexion. Table 2 gives obturator externus 0.43 ± 0.14 N m at 30°, 0.50 ± 0.15 at 45° and 0.54 ± 0.18 at 60°, and piriformis 0.32 ± 0.10, 0.24 ± 0.06 and 0.13 ± 0.04."
+      says_kind: summary
+    - ref: abouzaid-2026
+      locator: Discussion
+      says: "Obturator externus is known to be an external rotator of the hip in flexed and neutral positions and assists in adduction of a flexed hip [10]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: primary here is our reading of Ito 2025 Table 2. From 30 degrees obturator externus gives more external rotation torque than piriformis (0.43 vs 0.32 N m at 30, 0.50 vs 0.24 at 45), so it is drafted primary from 30 degrees, whichever answer you give on the piriformis 45 versus 30 question. Is that right? If so, should this row and the 75 to 105 degree row become one row from 30 to 105?"
+
+- id: quadratus-femoris-hip-external-rotation
+  structure: quadratus-femoris
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, paragraph after Table 1
+      says: "Deep to the gluteus maximus, the piriformis, obturator internus, obturator externus, superior gemellus, inferior gemellus, and quadratus femoris laterally rotate the femur at the hip."
+      says_kind: quote
+    - ref: sanchez-montoya-2025
+      locator: 1. Introduction, second paragraph
+      says: "functioning primarily as a hip external rotator and assisting in adduction"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Sanchez-Montoya 2025 says external rotation is the main job of quadratus femoris, but no source ranks it against the other external rotators, and Ito 2025 left it out. Primary or secondary?"
+
+# Iliopsoas group
+
+- id: psoas-major-hip-flexion
+  structure: psoas-major
+  movement: hip-flexion
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Iliopsoas group, row Psoas major, and the section Gluteal Region Muscles That Move the Femur
+      says: "The text groups psoas major with iliacus as the iliopsoas. The table gives psoas major the target motions thigh flexion and lateral rotation, and torso flexion."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip flexion, the iliopsoas and rectus femoris are the main agonists, and the sartorius and adductor longus act as synergists."
+      says_kind: quote
+  checked_by: null
+
+# Adductors. OERI Table 1 gives pectineus the target motions adduction, flexion and medial
+# rotation, but its Movement column says "Opens thighs". The OERI prose and Bai 2023 say adduction.
+
+- id: pectineus-hip-adduction
+  structure: pectineus
+  movement: hip-adduction
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, second paragraph after Table 1
+      says: "The pectineus adducts and flexes the femur at the hip as well."
+      says_kind: quote
+    - ref: bai-2023
+      locator: 5. Discussion
+      says: "The pectineus muscle functions to flex and adduct the hip and internally rotate the thigh ... these functions can be performed with other muscles such as the iliopsoas, adductor magnus, brevis, and longus."
+      says_kind: quote
+  checked_by: null
+
+- id: pectineus-hip-flexion
+  structure: pectineus
+  movement: hip-flexion
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, second paragraph after Table 1
+      says: "The pectineus adducts and flexes the femur at the hip as well."
+      says_kind: quote
+    - ref: hirano-2025
+      locator: 1. Introduction, first paragraph
+      says: "Among them, the pectineus, adductor longus, and brevis not only have hip flexion in the neutral position of the hip joint, but can also switch to hip extension in the flexed position [1,2]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Hirano 2025 says pectineus flexes the hip from neutral but can switch to extending it once the hip is bent. The paper gives no angle, so the row has no angle range. Should it end at some hip flexion angle?"
+
+- id: adductor-longus-hip-flexion
+  structure: adductor-longus
+  movement: hip-flexion
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, second paragraph after Table 1
+      says: "The adductor longus flexes the thigh, whereas the adductor magnus extends it."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip flexion, the iliopsoas and rectus femoris are the main agonists, and the sartorius and adductor longus act as synergists."
+      says_kind: quote
+    - ref: hirano-2025
+      locator: 1. Introduction, first paragraph
+      says: "Among them, the pectineus, adductor longus, and brevis not only have hip flexion in the neutral position of the hip joint, but can also switch to hip extension in the flexed position [1,2]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Hirano 2025 says adductor longus flexes the hip from neutral but can switch to extending it once the hip is bent. The paper gives no angle, so the row has no angle range. Should it end at some hip flexion angle?"
+
+- id: adductor-brevis-hip-adduction
+  structure: adductor-brevis
+  movement: hip-adduction
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor brevis the target motions adduction and flexion."
+      says_kind: summary
+    - ref: hirano-2025
+      locator: 1. Introduction, first paragraph
+      says: "The hip adductor muscle group consists of five muscles and is primarily responsible for hip adduction."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: primary follows the adductor longus row. The sources call the adductor group the main adductors but do not rank adductor brevis against the others. Is primary right?"
+
+- id: adductor-brevis-hip-flexion
+  structure: adductor-brevis
+  movement: hip-flexion
+  load: working
+  role: secondary
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor brevis
+      says: "The table describes adductor brevis as bringing the thighs together and assisting with raising the knee, with the target motions adduction and flexion."
+      says_kind: summary
+    - ref: hirano-2025
+      locator: 1. Introduction, first paragraph
+      says: "Among them, the pectineus, adductor longus, and brevis not only have hip flexion in the neutral position of the hip joint, but can also switch to hip extension in the flexed position [1,2]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Hirano 2025 says adductor brevis flexes the hip from neutral but can switch to extending it once the hip is bent. The paper gives no angle, so the row has no angle range. Should it end at some hip flexion angle?"
+
+- id: adductor-magnus-hip-adduction
+  structure: adductor-magnus
+  movement: hip-adduction
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph, and Table 1 (Gluteal Region Muscles That Move the Femur), Adductors, row Adductor magnus
+      says: "The text says the muscles of the medial thigh compartment adduct the femur at the hip. The table gives adductor magnus the target motions adduction, flexion and extension."
+      says_kind: summary
+    - ref: hirano-2025
+      locator: 1. Introduction, first paragraph
+      says: "The hip adductor muscle group consists of five muscles and is primarily responsible for hip adduction."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: primary follows the adductor longus row. The sources call the adductor group the main adductors but do not rank adductor magnus against the others. Is primary right?"
+
+# Kumazaki 2022 writes "adductor maximus" in this sentence. We read it as adductor magnus, so the
+# citation is a summary and not a quote.
+- id: adductor-magnus-hip-extension
+  structure: adductor-magnus
+  movement: hip-extension
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Gluteal Region Muscles That Move the Femur, second paragraph after Table 1
+      says: "The adductor longus flexes the thigh, whereas the adductor magnus extends it."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "The paper names gluteus maximus and the three hamstrings as the main hip extensors, with the adductor magnus as a synergist."
+      says_kind: summary
+  checked_by: null
+
+# Gracilis. OERI Table 2 gives the target motions thigh adduction and lower leg flexion, but its
+# Movement column says "assists in opening thighs". The OERI prose and Landfald 2026 say adduction.
+
+- id: gracilis-hip-adduction
+  structure: gracilis
+  movement: hip-adduction
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph
+      says: "Along with the adductor longus, adductor brevis, adductor magnus, and pectineus, the strap-like gracilis adducts the thigh in addition to flexing the leg at the knee."
+      says_kind: quote
+    - ref: landfald-2026
+      locator: 1. Introduction, first paragraph
+      says: "Functionally, it contributes to hip adduction, knee flexion, and internal rotation of the leg [1,3]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: no source ranks gracilis among the adductors. Secondary is our judgment, it is a thin strap next to the larger adductors. Is that right?"
+
+- id: gracilis-knee-flexion
+  structure: gracilis
+  movement: knee-flexion
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, first paragraph
+      says: "Along with the adductor longus, adductor brevis, adductor magnus, and pectineus, the strap-like gracilis adducts the thigh in addition to flexing the leg at the knee."
+      says_kind: quote
+    - ref: landfald-2026
+      locator: 1. Introduction, first paragraph
+      says: "Functionally, it contributes to hip adduction, knee flexion, and internal rotation of the leg [1,3]."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: no source ranks gracilis among the knee flexors. Secondary is our judgment, with the hamstrings as primary. Is that right?"
+
+# Sartorius
+
+- id: sartorius-hip-flexion
+  structure: sartorius
+  movement: hip-flexion
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2
+      says: "This versatile muscle flexes the leg at the knee and flexes, abducts, and laterally rotates the leg at the hip."
+      says_kind: quote
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "draws the lower limb into a tailor's sitting position, by flexing, laterally rotating, and abducting the hip, and flexing the knee"
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip flexion, the iliopsoas and rectus femoris are the main agonists, and the sartorius and adductor longus act as synergists."
+      says_kind: quote
+  checked_by: null
+
+- id: sartorius-hip-abduction
+  structure: sartorius
+  movement: hip-abduction
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2
+      says: "This versatile muscle flexes the leg at the knee and flexes, abducts, and laterally rotates the leg at the hip."
+      says_kind: quote
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "draws the lower limb into a tailor's sitting position, by flexing, laterally rotating, and abducting the hip, and flexing the knee"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: no source ranks sartorius among the hip abductors. Secondary is our judgment. Is that right?"
+
+- id: sartorius-hip-external-rotation
+  structure: sartorius
+  movement: hip-external-rotation
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2
+      says: "This versatile muscle flexes the leg at the knee and flexes, abducts, and laterally rotates the leg at the hip."
+      says_kind: quote
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "draws the lower limb into a tailor's sitting position, by flexing, laterally rotating, and abducting the hip, and flexing the knee"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: no source ranks sartorius among the hip external rotators. Secondary is our judgment. Is that right?"
+
+- id: sartorius-knee-flexion
+  structure: sartorius
+  movement: knee-flexion
+  load: working
+  role: secondary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2
+      says: "This versatile muscle flexes the leg at the knee and flexes, abducts, and laterally rotates the leg at the hip."
+      says_kind: quote
+    - ref: burnet-2004
+      locator: Section Anatomy of sartorius and its surrounding fascia
+      says: "draws the lower limb into a tailor's sitting position, by flexing, laterally rotating, and abducting the hip, and flexing the knee"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: no source ranks sartorius among the knee flexors. Secondary is our judgment, with the hamstrings as primary. Is that right?"
+
+# Quadriceps femoris. Kumazaki 2022 modelled hip flexion from 0° to 90°, so the rectus femoris hip
+# flexion row only claims that range.
+
+- id: rectus-femoris-hip-flexion
+  structure: rectus-femoris
+  movement: hip-flexion
+  load: working
+  role: primary
+  when:
+    - {angle: hip.flexion, min: 0, max: 90}
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Quadriceps Femoris Group, row Rectus femoris
+      says: "The table describes rectus femoris as moving the lower leg out in front of the body and assisting in raising the knee, with the target motions thigh flexion and lower leg extension."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip flexion, the iliopsoas and rectus femoris are the main agonists, and the sartorius and adductor longus act as synergists."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Results, Relative contribution of individual hip flexors to the maximal hip flexion torque. Estimated from 22 cadaver limbs.
+      says: "The relative contribution of the rectus femoris to the maximal hip flexion torque was greater than that of the iliopsoas in mild flexion up to 60°, and its relative contribution decreased steeply in deep flexion."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Kumazaki 2022 calls rectus femoris a main hip flexor, with more of the torque than iliopsoas up to about 60 degrees. The OERI table only says it assists in raising the knee. Is primary right? Beyond about 60 to 70 degrees its share falls behind iliopsoas. Should the primary range end there?"
+
+- id: rectus-femoris-knee-extension
+  structure: rectus-femoris
+  movement: knee-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2
+      says: "This compartment contains the quadriceps femoris group, which actually comprises four muscles that extend and stabilize the knee."
+      says_kind: quote
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "The QF is the primary extensor of the leg and comprises four parts: rectus femoris (RF), vastus intermedius (VI), vastus lateralis (VL), and vastus medialis (VM)."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During knee extension, the four muscles of the quadriceps femoris play the role of the main agonist."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-lateralis-knee-extension
+  structure: vastus-lateralis
+  movement: knee-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2, and Table 2, row Vastus lateralis
+      says: "This compartment contains the quadriceps femoris group, which actually comprises four muscles that extend and stabilize the knee."
+      says_kind: quote
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "The QF is the primary extensor of the leg and comprises four parts: rectus femoris (RF), vastus intermedius (VI), vastus lateralis (VL), and vastus medialis (VM)."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During knee extension, the four muscles of the quadriceps femoris play the role of the main agonist."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-medialis-knee-extension
+  structure: vastus-medialis
+  movement: knee-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2, and Table 2, row Vastus medialis
+      says: "This compartment contains the quadriceps femoris group, which actually comprises four muscles that extend and stabilize the knee."
+      says_kind: quote
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "The QF is the primary extensor of the leg and comprises four parts: rectus femoris (RF), vastus intermedius (VI), vastus lateralis (VL), and vastus medialis (VM)."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During knee extension, the four muscles of the quadriceps femoris play the role of the main agonist."
+      says_kind: quote
+  checked_by: null
+
+- id: vastus-intermedius-knee-extension
+  structure: vastus-intermedius
+  movement: knee-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, paragraph after Table 2, and Table 2, row Vastus intermedius
+      says: "This compartment contains the quadriceps femoris group, which actually comprises four muscles that extend and stabilize the knee."
+      says_kind: quote
+    - ref: piagkou-2025
+      locator: 1. Introduction
+      says: "The QF is the primary extensor of the leg and comprises four parts: rectus femoris (RF), vastus intermedius (VI), vastus lateralis (VL), and vastus medialis (VM)."
+      says_kind: quote
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During knee extension, the four muscles of the quadriceps femoris play the role of the main agonist."
+      says_kind: quote
+  checked_by: null
+
+# Hamstrings. The OERI Table 2 row for biceps femoris covers both heads. Obey 2016 is
+# CC BY-NC-ND, so its citations are summaries.
+
+- id: biceps-femoris-long-head-hip-extension
+  structure: biceps-femoris-long-head
+  movement: hip-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris, and the paragraph after Table 2
+      says: "The table gives biceps femoris the target motions thigh extension and lateral rotation, and lower leg flexion. The text says the posterior compartment muscles flex the leg and extend the thigh."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip extension, the gluteus maximus and three muscles of the hamstrings play the role of main agonists"
+      says_kind: quote
+    - ref: obey-2016
+      locator: Opening paragraph of the main text
+      says: "The hamstrings are an important hip extensor and knee flexor. They are biceps femoris with its long and short heads, semitendinosus and semimembranosus. All but the short head start on the ischial tuberosity."
+      says_kind: summary
+  checked_by: null
+
+- id: biceps-femoris-long-head-knee-flexion
+  structure: biceps-femoris-long-head
+  movement: knee-flexion
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, last paragraph
+      says: "The three long muscles on the back of the knee are the hamstring group, which flexes the knee."
+      says_kind: quote
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The differing insertion sites allow these two muscles to contribute to both knee flexion and rotational control, with the ST assisting in medial tibial rotation and the BFlh assisting in lateral rotation."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: OERI names the hamstrings as the group that flexes the knee, but no source ranks the knee flexors. Primary for each hamstring is our judgment. Is that right?"
+
+# The short head starts on the femur, so it does not cross the hip and has no hip row.
+- id: biceps-femoris-short-head-knee-flexion
+  structure: biceps-femoris-short-head
+  movement: knee-flexion
+  load: working
+  role: primary
+  confidence: medium
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Biceps femoris
+      says: "The biceps femoris row lists both heads together. Its origins include the linea aspera and distal femur, where the short head starts, and it gives lower leg flexion as a target motion."
+      says_kind: summary
+    - ref: obey-2016
+      locator: Opening paragraph of the main text
+      says: "The hamstrings are an important hip extensor and knee flexor. They are biceps femoris with its long and short heads, semitendinosus and semimembranosus. All but the short head start on the ischial tuberosity."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: neither source looks at the short head on its own. Both describe biceps femoris or the hamstrings as a whole as knee flexors. Primary is our judgment. Is a primary knee flexion row right for the short head?"
+
+- id: semitendinosus-hip-extension
+  structure: semitendinosus
+  movement: hip-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semitendinosus
+      says: "The table gives semitendinosus the target motions thigh extension and medial rotation, and lower leg flexion."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip extension, the gluteus maximus and three muscles of the hamstrings play the role of main agonists"
+      says_kind: quote
+    - ref: arai-2026
+      locator: Discussion
+      says: "The semitendinosus is a biarticular muscle that acts as a hip extensor and knee flexor"
+      says_kind: quote
+  checked_by: null
+
+- id: semitendinosus-knee-flexion
+  structure: semitendinosus
+  movement: knee-flexion
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, last paragraph
+      says: "The three long muscles on the back of the knee are the hamstring group, which flexes the knee."
+      says_kind: quote
+    - ref: arai-2026
+      locator: Discussion
+      says: "The semitendinosus is a biarticular muscle that acts as a hip extensor and knee flexor"
+      says_kind: quote
+    - ref: asonganyi-eyong-2026
+      locator: Introduction
+      says: "The differing insertion sites allow these two muscles to contribute to both knee flexion and rotational control, with the ST assisting in medial tibial rotation and the BFlh assisting in lateral rotation."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: OERI names the hamstrings as the group that flexes the knee, but no source ranks the knee flexors. Primary for each hamstring is our judgment. Is that right?"
+
+- id: semimembranosus-hip-extension
+  structure: semimembranosus
+  movement: hip-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Table 2 (Thigh Muscles That Move the Femur, Tibia, and Fibula), Hamstring Group, row Semimembranosus
+      says: "The table gives semimembranosus the target motions thigh extension and medial rotation, and lower leg flexion."
+      says_kind: summary
+    - ref: kumazaki-2022
+      locator: Introduction, second paragraph
+      says: "During hip extension, the gluteus maximus and three muscles of the hamstrings play the role of main agonists"
+      says_kind: quote
+    - ref: obey-2016
+      locator: Opening paragraph of the main text
+      says: "The hamstrings are an important hip extensor and knee flexor. They are biceps femoris with its long and short heads, semitendinosus and semimembranosus. All but the short head start on the ischial tuberosity."
+      says_kind: summary
+  checked_by: null
+
+- id: semimembranosus-knee-flexion
+  structure: semimembranosus
+  movement: knee-flexion
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - ref: oeri-human-anatomy-10-7
+      locator: Section Thigh Muscles That Move the Femur, Tibia, and Fibula, last paragraph
+      says: "The three long muscles on the back of the knee are the hamstring group, which flexes the knee."
+      says_kind: quote
+    - ref: obey-2016
+      locator: Opening paragraph of the main text
+      says: "The hamstrings are an important hip extensor and knee flexor. They are biceps femoris with its long and short heads, semitendinosus and semimembranosus. All but the short head start on the ischial tuberosity."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: OERI names the hamstrings as the group that flexes the knee, but no source ranks the knee flexors. Primary for each hamstring is our judgment. Is that right?"

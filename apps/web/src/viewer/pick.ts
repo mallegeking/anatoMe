@@ -1,5 +1,4 @@
 import type { Object3D } from "three";
-import type { Translate } from "../i18n/t";
 
 export type PickedStructure = {
   sid: string;
@@ -8,6 +7,9 @@ export type PickedStructure = {
   kind: string;
 };
 
+// What is selected: a structure id and, for paired structures, the side.
+export type Selection = { sid: string; side: "l" | "r" | "" };
+
 export type Hit = { object: Object3D; distance: number };
 export type PickedHit = { object: Object3D; structure: PickedStructure };
 
@@ -15,6 +17,11 @@ export type PickedHit = { object: Object3D; structure: PickedStructure };
 const TAP_SLOP_PX = 6;
 
 export function shouldSelect(dragPx: number): boolean {
+  return dragPx < TAP_SLOP_PX;
+}
+
+// A tap on empty space clears the selection. It uses the same rule, so selecting and clearing feel the same.
+export function shouldClear(dragPx: number): boolean {
   return dragPx < TAP_SLOP_PX;
 }
 
@@ -44,12 +51,13 @@ export function pickHit(hits: Hit[]): PickedHit | null {
   return null;
 }
 
-export function pickStructure(hits: Hit[]): PickedStructure | null {
-  return pickHit(hits)?.structure ?? null;
-}
-
-export function formatLabel(p: PickedStructure, t: Translate): string {
-  if (p.side === "l") return t("side.left", { label: p.label });
-  if (p.side === "r") return t("side.right", { label: p.label });
-  return p.label;
+// Like pickHit, but skips hits on structures that are hidden.
+// Three.js still reports hits on meshes that are switched off, so we filter them out here.
+export function pickVisibleHit(hits: Hit[], isVisibleSid: (sid: string) => boolean): PickedHit | null {
+  return pickHit(
+    hits.filter((hit) => {
+      const structure = structureOf(hit.object);
+      return structure !== null && isVisibleSid(structure.sid);
+    }),
+  );
 }

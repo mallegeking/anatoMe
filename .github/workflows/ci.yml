@@ -28,9 +28,26 @@ jobs:
       - name: Node tests
         run: npm test
 
+      # Builds the review copy first. The normal build after it, and the draft check further down,
+      # then prove on every run that review data can never reach apps/web/dist.
+      - name: Build the review copy
+        run: npm run build:review -w apps/web
+
       # Type-checks and builds the app. It uses the committed models/ folder, so it needs no sources/ or tools/.
       - name: Build the app
         run: npm run build
+
+      # Opens the built app in a real Chromium and walks the search path. The version is the one pinned in apps/web.
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+
+      - name: End-to-end test
+        run: npm run e2e -w apps/web
+
+      # Fails when an unchecked row reached the normal bundle.
+      - name: Check the build has no drafts
+        run: node scripts/check-no-drafts.mjs
 
       - uses: actions/setup-python@v7
         with:

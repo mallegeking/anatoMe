@@ -4,6 +4,10 @@ sources/
 tools/
 .venv/
 apps/web/public/models/
+apps/web/public/data/
+apps/web/dist-review/
+apps/web/dist-e2e/
 *.log
 .superpowers/
 __pycache__/
+apps/web/test-results/

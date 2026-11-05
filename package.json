@@ -9,6 +9,8 @@
     "dev": "npm run dev -w apps/web",
     "build": "npm run build -w apps/web",
     "validate": "tsx pipeline/data/src/cli.ts validate data",
+    "build-data": "tsx pipeline/data/src/cli.ts build-data data apps/web/public/data",
+    "build-data:review": "tsx pipeline/data/src/cli.ts build-data data apps/web/dist-review/data --review",
     "check-models": "tsx pipeline/data/src/cli.ts check-models models data",
     "test": "npm test --workspaces --if-present",
     "test:py": ".venv/bin/pytest pipeline/assets/tests -q"

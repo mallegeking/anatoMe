@@ -1,3 +1,7 @@
-- {id: femur, type: bone, english: Femur, region: hip}
-- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip}
-- {id: ischiofemoral-ligament, type: ligament, english: Ischiofemoral ligament, region: hip}
+- {id: femur, type: bone, english: Femur, region: hip, depth: 4}
+- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip, depth: 1, depth_note: Test note.}
+- {id: ischiofemoral-ligament, type: ligament, english: Ischiofemoral ligament, region: hip, depth: 3}
+- {id: hip-joint-capsule, type: capsule, english: Hip joint capsule, region: hip, depth: 3}
+- {id: trochanteric-bursa, type: bursa, english: Trochanteric bursa, region: hip, depth: 2}
+- {id: medial-meniscus, type: meniscus, english: Medial meniscus, region: hip, depth: 3}
+- {id: iliotibial-tract, type: fascia, english: Iliotibial tract, region: hip, depth: 1}

@@ -1,0 +1,11 @@
+# Joints and their degrees of freedom (dofs).
+# An angle is written <joint>.<dof>, for example hip.flexion, in degrees.
+# Zero is standing upright. A positive angle moves toward the name in positive.
+- id: hip
+  dofs:
+    - {id: flexion, positive: flexion, negative: extension}
+    - {id: abduction, positive: abduction, negative: adduction}
+    - {id: rotation, positive: internal rotation, negative: external rotation}
+- id: knee
+  dofs:
+    - {id: flexion, positive: flexion, negative: extension}

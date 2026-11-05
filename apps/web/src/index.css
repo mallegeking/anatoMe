@@ -39,13 +39,22 @@ body,
   touch-action: none;
 }
 
+/* The educational line stays at the top of the panel. Only the part below it scrolls. */
 .panel {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
   max-height: 45dvh;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   background: var(--panel);
   border-top: 1px solid #2c323b;
+}
+
+.panel-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .info-label {
@@ -87,6 +96,46 @@ body,
   text-align: center;
 }
 
+/* Inside the panel the message is just a line of text. */
+.panel .model-error {
+  display: block;
+  height: auto;
+  padding: 0 0 8px;
+  text-align: left;
+}
+
+/* The last-resort error: the message fills the screen and the credits stay below it. */
+.error-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.error-page .model-error {
+  flex: 1 1 auto;
+  height: auto;
+}
+
+/* Sits in the middle of the empty stage until the model is in. It lets taps through. */
+.model-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+.educational {
+  flex: 0 0 auto;
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
 .perf-overlay {
   position: absolute;
   top: 8px;
@@ -96,4 +145,287 @@ body,
   background: rgba(0, 0, 0, 0.6);
   font: 12px ui-monospace, monospace;
   pointer-events: none;
+}
+
+.info-panel h2,
+.info-panel h3,
+.info-panel h4 {
+  margin: 8px 0 4px;
+}
+
+.info-panel h2 {
+  margin-top: 0;
+  font-size: 1.125rem;
+  overflow-wrap: anywhere;
+}
+
+.info-panel h3 {
+  font-size: 0.9375rem;
+}
+
+.info-panel h4 {
+  font-size: 0.875rem;
+}
+
+.info-panel p,
+.info-panel ul {
+  margin: 4px 0;
+}
+
+.info-panel ul {
+  padding-left: 18px;
+}
+
+.info-panel {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.review-note {
+  font-style: italic;
+}
+
+.link-button {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #8ab4f8;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.panel-actions button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.layers-toggle {
+  min-height: 44px;
+  margin: 0 0 8px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.layers-panel {
+  font-size: 0.9375rem;
+}
+
+.layers-title,
+.layers-hidden-title {
+  margin: 8px 0 4px;
+  font-size: 1.125rem;
+}
+
+.layers-hidden-title {
+  font-size: 0.9375rem;
+}
+
+.layers-panel p {
+  margin: 4px 0;
+}
+
+.layers-panel button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.layers-panel button:disabled {
+  opacity: 0.5;
+}
+
+.layers-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+}
+
+.layers-tissues .layers-row {
+  justify-content: flex-start;
+}
+
+.layers-tissues input {
+  width: 22px;
+  height: 22px;
+}
+
+.layers-hidden {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The top bar sits above the model, so it never covers it. */
+.top-bar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid #2c323b;
+}
+
+.top-bar-row {
+  display: flex;
+  gap: 8px;
+}
+
+.top-bar .layers-toggle {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.search-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #14171c;
+  color: var(--text);
+  font: inherit;
+}
+
+/* The list floats over the model only while it is open. */
+.search-drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 50dvh;
+  overflow-y: auto;
+  background: var(--panel);
+  border-bottom: 1px solid #2c323b;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.search-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The English name on the left, the type on the right, the Latin name below. */
+.search-result-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+}
+
+.search-result-top .muted {
+  flex: 0 0 auto;
+}
+
+.search-results button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 0;
+  border-top: 1px solid #2c323b;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.search-none {
+  margin: 0;
+  padding: 12px 16px;
+  color: var(--muted);
+}
+
+.search-notice {
+  margin: 0 0 8px;
+}
+
+/* Review build only. The banner takes its own row above the model, so it never covers it. */
+.review-banner {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #5c4400;
+  color: #fff3cd;
+  font-size: 0.8125rem;
+}
+
+.review-banner span {
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+}
+
+.review-banner button,
+.review-list-bar button {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+
+.review-stage {
+  overflow-y: auto;
+}
+
+.review-list {
+  padding: 8px 16px;
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.review-list-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.review-list ul {
+  padding-left: 18px;
+}
+
+.draft-mark {
+  margin: 4px 0;
+}
+
+.draft-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: #5c4400;
+  color: #fff3cd;
+  font-size: 0.8125rem;
 }

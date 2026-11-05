@@ -6,16 +6,26 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "type", "english", "region"],
+    "required": ["id", "type", "english", "region", "depth"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
       "type": {
-        "enum": ["bone", "muscle", "tendon", "ligament", "joint", "capsule", "labrum", "bursa", "nerve"]
+        "enum": ["bone", "muscle", "tendon", "ligament", "joint", "capsule", "labrum", "bursa", "nerve", "meniscus", "fascia"]
       },
       "english": { "type": "string", "minLength": 1 },
       "latin": { "type": "string", "minLength": 1 },
       "fma": { "type": "string", "pattern": "^FMA[0-9]+$" },
-      "region": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+      "region": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "depth": {
+        "description": "Layer from the skin inwards, 1 is the outermost. Peeling a layer hides the lowest depth still shown.",
+        "type": "integer",
+        "minimum": 1
+      },
+      "depth_note": {
+        "description": "Where the depth comes from. Written for every muscle.",
+        "type": "string",
+        "minLength": 1
+      }
     }
   }
 }

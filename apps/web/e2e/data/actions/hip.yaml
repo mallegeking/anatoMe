@@ -1,0 +1,21 @@
+# Test-only rows. One is checked, so the panel has a hip row to show.
+# The other stays unchecked on purpose, so the panel always shows the waiting-for-review line,
+# however far the real review has got.
+- id: e2e-piriformis-checked
+  structure: piriformis
+  movement: hip-external-rotation
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - {ref: e2e-source, locator: test page 1, says: Test text for the end-to-end check., says_kind: summary}
+  checked_by: physio-1
+  checked_on: 2026-11-03
+- id: e2e-piriformis-unchecked
+  structure: piriformis
+  movement: hip-internal-rotation
+  load: stretched
+  confidence: low
+  citations:
+    - {ref: e2e-source, locator: test page 2, says: Test text for the end-to-end check., says_kind: summary}
+  checked_by: null

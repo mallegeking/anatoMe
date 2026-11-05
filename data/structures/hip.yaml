@@ -1,54 +1,63 @@
 # One entry per structure in the hip region that has a mesh.
 # id is the sid in the glTF extras. latin is from Z-Anatomy's TA2.csv and fma from
 # the BodyParts3D parts lists, each left out when the source has none.
+# On 2026-11-03 every latin was checked against FIPAT Terminologia Anatomica 2 in the TA2 Viewer
+# (https://ta2viewer.openanatomy.org). All matched a TA2 term except the hip joint capsule, which has
+# no term of its own in TA2, so it keeps its name. The posterior cruciate ligament got its TA2 name.
 # Built from pipeline/assets/regions/hip.json on 2026-11-02.
-- {id: hip-bone, type: bone, english: Hip bone, latin: Os coxae, fma: "FMA16585", region: hip}
-- {id: sacrum, type: bone, english: Sacrum, latin: Os sacrum, fma: "FMA16202", region: hip}
-- {id: femur, type: bone, english: Femur, latin: Os femoris, fma: "FMA9611", region: hip}
-- {id: patella, type: bone, english: Patella, latin: Patella, fma: "FMA24485", region: hip}
-- {id: tibia, type: bone, english: Tibia, latin: Tibia, fma: "FMA24476", region: hip}
-- {id: fibula, type: bone, english: Fibula, latin: Fibula, fma: "FMA24479", region: hip}
-- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip}
-- {id: gluteus-medius, type: muscle, english: Gluteus medius, latin: Musculus gluteus medius, fma: "FMA22315", region: hip}
-- {id: gluteus-minimus, type: muscle, english: Gluteus minimus, latin: Musculus gluteus minimus, fma: "FMA22317", region: hip}
-- {id: tensor-fasciae-latae, type: muscle, english: Tensor fasciae latae, latin: Tensor fasciae latae, fma: "FMA22423", region: hip}
-- {id: piriformis, type: muscle, english: Piriformis, latin: Musculus piriformis, fma: "FMA19082", region: hip}
-- {id: superior-gemellus, type: muscle, english: Superior gemellus, latin: Musculus gemellus superior, fma: "FMA22318", region: hip}
-- {id: inferior-gemellus, type: muscle, english: Inferior gemellus, latin: Musculus gemellus inferior, fma: "FMA22320", region: hip}
-- {id: obturator-internus, type: muscle, english: Obturator internus, latin: Obturator internus, fma: "FMA22298", region: hip}
-- {id: obturator-externus, type: muscle, english: Obturator externus, latin: Obturator externus, fma: "FMA22299", region: hip}
-- {id: quadratus-femoris, type: muscle, english: Quadratus femoris, latin: Musculus quadratus femoris, fma: "FMA22321", region: hip}
-- {id: iliacus, type: muscle, english: Iliacus, latin: Musculus iliacus, fma: "FMA22310", region: hip}
-- {id: psoas-major, type: muscle, english: Psoas major, latin: Psoas major, fma: "FMA18060", region: hip}
-- {id: pectineus, type: muscle, english: Pectineus, latin: Musculus pectineus, fma: "FMA22440", region: hip}
-- {id: adductor-longus, type: muscle, english: Adductor longus, latin: Adductor longus, fma: "FMA22441", region: hip}
-- {id: adductor-brevis, type: muscle, english: Adductor brevis, latin: Adductor brevis, fma: "FMA22442", region: hip}
-- {id: adductor-magnus, type: muscle, english: Adductor magnus, latin: Adductor magnus, fma: "FMA22443", region: hip}
-- {id: gracilis, type: muscle, english: Gracilis, latin: Musculus gracilis, fma: "FMA43882", region: hip}
-- {id: sartorius, type: muscle, english: Sartorius, latin: Musculus sartorius, fma: "FMA22353", region: hip}
-- {id: rectus-femoris, type: muscle, english: Rectus femoris, latin: Musculus rectus femoris, fma: "FMA22430", region: hip}
-- {id: vastus-lateralis, type: muscle, english: Vastus lateralis, latin: Musculus vastus lateralis, fma: "FMA22431", region: hip}
-- {id: vastus-medialis, type: muscle, english: Vastus medialis, latin: Musculus vastus medialis, fma: "FMA22432", region: hip}
-- {id: vastus-intermedius, type: muscle, english: Vastus intermedius, latin: Musculus vastus intermedius, fma: "FMA22433", region: hip}
-- {id: biceps-femoris-long-head, type: muscle, english: "Biceps femoris, long head", latin: Caput longum musculi bicipitis femoris, fma: "FMA45887", region: hip}
-- {id: biceps-femoris-short-head, type: muscle, english: "Biceps femoris, short head", latin: Caput breve musculi bicipitis femoris, fma: "FMA45890", region: hip}
-- {id: semitendinosus, type: muscle, english: Semitendinosus, latin: Musculus semitendinosus, fma: "FMA22357", region: hip}
-- {id: semimembranosus, type: muscle, english: Semimembranosus, latin: Musculus semimembranosus, fma: "FMA22438", region: hip}
-- {id: iliotibial-tract, type: tendon, english: Iliotibial tract, latin: Tractus iliotibialis, fma: "FMA51048", region: hip}
-- {id: iliofemoral-ligament, type: ligament, english: Iliofemoral ligament, latin: Ligamentum iliofemorale, region: hip}
-- {id: pubofemoral-ligament, type: ligament, english: Pubofemoral ligament, latin: Ligamentum pubofemorale, region: hip}
-- {id: ischiofemoral-ligament, type: ligament, english: Ischiofemoral ligament, latin: Ligamentum ischiofemorale, region: hip}
-- {id: ligament-of-head-of-femur, type: ligament, english: Ligament of the head of the femur, latin: Ligamentum capitis femoris, region: hip}
-- {id: transverse-acetabular-ligament, type: ligament, english: Transverse acetabular ligament, latin: Ligamentum transversum acetabuli, region: hip}
-- {id: sacrotuberous-ligament, type: ligament, english: Sacrotuberous ligament, latin: Ligamentum sacrotuberale, region: hip}
-- {id: sacrospinous-ligament, type: ligament, english: Sacrospinous ligament, latin: Ligamentum sacrospinale, region: hip}
-- {id: inguinal-ligament, type: ligament, english: Inguinal ligament, latin: Ligamentum inguinale, region: hip}
-- {id: acetabular-labrum, type: labrum, english: Acetabular labrum, latin: Labrum acetabuli, region: hip}
-- {id: hip-joint-capsule, type: capsule, english: Hip joint capsule, latin: Capsula articularis coxae, region: hip}
-- {id: trochanteric-bursa, type: bursa, english: Trochanteric bursa of gluteus maximus, latin: Bursa trochanterica musculi glutei maximi, region: hip}
-- {id: iliopectineal-bursa, type: bursa, english: Iliopectineal bursa, latin: Bursa iliopectinea, region: hip}
-- {id: ischial-bursa, type: bursa, english: Ischial bursa of gluteus maximus, latin: Bursa ischiadica musculi glutei maximi, region: hip}
-- {id: anterior-cruciate-ligament, type: ligament, english: Anterior cruciate ligament, latin: Ligamentum cruciatum anterius, region: hip}
-- {id: posterior-cruciate-ligament, type: ligament, english: Posterior cruciate ligament, region: hip}
-- {id: medial-collateral-ligament, type: ligament, english: Medial (tibial) collateral ligament, latin: Ligamentum collaterale tibiale, region: hip}
-- {id: lateral-collateral-ligament, type: ligament, english: Lateral (fibular) collateral ligament, latin: Ligamentum collaterale fibulare, region: hip}
+# depth is the layer from the skin inwards, 1 is the outermost and bones are 4. Peeling a layer
+# hides the lowest depth still shown. Added by hand on 2026-11-03. Every muscle has a depth_note
+# with its source. Ligaments, capsule, labrum and bursae take the depth of the layer they sit in:
+# the bursae of gluteus maximus and iliopsoas lie under those muscles, the joint parts lie deep.
+- {id: hip-bone, type: bone, english: Hip bone, latin: Os coxae, fma: "FMA16585", region: hip, depth: 4}
+- {id: sacrum, type: bone, english: Sacrum, latin: Os sacrum, fma: "FMA16202", region: hip, depth: 4}
+- {id: femur, type: bone, english: Femur, latin: Os femoris, fma: "FMA9611", region: hip, depth: 4}
+- {id: patella, type: bone, english: Patella, latin: Patella, fma: "FMA24485", region: hip, depth: 4}
+- {id: tibia, type: bone, english: Tibia, latin: Tibia, fma: "FMA24476", region: hip, depth: 4}
+- {id: fibula, type: bone, english: Fibula, latin: Fibula, fma: "FMA24479", region: hip, depth: 4}
+- {id: gluteus-maximus, type: muscle, english: Gluteus maximus, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip, depth: 1, depth_note: "OERI Human Anatomy 10.7: the largest gluteal muscle, with gluteus medius deep to it."}
+- {id: gluteus-medius, type: muscle, english: Gluteus medius, latin: Musculus gluteus medius, fma: "FMA22315", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus."}
+- {id: gluteus-minimus, type: muscle, english: Gluteus minimus, latin: Musculus gluteus minimus, fma: "FMA22317", region: hip, depth: 3, depth_note: "OERI Human Anatomy 10.7: deep to gluteus medius."}
+- {id: tensor-fasciae-latae, type: muscle, english: Tensor fasciae latae, latin: Tensor fasciae latae, fma: "FMA22423", region: hip, depth: 1, depth_note: "Wikipedia, Tensor fasciae latae (read 2026-11-03): arises partly from the deep surface of the fascia lata, so it lies just under the fascia. Our reading, the source names no layer."}
+- {id: piriformis, type: muscle, english: Piriformis, latin: Musculus piriformis, fma: "FMA19082", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus, like the other lateral rotators."}
+- {id: superior-gemellus, type: muscle, english: Superior gemellus, latin: Musculus gemellus superior, fma: "FMA22318", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus, like the other lateral rotators."}
+- {id: inferior-gemellus, type: muscle, english: Inferior gemellus, latin: Musculus gemellus inferior, fma: "FMA22320", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus, like the other lateral rotators."}
+- {id: obturator-internus, type: muscle, english: Obturator internus, latin: Obturator internus, fma: "FMA22298", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus, like the other lateral rotators."}
+- {id: obturator-externus, type: muscle, english: Obturator externus, latin: Obturator externus, fma: "FMA22299", region: hip, depth: 3, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus. Wikipedia, External obturator muscle (read 2026-11-03): covers the outer surface of the front wall of the pelvis and its tendon runs across the back of the femoral neck and hip capsule, so it gets the deepest layer."}
+- {id: quadratus-femoris, type: muscle, english: Quadratus femoris, latin: Musculus quadratus femoris, fma: "FMA22321", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus, like the other lateral rotators."}
+- {id: iliacus, type: muscle, english: Iliacus, latin: Musculus iliacus, fma: "FMA22310", region: hip, depth: 1, depth_note: "Wikipedia, Iliopsoas (read 2026-11-03): below the inguinal ligament it forms part of the floor of the femoral triangle, like pectineus, so it gets the layer of pectineus."}
+- {id: psoas-major, type: muscle, english: Psoas major, latin: Psoas major, fma: "FMA18060", region: hip, depth: 1, depth_note: "Wikipedia, Iliopsoas (read 2026-11-03): below the inguinal ligament it forms part of the floor of the femoral triangle, like pectineus, so it gets the layer of pectineus."}
+- {id: pectineus, type: muscle, english: Pectineus, latin: Musculus pectineus, fma: "FMA22440", region: hip, depth: 1, depth_note: "Wikipedia, Adductor brevis muscle (read 2026-11-03): adductor brevis lies deep to pectineus and adductor longus, so these two are the outer layer of the inner thigh."}
+- {id: adductor-longus, type: muscle, english: Adductor longus, latin: Adductor longus, fma: "FMA22441", region: hip, depth: 1, depth_note: "Wikipedia, Adductor brevis muscle (read 2026-11-03): adductor brevis lies deep to pectineus and adductor longus, so these two are the outer layer of the inner thigh."}
+- {id: adductor-brevis, type: muscle, english: Adductor brevis, latin: Adductor brevis, fma: "FMA22442", region: hip, depth: 2, depth_note: "Wikipedia, Adductor brevis muscle (read 2026-11-03): deep to pectineus and adductor longus."}
+- {id: adductor-magnus, type: muscle, english: Adductor magnus, latin: Adductor magnus, fma: "FMA22443", region: hip, depth: 3, depth_note: "Wikipedia, Adductor magnus muscle (read 2026-11-03): its front surface lies against pectineus, adductor brevis and adductor longus, its back surface against the hamstrings and gluteus maximus, so it is the deepest inner thigh muscle."}
+- {id: gracilis, type: muscle, english: Gracilis, latin: Musculus gracilis, fma: "FMA43882", region: hip, depth: 1, depth_note: "Wikipedia, Gracilis muscle (read 2026-11-03): lies closer to the skin than any other muscle on the inner (medial) side of the thigh."}
+- {id: sartorius, type: muscle, english: Sartorius, latin: Musculus sartorius, fma: "FMA22353", region: hip, depth: 1, depth_note: "Wikipedia, Sartorius muscle (read 2026-11-03): a thin strap of muscle running just under the skin across the front of the thigh."}
+- {id: rectus-femoris, type: muscle, english: Rectus femoris, latin: Musculus rectus femoris, fma: "FMA22430", region: hip, depth: 1, depth_note: "OERI Human Anatomy 10.7: on the front of the thigh, with vastus intermedius deep to it."}
+- {id: vastus-lateralis, type: muscle, english: Vastus lateralis, latin: Musculus vastus lateralis, fma: "FMA22431", region: hip, depth: 1, depth_note: "OERI Human Anatomy 10.7: on the lateral side of the thigh. Of the quadriceps only vastus intermedius is named as deep."}
+- {id: vastus-medialis, type: muscle, english: Vastus medialis, latin: Musculus vastus medialis, fma: "FMA22432", region: hip, depth: 1, depth_note: "OERI Human Anatomy 10.7: on the medial side of the thigh. Of the quadriceps only vastus intermedius is named as deep."}
+- {id: vastus-intermedius, type: muscle, english: Vastus intermedius, latin: Musculus vastus intermedius, fma: "FMA22433", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: between vastus lateralis and vastus medialis and deep to rectus femoris."}
+- {id: biceps-femoris-long-head, type: muscle, english: "Biceps femoris, long head", latin: Caput longum musculi bicipitis femoris, fma: "FMA45887", region: hip, depth: 1, depth_note: "Wikipedia, Biceps femoris muscle (read 2026-11-03): the long head comes down from the ischial tuberosity over the short head, which arises on the femur. Our reading of the described course."}
+- {id: biceps-femoris-short-head, type: muscle, english: "Biceps femoris, short head", latin: Caput breve musculi bicipitis femoris, fma: "FMA45890", region: hip, depth: 2, depth_note: "Wikipedia, Biceps femoris muscle (read 2026-11-03): arises from the linea aspera of the femur, between adductor magnus and vastus lateralis, under the long head. Our reading of the described course."}
+- {id: semitendinosus, type: muscle, english: Semitendinosus, latin: Musculus semitendinosus, fma: "FMA22357", region: hip, depth: 1, depth_note: "Wikipedia, Semitendinosus muscle (read 2026-11-03): sits just under the skin at the back of the thigh and lies over semimembranosus."}
+- {id: semimembranosus, type: muscle, english: Semimembranosus, latin: Musculus semimembranosus, fma: "FMA22438", region: hip, depth: 2, depth_note: "Wikipedia, Semimembranosus muscle (read 2026-11-03): deep to semitendinosus."}
+- {id: iliotibial-tract, type: fascia, english: Iliotibial tract, latin: Tractus iliotibialis, fma: "FMA51048", region: hip, depth: 1}
+- {id: iliofemoral-ligament, type: ligament, english: Iliofemoral ligament, latin: Ligamentum iliofemorale, region: hip, depth: 3}
+- {id: pubofemoral-ligament, type: ligament, english: Pubofemoral ligament, latin: Ligamentum pubofemorale, region: hip, depth: 3}
+- {id: ischiofemoral-ligament, type: ligament, english: Ischiofemoral ligament, latin: Ligamentum ischiofemorale, region: hip, depth: 3}
+- {id: ligament-of-head-of-femur, type: ligament, english: Ligament of the head of the femur, latin: Ligamentum capitis femoris, region: hip, depth: 3}
+- {id: transverse-acetabular-ligament, type: ligament, english: Transverse acetabular ligament, latin: Ligamentum transversum acetabuli, region: hip, depth: 3}
+- {id: sacrotuberous-ligament, type: ligament, english: Sacrotuberous ligament, latin: Ligamentum sacrotuberale, region: hip, depth: 2, depth_note: "Wikipedia, Sacrotuberous ligament (read 2026-11-03): the lowest fibres of gluteus maximus attach to its back surface, so it lies under gluteus maximus."}
+- {id: sacrospinous-ligament, type: ligament, english: Sacrospinous ligament, latin: Ligamentum sacrospinale, region: hip, depth: 3, depth_note: "Wikipedia, Sacrospinous ligament (read 2026-11-03): the sacrotuberous ligament runs behind it, so it sits one layer deeper."}
+- {id: inguinal-ligament, type: ligament, english: Inguinal ligament, latin: Ligamentum inguinale, region: hip, depth: 1}
+- {id: acetabular-labrum, type: labrum, english: Acetabular labrum, latin: Labrum acetabuli, region: hip, depth: 3}
+- {id: hip-joint-capsule, type: capsule, english: Hip joint capsule, latin: Capsula articularis coxae, region: hip, depth: 3}
+- {id: trochanteric-bursa, type: bursa, english: Trochanteric bursa of gluteus maximus, latin: Bursa trochanterica musculi glutei maximi, region: hip, depth: 2}
+- {id: iliopectineal-bursa, type: bursa, english: Iliopectineal bursa, latin: Bursa iliopectinea, region: hip, depth: 2}
+- {id: ischial-bursa, type: bursa, english: Ischial bursa of gluteus maximus, latin: Bursa ischiadica musculi glutei maximi, region: hip, depth: 2}
+- {id: anterior-cruciate-ligament, type: ligament, english: Anterior cruciate ligament, latin: Ligamentum cruciatum anterius, region: hip, depth: 3}
+- {id: posterior-cruciate-ligament, type: ligament, english: Posterior cruciate ligament, latin: Ligamentum cruciatum posterius, region: hip, depth: 3}
+- {id: medial-collateral-ligament, type: ligament, english: Medial (tibial) collateral ligament, latin: Ligamentum collaterale tibiale, region: hip, depth: 2, depth_note: "Our reading of the layers in this model, no source names one: only the pes anserinus tendons (sartorius, gracilis, semitendinosus, all depth 1) cross over it, so it sits one layer below the surface."}
+- {id: lateral-collateral-ligament, type: ligament, english: Lateral (fibular) collateral ligament, latin: Ligamentum collaterale fibulare, region: hip, depth: 3, depth_note: "Wikipedia, Fibular collateral ligament (read 2026-11-03): most of its lateral surface is covered by the biceps femoris tendon."}
+- {id: medial-meniscus, type: meniscus, english: Medial meniscus, latin: Meniscus medialis, region: hip, depth: 3}
+- {id: lateral-meniscus, type: meniscus, english: Lateral meniscus, latin: Meniscus lateralis, region: hip, depth: 3}

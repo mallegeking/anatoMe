@@ -17,7 +17,7 @@ These are the 3D model files in `models/`, where each one comes from, and its li
 | File | Source | License | What is in it |
 | --- | --- | --- | --- |
 | `models/hip.glb` | BodyParts3D | CC BY 4.0 | Hip region bones, muscles and the iliotibial tract (65 meshes) |
-| `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments (34 meshes) |
+| `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments and the two menisci (38 meshes) |
 
 Changes we made to the source meshes: we reduced the number of triangles, removed materials, texture coordinates and colours, and converted them to glTF with Draco compression. The Z-Anatomy meshes were also scaled, turned and moved (a separate fit for each side) so they sit on the BodyParts3D bones. Built by `pipeline/assets/build_region_blender.py`.
 
@@ -30,7 +30,7 @@ Older BodyParts3D OBJ file headers mention CC BY-SA 2.1 Japan. The license page 
 - Code is MIT, see `LICENSE`.
 - Our own data is CC BY 4.0, see `data/LICENSE`.
 - Each mesh file has its own license, recorded in `models/manifest.json` and explained in `models/LICENSE`.
-- Short quotations in the `says` fields under `data/` keep the license of their source, listed in `data/citations.yaml`.
+- Quotes in the `says` fields under `data/` come only from sources whose license fits CC BY 4.0, each credited in `data/citations.yaml`. For other sources `says` is our own summary.
 
 ## Note on React Three Fiber
 

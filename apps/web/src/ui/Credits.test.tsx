@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, test } from "vitest";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
-import { Credits } from "./Credits";
+import { Credits, EducationalLine } from "./Credits";
 
 afterEach(cleanup);
 
@@ -15,4 +15,16 @@ test("credits show the licence deeds, the changes and the library licences", () 
   expect(screen.getByText(en["credits.licenceCcBySa"]).getAttribute("href")).toBe("https://creativecommons.org/licenses/by-sa/4.0/");
   expect(screen.getByText(en["credits.modified"])).toBeTruthy();
   expect(screen.getByText(en["credits.librariesLink"]).getAttribute("href")).toMatch(/third-party-licenses\.txt$/);
+});
+
+test("educational line is visible without opening credits", () => {
+  render(
+    <>
+      <EducationalLine t={createT(en)} />
+      <Credits t={createT(en)} />
+    </>,
+  );
+  const line = screen.getByText(en["about.educational"]);
+  // Text inside a closed <details> is hidden until someone opens it, so the line must sit outside.
+  expect(line.closest("details")).toBeNull();
 });

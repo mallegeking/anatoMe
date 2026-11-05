@@ -1,10 +1,6 @@
 import { Group, Mesh, type Object3D } from "three";
 import { expect, test } from "vitest";
-import { createT } from "../i18n/t";
-import en from "../i18n/en.json";
-import { formatLabel, pickStructure, shouldSelect } from "./pick";
-
-const t = createT(en);
+import { pickHit, pickVisibleHit, shouldClear, shouldSelect } from "./pick";
 
 function mesh(userData: Record<string, unknown>): Object3D {
   const m = new Mesh();
@@ -22,39 +18,39 @@ function childOf(userData: Record<string, unknown>): Object3D {
 
 test("a tap selects", () => expect(shouldSelect(3)).toBe(true));
 test("a drag does not select", () => expect(shouldSelect(6)).toBe(false));
+test("empty-space clear uses the same 6 px rule as selecting", () => expect(shouldClear(5)).toBe(true));
+test("a drag over empty space does not clear", () => expect(shouldClear(6)).toBe(false));
 
 test("nearest hit with a sid wins", () => {
   const near = mesh({});
   const mid = mesh({ sid: "gluteus-medius", label: "Gluteus medius", side: "l", kind: "muscle" });
   const far = mesh({ sid: "femur", label: "Femur", side: "l", kind: "bone" });
   expect(
-    pickStructure([
+    pickHit([
       { object: far, distance: 3 },
       { object: near, distance: 1 },
       { object: mid, distance: 2 },
-    ])?.sid,
+    ])?.structure.sid,
   ).toBe("gluteus-medius");
 });
 
 test("sid on a parent is found", () =>
   expect(
-    pickStructure([{ object: childOf({ sid: "femur", label: "Femur", side: "r", kind: "bone" }), distance: 1 }])?.sid,
+    pickHit([{ object: childOf({ sid: "femur", label: "Femur", side: "r", kind: "bone" }), distance: 1 }])?.structure.sid,
   ).toBe("femur"));
 
 test("no sid anywhere gives null", () =>
-  expect(pickStructure([{ object: mesh({}), distance: 1 }])).toBeNull());
+  expect(pickHit([{ object: mesh({}), distance: 1 }])).toBeNull());
 
-test("an empty hit list gives null", () => expect(pickStructure([])).toBeNull());
+test("an empty hit list gives null", () => expect(pickHit([])).toBeNull());
 
-test("left label", () =>
-  expect(formatLabel({ sid: "x", label: "Gluteus maximus", side: "l", kind: "muscle" }, t)).toBe(
-    "Gluteus maximus (left)",
-  ));
+const maxMesh = mesh({ sid: "gluteus-maximus", label: "Gluteus maximus", side: "", kind: "muscle" });
+const medMesh = mesh({ sid: "gluteus-medius", label: "Gluteus medius", side: "", kind: "muscle" });
 
-test("right label", () =>
-  expect(formatLabel({ sid: "x", label: "Gluteus maximus", side: "r", kind: "muscle" }, t)).toBe(
-    "Gluteus maximus (right)",
-  ));
+test("tap skips hidden meshes", () =>
+  expect(
+    pickVisibleHit([{ object: maxMesh, distance: 1 }, { object: medMesh, distance: 2 }], (sid) => sid !== "gluteus-maximus")?.structure.sid,
+  ).toBe("gluteus-medius"));
 
-test("unpaired label has no side", () =>
-  expect(formatLabel({ sid: "sacrum", label: "Sacrum", side: "", kind: "bone" }, t)).toBe("Sacrum"));
+test("tap on only hidden meshes picks nothing", () =>
+  expect(pickVisibleHit([{ object: maxMesh, distance: 1 }], () => false)).toBeNull());

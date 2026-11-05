@@ -1,0 +1,10 @@
+# One test-only attachment row, checked, so the panel shows the attachments part.
+- id: e2e-piriformis-origin
+  muscle: piriformis
+  end: origin
+  bone: sacrum
+  landmark: test landmark
+  citations:
+    - {ref: e2e-source, locator: test page 3, says: Test text for the end-to-end check., says_kind: summary}
+  checked_by: owner
+  checked_on: 2026-11-03
