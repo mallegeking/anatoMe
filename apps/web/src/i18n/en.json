@@ -12,6 +12,7 @@
   "credits.draco": "Draco, Apache License 2.0",
   "credits.licenceCcBy": "Licence: CC BY 4.0",
   "credits.licenceCcBySa": "Licence: CC BY-SA 4.0",
+  "credits.withLicence": "{credit} ({licence})",
   "credits.modified": "The BodyParts3D and Z-Anatomy meshes shown here were simplified and repositioned for anatoMe.",
   "credits.libraries": "The app also contains open-source libraries such as React. Each keeps its own licence.",
   "credits.librariesLink": "Read the licence texts",

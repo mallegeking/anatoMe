@@ -59,7 +59,7 @@ export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, op
           onChange={(e) => change(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Escape") onOpenChange(false);
-            if (e.key === "Enter" && results[0]) choose(results[0]);
+            if (e.key === "Enter" && open && results[0]) choose(results[0]);
           }}
         />
         <button type="button" className="layers-toggle" aria-expanded={layersOpen} onClick={onToggleLayers}>

@@ -81,3 +81,11 @@ test("a result shows the English name, the type and the Latin name", () => {
   expect(result.textContent).toContain(en["type.muscle"]);
   expect(result.textContent).toContain("Musculus piriformis");
 });
+
+test("after Escape closed the list, Enter chooses nothing", () => {
+  const { onChoose, field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.keyDown(field, { key: "Escape" });
+  fireEvent.keyDown(field, { key: "Enter" });
+  expect(onChoose).not.toHaveBeenCalled();
+});

@@ -28,3 +28,10 @@ test("educational line is visible without opening credits", () => {
   // Text inside a closed <details> is hidden until someone opens it, so the line must sit outside.
   expect(line.closest("details")).toBeNull();
 });
+
+test("the brackets around a licence link come from en.json", () => {
+  render(<Credits t={createT({ ...en, "credits.withLicence": "{credit} [{licence}]" })} />);
+  // The credit lines live inside the closed details, but they are still in the document.
+  expect(screen.getAllByText(/\[/).length).toBe(2);
+  expect(screen.queryByText(/\(/)).toBeNull();
+});

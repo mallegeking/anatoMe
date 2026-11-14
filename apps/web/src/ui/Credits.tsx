@@ -26,6 +26,18 @@ export function EducationalLine({ t }: { t: Translate }) {
   return <p className="educational">{t("about.educational")}</p>;
 }
 
+// The credit, then the licence link, with the text around them taken from en.json.
+function withLicence(t: Translate, key: string, licence: { key: string; href: string }) {
+  const [before, after] = t("credits.withLicence").split("{licence}");
+  return (
+    <>
+      {before.replace("{credit}", t(key))}
+      <a href={licence.href} target="_blank" rel="noopener noreferrer">{t(licence.key)}</a>
+      {after}
+    </>
+  );
+}
+
 export function Credits({ t }: { t: Translate }) {
   return (
     <>
@@ -34,13 +46,7 @@ export function Credits({ t }: { t: Translate }) {
         <ul>
           {CREDITS.map(({ key, licence }) => (
             <li key={key}>
-              {t(key)}
-              {licence && (
-                <>
-                  {" "}
-                  (<a href={licence.href} target="_blank" rel="noopener noreferrer">{t(licence.key)}</a>)
-                </>
-              )}
+              {licence ? withLicence(t, key, licence) : t(key)}
             </li>
           ))}
         </ul>

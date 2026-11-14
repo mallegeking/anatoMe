@@ -47,9 +47,9 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 Found in the Phase 1 reviews and left for Phase 2.
 
 - Iliacus and psoas major are at depth 1, so the first peel hides them together with sartorius and rectus femoris. Decide how deep they should show.
-- "Hide this" hides both sides of a paired structure. Let it hide one side only.
-- Search opens paired structures on the left and keeps a hard-coded list of unpaired ones (only the sacrum). Give the bundle a `paired` flag instead, before the next region adds midline structures.
-- After Escape closed the search list, Enter still chooses the first result. Make Enter do nothing while the list is closed.
-- The brackets around the licence links in `Credits.tsx` are typed in the code. Move them into `en.json`.
-- Playwright: keep a trace of a failed run, and decide whether CI should retry a failed end-to-end test.
+- Done 2026-11-13 (Phase 2a Task 1 or 2): "Hide this" hides both sides of a paired structure. Let it hide one side only.
+- Done 2026-11-13 (Phase 2a Task 1 or 2): Search opens paired structures on the left and keeps a hard-coded list of unpaired ones (only the sacrum). Give the bundle a `paired` flag instead, before the next region adds midline structures.
+- Done 2026-11-13 (Phase 2a Task 1 or 2): After Escape closed the search list, Enter still chooses the first result. Make Enter do nothing while the list is closed.
+- Done 2026-11-13 (Phase 2a Task 1 or 2): The brackets around the licence links in `Credits.tsx` are typed in the code. Move them into `en.json`.
+- Done 2026-11-13 (Phase 2a Task 1 or 2): Playwright: keep a trace of a failed run, and decide whether CI should retry a failed end-to-end test.
 - Angles between measured points: a row only claims what a source measured, so nothing is said between two measured angles (for example obturator externus between 60 and 75 degrees). Agree a rule with the physio.
