@@ -55,7 +55,7 @@ export function AreaPanel({ t, bundle, area, selection, onFocusStructure, onOpen
               </button>
               {structure && (
                 <div className="muted">
-                  {t(`type.${structure.type}`)}, {cm === "0" ? t("area.atSurface") : t("area.depth", { cm })}
+                  {t("area.typeDepth", { type: t(`type.${structure.type}`), depth: cm === "0" ? t("area.atSurface") : t("area.depth", { cm }) })}
                 </div>
               )}
               {loads.length > 0 && (

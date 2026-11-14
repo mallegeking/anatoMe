@@ -105,6 +105,7 @@
   "area.depth": "about {cm} cm deeper",
   "area.loadedBy": "Movements that load it",
   "area.movement": "{movement} ({load})",
+  "area.typeDepth": "{type}, {depth}",
   "area.clear": "Clear the spot",
   "info.overUnder": "See what lies over and under it",
   "mode.atlas": "Structures",
