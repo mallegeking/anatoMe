@@ -72,6 +72,7 @@ export function markChecked(dataDir: string, ids: string[], by: string, on: stri
   if (!DATE.test(on)) run.errors.push(`--on must be a date like 2026-11-20, not "${on}"`);
   if (run.errors.length > 0) return run;
 
+  ids = [...new Set(ids)];
   const olds = new Map<string, string>();
   const news = new Map<string, string>();
   for (const file of reviewFiles(dataDir)) {
@@ -86,14 +87,29 @@ export function markChecked(dataDir: string, ids: string[], by: string, on: stri
   run.missing = ids.filter((id) => !seen.has(id));
   if (run.missing.length > 0 || run.already.length > 0) return run;
 
-  const write = (texts: Map<string, string>) => {
-    for (const [file, text] of texts) writeFileSync(file, text);
-  };
-  write(news);
-  const result = validateDataDir(dataDir);
-  if (!result.ok) {
-    write(olds);
-    run.errors = result.errors.map((e) => `${e.file} ${e.path}: ${e.message}`);
+  // Write only the changed files. If anything fails, put back every file we already wrote.
+  const written: string[] = [];
+  try {
+    for (const [file, text] of news) {
+      if (text === olds.get(file)) continue;
+      written.push(file);
+      writeFileSync(file, text);
+    }
+    const result = validateDataDir(dataDir);
+    if (!result.ok) {
+      run.errors = result.errors.map((e) => `${e.file} ${e.path}: ${e.message}`);
+    }
+  } catch (err) {
+    run.errors = [`could not record the review: ${err instanceof Error ? err.message : String(err)}`];
+  }
+  if (run.errors.length > 0) {
+    for (const file of written) {
+      try {
+        writeFileSync(file, olds.get(file) ?? "");
+      } catch (err) {
+        run.errors.push(`could not restore ${file}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
     run.marked = [];
     return run;
   }

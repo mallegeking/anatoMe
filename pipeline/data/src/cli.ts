@@ -58,7 +58,14 @@ async function main(args: string[]): Promise<number> {
       if (rest[i] === "--by") by = rest[++i] ?? "";
       else if (rest[i] === "--on") on = rest[++i] ?? "";
       else if (rest[i] === "--from") {
-        const lines = readFileSync(rest[++i] ?? "", "utf8").split(/\r?\n/);
+        let content: string;
+        try {
+          content = readFileSync(rest[++i] ?? "", "utf8");
+        } catch {
+          console.error(`cannot read the ids file ${rest[i]}`);
+          return 2;
+        }
+        const lines = content.split(/\r?\n/);
         for (const l of lines) if (l.trim() !== "" && !l.trim().startsWith("#")) ids.push(l.trim());
       } else ids.push(rest[i]);
     }
@@ -66,8 +73,8 @@ async function main(args: string[]): Promise<number> {
       console.error("usage: cli.ts mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...]");
       return 2;
     }
-    const run = markChecked(dataDir, ids, by, on);
-    for (const id of ids) {
+    const run = markChecked(dataDir, [...new Set(ids)], by, on);
+    for (const id of new Set(ids)) {
       const state = run.missing.includes(id) ? "not found" : run.already.includes(id) ? "already checked" : "marked";
       console.log(`${id}: ${run.ok || state !== "marked" ? state : "not written"}`);
     }

@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { chmodSync, cpSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -114,4 +114,21 @@ test("a bad label or date is refused", () => {
   const badDate = markChecked(dir, ["piriformis-insertion-femur"], "owner", "20-11-2026");
   expect(badDate.ok).toBe(false);
   expect(snapshot(dir)).toEqual(before);
+});
+test("a write that fails part way restores every file", () => {
+  const dir = copyFixture();
+  const before = snapshot(dir);
+  // actions/hip.yaml is written first, then the read-only exercises.yaml fails.
+  chmodSync(join(dir, "exercises.yaml"), 0o444);
+  const run = markChecked(dir, ["piriformis-hip-internal-rotation", "goblet-squat"], "physio-1", "2026-11-20");
+  chmodSync(join(dir, "exercises.yaml"), 0o644);
+  expect(run.ok).toBe(false);
+  expect(run.errors.join("\n")).toContain("could not record the review");
+  expect(snapshot(dir)).toEqual(before);
+});
+test("the same id twice is marked once", () => {
+  const dir = copyFixture();
+  const run = markChecked(dir, ["piriformis-insertion-femur", "piriformis-insertion-femur"], "owner", "2026-11-20");
+  expect(run.ok).toBe(true);
+  expect(run.marked).toEqual(["piriformis-insertion-femur"]);
 });
