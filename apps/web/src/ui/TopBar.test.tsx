@@ -10,8 +10,8 @@ const t = createT(en);
 afterEach(cleanup);
 
 const structures: BundleStructure[] = [
-  { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2 },
-  { id: "femur", type: "bone", english: "Femur", depth: 4 },
+  { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2, paired: true },
+  { id: "femur", type: "bone", english: "Femur", depth: 4, paired: true },
 ];
 
 // The app keeps the open state of the list, so the tests do the same.

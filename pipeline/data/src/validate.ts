@@ -165,17 +165,17 @@ function checkStructureType(
 
 // The ids of every structure in dir/structures, for the model check.
 // Returns an empty set when a file cannot be read, validateDataDir reports why.
-// What the mesh check needs to know about each structure.
-export type StructureInfo = { type: string; english: string };
+// What the mesh check needs to know about each structure. midline means it has no left and right copy.
+export type StructureInfo = { type: string; english: string; midline: boolean };
 
-// Reads data/structures into a map from structure id to its type and english name.
+// Reads data/structures into a map from structure id to its type, english name and midline flag.
 export function loadStructures(dir: string): Map<string, StructureInfo> {
   const structures = new Map<string, StructureInfo>();
   for (const file of listYaml(dir, "structures")) {
     const rows = readYaml(dir, file, []);
     if (!Array.isArray(rows)) continue;
     for (const r of rows) {
-      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english) });
+      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english), midline: r.midline === true });
     }
   }
   return structures;

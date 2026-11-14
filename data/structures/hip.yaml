@@ -10,7 +10,7 @@
 # with its source. Ligaments, capsule, labrum and bursae take the depth of the layer they sit in:
 # the bursae of gluteus maximus and iliopsoas lie under those muscles, the joint parts lie deep.
 - {id: hip-bone, type: bone, english: Hip bone, latin: Os coxae, fma: "FMA16585", region: hip, depth: 4}
-- {id: sacrum, type: bone, english: Sacrum, latin: Os sacrum, fma: "FMA16202", region: hip, depth: 4}
+- {id: sacrum, type: bone, english: Sacrum, latin: Os sacrum, fma: "FMA16202", region: hip, depth: 4, midline: true}
 - {id: femur, type: bone, english: Femur, latin: Os femoris, fma: "FMA9611", region: hip, depth: 4}
 - {id: patella, type: bone, english: Patella, latin: Patella, fma: "FMA24485", region: hip, depth: 4}
 - {id: tibia, type: bone, english: Tibia, latin: Tibia, fma: "FMA24476", region: hip, depth: 4}

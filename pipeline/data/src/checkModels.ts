@@ -102,6 +102,15 @@ export async function checkModelMapping(
       if (structure && extras.label !== undefined && extras.label !== structure.english) {
         errors.push({ file: f.path, path: name, message: `label ${String(extras.label)} but ${sid} is called ${structure.english}` });
       }
+      // Only a midline structure may have an empty side, and it must have one.
+      if (structure && typeof extras.side === "string") {
+        if (structure.midline && extras.side !== "") {
+          errors.push({ file: f.path, path: name, message: `${sid} is marked midline but mesh ${name} has side ${extras.side}` });
+        }
+        if (!structure.midline && extras.side === "") {
+          errors.push({ file: f.path, path: name, message: `${sid} is not marked midline but mesh ${name} has no side` });
+        }
+      }
       // A mesh from another source would carry the wrong license, so the sources must agree.
       if (extras.source !== undefined && extras.source !== f.source) {
         errors.push({ file: f.path, path: name, message: `source ${String(extras.source)} but the manifest says ${f.source}` });

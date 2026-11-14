@@ -4,7 +4,7 @@ import { CameraControls } from "@react-three/drei";
 import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
-import { shouldClear, type Selection } from "./pick";
+import { shouldClear, type Selection, type Side } from "./pick";
 import { redrawWhenBack } from "./redraw";
 import { RegionModel } from "./RegionModel";
 
@@ -13,7 +13,7 @@ export type SceneProps = {
   selection: Selection | null;
   // Where the camera should go. A new object each time makes it move again, even for the same structure.
   focus: Selection | null;
-  isVisibleSid: (sid: string) => boolean;
+  isShown: (sid: string, side: Side) => boolean;
   onSelect: (sel: Selection | null, label?: string) => void;
   // Called once, when the model files have finished loading.
   onLoaded: () => void;
@@ -73,7 +73,7 @@ function RedrawWhenBack() {
   return null;
 }
 
-export default function Scene({ region, selection, focus, isVisibleSid, onSelect, onLoaded }: SceneProps) {
+export default function Scene({ region, selection, focus, isShown, onSelect, onLoaded }: SceneProps) {
   const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
@@ -114,7 +114,7 @@ export default function Scene({ region, selection, focus, isVisibleSid, onSelect
             urls={urls}
             selection={selection}
             focus={focus}
-            isVisibleSid={isVisibleSid}
+            isShown={isShown}
             onSelect={onSelect}
             onLoaded={onLoaded}
             onModelClick={(event) => {

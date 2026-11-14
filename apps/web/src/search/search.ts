@@ -29,11 +29,8 @@ export function searchStructures(query: string, structures: BundleStructure[]): 
   return [...english, ...latinOnly].slice(0, MAX_RESULTS);
 }
 
-// Structures on the midline have no left and right copy. In the hip models that is only the sacrum.
-const UNPAIRED = new Set(["sacrum"]);
-
 // A search result has no side of its own, so paired structures open on the left.
 export function selectBySearch(id: string, bundle: RegionBundle): Selection {
-  const known = bundle.structures.some((s) => s.id === id);
-  return { sid: id, side: known && UNPAIRED.has(id) ? "" : "l" };
+  const structure = bundle.structures.find((s) => s.id === id);
+  return { sid: id, side: structure && !structure.paired ? "" : "l" };
 }

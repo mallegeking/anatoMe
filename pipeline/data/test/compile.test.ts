@@ -17,3 +17,9 @@ test("the real data compiles with no drafts in normal mode", () => expect(compil
 test("a dropped row's own citation is not in normal mode", () => expect(compileRegion(fx("valid"), "hip", "normal").citations.map(c => c.id)).not.toContain("draft-only-source"));
 test("review mode includes the draft row's citation", () => expect(compileRegion(fx("valid"), "hip", "review").citations.map(c => c.id)).toContain("draft-only-source"));
 test("normal mode keeps exactly the checked attachments", () => expect(compileRegion(fx("valid"), "hip", "normal").attachments.map(a => a.id)).toEqual(["gluteus-maximus-insertion-femur"]));
+
+test("paired is false for a midline structure and true otherwise", () => {
+  const byId = new Map(compileRegion(realDataDir, "hip", "normal").structures.map((s) => [s.id, s.paired]));
+  expect(byId.get("sacrum")).toBe(false);
+  expect(byId.get("femur")).toBe(true);
+});

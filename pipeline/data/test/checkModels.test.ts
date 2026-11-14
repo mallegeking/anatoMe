@@ -55,7 +55,7 @@ async function dirWithLicense(license: string) {
 }
 
 // The structures the checks know about, with the type and english name the meshes must match.
-const femur = new Map([["femur", { type: "bone", english: "Femur" }]]);
+const femur = new Map([["femur", { type: "bone", english: "Femur", midline: false }]]);
 
 function expectError(result: ValidationResult, pattern: RegExp) {
   expect(result.ok).toBe(false);
@@ -86,8 +86,6 @@ test("modelStats counts mesh nodes, triangles and bytes", async () => {
   expect(stats.bytes).toBeGreaterThan(0);
 });
 
-test("a midline mesh has an empty side and passes", async () =>
-  expect((await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur)).ok).toBe(true));
 test("fails on a side that is not l, r or empty", async () =>
   expectError(await checkModelMapping(await dir([{ side: "left" }]), femur), /side must be/));
 
@@ -106,3 +104,16 @@ test("fails when a mesh kind differs from the structure type", async () =>
   expectError(await checkModelMapping(await dir([{ kind: "muscle" }]), femur), /kind muscle but femur is a bone/));
 test("fails when a mesh label differs from the structure name", async () =>
   expectError(await checkModelMapping(await dir([{ label: "Thigh bone" }]), femur), /label Thigh bone but femur is called Femur/));
+
+test("a midline structure with a sided mesh is an error", async () => {
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true }]]);
+  expectError(await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "l" }]), sacrum), /sacrum is marked midline but mesh .* has side l/);
+});
+
+test("a paired structure with an unsided mesh is an error", async () =>
+  expectError(await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur), /femur is not marked midline but mesh .* has no side/));
+
+test("a midline structure with an unsided mesh passes", async () => {
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true }]]);
+  expect((await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "" }]), sacrum)).ok).toBe(true);
+});

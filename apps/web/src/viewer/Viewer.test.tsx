@@ -76,7 +76,7 @@ afterEach(() => {
 });
 
 function show() {
-  render(<Viewer region="hip" t={t} selection={null} focus={null} isVisibleSid={() => true} onSelect={() => {}} />);
+  render(<Viewer region="hip" t={t} selection={null} focus={null} isShown={() => true} onSelect={() => {}} />);
 }
 
 // A model with a left and a right piriformis, like the real files.
@@ -146,7 +146,7 @@ test("a WebGL failure shows the WebGL message, not the connection message", () =
 test("switching to the other side lights up that side's mesh and puts the first one back", async () => {
   withWebGL(true);
   const { left, right } = await loadPiriformisPair();
-  const props = { region: "hip", t, isVisibleSid: () => true, onSelect: () => {} };
+  const props = { region: "hip", t, isShown: () => true, onSelect: () => {} };
   const { rerender } = render(<Viewer {...props} selection={{ sid: "piriformis", side: "l" }} focus={null} />);
   await settle();
   await act(async () => {

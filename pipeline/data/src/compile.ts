@@ -14,7 +14,7 @@ import type {
 } from "../../../apps/web/src/data/bundle.ts";
 
 // Rows as they are written in the YAML files. validateDataDir has already checked them.
-type StructureRow = BundleStructure & { region: string };
+type StructureRow = Omit<BundleStructure, "paired"> & { region: string; midline?: boolean };
 type ActionRow = Omit<BundleAction, "draft"> & { checked_by: string | null };
 type AttachmentRow = Omit<BundleAttachment, "draft"> & { checked_by: string | null };
 
@@ -80,7 +80,7 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
   return {
     region,
     mode,
-    structures: structures.map(({ id, type, english, latin, depth }) => ({ id, type, english, latin, depth })),
+    structures: structures.map(({ id, type, english, latin, depth, midline }) => ({ id, type, english, latin, depth, paired: !midline })),
     movements,
     attachments,
     actions,

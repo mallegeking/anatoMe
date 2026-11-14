@@ -21,6 +21,7 @@
         "type": "integer",
         "minimum": 1
       },
+      "midline": { "description": "True for a structure on the midline that has no left and right copy.", "type": "boolean" },
       "depth_note": {
         "description": "Where the depth comes from. Written for every muscle.",
         "type": "string",

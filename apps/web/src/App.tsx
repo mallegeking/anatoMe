@@ -14,7 +14,7 @@ import { Hint, RegionInfo } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
-import type { Selection } from "./viewer/pick";
+import type { Selection, Side } from "./viewer/pick";
 
 const t = createT(en);
 const REGION = "hip";
@@ -43,7 +43,7 @@ function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, 
         onPeel={() => setLayers((s) => peel(s, bundle.structures))}
         onRestore={() => setLayers(restore)}
         onToggleTissue={(group) => setLayers((s) => toggleTissue(s, group))}
-        onShow={(id) => setLayers((s) => showStructure(s, id))}
+        onShow={(key) => setLayers((s) => showStructure(s, key))}
       />
     );
   }
@@ -83,8 +83,8 @@ export function App() {
   // A search result: select it, make it visible, move the camera and say what was peeled.
   function chooseResult(structure: BundleStructure) {
     if (!bundle) return;
-    const { state, peeledNow } = revealFor(layers, structure, structures);
     const sel = selectBySearch(structure.id, bundle);
+    const { state, peeledNow } = revealFor(layers, structure, sel.side, structures);
     setLayers(state);
     setSelection(sel);
     setLabel(undefined);
@@ -94,25 +94,25 @@ export function App() {
   }
 
   // Structures the data does not know are always shown.
-  const isVisibleSid = useMemo(() => {
+  const isShown = useMemo(() => {
     const byId = new Map(structures.map((s) => [s.id, s]));
-    return (sid: string) => {
+    return (sid: string, side: Side) => {
       const structure = byId.get(sid);
-      return structure ? isVisible(layers, structure) : true;
+      return structure ? isVisible(layers, structure, side) : true;
     };
   }, [structures, layers]);
 
   // If the selected structure disappears, the panel should not keep describing it.
   useEffect(() => {
-    if (selection && !isVisibleSid(selection.sid)) {
+    if (selection && !isShown(selection.sid, selection.side)) {
       setSelection(null);
       setLabel(undefined);
     }
-  }, [selection, isVisibleSid]);
+  }, [selection, isShown]);
 
   const hideSelected = useCallback(() => {
     if (!selection) return;
-    setLayers((s) => hideStructure(s, selection.sid));
+    setLayers((s) => hideStructure(s, selection.sid, selection.side));
     setSelection(null);
     setLabel(undefined);
   }, [selection]);
@@ -150,7 +150,7 @@ export function App() {
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isVisibleSid={isVisibleSid} onSelect={tapModel} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} onSelect={tapModel} />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
