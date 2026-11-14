@@ -88,6 +88,11 @@ body,
   margin: 8px 0 0;
 }
 
+/* The language switch below the credits. */
+.lang-switch {
+  margin: 8px 0 0;
+}
+
 .model-error {
   display: grid;
   place-items: center;
@@ -303,8 +308,10 @@ body,
   flex: 0 0 auto;
 }
 
-/* Only there when the manifest has more than one body region. Big enough for a thumb. */
-.region-picker {
+/* Only there when the manifest has more than one body region. Big enough for a thumb.
+   The language switch in the credits looks the same. */
+.region-picker,
+.lang-picker {
   flex: 0 1 auto;
   min-width: 0;
   min-height: 44px;

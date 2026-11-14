@@ -1,6 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BundleStructure, RegionBundle } from "./data/bundle";
+import de from "./i18n/de.json";
 import en from "./i18n/en.json";
+import { pickLanguage, readStoredLanguage, storeLanguage, type Lang } from "./i18n/lang";
 import { createT } from "./i18n/t";
 import { hideStructure, initialLayers, revealFor, type LayerState } from "./layers/layers";
 import type { AreaState } from "./area/AreaPanel";
@@ -28,10 +30,21 @@ import type { Selection } from "./viewer/pick";
 // The printed summary is notebook code, so it loads only when the person presses print.
 const PrintSummary = lazy(() => import("./notebook/PrintSummary"));
 
-const t = createT(en);
 const BASE = import.meta.env.BASE_URL;
 
+// The texts of each language. A text missing in one falls back to the English one.
+const MESSAGES: Record<Lang, Record<string, string>> = { en, de };
+
+// The browser's languages, best first. Some browsers have only navigator.language.
+function browserLanguages(): readonly string[] {
+  if (typeof navigator === "undefined") return [];
+  return navigator.languages ?? (navigator.language ? [navigator.language] : []);
+}
+
 export function App() {
+  // The language is read once at start: the stored choice, else the browser's, else English.
+  const [lang, setLang] = useState<Lang>(() => pickLanguage(readStoredLanguage(), browserLanguages()));
+  const t = useMemo(() => createT(MESSAGES[lang], en), [lang]);
   // The model manifest, read once. It says which body regions there are and which files each one has.
   const [models, setModels] = useState<{ manifest: Manifest } | { error: unknown } | null>(null);
   // The body region shown. null until the manifest is in.
@@ -72,6 +85,17 @@ export function App() {
       cancelled = true;
     };
   }, []);
+
+  // Screen readers and the browser's hyphenation read the page in the chosen language.
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  // A new choice from the switch in the credits. It is kept for the next visit.
+  function changeLang(next: Lang) {
+    setLang(next);
+    storeLanguage(next);
+  }
 
   const regions = useMemo(() => (models && "manifest" in models ? regionIds(models.manifest) : []), [models]);
 
@@ -249,7 +273,7 @@ export function App() {
         <footer className="panel">
           <EducationalLine t={t} />
           <div className="panel-scroll">
-            <Credits t={t} />
+            <Credits t={t} lang={lang} onLang={changeLang} />
           </div>
         </footer>
       }
@@ -330,7 +354,7 @@ export function App() {
                 </Suspense>
               )}
             </ModelErrorBoundary>
-            <Credits t={t} />
+            <Credits t={t} lang={lang} onLang={changeLang} />
           </div>
         </footer>
       </main>

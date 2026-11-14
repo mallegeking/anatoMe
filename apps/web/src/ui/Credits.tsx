@@ -1,4 +1,5 @@
 import { CORRECTION_URL, REPO_URL } from "../config";
+import { LANGS, type Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 
 // The credit lines below are copies of the "Credit text" column in ATTRIBUTION.md.
@@ -39,7 +40,9 @@ function withLicence(t: Translate, key: string, licence: { key: string; href: st
   );
 }
 
-export function Credits({ t }: { t: Translate }) {
+// The language switch sits below the credits, outside the closed part, so it is easy to find.
+// Each language keeps its own name, the same in every language file.
+export function Credits({ t, lang, onLang }: { t: Translate; lang: Lang; onLang: (lang: Lang) => void }) {
   return (
     <>
       <details className="credits">
@@ -65,6 +68,15 @@ export function Credits({ t }: { t: Translate }) {
           <a href={CORRECTION_URL} target="_blank" rel="noopener noreferrer">{t("about.report")}</a>
         </p>
       </details>
+      <p className="lang-switch">
+        <select className="lang-picker" aria-label={t("lang.label")} value={lang} onChange={(e) => onLang(e.target.value as Lang)}>
+          {LANGS.map((id) => (
+            <option key={id} value={id}>
+              {t(`lang.${id}`)}
+            </option>
+          ))}
+        </select>
+      </p>
     </>
   );
 }
