@@ -1,5 +1,6 @@
 # What hip movements do to each structure, and when.
-# The first 11 rows were drafted from the cited sources on 2026-11-02, the rest on 2026-11-03.
+# The first 11 rows were drafted from the cited sources on 2026-11-02, the rest on 2026-11-03,
+# except the rows below the line "Drafted on 2026-11-14" near the end of the file.
 # Every row waits for a person to check it.
 # Each citation is marked quote when says is the source's own words, or summary when it is our own short summary.
 # We only quote sources whose licence fits CC BY 4.0. Ito 2025 and Groh 2009 are CC BY-NC, so their
@@ -1041,3 +1042,94 @@
       says_kind: summary
   checked_by: null
   review_note: "Physio: OERI names the hamstrings as the group that flexes the knee, but no source ranks the knee flexors. Primary for each hamstring is our judgment. Is that right?"
+
+# Drafted on 2026-11-14 (plan 2d, Tasks 3 and 5). Every source below was opened in full that day.
+# Stretched and pinched rows for the capsular ligaments, the capsule and the ligament of the head of the femur.
+# van Arkel 2015 (rotational restraint) cut the ligaments one by one in nine cadaver hips and measured how much
+# each one held back rotation, at full extension and at 0, 30, 60 and 90 degrees of flexion and full flexion.
+- id: iliofemoral-ligament-hip-external-rotation-stretched
+  structure: iliofemoral-ligament
+  movement: hip-external-rotation
+  load: stretched
+  confidence: high
+  citations:
+    - ref: van-arkel-2015-restraint
+      locator: Results, paragraph beginning "The capsular ligaments provided primary internal and external rotation restraint"
+      says: "The iliofemoral ligament provided primary external rotation restraint in all hip positions"
+      says_kind: quote
+    - ref: ng-2019
+      locator: Characteristics, Anatomy, paragraph beginning "Human ligaments consist of predominantly type-I collagen"
+      says: "forming the inverted Y-shaped ligament of Bigelow (Fig. 1), to reinforce the capsule during external rotation and extension."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: van Arkel 2015 measured restraint, the turning force a ligament holds back when the hip is turned outwards. We read restraint as the ligament being stretched. Is that fair?"
+
+- id: pubofemoral-ligament-hip-abduction-stretched
+  structure: pubofemoral-ligament
+  movement: hip-abduction
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: ng-2019
+      locator: Characteristics, Anatomy, paragraph beginning "Human ligaments consist of predominantly type-I collagen"
+      says: "reinforcing the inferior capsule to restrict excessive abduction and external rotation during hip extension."
+      says_kind: quote
+    - ref: van-arkel-2015-restraint
+      locator: Results, paragraph beginning "The capsular ligaments provided primary internal and external rotation restraint"
+      says: "The pubofemoral ligament only contributed significantly to rotational restraint when the hip was fully abducted"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Ng 2019 says the pubofemoral ligament limits abduction (with external rotation, in extension). van Arkel 2015 found it held back rotation only with the hip fully abducted. Neither gives an angle, so the row has no angle range. Is stretched in abduction right at any amount of hip flexion?"
+
+- id: ischiofemoral-ligament-hip-adduction-stretched
+  structure: ischiofemoral-ligament
+  movement: hip-adduction
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: baba-2022
+      locator: Discussion, paragraph beginning "The ischiofemoral ligament is one of the posterior capsular ligaments"
+      says: "The ligament is tense during internal rotation and adduction"
+      says_kind: quote
+    - ref: van-arkel-2015-restraint
+      locator: Results, paragraph beginning "The capsular ligaments provided primary internal and external rotation restraint"
+      says: "particularly prominent in high flexion (≥ 30°), adduction and internal rotation"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: Baba 2022 says this with reference to earlier studies and did not test adduction itself. van Arkel 2015 found the ligament most active with the hip bent 30 degrees or more, drawn in and turned in. The row has no angle range. Is adduction a fair movement to file it under?"
+
+- id: hip-joint-capsule-hip-extension-stretched
+  structure: hip-joint-capsule
+  movement: hip-extension
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: ng-2019
+      locator: Characteristics, Anatomy, legend of Fig. 2
+      says: "large portal view of the tightened posterior collar of the zona orbicularis (ZO) during hip extension"
+      says_kind: quote
+    - ref: van-arkel-2015
+      locator: Discussion, first paragraph
+      says: "towards the extremes of hip ROM (in positions of deep flexion/extension or high levels of ab/adduction) there was a minimal/non-existent slack region"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the model has one mesh for the whole capsule. This row rests on a photo of the zona orbicularis tightening in extension (Ng 2019) and on the capsule leaving almost no slack for rotation at the end of extension (van Arkel 2015). Is a whole-capsule row fair?"
+
+- id: ligament-of-head-of-femur-hip-external-rotation-stretched
+  structure: ligament-of-head-of-femur
+  movement: hip-external-rotation
+  load: stretched
+  when:
+    - {angle: hip.flexion, min: 60, max: 90}
+  confidence: medium
+  citations:
+    - ref: van-arkel-2015-restraint
+      locator: Results, paragraph beginning "The capsular ligaments provided primary internal and external rotation restraint". Tested at 60 and 90 degrees and at full flexion.
+      says: "The ligamentum teres also had a small secondary role restraining external rotation when the hip was in high flexion (≥ 60°) with neutral/full adduction"
+      says_kind: quote
+    - ref: migliorini-2024
+      locator: Introduction, paragraph beginning "The ligamentum capitis femoris, commonly called the ligamentum teres"
+      says: "The LT is tightly stretched either in maximum flexion and external rotation or when the hip is internally rotated in extension"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: van Arkel 2015 found only a small role, with the hip bent 60 degrees or more and the thigh in neutral or full adduction. The range 60 to 90 holds only the angles that study names (full flexion has no number there). Is the row worth showing, given the role is small?"

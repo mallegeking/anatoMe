@@ -1,0 +1,14 @@
+# Data gaps for the hip (Phase 2d)
+
+Started 2026-11-14 by the builder. One line per gap: the structure, what was looked for, the sources opened, and why they did not support a row. An honest gap beats a weak row. Sources were opened in full as open-access texts from Europe PMC. "PMC" numbers link as https://pmc.ncbi.nlm.nih.gov/articles/PMCxxxxxxx/.
+
+## Task 3: stretched and pinched rows
+
+### Capsular ligaments, capsule, labrum and the ligament of the head of the femur
+
+- **Iliofemoral ligament, angles.** Looked for: the hip angle at which it tightens in extension or external rotation. Opened: PMC4491667 (van Arkel 2015, rotational restraint), PMC4655836 (van Arkel 2015, envelope of passive motion), PMC7406151 (Ng 2019), PMC10485585 (iliofemoral band strains, CC BY-NC-ND), PMC8335960 (CC BY-NC). Why not: no opened source states an angle. The rows stay without an angle range.
+- **Pubofemoral ligament in external rotation.** Looked for: external rotation as its own row. Opened: PMC4491667, PMC7406151, PMC8479567 (CC BY-NC-ND). Why not: the sources tie it to extension or full abduction without a number, so a row without an angle range would claim it at every amount of flexion.
+- **Ischiofemoral ligament in extension.** Looked for: extension as a stretching movement. Opened: PMC8725321 (Baba 2022), PMC4491667. Why not: one sentence in Baba 2022 cites an earlier study, nothing measured in an opened source.
+- **Hip joint capsule in flexion, abduction and adduction.** Looked for: positions that tighten the whole capsule, with angles. Opened: PMC4655836, PMC7406151. Why not: the sources say "deep flexion" and "high levels of ab/adduction" without a starting angle. Only extension got a row.
+- **Ligament of the head of the femur in internal rotation with extension, and in adduction.** Looked for: tension positions with angles. Opened: PMC4491667, PMC11662112 (Migliorini 2024), PMC12461197 (finite element model). Why not: "in extension" has no number, the adduction statement in van Arkel 2015 reports other people's arthroscopic observations, and the finite element study is one model with stress, not tension, values.
+- **Acetabular labrum, more pinching positions.** Looked for: positions beyond the existing internal rotation row. Opened: PMC4491667. Why not: van Arkel 2015 found secondary restraint in extension with external rotation and in low flexion with full abduction, but "extension" and "full abduction" have no numbers, so a row would claim the pinch at every angle.
