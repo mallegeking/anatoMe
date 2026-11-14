@@ -11,6 +11,7 @@ Phase 1, the hip atlas, covers the hip, the pelvis and the thigh down to the kne
 - **Search** by English or Latin name. Choosing a result selects the structure, turns the camera to it and peels away the layers in front of it.
 - **Layers:** hide bones, muscles or the other soft tissue, peel the muscles one layer at a time, or hide a single structure.
 - **Info panel:** the name, Latin name and type of the selected structure, where a muscle attaches, and what it does at the hip and the knee, each claim with its sources.
+- **Movements:** pick a hip or knee movement or an exercise. Structures are coloured by their role in it, and a slider changes the joint angle. The model itself does not bend. Movement information shows only after review.
 - **Review gate:** a claim only shows in the app after a person has checked it. Action rows need a physiotherapist, attachment rows can be checked by the owner against the cited source. Unchecked rows never reach the normal build.
 - **Review build:** `npm run build:review -w apps/web` makes a separate copy that shows the unchecked rows, marked as drafts, with a review list for the physiotherapist. It is for the homelab only, never for publishing. See [docs/deploy-homelab.md](docs/deploy-homelab.md).
 
