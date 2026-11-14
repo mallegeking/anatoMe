@@ -10,8 +10,9 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 - Done 2026-11-03: the piriformis 45 versus 30 degree question is attached to both piriformis rows as a `review_note` for the physio (Phase 1 Tasks 1 and 11). The answer itself comes from the physio review.
 - Done 2026-11-03: `posterior-cruciate-ligament` has its Terminologia Anatomica 2 name, Ligamentum cruciatum posterius (Phase 1 Task 10).
 - Done 2026-11-03: validator fixtures cover the load-type rule for capsule, bursa, bone, meniscus and fascia too (Phase 1 Task 1). Labrum and joint still have no fixture of their own.
-- Check structures in the reverse direction too (every meshed target has a structure entry).
-- Model check unit tests use glb files without Draco. Add one Draco fixture.
+- Done 2026-11-14: the labrum and the joint have their own validator fixtures (Phase 2d Task 2).
+- Done 2026-11-14: the model check also fails for a structure in the data that no mesh carries (Phase 2d Task 2).
+- Done 2026-11-14: one model check test reads a Draco-compressed glb that the test writes itself (Phase 2d Task 2).
 
 ## Mesh pipeline
 

@@ -1,7 +1,9 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Document, NodeIO } from "@gltf-transform/core";
+import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
+import draco3d from "draco3dgltf";
 import { afterAll, expect, test } from "vitest";
 import { checkModelMapping, modelStats, type ValidationResult } from "../src/checkModels.ts";
 
@@ -116,4 +118,38 @@ test("a paired structure with an unsided mesh is an error", async () =>
 test("a midline structure with an unsided mesh passes", async () => {
   const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true }]]);
   expect((await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "" }]), sacrum)).ok).toBe(true);
+});
+
+// Structures in the data must have a mesh somewhere, the check works in both directions.
+test("a structure that no mesh carries is an error", async () => {
+  const two = new Map([
+    ["femur", { type: "bone", english: "Femur", midline: false }],
+    ["sacrum", { type: "bone", english: "Sacrum", midline: true }],
+  ]);
+  expectError(await checkModelMapping(await dir([{ sid: "femur" }]), two), /structure sacrum has no mesh in any file/);
+});
+
+// Writes a Draco-compressed glb with one triangle mesh, the way the real model files are stored.
+async function writeDracoGlb(file: string, extras: Extras) {
+  const doc = new Document();
+  const buffer = doc.createBuffer();
+  const position = doc.createAccessor().setType("VEC3").setArray(new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0])).setBuffer(buffer);
+  const indices = doc.createAccessor().setType("SCALAR").setArray(new Uint16Array([0, 1, 2])).setBuffer(buffer);
+  const mesh = doc.createMesh().addPrimitive(doc.createPrimitive().setAttribute("POSITION", position).setIndices(indices));
+  doc.createScene().addChild(doc.createNode().setMesh(mesh).setExtras({ ...BASE, ...extras }));
+  doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
+  const io = new NodeIO()
+    .registerExtensions([KHRDracoMeshCompression])
+    .registerDependencies({ "draco3d.encoder": await draco3d.createEncoderModule() });
+  await io.write(file, doc);
+}
+
+test("the model check reads a Draco-compressed file", async () => {
+  const d = makeDir([entry()]);
+  await writeDracoGlb(join(d, "test.glb"), { sid: "femur" });
+  // The file really is compressed, so a reader without the decoder cannot open it.
+  expect(readFileSync(join(d, "test.glb")).includes("KHR_draco_mesh_compression")).toBe(true);
+  const result = await checkModelMapping(d, femur);
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
 });

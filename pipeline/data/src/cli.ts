@@ -2,6 +2,7 @@
 //   validate <dataDir>                  checks the YAML knowledge base
 //   build-data <dataDir> <outDir> [--review]  validates, then writes <outDir>/<region>.json per region
 //   mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...]  records a review
+//   data-report <dataDir> <region>      prints the coverage report as Markdown
 //   check-models <modelsDir> <dataDir>  checks mesh extras, licenses and the triangle budget
 // Prints one "file path: message" line per problem and exits 1 when there is any.
 
@@ -10,6 +11,7 @@ import { join } from "node:path";
 import { compileRegion, listRegions } from "./compile.ts";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
 import { markChecked } from "./markChecked.ts";
+import { coverage, formatReport } from "./report.ts";
 import { loadStructures, validateDataDir, type ValidationResult } from "./validate.ts";
 
 // The most triangles one region may have, so it stays smooth on a phone.
@@ -82,6 +84,10 @@ async function main(args: string[]): Promise<number> {
     if (!run.ok) console.error("nothing was written");
     return run.ok ? 0 : 1;
   }
+  if (command === "data-report" && rest.length === 2) {
+    console.log(formatReport(coverage(rest[0], rest[1])));
+    return 0;
+  }
   if (command === "build-data") {
     const review = rest.includes("--review");
     const paths = rest.filter((a) => a !== "--review");
@@ -101,7 +107,7 @@ async function main(args: string[]): Promise<number> {
       return 0;
     }
   }
-  console.error("usage: cli.ts validate <dataDir> | build-data <dataDir> <outDir> [--review] | mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...] | check-models <modelsDir> <dataDir>");
+  console.error("usage: cli.ts validate <dataDir> | build-data <dataDir> <outDir> [--review] | mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...] | data-report <dataDir> <region> | check-models <modelsDir> <dataDir>");
   return 2;
 }
 

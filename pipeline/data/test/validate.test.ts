@@ -78,3 +78,6 @@ test("a data folder without exercises.yaml passes", () => {
     rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test("a labrum cannot work", () => expectError(fx("labrum-working"), /load must be stretched or pinched for type labrum/));
+test("a joint cannot appear in actions", () => expectError(fx("joint-in-actions"), /type joint cannot appear in actions/));

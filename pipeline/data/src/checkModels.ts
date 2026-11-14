@@ -53,6 +53,8 @@ export async function checkModelMapping(
     return { ok: false, errors };
   }
 
+  // The ids that at least one mesh carries, to find structures without a mesh afterwards.
+  const meshed = new Set<string>();
   for (const f of files) {
     const at = `regions.${f.region}`;
     if (!ALLOWED_LICENSES.has(f.license)) {
@@ -91,6 +93,7 @@ export async function checkModelMapping(
       if (sid !== undefined && sid !== null && typeof sid !== "string") {
         errors.push({ file: f.path, path: name, message: `sid must be text, not ${JSON.stringify(sid)}` });
       }
+      if (typeof sid === "string") meshed.add(sid);
       const structure = typeof sid === "string" ? structures.get(sid) : undefined;
       if (typeof sid === "string" && sid !== "" && !structure) {
         errors.push({ file: f.path, path: name, message: `unknown structure id ${sid}` });
@@ -116,6 +119,10 @@ export async function checkModelMapping(
         errors.push({ file: f.path, path: name, message: `source ${String(extras.source)} but the manifest says ${f.source}` });
       }
     }
+  }
+  // The other direction: every structure in the data needs a mesh somewhere.
+  for (const id of structures.keys()) {
+    if (!meshed.has(id)) errors.push({ file: "manifest.json", path: id, message: `structure ${id} has no mesh in any file` });
   }
   return { ok: errors.length === 0, errors };
 }
