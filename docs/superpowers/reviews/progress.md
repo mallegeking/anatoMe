@@ -5,6 +5,7 @@ Sessions of 2026-11-14:
 - Overnight run, prompt 1 of `docs/superpowers/plans/2026-11-13-opus-prompts.md`.
 - Second run: finished plan 2b (Tasks 2 to 4) after the owner corrected the model size check.
 - Third run: built plan 2c, the Notebook (Tasks 2 to 7), with the comparison on.
+- Fourth run: built plan 3, publish v1 (Tasks 1 to 8). The repo stays private. Nothing was made public, Pages is off, no tag was pushed.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -14,6 +15,7 @@ Sessions of 2026-11-14:
 | Phase 2c notebook, Task 1 (wording check) | done | `docs/phase2/medical-device-wording.md` |
 | Phase 2c notebook, Tasks 2 to 7 | done (with the owner's stricter wording rules, points for the owner below) | `phase-2c-build-report.md` |
 | Phase 2d hip data, Tasks 3 to 6 (sourced data) | done (12 rows, 2 exercises, gaps listed) | `phase-2d-data-build-report.md` |
+| Phase 3 publish v1, Tasks 1 to 8 | done (Task 3 stopped for the owner, open audit items below) | `phase-3-build-report.md` |
 
 ## Waiting for the owner
 
@@ -28,9 +30,12 @@ Sessions of 2026-11-14:
 - Phase 2c: three texts that are slightly off, all plan wording (item 4), and the phone sheet question that contains "diagnosis" (item 5).
 - Phase 2c: run section 7 "Notebook" of `docs/phase2/phone-measurements.md` on the phone in the review build, including a real print preview.
 - Phase 2d data: 12 new action rows and 2 exercises wait for the physio in the review build. Gaps in `docs/phase2/data-gaps.md`.
+- Phase 3: the history audit (`docs/phase3/history-audit.md`) has seven open items D1 to D7 (handle, symptoms and personal circumstances in the spec, the home server description, a personal e-mail address and a computer-like author name in commit metadata, and a local home-folder path in the history of commit `ed43141`). Decide between leaving them, rewriting history, or starting the public repo from a fresh commit, before checklist item 9. A squash-merge keeps D7 out of `main`. Item 1 of `phase-3-build-report.md`, "For the owner".
+- Phase 3: confirm the four extra licence mappings and the 21 licence rows read from Europe PMC (item 2 of the report), `REPO_URL` in `apps/web/src/config.ts` (item 3) and the README "What comes next" wording (item 4).
+- Phase 3: the remaining steps to publish v1 are in `docs/phase3/publish-checklist.md`. They start after the physio review.
 
 ## Notes for the next session
 
-- All three runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. The Windows checkout was fast-forwarded to the same commit at the end.
+- All four runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. The Windows checkout was fast-forwarded to the same commit at the end.
 - `npm ci` and the Python `.venv` in the Windows checkout were run from WSL in the first run. Its `node_modules` and `.venv` hold Linux builds. Run `npm ci` again before using that checkout from Windows.
 - If the owner changes the 2b stopping rule or the probe aim, the change sits in `apps/web/src/area/under.ts` and the probe effect in `apps/web/src/viewer/RegionModel.tsx`, each with a unit test.
