@@ -4,6 +4,7 @@ import { useRegionData } from "../data/useRegionData";
 import type { Translate } from "../i18n/t";
 import { peel, restore, showStructure, toggleTissue, type LayerState } from "../layers/layers";
 import { LayersPanel } from "../layers/LayersPanel";
+import { AreaPanel, type AreaState } from "../area/AreaPanel";
 import { MovementPanel } from "../movement/MovementPanel";
 import type { MovementState } from "../movement/state";
 import type { Selection } from "../viewer/pick";
@@ -26,11 +27,15 @@ type Props = {
   onHideSelected: () => void;
   onOpenMovement: (movementId: string) => void;
   onFocusStructure: (sid: string) => void;
+  area: AreaState;
+  onFocusAreaStructure: (sel: Selection) => void;
+  onAreaClear: () => void;
+  onOverUnder: () => void;
   onOpenStructure: (sid: string) => void;
 };
 
 // Loads the data, tells the app which structures exist, and shows one of the panels:
-// the layers panel when it is open, else the movement panel in the Movements tab, else the info panel.
+// the layers panel when it is open, else the movement panel in the Movements tab, else the area panel in the Area tab, else the info panel.
 export function PanelArea({ region, t, mode, selection, label, layersOpen, layers, setLayers, movement, onBundle, ...on }: Props) {
   const bundle = useRegionData(region);
   useEffect(() => onBundle(bundle), [bundle, onBundle]);
@@ -60,6 +65,19 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
       />
     );
   }
+  if (mode === "area") {
+    return (
+      <AreaPanel
+        t={t}
+        bundle={bundle}
+        area={on.area}
+        selection={selection}
+        onFocusStructure={on.onFocusAreaStructure}
+        onOpenMovement={on.onOpenMovement}
+        onClear={on.onAreaClear}
+      />
+    );
+  }
   return (
     <RegionInfo
       region={region}
@@ -69,6 +87,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
       onSwitchSide={on.onSwitchSide}
       onHide={on.onHideSelected}
       onOpenMovement={on.onOpenMovement}
+      onOverUnder={on.onOverUnder}
     />
   );
 }

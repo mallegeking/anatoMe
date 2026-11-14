@@ -3,6 +3,7 @@ import type { BundleStructure, RegionBundle } from "./data/bundle";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
 import { hideStructure, initialLayers, revealFor, type LayerState } from "./layers/layers";
+import type { AreaState } from "./area/AreaPanel";
 import { makeIsShown } from "./layers/shown";
 import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
@@ -34,6 +35,8 @@ export function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("atlas");
   const [movement, setMovement] = useState<MovementState>(initialMovementState);
+  const [area, setArea] = useState<AreaState>(null);
+  const [areaProbe, setAreaProbe] = useState<Selection | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
@@ -74,6 +77,25 @@ export function App() {
     const sel = selectBySearch(sid, bundle);
     select(sel);
     setFocus({ ...sel });
+  }
+
+  // A structure in the area list: make it visible, select it and turn the camera to it.
+  // A structure the data does not know has nothing to reveal, so it is only selected.
+  function focusAreaStructure(sel: Selection) {
+    const structure = structures.find((s) => s.id === sel.sid);
+    if (structure) {
+      const { state } = revealFor(layers, structure, sel.side, structures);
+      setLayers(state);
+    }
+    select(sel);
+    setFocus({ ...sel });
+  }
+
+  // "See what lies over and under it": switch to the Area tab and look through the selected structure.
+  function overUnder() {
+    if (!selection) return;
+    setMode("area");
+    setAreaProbe({ ...selection });
   }
 
   // "Read about this structure" works like a search result, so it also switches to the Structures tab.
@@ -143,14 +165,21 @@ export function App() {
           open={searchOpen}
           onOpenChange={setSearchOpen}
         />
-        <ModeBar t={t} mode={mode} modes={["atlas", "movement"]} onChange={setMode} />
+        <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area"]} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} highlights={highlights} onSelect={tapModel} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown}
+            highlights={highlights}
+            onSelect={tapModel}
+            areaMode={mode === "area"}
+            onAreaTap={setArea}
+            areaMarker={mode === "area" ? (area?.point ?? null) : null}
+            areaProbe={areaProbe}
+          />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
@@ -180,6 +209,10 @@ export function App() {
                   onOpenMovement={openMovement}
                   onFocusStructure={focusStructure}
                   onOpenStructure={openStructure}
+                  area={area}
+                  onFocusAreaStructure={focusAreaStructure}
+                  onAreaClear={() => setArea(null)}
+                  onOverUnder={overUnder}
                 />
               </Suspense>
             </ModelErrorBoundary>

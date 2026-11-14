@@ -564,3 +564,42 @@ body,
 .swatch--stretched {
   background: #00798c;
 }
+
+.area-panel {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.area-panel h2 {
+  margin: 0 0 4px;
+  font-size: 1.125rem;
+}
+
+.area-panel h3 {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.area-panel p {
+  margin: 4px 0;
+}
+
+.area-panel ol {
+  margin: 8px 0;
+  padding-left: 22px;
+}
+
+.area-panel li {
+  margin: 0 0 10px;
+}
+
+.area-panel li .link-button {
+  display: block;
+  min-height: 32px;
+  text-align: left;
+}
+
+.area-panel li .link-button[aria-current="true"] {
+  font-weight: 700;
+}

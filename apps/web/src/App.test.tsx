@@ -12,6 +12,7 @@ import type { Selection } from "./viewer/pick";
 const viewer = vi.hoisted(() => ({
   selection: null as unknown,
   focus: null as unknown,
+  areaProbe: null as unknown,
   highlights: null as unknown,
   isShown: (() => true) as (sid: string, side: "l" | "r" | "") => boolean,
 }));
@@ -25,7 +26,11 @@ vi.mock("./viewer/Viewer", () => ({
     focus,
     highlights,
     isShown,
+    onAreaTap,
+    areaProbe,
   }: {
+    onAreaTap: (tap: unknown) => void;
+    areaProbe: unknown;
     onSelect: (sel: Selection | null) => void;
     selection: Selection | null;
     focus: Selection | null;
@@ -34,6 +39,7 @@ vi.mock("./viewer/Viewer", () => ({
   }) => {
     viewer.selection = selection;
     viewer.focus = focus;
+    viewer.areaProbe = areaProbe;
     viewer.highlights = highlights;
     viewer.isShown = isShown;
     return (
@@ -43,6 +49,12 @@ vi.mock("./viewer/Viewer", () => ({
         </button>
         <button type="button" onClick={() => onSelect({ sid: "piriformis", side: "l" })}>
           tap piriformis
+        </button>
+        <button type="button" onClick={() => onAreaTap({ point: [0, 0, 0], through: null, entries: [{ sid: "piriformis", side: "l", distance: 1, depth: 0 }, { sid: "femur", side: "l", distance: 1.05, depth: 0.05 }] })}>
+          area tap
+        </button>
+        <button type="button" onClick={() => onAreaTap(null)}>
+          area miss
         </button>
       </>
     );
@@ -192,4 +204,50 @@ test("choosing a search result switches to the Structures tab", async () => {
   fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
   expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true");
   expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
+});
+
+test("the Area tab shows the hint", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.area"]));
+  expect(screen.getByText(en["area.hint"])).toBeTruthy();
+  expect(screen.queryByText(en["info.tapHint"])).toBeNull();
+});
+
+test("a tap in the Area tab shows the list and a missed tap brings the hint back", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.area"]));
+  fireEvent.click(screen.getByText("area tap"));
+  expect(screen.getByRole("heading", { name: en["area.title"] })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Femur (left)" })).toBeTruthy();
+  fireEvent.click(screen.getByText("area miss"));
+  expect(screen.getByText(en["area.hint"])).toBeTruthy();
+});
+
+test("choosing a list entry for a hidden structure makes it visible and selects it", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  fireEvent.click(screen.getByRole("button", { name: en["info.hide"] }));
+  expect(viewer.isShown("piriformis", "l")).toBe(false);
+  fireEvent.click(tab(en["mode.area"]));
+  fireEvent.click(screen.getByText("area tap"));
+  fireEvent.click(screen.getByRole("button", { name: "Piriformis (left)" }));
+  expect(viewer.isShown("piriformis", "l")).toBe(true);
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
+  expect(viewer.focus).toEqual({ sid: "piriformis", side: "l" });
+});
+
+test("over and under in the info panel switches to the Area tab and probes that structure", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
+  expect(tab(en["mode.area"]).getAttribute("aria-selected")).toBe("true");
+  expect(viewer.areaProbe).toEqual({ sid: "piriformis", side: "l" });
 });

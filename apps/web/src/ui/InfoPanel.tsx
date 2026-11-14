@@ -15,6 +15,8 @@ type Props = {
   onHide: () => void;
   // Opens the Movements tab with this movement picked.
   onOpenMovement: (movementId: string) => void;
+  // Switches to the Area tab with a look through this structure.
+  onOverUnder: () => void;
 };
 
 // One line for each structure with a part that the model does not show yet. The value is the en.json key.
@@ -87,7 +89,7 @@ function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: Region
   );
 }
 
-export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, onHide, onOpenMovement }: Props) {
+export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
   const structure = bundle.structures.find((s) => s.id === selection.sid);
   const name = structure?.english ?? fallbackLabel ?? selection.sid;
   const sideText = selection.side === "l" ? t("side.left", { label: name }) : selection.side === "r" ? t("side.right", { label: name }) : name;
@@ -163,6 +165,9 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
         )}
         <button type="button" onClick={onHide}>
           {t("info.hide")}
+        </button>
+        <button type="button" onClick={onOverUnder}>
+          {t("info.overUnder")}
         </button>
       </div>
     </section>
