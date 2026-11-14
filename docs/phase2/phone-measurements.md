@@ -48,11 +48,14 @@ Tap "Movements" in the row of tabs under the search bar. Pick "Hip external rota
 
 ## 4. Exercises
 
-Left empty on purpose. Fill it in once plan 2d has added exercises.
+Plan 2d added two exercises on 2026-11-14 (both drafts, so use the review build). Pick each one in the Movements tab, choose each phase and move the progress slider from 0 to 100.
 
-| Exercise | Does the slider play through its phases? (yes or no) | Anything odd? |
+| Exercise and phase | Does the list change in a sensible way as the slider moves? (yes or no) | Anything odd? |
 | --- | --- | --- |
-| | | |
+| Bodyweight squat, Lowering (the hip and knee extensors work, the hamstrings show as stretched once the hip bends) | | |
+| Bodyweight squat, Rising | | |
+| Side-lying hip abduction, Lifting the leg (the abductors work, adductor longus and the pubofemoral ligament show as stretched once the leg is up) | | |
+| Side-lying hip abduction, Lowering the leg | | |
 
 ## 5. Hiding one side
 

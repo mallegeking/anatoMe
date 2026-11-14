@@ -324,3 +324,24 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10261119/
   license: CC BY 4.0
   access: open
+- id: pottorf-2026
+  title: "Comparison of peak joint angles from non-concurrent squat and upper-limb assessment using a markerless Kinotek system and a marker-based Vicon system"
+  authors: Pottorf OA, Greenberg ET, Garcia MC, Dewan BM
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13179743/
+  license: Creative Commons Attribution License (version not stated)
+  access: open
+- id: park-2026
+  title: "Effects of Barbell Position and Squat Depth on Trunk and Lower-Extremity Muscle Activation During the Back Squat in Healthy Adult Men"
+  authors: Park JH, Lei S, Cho HY, Kim SH
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13413768/
+  license: Creative Commons Attribution (CC BY) license (version not stated)
+  access: open
+- id: uebayashi-2026
+  title: "Muscle activity of deep hip muscles across joint positions and elevation phases during side-lying hip abduction"
+  authors: Uebayashi K, Okubo Y, Akasaka K, Adachi G, Oshikawa T, Matsunaga N, Kaneoka K
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13353230/
+  license: Creative Commons Attribution License (version not stated)
+  access: open
