@@ -44,3 +44,7 @@ Two of the six exercises were added (bodyweight squat, side-lying hip abduction)
 - **Romanian deadlift.** Looked for: hip and knee angles at the bottom of the lift. Opened: PMC8835508, PMC7046193, PMC12591051, PMC8248606, PMC13750531, PMC13511462, PMC11036218, PMC13727010 (CC BY-NC). Why not: the sources give muscle activity and technique ("knees slightly flexed") but no angles. The nearest numbers are from a conventional deadlift at the moment of peak force, a different lift.
 - **Glute bridge.** Looked for: hip angles at the start and at the top. Opened: PMC11981018, PMC8248606, PMC13619985. Why not: the review gives knee positions (60, 90 or 120 degrees) and says the hip can extend about 20 degrees past neutral, but no hip angles for the bridge itself. The hip thrust numbers are from a different exercise on a box.
 - **Clamshell.** Looked for: how far the knee opens (hip abduction and external rotation). Opened: PMC11195955, PMC10315199 (CC BY-NC-ND). Why not: the studies hold the hip at 30, 45 or 60 degrees of flexion and the knee at 90, but name the movement only as "maximum abduction with external rotation" without a number.
+
+## Task 5: knee rows for the thigh muscles
+
+No gap. On 2026-11-14 each of the ten muscles already had a working knee row from Phase 1, so no row was added: rectus femoris, vastus lateralis, vastus medialis and vastus intermedius (knee extension), sartorius, gracilis, biceps femoris long head, biceps femoris short head, semitendinosus and semimembranosus (knee flexion).
