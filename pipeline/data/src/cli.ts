@@ -61,7 +61,7 @@ async function main(args: string[]): Promise<number> {
         const bundle = compileRegion(dataDir, region, review ? "review" : "normal");
         const text = JSON.stringify(bundle);
         writeFileSync(join(outDir, `${region}.json`), text);
-        console.log(`${region}.json (${bundle.mode}): ${text.length} bytes, ${bundle.actions.length} actions, ${bundle.attachments.length} attachments`);
+        console.log(`${region}.json (${bundle.mode}): ${text.length} bytes, ${bundle.actions.length} actions, ${bundle.attachments.length} attachments, ${bundle.exercises.length} exercises`);
       }
       return 0;
     }

@@ -52,5 +52,8 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
     ],
     citations: [{ id: "c1", title: "Hip anatomy", authors: "Smith", year: 2020, url: "https://example.org", license: "CC-BY" }],
     pendingByStructure: { piriformis: 1 },
+    exercises: [],
+    pendingByMovement: {},
+    pendingExercises: 0,
   };
 }

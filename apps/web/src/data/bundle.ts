@@ -34,6 +34,18 @@ export type BundleAction = {
   review_note?: string;
 };
 
+export type BundlePhase = { id: string; english: string; path: { angle: string; from: number; to: number }[]; effort: string[] };
+
+export type BundleExercise = {
+  id: string;
+  english: string;
+  phases: BundlePhase[];
+  citations: BundleCitationUse[];
+  draft: boolean;
+  // A question for the reviewer. Only the review build has it.
+  review_note?: string;
+};
+
 export type BundleCitation = { id: string; title: string; authors: string; year: number; url: string; license: string };
 
 export type RegionBundle = {
@@ -46,4 +58,9 @@ export type RegionBundle = {
   citations: BundleCitation[];
   // How many unchecked action rows each structure has. Normal mode counts the rows it dropped.
   pendingByStructure: Record<string, number>;
+  exercises: BundleExercise[];
+  // How many unchecked action rows each movement has.
+  pendingByMovement: Record<string, number>;
+  // How many unchecked exercise rows this region has.
+  pendingExercises: number;
 };

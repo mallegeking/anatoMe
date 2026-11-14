@@ -14,7 +14,7 @@ export type ValidationResult = { ok: boolean; errors: ValidationError[] };
 // The schemas live next to the real data, also when we check a test fixture.
 const SCHEMA_DIR = fileURLToPath(new URL("../../../data/schema/", import.meta.url));
 
-type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations";
+type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations" | "exercises";
 
 type Joint = { id: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
@@ -28,6 +28,11 @@ type Action = Gated & {
   load: "working" | "stretched" | "pinched";
   role?: string;
   when?: { angle: string; min: number; max: number }[];
+};
+type Exercise = Gated & {
+  english: string;
+  regions: string[];
+  phases: { id: string; path: { angle: string; from: number; to: number }[]; effort: string[] }[];
 };
 type Attachment = Gated & { muscle: string; bone: string };
 
@@ -70,14 +75,16 @@ export function validateDataDir(dir: string): ValidationResult {
   const actions = listYaml(dir, "actions").map((f) => load<Action>("actions", f));
   // The attachments folder is optional, listYaml returns nothing when it is missing.
   const attachments = listYaml(dir, "attachments").map((f) => load<Attachment>("attachments", f));
+  // data/exercises.yaml is optional. A missing file means no exercises.
+  const exercises: Loaded<Exercise>[] = existsSync(join(dir, "exercises.yaml")) ? [load<Exercise>("exercises", "exercises.yaml")] : [];
 
   // Ids must be unique within each kind, across all files of that kind.
-  // Actions and attachments share one id space, because the review list shows them together.
+  // Actions, attachments and exercises share one id space, because the review list shows them together.
   checkUnique([joints], errors);
   checkUnique([movements], errors);
   checkUnique([citations], errors);
   checkUnique(structures, errors);
-  checkUnique([...actions, ...attachments], errors);
+  checkUnique([...actions, ...attachments, ...exercises], errors);
 
   const angles = new Set(joints.rows.flatMap((j) => j.dofs.map((d) => `${j.id}.${d.id}`)));
   for (const [i, m] of movements.rows.entries()) {
@@ -133,6 +140,36 @@ export function validateDataDir(dir: string): ValidationResult {
     }
   }
 
+  const regions = new Set(structures.flatMap((s) => s.rows).map((s) => (s as Structure & { region?: string }).region));
+  for (const { file, rows } of exercises) {
+    for (const [i, x] of rows.entries()) {
+      for (const [j, r] of x.regions.entries()) {
+        if (!regions.has(r)) errors.push({ file, path: `/${i}/regions/${j}`, message: `unknown region ${r}` });
+      }
+      const phaseIds = new Set<string>();
+      for (const [p, phase] of x.phases.entries()) {
+        const pathAt = `/${i}/phases/${p}`;
+        if (phaseIds.has(phase.id)) errors.push({ file, path: `${pathAt}/id`, message: `duplicate phase id ${phase.id}` });
+        phaseIds.add(phase.id);
+        const seen = new Set<string>();
+        for (const [k, step] of phase.path.entries()) {
+          if (!angles.has(step.angle)) errors.push({ file, path: `${pathAt}/path/${k}/angle`, message: `unknown angle ${step.angle}` });
+          if (seen.has(step.angle)) errors.push({ file, path: `${pathAt}/path/${k}/angle`, message: `angle ${step.angle} appears twice in one phase` });
+          seen.add(step.angle);
+          if (step.from === step.to) errors.push({ file, path: `${pathAt}/path/${k}`, message: "from and to must differ" });
+        }
+        for (const [k, m] of phase.effort.entries()) {
+          if (!movementIds.has(m)) errors.push({ file, path: `${pathAt}/effort/${k}`, message: `unknown movement ${m}` });
+        }
+      }
+      // Like action rows, exercises are movement claims, so only a physio may check them.
+      if (x.checked_by !== null && !x.checked_by.startsWith("physio-")) {
+        errors.push({ file, path: `/${i}/checked_by`, message: "exercise rows can only be checked by a physio, use a label like physio-1" });
+      }
+      checkGated(file, i, x, citationIds, errors);
+    }
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -184,7 +221,7 @@ export function loadStructures(dir: string): Map<string, StructureInfo> {
 function compileSchemas(): Record<Kind, ValidateFunction> {
   // allErrors so one run shows every problem, allowUnionTypes for checked_by (string or null).
   const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "attachments", "citations"];
+  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "attachments", "citations", "exercises"];
   return Object.fromEntries(
     kinds.map((k) => [k, ajv.compile(JSON.parse(readFileSync(join(SCHEMA_DIR, `${k}.schema.json`), "utf8")))]),
   ) as Record<Kind, ValidateFunction>;

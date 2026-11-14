@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
 import { validateDataDir, type ValidationResult } from "../src/validate.ts";
@@ -49,3 +51,22 @@ test("attachment checked_by cannot be a name in role form", () => expectError(fx
 // Only a physio may check action rows. Attachment rows may be checked by the owner or a physio.
 test("action rows cannot be checked by the owner", () => expectError(fx("action-checked-by-owner"), /action rows can only be checked by a physio/));
 test("attachment rows can be checked by a physio", () => expect(validateDataDir(fx("attachment-checked-by-physio")).ok).toBe(true));
+
+// Exercises: cross references, the phase rules and the physio-only gate.
+test("exercise with an unknown angle", () => expectError(fx("exercise-bad-angle"), /unknown angle hip\.twist/));
+test("exercise with an unknown effort movement", () => expectError(fx("exercise-bad-movement"), /unknown movement hip-wiggle/));
+test("exercise with an unknown region", () => expectError(fx("exercise-bad-region"), /unknown region elbow/));
+test("exercise with a duplicate phase id", () => expectError(fx("exercise-duplicate-phase"), /duplicate phase id lowering/));
+test("exercise phase naming an angle twice", () => expectError(fx("exercise-angle-twice"), /angle hip\.flexion appears twice in one phase/));
+test("exercise path that goes nowhere", () => expectError(fx("exercise-no-movement"), /from and to must differ/));
+test("exercise checked by the owner", () => expectError(fx("exercise-checked-by-owner"), /exercise rows can only be checked by a physio, use a label like physio-1/));
+test("exercise id that an action row already uses", () => expectError(fx("exercise-duplicate-id"), /duplicate id/));
+test("the valid fixture with an exercise passes", () => {
+  expect(existsSync(join(fx("valid"), "exercises.yaml"))).toBe(true);
+  expect(validateDataDir(fx("valid")).ok).toBe(true);
+});
+test("a data folder without exercises.yaml passes", () => {
+  const dir = fileURLToPath(new URL("../../../data", import.meta.url));
+  expect(existsSync(join(dir, "exercises.yaml"))).toBe(false);
+  expect(validateDataDir(dir).ok).toBe(true);
+});

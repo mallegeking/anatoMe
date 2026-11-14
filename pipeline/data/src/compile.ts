@@ -8,6 +8,7 @@ import type {
   BundleAction,
   BundleAttachment,
   BundleCitation,
+  BundleExercise,
   BundleMovement,
   BundleStructure,
   RegionBundle,
@@ -16,6 +17,7 @@ import type {
 // Rows as they are written in the YAML files. validateDataDir has already checked them.
 type StructureRow = Omit<BundleStructure, "paired"> & { region: string; midline?: boolean };
 type ActionRow = Omit<BundleAction, "draft"> & { checked_by: string | null };
+type ExerciseRow = Omit<BundleExercise, "draft"> & { regions: string[]; checked_by: string | null };
 type AttachmentRow = Omit<BundleAttachment, "draft"> & { checked_by: string | null };
 
 function readRows<T>(dir: string, file: string): T[] {
@@ -44,11 +46,15 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
   const inRegion = new Set(structures.map((s) => s.id));
 
   const pendingByStructure: Record<string, number> = {};
+  const pendingByMovement: Record<string, number> = {};
   const actions: BundleAction[] = [];
   for (const row of readFolder<ActionRow>(dataDir, "actions")) {
     if (!inRegion.has(row.structure)) continue;
     const draft = row.checked_by === null;
-    if (draft) pendingByStructure[row.structure] = (pendingByStructure[row.structure] ?? 0) + 1;
+    if (draft) {
+      pendingByStructure[row.structure] = (pendingByStructure[row.structure] ?? 0) + 1;
+      pendingByMovement[row.movement] = (pendingByMovement[row.movement] ?? 0) + 1;
+    }
     if (draft && !review) continue;
     // Pick the fields one by one, so checked_by, checked_on and (in normal mode) review_note never leak.
     const { id, structure, movement, load, role, when, applies_to, confidence, citations, review_note } = row;
@@ -67,8 +73,20 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
     attachments.push({ id, muscle, end, bone, landmark, citations, draft });
   }
 
+  let pendingExercises = 0;
+  const exercises: BundleExercise[] = [];
+  for (const row of readRows<ExerciseRow>(dataDir, "exercises.yaml")) {
+    if (!row.regions.includes(region)) continue;
+    const draft = row.checked_by === null;
+    if (draft) pendingExercises++;
+    if (draft && !review) continue;
+    // Pick the fields one by one, so checked_by, checked_on and (in normal mode) review_note never leak.
+    const { id, english, phases, citations, review_note } = row;
+    exercises.push({ id, english, phases, citations, draft, ...(review && review_note !== undefined ? { review_note } : {}) });
+  }
+
   // Only sources that a kept row points to.
-  const used = new Set([...actions, ...attachments].flatMap((r) => r.citations.map((c) => c.ref)));
+  const used = new Set([...actions, ...attachments, ...exercises].flatMap((r) => r.citations.map((c) => c.ref)));
   const citations = readRows<BundleCitation & { access: string }>(dataDir, "citations.yaml")
     .filter((c) => used.has(c.id))
     .map(({ id, title, authors, year, url, license }) => ({ id, title, authors, year, url, license }));
@@ -86,5 +104,8 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
     actions,
     citations,
     pendingByStructure,
+    exercises,
+    pendingByMovement,
+    pendingExercises,
   };
 }

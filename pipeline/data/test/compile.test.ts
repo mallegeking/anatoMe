@@ -23,3 +23,28 @@ test("paired is false for a midline structure and true otherwise", () => {
   expect(byId.get("sacrum")).toBe(false);
   expect(byId.get("femur")).toBe(true);
 });
+
+test("normal mode drops an unchecked exercise and counts it", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  expect(b.exercises.map((e) => e.id)).toEqual(["bodyweight-squat"]);
+  expect(b.exercises.some((e) => e.draft)).toBe(false);
+  expect(b.pendingExercises).toBe(1);
+});
+test("review mode keeps it as a draft with its review note", () => {
+  const e = compileRegion(fx("valid"), "hip", "review").exercises.find((x) => x.id === "goblet-squat");
+  expect(e?.draft).toBe(true);
+  expect(e?.review_note).toBe("A question about the goblet squat.");
+});
+test("an exercise for another region is left out", () => {
+  const b = compileRegion(fx("exercise-other-region"), "hip", "review");
+  expect(b.exercises.map((e) => e.id)).toEqual(["goblet-squat"]);
+  expect(b.pendingExercises).toBe(1);
+});
+test("pendingByMovement counts unchecked action rows per movement", () =>
+  expect(compileRegion(fx("valid"), "hip", "normal").pendingByMovement).toEqual({ "hip-internal-rotation": 1 }));
+test("a checked exercise keeps its citation in the bundle", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  expect(b.citations.map((c) => c.id)).toContain("used-source");
+  expect(b.exercises[0].citations[0].ref).toBe("used-source");
+  expect(JSON.stringify(b)).not.toContain("review_note");
+});

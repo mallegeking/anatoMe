@@ -1,0 +1,27 @@
+- id: bodyweight-squat
+  english: Bodyweight squat
+  regions: [hip]
+  phases:
+    - id: lowering
+      english: Phase
+      path:
+        - {angle: hip.flexion, from: 0, to: 100}
+        - {angle: hip.rotation, from: 0, to: 10}
+      effort: [hip-extension]
+  citations:
+    - {ref: used-source, locator: page 3, says: A short summary., says_kind: summary}
+  checked_by: physio-1
+  checked_on: 2026-11-03
+- id: goblet-squat
+  english: Goblet squat
+  regions: [hip]
+  phases:
+    - id: lowering
+      english: Lowering
+      path:
+        - {angle: hip.flexion, from: 0, to: 90}
+      effort: [hip-extension]
+  citations:
+    - {ref: draft-only-source, locator: page 4, says: Another summary., says_kind: summary}
+  checked_by: null
+  review_note: A question about the goblet squat.
