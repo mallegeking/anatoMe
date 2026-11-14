@@ -86,6 +86,13 @@ test("candidate lines read like the panel's", () => {
   expect(screen.getByText("Piriformis: loaded in 1 of 1 movements you marked as hurting, and in none you marked as fine")).toBeTruthy();
 });
 
+test("when a fine movement rules everything out the side says so, not that there is no information", () => {
+  page([entry(), entry({ id: "f", feeling: "fine" })]);
+  expect(screen.queryByText(en["notebook.noRows"])).toBeNull();
+  expect(screen.queryByText(/loaded in \d+ of/)).toBeNull();
+  expect(screen.getByText(/^Also loaded by movements that feel fine: .*Piriformis/)).toBeTruthy();
+});
+
 test("print runs once per press and only after the summary is in the document", async () => {
   vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
   let seen: boolean | null = null;

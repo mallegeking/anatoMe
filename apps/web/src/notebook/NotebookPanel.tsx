@@ -194,6 +194,12 @@ export function candidateText(t: Translate, bundle: RegionBundle, cand: Candidat
   return t("notebook.candidate", { name, painful: String(cand.painful), total: String(total) });
 }
 
+// The line naming structures that movements feeling fine also load. The printed summary uses it too.
+export function ruledOutText(t: Translate, bundle: RegionBundle, ruledOut: string[]): string {
+  const nameOf = (sid: string) => bundle.structures.find((s) => s.id === sid)?.english ?? sid;
+  return t("notebook.ruledOut", { names: ruledOut.map(nameOf).join(", ") });
+}
+
 // One note. The note text is shown as plain text, never as HTML.
 function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: RegionBundle; entry: NotebookEntry; onDelete: () => void }) {
   const angles = formatAngles(entry.pose, bundle, t);
@@ -219,7 +225,6 @@ function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: Regio
 // The structures to look into, side by side apart. The disclaimer sits right under the heading,
 // next to the result. The candidates come in the order compare() gives, by name, with plain counts.
 function LookInto({ t, bundle, entries, onFocusStructure }: { t: Translate; bundle: RegionBundle; entries: NotebookEntry[]; onFocusStructure: (sel: Selection) => void }) {
-  const nameOf = (sid: string) => bundle.structures.find((s) => s.id === sid)?.english ?? sid;
   const sides = (["l", "r"] as const).map((side) => compare(entries, bundle, side)).filter((c) => c.painfulCount > 0);
   return (
     <div className="notebook-look-into">
@@ -244,7 +249,7 @@ function LookInto({ t, bundle, entries, onFocusStructure }: { t: Translate; bund
             </ul>
             )
           )}
-          {c.ruledOut.length > 0 && <p className="muted">{t("notebook.ruledOut", { names: c.ruledOut.map(nameOf).join(", ") })}</p>}
+          {c.ruledOut.length > 0 && <p className="muted">{ruledOutText(t, bundle, c.ruledOut)}</p>}
           {c.fineCount === 0 && <p className="muted">{t("notebook.needFine")}</p>}
           {c.incomplete && <p className="muted">{t("notebook.incomplete")}</p>}
         </div>

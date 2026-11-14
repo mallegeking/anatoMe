@@ -1,7 +1,7 @@
 import type { RegionBundle } from "../data/bundle";
 import type { Translate } from "../i18n/t";
 import { formatAngles } from "./angles";
-import { candidateText, entryName } from "./NotebookPanel";
+import { candidateText, entryName, ruledOutText } from "./NotebookPanel";
 import type { SummaryModel } from "./summary";
 import type { NotebookEntry } from "./types";
 
@@ -52,15 +52,15 @@ export function Summary({ t, bundle, model }: { t: Translate; bundle: RegionBund
           {model.comparisons.map((c) => (
             <div key={c.side}>
               <h3>{t(`notebook.lookIntoSide.${c.side}`)}</h3>
-              {c.candidates.length === 0 ? (
-                <p>{t("notebook.noRows")}</p>
-              ) : (
+              {c.candidates.length === 0 && c.ruledOut.length === 0 && <p>{t("notebook.noRows")}</p>}
+              {c.candidates.length > 0 && (
                 <ul>
                   {c.candidates.map((cand) => (
                     <li key={cand.sid}>{candidateText(t, bundle, cand, c.painfulCount)}</li>
                   ))}
                 </ul>
               )}
+              {c.ruledOut.length > 0 && <p>{ruledOutText(t, bundle, c.ruledOut)}</p>}
             </div>
           ))}
           <p>{t("summary.basis")}</p>

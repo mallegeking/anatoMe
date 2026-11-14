@@ -18,6 +18,18 @@ const viewer = vi.hoisted(() => ({
   isShown: (() => true) as (sid: string, side: "l" | "r" | "") => boolean,
 }));
 
+// Lets one test make the lazy print summary fail. Otherwise it is the real one.
+const printSummary = vi.hoisted(() => ({ fails: false }));
+vi.mock("./notebook/PrintSummary", async (original) => {
+  const real = await original<typeof import("./notebook/PrintSummary")>();
+  return {
+    default: (props: Parameters<typeof real.default>[0]) => {
+      if (printSummary.fails) throw new Error("chunk failed");
+      return real.default(props);
+    },
+  };
+});
+
 // jsdom cannot draw 3D, so the model is plain buttons here. "model" is a tap on empty space,
 // "tap piriformis" a tap on the left piriformis.
 vi.mock("./viewer/Viewer", () => ({
@@ -356,4 +368,33 @@ test("the print button prints once per press, after the summary is on the page",
   await waitFor(() => expect(print).toHaveBeenCalledTimes(2));
   expect(seen).toEqual([true, true]);
   print.mockRestore();
+});
+
+test("a print summary that fails to load leaves the rest of the app on screen", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  printSummary.fails = true;
+  const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+  const print = vi.spyOn(window, "print").mockImplementation(() => {});
+  try {
+    render(<App />);
+    await screen.findByText(en["info.tapHint"]);
+    fireEvent.click(tab(en["mode.movement"]));
+    fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+    fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+    fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+    fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+    fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+    await screen.findByText(en["notebook.saved"]);
+    fireEvent.click(tab(en["mode.notebook"]));
+    fireEvent.click(await screen.findByRole("button", { name: en["notebook.print"] }));
+    await waitFor(() => expect(quiet).toHaveBeenCalled());
+    expect(print).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(tab(en["mode.notebook"]).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("button", { name: en["notebook.print"] })).toBeTruthy();
+    expect(screen.getByTestId("notebook-panel")).toBeTruthy();
+  } finally {
+    printSummary.fails = false;
+  }
 });

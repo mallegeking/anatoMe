@@ -9,6 +9,7 @@ import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
 import type { NotebookEntry, EntrySide, Feeling } from "./notebook/types";
 import type { NotebookStore } from "./notebook/store";
+import { QuietBoundary } from "./ui/QuietBoundary";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
@@ -269,9 +270,11 @@ export function App() {
         </footer>
       </main>
       {bundle && printJob && (
-        <Suspense fallback={null}>
-          <PrintSummary t={t} bundle={bundle} entries={printJob.entries} press={printJob.press} />
-        </Suspense>
+        <QuietBoundary>
+          <Suspense fallback={null}>
+            <PrintSummary t={t} bundle={bundle} entries={printJob.entries} press={printJob.press} />
+          </Suspense>
+        </QuietBoundary>
       )}
     </ModelErrorBoundary>
   );
