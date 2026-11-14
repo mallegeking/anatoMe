@@ -76,7 +76,9 @@ jobs:
         with:
           node-version: 22
 
+      # shell: bash turns on pipefail, so a failing git diff fails the step instead of passing on empty input.
       - name: Check that no review was recorded
+        shell: bash
         run: |
           if ! git diff "origin/${{ github.base_ref }}...HEAD" -- data | node scripts/check-review-guard.mjs; then
             echo "Only the project owner records reviews. Please leave checked_by: null and remove checked_on. See docs/data-corrections.md."

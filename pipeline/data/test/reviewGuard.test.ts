@@ -9,3 +9,20 @@ test("setting checked_by is caught", () => expect(findReviewEdits(diff(["-  chec
 test("adding checked_on is caught", () => expect(findReviewEdits(diff(["+  checked_on: 2026-12-01"]))).toHaveLength(1));
 test("removing a review is not an edit this guard cares about", () => expect(findReviewEdits(diff(["-  checked_by: physio-1", "+  checked_by: null"]))).toEqual([]));
 test("the words inside a says text do not trigger it", () => expect(findReviewEdits(diff(['+      says: "the row has checked_by: owner in the text"']))).toEqual([]));
+
+test("in a diff of two files the result names the file that sets checked_by", () => {
+  const two = [
+    "diff --git a/data/actions/hip.yaml b/data/actions/hip.yaml",
+    "+++ b/data/actions/hip.yaml",
+    "@@ -1,2 +1,3 @@",
+    "+- id: new-row",
+    "+  checked_by: null",
+    "diff --git a/data/attachments/hip.yaml b/data/attachments/hip.yaml",
+    "+++ b/data/attachments/hip.yaml",
+    "@@ -1,2 +1,3 @@",
+    "+  checked_by: owner",
+  ].join("\n");
+  const found = findReviewEdits(two);
+  expect(found).toHaveLength(1);
+  expect(found[0]).toContain("data/attachments/hip.yaml");
+});
