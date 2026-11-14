@@ -38,3 +38,10 @@ test("a target that no ray hits falls back to the normal rule", () => {
   const center = [hit("sartorius", 1.0), hit("femur", 1.05, "bone"), hit("biceps-femoris-long-head", 1.1)];
   expect(structuresUnder(center, [], { sid: "piriformis", side: "l" }).map((e) => e.sid)).toEqual(["sartorius", "femur"]);
 });
+test("the left and right copy at the same distance come out in the same order, whatever the order of the hits", () => {
+  const left = hit("gracilis", 1.0, "muscle", "l");
+  const right = hit("gracilis", 1.0, "muscle", "r");
+  const keys = (center: RayHit[]) => structuresUnder(center, []).map((e) => `${e.sid}|${e.side}`);
+  expect(keys([left, right])).toEqual(["gracilis|l", "gracilis|r"]);
+  expect(keys([right, left])).toEqual(["gracilis|l", "gracilis|r"]);
+});

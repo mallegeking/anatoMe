@@ -39,7 +39,10 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
       nearest.set(key, { sid: h.sid, side: h.side, distance: h.distance, depth: Math.max(0, h.distance - surface) });
     }
   }
-  return [...nearest.values()]
-    .filter((e) => e.distance <= stop)
-    .sort((a, b) => a.distance - b.distance || (a.sid < b.sid ? -1 : a.sid > b.sid ? 1 : 0));
+  // Ties go by sid and then by side ("" before "l" before "r"), so the order never depends on the order of the hits.
+  return [...nearest.values()].filter((e) => e.distance <= stop).sort((a, b) => a.distance - b.distance || order(a.sid, b.sid) || order(a.side, b.side));
+}
+
+function order(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
