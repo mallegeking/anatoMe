@@ -199,7 +199,7 @@ Effort assumes part-time weekends. Estimates beyond Phase 1 are rough and get re
 | 0. Spike | See task list below | Done, phone gate passed on 2026-11-03 (updated 2026-11-03, was 1 to 2 weekends) | The hip region loads quickly on the owner's phone |
 | 1. Hip atlas | Hip, pelvis and thigh (down to and including the knee joint, because several thigh muscles attach below it) with search, info panel and peelable layers. Data schema in place. First sourced action rows for the hip. Credits screen. | 3 to 6 weekends (medium, updated 2026-11-02, was 4 to 8) | It helps the owner understand their own hip |
 | 2. Movement explorer, area lookup and notebook | Stretched and pinched rows for the hip where sources exist. Joint-angle control changes highlighting only (the model does not bend). Hip movements, plus knee flexion and extension for the muscles that cross both joints. Exercises show their hip part only until Phase 4 adds knee and ankle data. Roles by joint angle, "tap where it hurts", symptom notebook with one-page export and a backup file the user can save and re-import (iPhone browsers can delete site storage of web apps that are not installed after about 7 days unused). Before the notebook is built, a short check of the EU medical device rules for its wording. | 2 to 4 months part-time (low, updated 2026-11-02, was 1 to 3) | The owner's physio has reviewed the hip data |
-| 3. Publish v1 | Make the repo public. README with educational framing up front, CONTRIBUTING.md, a process for data corrections from physios and students. Re-check every license page, including the ones blocked during design. | 1 to 2 weekends (medium) | |
+| 3. Publish v1 | Make the repo public. README with educational framing up front, CONTRIBUTING.md, a process for data corrections from physios and students. Re-check every license page, including the ones blocked during design. | Prepared on 2026-11-14, the owner's remaining steps are in `docs/phase3/publish-checklist.md` (was 1 to 2 weekends, medium) | |
 | 4. Whole body, region by region | Spine and neck, shoulder girdle, upper limb, knee and ankle. Each region ships on its own once its data is reviewed. German UI. | Months (low) | Name mapping works for one full region beyond the hip |
 | 5. Simulation playback | OpenSim activations computed offline for common exercises, animated over the 3D model | Several months (low) | |
 | 6. Your own movement (stretch goal) | See section 10 | Open-ended | |
@@ -240,8 +240,8 @@ Kept in `docs/ideas.md`, which is the running list across sessions.
 
 ## 12. Open items
 
-- Re-check these pages from a session that can reach them: the OpenSim full-body model license on simtk.org, AnatomyScope. (The DBCLS BodyParts3D license page was confirmed on 2026-11-02.)
-- Verify the EU medical device rules for the educational framing before the notebook is built (Phase 2) and again before v1 is published. Claude summarises the rules and sources. This is research, not legal advice.
+- ~~Re-check these pages from a session that can reach them: the OpenSim full-body model license on simtk.org, AnatomyScope. (The DBCLS BodyParts3D license page was confirmed on 2026-11-02.)~~ Done on 2026-11-14, see `docs/phase3/licence-recheck.md`.
+- Verify the EU medical device rules for the educational framing before the notebook is built (Phase 2) and again before v1 is published. Claude summarises the rules and sources. This is research, not legal advice. Partly done: the check before the notebook was built is in `docs/phase2/medical-device-wording.md`. The second read before v1 is published is still open, it is item 6 in `docs/phase3/publish-checklist.md`.
 - Shona anatomy terminology availability, when Shona is added.
 - How the physio reviews: in person on the owner's phone, or through Tailscale sharing. Decide when she is approached.
 - Added 2026-11-02, from the Phase 0 spike (details in `docs/phase0/spike-report.md`):
@@ -250,4 +250,4 @@ Kept in `docs/ideas.md`, which is the running list across sessions.
   - No meniscus structure type exists, so the two menisci are deferred to Phase 1.
   - Two required structures have no mesh in either source: quadriceps tendon and patellar ligament. Psoas minor (optional) is also missing.
   - OpenStax Anatomy and Physiology 2e is now CC BY-NC-SA with a no-LLM clause. Rows cite the CC BY 4.0 OERI remix on LibreTexts instead. The owner confirms this is acceptable.
-  - Two cited papers are non-commercial (Ito 2025, Groh 2009) and are used only as short evidence quotes. Decide the policy for such sources before v1.
+  - ~~Two cited papers are non-commercial (Ito 2025, Groh 2009) and are used only as short evidence quotes. Decide the policy for such sources before v1.~~ Decided and enforced by the validator on 2026-11-14, see `data/schema/citations.schema.json`, `pipeline/data/src/validate.ts` and `docs/phase3/licence-recheck.md`.
