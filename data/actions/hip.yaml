@@ -1235,3 +1235,25 @@
       says_kind: summary
   checked_by: null
   review_note: "Physio: both sources take it as given that hip extension tightens psoas (one in surgery, one as a flexibility test). Neither gives an angle. Is stretched in hip extension right? We left iliacus out for want of a source of its own. Should iliacus get the same row?"
+
+# Adductors: only adductor longus has a measurement. Kato 2023 measured its stiffness with shear wave
+# elastography in 16 men at hip flexion -20, 0, 20, 40, 60 and 80 degrees and abduction 0 to 40 degrees.
+- id: adductor-longus-hip-abduction-stretched
+  structure: adductor-longus
+  movement: hip-abduction
+  load: stretched
+  when:
+    - {angle: hip.abduction, min: 0, max: 40}
+    - {angle: hip.flexion, min: -20, max: 80}
+  confidence: high
+  citations:
+    - ref: kato-2023
+      locator: Discussion, paragraph beginning "The increase in the shear modulus of the AL muscle associated with hip abduction depends on the hip flexion angle", and the Methods (hip angles tested)
+      says: "Therefore, the increase in the shear modulus of the AL muscle during hip abduction is higher in the hip-extended position than in the hip-flexed position because the AL muscle is elongated in the hip-extended position."
+      says_kind: quote
+    - ref: kato-2023
+      locator: Discussion, paragraph beginning "In football"
+      says: "This study demonstrated that the shear modulus of the AL muscle increases through hip abduction, extension, and internal rotation."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the ranges hold only the tested angles (abduction 0 to 40, hip flexion from 20 behind neutral to 80). The stretch was largest with the hip extended. Only the upper part of the muscle was measured. Is the row right?"

@@ -317,3 +317,10 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11923245/
   license: CC BY-NC-ND 4.0
   access: open
+- id: kato-2023
+  title: "Quantifying the shear modulus of the adductor longus muscle during hip joint motion using shear wave elastography"
+  authors: Kato T, Taniguchi K, Kodesho T, Nakao G, Yokoyama Y, Saito Y, Katayose M
+  year: 2023
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10261119/
+  license: CC BY 4.0
+  access: open
