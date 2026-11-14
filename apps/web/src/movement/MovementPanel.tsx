@@ -1,12 +1,18 @@
-import { useId, type ReactNode } from "react";
+import { lazy, Suspense, useId, useState, type ReactNode } from "react";
 import type { BundleAction, RegionBundle } from "../data/bundle";
 import { describeAction, jointOf } from "../data/describe";
 import type { Translate } from "../i18n/t";
+import type { EntrySide, Feeling } from "../notebook/types";
 import { DraftMark } from "../review/DraftMark";
 import { ActionNotes, Sources } from "../ui/InfoPanel";
 import type { Selection } from "../viewer/pick";
 import { contextAngles, HIGHLIGHT_ORDER, involved, type Query } from "./roles";
 import { clearPick, pickExercise, pickMovement, pickPhase, queryOf, setAngle, setProgress, type MovementPick, type MovementState } from "./state";
+
+// The log form is notebook code, so it loads only when "Log this movement" is first pressed.
+const LogForm = lazy(() => import("../notebook/LogForm"));
+
+type LogInput = { feeling: Feeling; side: EntrySide; note: string };
 
 type Props = {
   t: Translate;
@@ -18,6 +24,8 @@ type Props = {
   onFocusStructure: (sid: string) => void;
   // The same, and switch to the Structures tab.
   onOpenStructure: (sid: string) => void;
+  // Save the picked movement to the notebook. Without it there is no log button.
+  onLog?: (input: LogInput) => void;
 };
 
 // The panel of the Movements tab: the list to pick from, or the picked movement or exercise with its result.
@@ -35,10 +43,12 @@ export function MovementPanel(props: Props) {
     </div>
   );
   const result = <Result {...props} query={query} />;
+  // A new pick starts with the form closed.
+  const log = props.onLog ? <LogMovement key={`${state.pick.kind}:${state.pick.id}`} t={t} onLog={props.onLog} /> : null;
 
   if (state.pick.kind === "exercise") {
     return (
-      <ExerciseView {...props} pick={state.pick} back={back}>
+      <ExerciseView {...props} pick={state.pick} back={back} log={log}>
         {result}
       </ExerciseView>
     );
@@ -59,8 +69,35 @@ export function MovementPanel(props: Props) {
           </label>
         );
       })}
+      {log}
       {result}
     </section>
+  );
+}
+
+// "Log this movement" opens the form in place. Saving or cancelling closes it again.
+function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => void }) {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <div className="panel-actions">
+        <button type="button" onClick={() => setOpen(true)}>
+          {t("notebook.log")}
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Suspense fallback={null}>
+      <LogForm
+        t={t}
+        onSave={(input) => {
+          setOpen(false);
+          onLog(input);
+        }}
+        onCancel={() => setOpen(false)}
+      />
+    </Suspense>
   );
 }
 
@@ -104,9 +141,9 @@ function Picker({ t, bundle, onChange }: Pick<Props, "t" | "bundle" | "onChange"
 }
 
 // An exercise: its phases, how far through the phase, and the result.
-type ExerciseProps = Props & { pick: Extract<MovementPick, { kind: "exercise" }>; back: ReactNode; children: ReactNode };
+type ExerciseProps = Props & { pick: Extract<MovementPick, { kind: "exercise" }>; back: ReactNode; log: ReactNode; children: ReactNode };
 
-function ExerciseView({ t, bundle, state, onChange, pick, back, children }: ExerciseProps) {
+function ExerciseView({ t, bundle, state, onChange, pick, back, log, children }: ExerciseProps) {
   const phaseLabel = useId();
   const exercise = bundle.exercises.find((e) => e.id === pick.id)!;
   const percent = Math.round(state.progress * 100);
@@ -133,6 +170,7 @@ function ExerciseView({ t, bundle, state, onChange, pick, back, children }: Exer
         <input type="range" min={0} max={100} step={5} value={percent} onChange={(e) => onChange(setProgress(state, bundle, Number(e.target.value) / 100))} />
       </label>
       <p className="muted">{t("movement.effortNote")}</p>
+      {log}
       {children}
     </section>
   );

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import type { RegionBundle } from "../data/bundle";
 import { useRegionData } from "../data/useRegionData";
 import type { Translate } from "../i18n/t";
@@ -7,9 +7,14 @@ import { LayersPanel } from "../layers/LayersPanel";
 import { AreaPanel, type AreaState } from "../area/AreaPanel";
 import { MovementPanel } from "../movement/MovementPanel";
 import type { MovementState } from "../movement/state";
+import type { NotebookStore } from "../notebook/store";
+import type { EntrySide, Feeling, NotebookEntry } from "../notebook/types";
 import type { Selection } from "../viewer/pick";
 import type { Mode } from "./ModeBar";
 import { RegionInfo } from "./RegionInfo";
+
+// The Notebook tab is its own chunk, so it loads only when the tab is first opened.
+const NotebookPanel = lazy(() => import("../notebook/NotebookPanel"));
 
 type Props = {
   region: string;
@@ -32,10 +37,16 @@ type Props = {
   onAreaClear: () => void;
   onOverUnder: () => void;
   onOpenStructure: (sid: string) => void;
+  onLog: (input: { feeling: Feeling; side: EntrySide; note: string }) => void;
+  notebookStore: NotebookStore | null;
+  notebookError: boolean;
+  onFocusNotebookStructure: (sel: Selection) => void;
+  onPrintNotebook: (entries: NotebookEntry[]) => void;
 };
 
 // Loads the data, tells the app which structures exist, and shows one of the panels:
-// the layers panel when it is open, else the movement panel in the Movements tab, else the area panel in the Area tab, else the info panel.
+// the layers panel when it is open, else the movement panel in the Movements tab, else the area panel in the Area tab,
+// else the notebook in the Notebook tab, else the info panel.
 export function PanelArea({ region, t, mode, selection, label, layersOpen, layers, setLayers, movement, onBundle, ...on }: Props) {
   const bundle = useRegionData(region);
   useEffect(() => onBundle(bundle), [bundle, onBundle]);
@@ -62,6 +73,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
         selection={selection}
         onFocusStructure={on.onFocusStructure}
         onOpenStructure={on.onOpenStructure}
+        onLog={on.onLog}
       />
     );
   }
@@ -76,6 +88,20 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
         onOpenMovement={on.onOpenMovement}
         onClear={on.onAreaClear}
       />
+    );
+  }
+  if (mode === "notebook") {
+    return (
+      <Suspense fallback={null}>
+        <NotebookPanel
+          t={t}
+          bundle={bundle}
+          store={on.notebookStore}
+          storeError={on.notebookError}
+          onFocusStructure={on.onFocusNotebookStructure}
+          onPrint={on.onPrintNotebook}
+        />
+      </Suspense>
     );
   }
   return (

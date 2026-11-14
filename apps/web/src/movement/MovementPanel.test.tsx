@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "../data/bundle";
 import en from "../i18n/en.json";
@@ -13,7 +13,9 @@ const t = createT(en);
 afterEach(cleanup);
 
 // The app keeps the movement state, so the tests do the same.
-function Harness({ bundle, selection, onFocusStructure }: { bundle: RegionBundle; selection: Selection | null; onFocusStructure: (sid: string) => void }) {
+type HarnessProps = { bundle: RegionBundle; selection: Selection | null; onFocusStructure: (sid: string) => void; onLog?: ComponentProps<typeof MovementPanel>["onLog"] };
+
+function Harness({ bundle, selection, onFocusStructure, onLog }: HarnessProps) {
   const [state, setState] = useState(initialMovementState);
   return (
     <MovementPanel
@@ -24,13 +26,14 @@ function Harness({ bundle, selection, onFocusStructure }: { bundle: RegionBundle
       selection={selection}
       onFocusStructure={onFocusStructure}
       onOpenStructure={() => {}}
+      onLog={onLog}
     />
   );
 }
 
-function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn() } = {}) {
-  render(<Harness bundle={bundle} selection={selection} onFocusStructure={onFocusStructure} />);
-  return { onFocusStructure };
+function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn(), onLog = vi.fn(), noLog = false } = {}) {
+  render(<Harness bundle={bundle} selection={selection} onFocusStructure={onFocusStructure} onLog={noLog ? undefined : onLog} />);
+  return { onFocusStructure, onLog };
 }
 
 const pick = (name: string) => fireEvent.click(screen.getByRole("button", { name }));
@@ -154,4 +157,49 @@ test("no exercises and nothing waiting shows no exercise heading", () => {
   show({ ...makeMovementBundle(), exercises: [], pendingExercises: 0 });
   expect(screen.queryByRole("heading", { name: "Exercises" })).toBeNull();
   expect(screen.queryByText(en["movement.exercisesPending"])).toBeNull();
+});
+
+test("a picked movement can be logged", async () => {
+  const { onLog } = show();
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  // The form loads on its own the first time, so the test waits for it.
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  pick(en["notebook.side.l"]);
+  pick(en["notebook.save"]);
+  expect(onLog).toHaveBeenCalledTimes(1);
+  expect(onLog).toHaveBeenCalledWith({ feeling: "painful", side: "l", note: "" });
+  // The form closes and the button is back.
+  expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
+  expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
+});
+
+test("an exercise phase can be logged too", async () => {
+  const { onLog } = show();
+  pick("Bodyweight squat");
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.fine"] }));
+  pick(en["notebook.side.both"]);
+  pick(en["notebook.save"]);
+  expect(onLog).toHaveBeenCalledWith({ feeling: "fine", side: "both", note: "" });
+});
+
+test("cancel closes the form without logging", async () => {
+  const { onLog } = show();
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.cancel"] }));
+  expect(onLog).not.toHaveBeenCalled();
+  expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
+});
+
+test("without a pick there is no log button", () => {
+  show();
+  expect(screen.queryByRole("button", { name: en["notebook.log"] })).toBeNull();
+});
+
+test("without a log handler there is no log button", () => {
+  show(makeMovementBundle(), { noLog: true });
+  pick("Hip external rotation");
+  expect(screen.queryByRole("button", { name: en["notebook.log"] })).toBeNull();
 });

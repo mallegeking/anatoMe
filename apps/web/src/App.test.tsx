@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "./data/bundle";
 import { App } from "./App";
@@ -250,4 +251,81 @@ test("over and under in the info panel switches to the Area tab and probes that 
   fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
   expect(tab(en["mode.area"]).getAttribute("aria-selected")).toBe("true");
   expect(viewer.areaProbe).toEqual({ sid: "piriformis", side: "l" });
+});
+
+// The notebook tests give the app its own empty in-memory IndexedDB.
+function freshNotebook() {
+  const factory = new IDBFactory();
+  const open = vi.spyOn(factory, "open");
+  vi.stubGlobal("indexedDB", factory);
+  return { open };
+}
+
+test("the notebook is not opened at start, only when its tab opens", async () => {
+  const { open } = freshNotebook();
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(open).not.toHaveBeenCalled();
+  fireEvent.click(tab(en["mode.notebook"]));
+  expect(await screen.findByText(en["notebook.empty"])).toBeTruthy();
+  expect(open).toHaveBeenCalledTimes(1);
+  expect(screen.queryByText(en["info.tapHint"])).toBeNull();
+});
+
+test("a logged movement is saved, says so and shows in the Notebook tab", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+  fireEvent.change(screen.getByLabelText(en["notebook.note"]), { target: { value: "  on the stairs  " } });
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
+  fireEvent.click(tab(en["mode.notebook"]));
+  expect(await screen.findByText(/^\d{4}-\d{2}-\d{2}: Hip external rotation, It hurts, Left$/)).toBeTruthy();
+  expect(screen.getByText("on the stairs")).toBeTruthy();
+});
+
+test("a structure to look into is made visible, selected and turned to", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.r"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  await screen.findByText(en["notebook.saved"]);
+  fireEvent.click(tab(en["mode.notebook"]));
+  fireEvent.click(await screen.findByRole("button", { name: /^Piriformis: loaded in 1 of 1/ }));
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "r" });
+  expect(viewer.focus).toEqual({ sid: "piriformis", side: "r" });
+  expect(viewer.isShown("piriformis", "r")).toBe(true);
+});
+
+test("without storage a log says the notebook is unavailable and the tab says so too", async () => {
+  vi.stubGlobal("indexedDB", undefined);
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.fine"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.both"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+  fireEvent.click(tab(en["mode.notebook"]));
+  await waitFor(() => expect(screen.getAllByText(en["notebook.unavailable"]).length).toBeGreaterThan(0));
+  expect(await screen.findByRole("heading", { name: en["notebook.title"] })).toBeTruthy();
+  // The rest of the app still works.
+  fireEvent.click(tab(en["mode.atlas"]));
+  expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
 });

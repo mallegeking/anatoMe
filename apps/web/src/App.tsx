@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BundleStructure, RegionBundle } from "./data/bundle";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
@@ -7,6 +7,8 @@ import type { AreaState } from "./area/AreaPanel";
 import { makeIsShown } from "./layers/shown";
 import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
+import type { NotebookStore } from "./notebook/store";
+import type { EntrySide, Feeling } from "./notebook/types";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
@@ -37,6 +39,9 @@ export function App() {
   const [movement, setMovement] = useState<MovementState>(initialMovementState);
   const [area, setArea] = useState<AreaState>(null);
   const [areaProbe, setAreaProbe] = useState<Selection | null>(null);
+  const [notebookStore, setNotebookStore] = useState<NotebookStore | null>(null);
+  const [notebookError, setNotebookError] = useState(false);
+  const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
@@ -90,6 +95,37 @@ export function App() {
     select(sel);
     setFocus({ ...sel });
   }
+
+  // Opens the notebook store once, the first time the Notebook tab opens or a movement is logged.
+  // Its code loads only then, so the first screen stays as fast as before.
+  const openStore = useCallback(() => {
+    if (!notebookOpening.current) {
+      notebookOpening.current = import("./notebook/store").then((m) => m.openNotebook());
+      notebookOpening.current.then(setNotebookStore, () => setNotebookError(true));
+    }
+    return notebookOpening.current;
+  }, []);
+
+  useEffect(() => {
+    if (mode === "notebook") void openStore();
+  }, [mode, openStore]);
+
+  // "Log this movement": saves the picked movement and its angles with the feeling, the side and the note.
+  // A browser that does not let the app store notes gets the plain line instead.
+  async function logMovement(input: { feeling: Feeling; side: EntrySide; note: string }) {
+    const { pick, pose } = movement;
+    if (!pick) return;
+    try {
+      const [{ makeEntry }, store] = await Promise.all([import("./notebook/types"), openStore()]);
+      await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
+      setNotice(t("notebook.saved"));
+    } catch {
+      setNotice(t("notebook.unavailable"));
+    }
+  }
+
+  // The printed summary comes with the next part of the notebook. Until then the button does nothing.
+  function printNotebook() {}
 
   // "See what lies over and under it": switch to the Area tab and look through the selected structure.
   function overUnder() {
@@ -165,7 +201,7 @@ export function App() {
           open={searchOpen}
           onOpenChange={setSearchOpen}
         />
-        <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area"]} onChange={setMode} />
+        <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area", "notebook"]} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
@@ -213,6 +249,11 @@ export function App() {
                   onFocusAreaStructure={focusAreaStructure}
                   onAreaClear={() => setArea(null)}
                   onOverUnder={overUnder}
+                  onLog={logMovement}
+                  notebookStore={notebookStore}
+                  notebookError={notebookError}
+                  onFocusNotebookStructure={focusAreaStructure}
+                  onPrintNotebook={printNotebook}
                 />
               </Suspense>
             </ModelErrorBoundary>

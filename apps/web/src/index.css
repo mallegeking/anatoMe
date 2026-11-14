@@ -439,11 +439,12 @@ body,
   border-bottom: 1px solid #2c323b;
 }
 
+/* Each tab is as wide as its word plus an equal share of the rest, so four tabs fit at 360 px. */
 .mode-bar button {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   min-width: 0;
   min-height: 44px;
-  padding: 0 8px;
+  padding: 0 6px;
   border: 0;
   border-bottom: 3px solid transparent;
   background: none;
@@ -602,4 +603,82 @@ body,
 
 .area-panel li .link-button[aria-current="true"] {
   font-weight: 700;
+}
+
+/* The Notebook tab. Long notes and names wrap, so the panel never scrolls sideways. */
+.notebook-panel {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.notebook-panel h2 {
+  margin: 0 0 4px;
+  font-size: 1.125rem;
+}
+
+.notebook-panel h3 {
+  margin: 12px 0 4px;
+  font-size: 0.9375rem;
+}
+
+.notebook-panel h4 {
+  margin: 8px 0 2px;
+  font-size: 0.875rem;
+}
+
+.notebook-panel p {
+  margin: 4px 0;
+}
+
+.notebook-panel ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.notebook-panel li {
+  margin: 0 0 8px;
+}
+
+.notebook-panel li .link-button {
+  min-height: 32px;
+  text-align: left;
+}
+
+.notebook-disclaimer {
+  font-style: italic;
+}
+
+/* A note keeps its own line breaks. */
+.notebook-note {
+  white-space: pre-wrap;
+}
+
+/* The log form under "Log this movement". */
+.log-form {
+  margin: 8px 0;
+}
+
+.log-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.log-note textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #14171c;
+  color: var(--text);
+  font: inherit;
+  /* 16 px keeps phones from zooming in when the field gets focus. */
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.panel-actions button:disabled {
+  opacity: 0.5;
 }
