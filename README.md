@@ -12,6 +12,7 @@ anatoMe covers the hip, the pelvis and the thigh down to the knee:
 - **Layers:** hide bones, muscles or the other soft tissue, peel the muscles one layer at a time, or hide a single structure.
 - **Info panel:** the name, Latin name and type of the selected structure, where a muscle attaches, and what it does at the hip and the knee, each claim with its sources.
 - **Movements:** pick a hip or knee movement or an exercise. Structures are coloured by their role in it, and a slider changes the joint angle. The model itself does not bend. Movement information shows only after review.
+- **Area:** tap a spot on the model and read which structures lie under it, from the surface inwards, with the movements that load each one. "See what lies over and under it" in the info panel does the same for the selected structure. It lists what the model holds and nothing more.
 - **Review gate:** a claim only shows in the app after a person has checked it. Action rows need a physiotherapist, attachment rows can be checked by the owner against the cited source. Unchecked rows never reach the normal build.
 - **Review build:** `npm run build:review -w apps/web` makes a separate copy that shows the unchecked rows, marked as drafts, with a review list for the physiotherapist. It is for the homelab only, never for publishing. See [docs/deploy-homelab.md](docs/deploy-homelab.md).
 

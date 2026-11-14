@@ -1,6 +1,6 @@
 # Phone measurements, Phase 2 (Samsung Galaxy A23)
 
-Fill this in yourself. Follow step 5 of `docs/deploy-homelab.md` for the exact steps. Do everything on home Wi-Fi with Tailscale switched on. Use the review build, so the movement rows that are still waiting for a check show up too. The Phase 1 sheet is `docs/phase1/phone-measurements.md`. This one repeats its speed and rotating checks and adds the Movements tab.
+Fill this in yourself. Follow step 5 of `docs/deploy-homelab.md` for the exact steps. Do everything on home Wi-Fi with Tailscale switched on. Use the review build, so the movement rows that are still waiting for a check show up too. The Phase 1 sheet is `docs/phase1/phone-measurements.md`. This one repeats its speed and rotating checks and adds the Movements and Area tabs.
 
 Pass mark for Phase 2: the model is interactive within 5000 ms (median of 3 runs), it does not stutter when you rotate it or move the slider, and every check below works.
 
@@ -65,13 +65,30 @@ Select the left piriformis and tap "Hide this". Look at the right side.
 | --- | --- |
 | Is the right piriformis still there? (yes or no) | |
 
-## 6. Questions for the physio
+## 6. Area tab
+
+Tap "Area" in the row of tabs. Tap the side of the hip, then the same spot again after peeling a layer. Use the review build.
+
+| Check | Answer |
+| --- | --- |
+| Does a dot show where you tapped? (yes or no) | |
+| Does the list start at the outermost structure and end at a bone? (yes or no) | |
+| After peeling a layer, does a tap on the same spot give the same list? (yes or no) | |
+| Does a drag to rotate the model leave the list alone? (yes or no) | |
+| Does a tap on a list entry turn the camera to it? (yes or no) | |
+| Is the fingertip size right, or do taps list too much or too little? (write which) | |
+
+## 7. Questions for the physio
 
 Between two measured angles the app says nothing about a muscle, for example obturator externus between 60 and 75 degrees of hip flexion. Is that the right thing to show, or should the app carry the nearest measured role across the gap?
 
 Answer: (write here)
 
-## 7. Notes
+Does the order of structures under the front of the hip and under the buttock look right to you?
+
+Answer: (write here)
+
+## 8. Notes
 
 Anything else you noticed, for example slow parts, things that looked odd, or a moment where the page froze.
 
