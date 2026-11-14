@@ -6,7 +6,7 @@ anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts wit
 
 ## What it does today
 
-Phase 1, the hip atlas, covers the hip, the pelvis and the thigh down to the knee:
+anatoMe covers the hip, the pelvis and the thigh down to the knee:
 
 - **Search** by English or Latin name. Choosing a result selects the structure, turns the camera to it and peels away the layers in front of it.
 - **Layers:** hide bones, muscles or the other soft tissue, peel the muscles one layer at a time, or hide a single structure.

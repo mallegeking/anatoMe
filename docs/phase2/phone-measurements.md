@@ -37,11 +37,11 @@ Turn the model with one finger for 10 seconds.
 
 ## 3. Movements tab
 
-Tap "Movements" in the top bar. Pick "Hip external rotation". Move the slider from 0 to 90 degrees.
+Tap "Movements" in the row of tabs under the search bar. Pick "Hip external rotation". Move the slider from 0 to 90 degrees.
 
 | Check | Answer |
 | --- | --- |
-| Does piriformis change group (for example from stretched to working) as the slider moves? (yes or no) | |
+| Does piriformis change group as the slider moves (for example from Main movers to Helpers, with "Nothing recorded at this angle" in between)? (yes or no) | |
 | Does the model stutter while the slider moves? (yes or no) | |
 | Is any text cut off? (yes or no) | |
 | Can it all be done with one thumb? (yes or no) | |

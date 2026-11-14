@@ -145,6 +145,19 @@ test("a movement with a row that applies colours it and hides the muscles that a
   expect(viewer.isShown("rectus-femoris", "l")).toBe(true);
 });
 
+test("a movement whose rows do not apply at the current angle leaves the model whole", async () => {
+  // The only row starts at 20 degrees, so at the neutral angle 0 nothing applies.
+  const bundle = makeBundle();
+  serve({ ...bundle, actions: bundle.actions.map((a) => ({ ...a, when: [{ angle: "hip.flexion", min: 20, max: 60 }] })) });
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  expect(viewer.highlights).toBeNull();
+  expect(viewer.isShown("rectus-femoris", "l")).toBe(true);
+  expect(viewer.isShown("piriformis", "r")).toBe(true);
+});
+
 test("a movement heading in the info panel opens that movement", async () => {
   serve(makeBundle());
   render(<App />);
