@@ -4,7 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, type Object3D } from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { HIGHLIGHT_COLORS } from "../movement/colors";
+import { HIGHLIGHT_ORDER, type Highlight } from "../movement/roles";
 import { markInteractive } from "../perf/loadTimer";
+import { paintOf } from "./appearance";
 import { pickVisibleHit, shouldSelect, type Selection, type Side } from "./pick";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
@@ -35,19 +38,22 @@ function groupOf(kind: string): Group {
   return "other";
 }
 
-// One normal and one lighter material for each group, shared by every mesh in that group.
+type Pair = { normal: MeshStandardMaterial; selected: MeshStandardMaterial };
+
+// One normal and one lighter material for each group and each highlight, shared by every mesh that uses it.
+// All are opaque, with the same surface settings.
 function makeMaterials() {
-  const materials = {} as Record<Group, { normal: MeshStandardMaterial; selected: MeshStandardMaterial }>;
-  for (const group of Object.keys(KIND_COLORS) as Group[]) {
-    const color = new Color(KIND_COLORS[group]);
-    const make = (c: Color) => new MeshStandardMaterial({ color: c, roughness: 0.75, metalness: 0, side: DoubleSide });
-    materials[group] = {
-      normal: make(color),
-      // Lerp towards white for a lighter tint.
-      selected: make(color.clone().lerp(new Color("#ffffff"), 0.55)),
-    };
-  }
-  return materials;
+  const make = (c: Color) => new MeshStandardMaterial({ color: c, roughness: 0.75, metalness: 0, side: DoubleSide });
+  const pair = (hex: string): Pair => {
+    const color = new Color(hex);
+    // Lerp towards white for a lighter tint.
+    return { normal: make(color), selected: make(color.clone().lerp(new Color("#ffffff"), 0.55)) };
+  };
+  const groups = {} as Record<Group, Pair>;
+  for (const group of Object.keys(KIND_COLORS) as Group[]) groups[group] = pair(KIND_COLORS[group]);
+  const highlights = {} as Record<Highlight, Pair>;
+  for (const h of HIGHLIGHT_ORDER) highlights[h] = pair(HIGHLIGHT_COLORS[h]);
+  return { groups, highlights };
 }
 
 type Props = {
@@ -61,6 +67,8 @@ type Props = {
   onSelect: (sel: Selection | null, label?: string) => void;
   // Says whether a structure is shown. Hidden ones are switched off and ignore taps.
   isShown: (sid: string, side: Side) => boolean;
+  // The role of each involved structure in the chosen movement, or null when none is chosen.
+  highlights: ReadonlyMap<string, Highlight> | null;
   // Called once the files have loaded. It does not wait for a drawn frame,
   // because a tab in the background draws none and the load watchdog would fire for nothing.
   onLoaded: () => void;
@@ -68,7 +76,7 @@ type Props = {
   onModelClick: (event: Event) => void;
 };
 
-export function RegionModel({ urls, selection, focus, isShown, onSelect, onLoaded, onModelClick }: Props) {
+export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -87,45 +95,25 @@ export function RegionModel({ urls, selection, focus, isShown, onSelect, onLoade
     onLoaded();
   }, [scenes, onLoaded]);
 
-  // Give every mesh a plain material by kind.
+  // Paint every mesh: shown or hidden, and which material. This runs when the selection, the layers or the highlights change.
   useEffect(() => {
     for (const scene of scenes) {
       scene.traverse((node: Object3D) => {
-        if (node instanceof Mesh) node.material = materials[groupOf(String(node.userData.kind ?? ""))].normal;
-      });
-    }
-    invalidate();
-  }, [scenes, materials, invalidate]);
-
-  // Draw the meshes of the selected structure (and side) lighter and put them back when it changes.
-  useEffect(() => {
-    if (!selection) return;
-    const found: Mesh[] = [];
-    for (const scene of scenes) {
-      scene.traverse((node: Object3D) => {
-        if (node instanceof Mesh && node.userData.sid === selection.sid && (node.userData.side ?? "") === selection.side) found.push(node);
-      });
-    }
-    for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].selected;
-    invalidate();
-    return () => {
-      for (const mesh of found) mesh.material = materials[groupOf(String(mesh.userData.kind ?? ""))].normal;
-      invalidate();
-    };
-  }, [selection, scenes, materials, invalidate]);
-
-  // Show or hide each mesh when the layers change.
-  useEffect(() => {
-    for (const scene of scenes) {
-      scene.traverse((node: Object3D) => {
-        if (node instanceof Mesh && typeof node.userData.sid === "string") {
-          const side = node.userData.side;
-          node.visible = isShown(node.userData.sid, side === "l" || side === "r" ? side : "");
+        if (!(node instanceof Mesh)) return;
+        const kindPair = materials.groups[groupOf(String(node.userData.kind ?? ""))];
+        if (typeof node.userData.sid !== "string") {
+          node.material = kindPair.normal;
+          return;
         }
+        const side = node.userData.side;
+        const paint = paintOf({ sid: node.userData.sid, side: side === "l" || side === "r" ? side : "" }, { selection, highlights, isShown });
+        const pair = paint.highlight ? materials.highlights[paint.highlight] : kindPair;
+        node.visible = paint.visible;
+        node.material = paint.selected ? pair.selected : pair.normal;
       });
     }
     invalidate();
-  }, [scenes, isShown, invalidate]);
+  }, [scenes, materials, selection, highlights, isShown, invalidate]);
 
   // Frame the camera on everything we loaded.
   useEffect(() => {

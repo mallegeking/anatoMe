@@ -5,6 +5,7 @@ import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
 import { shouldClear, type Selection, type Side } from "./pick";
+import type { Highlight } from "../movement/roles";
 import { redrawWhenBack } from "./redraw";
 import { RegionModel } from "./RegionModel";
 
@@ -14,6 +15,8 @@ export type SceneProps = {
   // Where the camera should go. A new object each time makes it move again, even for the same structure.
   focus: Selection | null;
   isShown: (sid: string, side: Side) => boolean;
+  // The role of each involved structure, or null when no movement is chosen.
+  highlights: ReadonlyMap<string, Highlight> | null;
   onSelect: (sel: Selection | null, label?: string) => void;
   // Called once, when the model files have finished loading.
   onLoaded: () => void;
@@ -73,7 +76,7 @@ function RedrawWhenBack() {
   return null;
 }
 
-export default function Scene({ region, selection, focus, isShown, onSelect, onLoaded }: SceneProps) {
+export default function Scene({ region, selection, focus, isShown, highlights, onSelect, onLoaded }: SceneProps) {
   const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
@@ -115,6 +118,7 @@ export default function Scene({ region, selection, focus, isShown, onSelect, onL
             selection={selection}
             focus={focus}
             isShown={isShown}
+            highlights={highlights}
             onSelect={onSelect}
             onLoaded={onLoaded}
             onModelClick={(event) => {

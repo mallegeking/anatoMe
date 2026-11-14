@@ -3,8 +3,9 @@ import type { BundleStructure, RegionBundle } from "./data/bundle";
 import { useRegionData } from "./data/useRegionData";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
-import { hideStructure, initialLayers, isVisible, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
+import { hideStructure, initialLayers, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
 import { LayersPanel } from "./layers/LayersPanel";
+import { makeIsShown } from "./layers/shown";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
@@ -14,7 +15,7 @@ import { Hint, RegionInfo } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
-import type { Selection, Side } from "./viewer/pick";
+import type { Selection } from "./viewer/pick";
 
 const t = createT(en);
 const REGION = "hip";
@@ -94,13 +95,7 @@ export function App() {
   }
 
   // Structures the data does not know are always shown.
-  const isShown = useMemo(() => {
-    const byId = new Map(structures.map((s) => [s.id, s]));
-    return (sid: string, side: Side) => {
-      const structure = byId.get(sid);
-      return structure ? isVisible(layers, structure, side) : true;
-    };
-  }, [structures, layers]);
+  const isShown = useMemo(() => makeIsShown(structures, layers, null), [structures, layers]);
 
   // If the selected structure disappears, the panel should not keep describing it.
   useEffect(() => {
@@ -150,7 +145,7 @@ export function App() {
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} onSelect={tapModel} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} highlights={null} onSelect={tapModel} />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
