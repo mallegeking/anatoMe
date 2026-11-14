@@ -28,7 +28,15 @@ function done(tx: IDBTransaction): Promise<void> {
 }
 
 // Opens the notebook database. Rejects when there is no IndexedDB or opening fails.
-export function openNotebook(factory: IDBFactory | undefined = globalThis.indexedDB): Promise<NotebookStore> {
+// Every failure is a rejection, even a browser that throws when IndexedDB is read.
+export function openNotebook(factory?: IDBFactory): Promise<NotebookStore> {
+  if (factory === undefined) {
+    try {
+      factory = globalThis.indexedDB;
+    } catch {
+      return Promise.reject(new Error("This browser blocks IndexedDB."));
+    }
+  }
   if (!factory) return Promise.reject(new Error("This browser has no IndexedDB."));
   return new Promise<IDBDatabase>((resolve, reject) => {
     let req: IDBOpenDBRequest;

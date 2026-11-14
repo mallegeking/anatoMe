@@ -73,3 +73,23 @@ test("makeEntry trims the note and cuts it at 500 characters", () => {
 test("makeEntry writes the local date", () => {
   expect(makeEntry(input, new Date(2026, 10, 13, 23, 30), "id1").date).toBe("2026-11-13");
 });
+
+test("a throw while reading indexedDB becomes a rejection", async () => {
+  const before = Object.getOwnPropertyDescriptor(globalThis, "indexedDB");
+  Object.defineProperty(globalThis, "indexedDB", {
+    configurable: true,
+    get() {
+      throw new DOMException("blocked", "SecurityError");
+    },
+  });
+  try {
+    let promise: Promise<unknown> | undefined;
+    expect(() => {
+      promise = openNotebook();
+    }).not.toThrow();
+    await expect(promise).rejects.toThrow();
+  } finally {
+    if (before) Object.defineProperty(globalThis, "indexedDB", before);
+    else delete (globalThis as { indexedDB?: unknown }).indexedDB;
+  }
+});
