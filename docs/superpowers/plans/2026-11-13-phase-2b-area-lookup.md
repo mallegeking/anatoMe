@@ -77,7 +77,7 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
   - Without `through`: `stop` is the smaller of the distance of the nearest `kind === "bone"` hit in `center` and `surface + CAP_M`.
   - With `through`: `stop` is the smallest distance of that structure and side over all rays plus `BEHIND_TARGET_M`. When no ray hits it, the function falls back to the rule without `through`.
   - All rays are merged. Each sid and side keeps its smallest distance. Entries with `distance <= stop` stay.
-  - `depth` is `Math.max(0, distance - surface)`. The result is sorted by distance, then by sid.
+  - `depth` is `Math.max(0, distance - surface)`. The result is sorted by distance, then by sid, then by side ("" before "l" before "r"), so two hits at the same distance always come out in the same order.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -207,7 +207,7 @@ test("a tap beside everything gives empty rays", () => expect(castFingerRays({ x
 test("each structure appears once per ray", ...two meshes with the same sid and side at z 0 and z -1 give one hit with the nearer distance);
 
 // checkModels.test.ts
-test("modelStats reports the size of the model", ...the existing test glb, size has three positive numbers);
+test("modelStats reports the size of the model", ...the existing test glb: size has three finite numbers, none negative. A flat test file may have a zero in it, so do not expect all three to be positive);
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
@@ -220,7 +220,7 @@ Expected: FAIL, module not found and `size` undefined.
 - [ ] **Step 4: Check the model scale**
 
 Run: `npm run check-models`
-Expected: the largest of the three size numbers for `hip.glb` lies between 0.5 and 1.0 (pelvis to below the knee, in metres). If it does not, stop and report: `CAP_M`, `BEHIND_TARGET_M` and the marker radius assume metres.
+Expected: the largest of the three size numbers for `hip.glb` lies between 0.8 and 1.4. The model runs from the ankle to the top of psoas major, which measured 1.124 on 2026-11-14, so it is in metres. (Corrected on 2026-11-14. The first version of this plan wrongly expected 0.5 to 1.0.) If the number is outside the range, stop and report: `CAP_M`, `BEHIND_TARGET_M` and the marker radius assume metres.
 
 - [ ] **Step 5: Run all checks**
 

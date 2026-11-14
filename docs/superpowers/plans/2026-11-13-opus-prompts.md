@@ -28,7 +28,8 @@ The repo should live in the Linux file system (for example `~/code/anatoMe`), no
 | Run | Prompt | What it builds | Why it ends there |
 | --- | --- | --- | --- |
 | Tonight | 1: Phase 2 overnight | 2a, 2d tools, 2b, the 2c wording check, 2d data | The notebook waits for your sign-off of the wording check |
-| After review and sign-off | 3: the notebook | 2c Tasks 2 to 7 | |
+| Next (added 2026-11-14) | 2b: finish the area lookup | 2b Tasks 2 to 4, which stopped overnight on a wrong number in the plan | |
+| After 2b and the sign-off | 3: the notebook | 2c Tasks 2 to 7 | |
 | After that review | 4: Phase 3 | publish preparation | The publish steps are yours |
 | After that review | 5: Phase 4a | regions and German | |
 
@@ -108,6 +109,35 @@ Then read docs/superpowers/plans/2026-11-13-opus-prompts.md, the block "Prompt 1
 If the working tree has uncommitted changes from the interrupted task, look at them. Keep them only if the task's checks pass with them. Otherwise throw them away and start that task again.
 
 Continue with the first unfinished task and go on to the end of the list, with the same rules and the same notes per item.
+```
+
+---
+
+## Prompt 2b: finish the area lookup
+
+Added 2026-11-14. The overnight run built Task 1 of Phase 2b and stopped at Task 2 Step 4, because the plan expected the model's longest side to be between 0.5 and 1.0 and it measured 1.124. The plan was wrong, not the model. It now expects 0.8 to 1.4.
+
+```text
+You are finishing one implementation plan for anatoMe: docs/superpowers/plans/2026-11-13-phase-2b-area-lookup.md. Task 1 is built. Build Tasks 2, 3 and 4.
+
+First read docs/superpowers/plans/2026-11-13-build-rules.md and follow it exactly. You work only on the branch claude/install-superpowers-plugin-v0gy65 and never on main.
+
+Read docs/superpowers/reviews/progress.md and docs/superpowers/reviews/phase-2b-build-report.md to see where the earlier session stopped and why.
+
+The plan was corrected on 2026-11-14 in three places. Read it again from the top, do not work from the earlier session's notes:
+- Task 2 Step 4 now expects the largest size number of hip.glb between 0.8 and 1.4. The model is in metres.
+- The modelStats size test in Task 2 no longer expects three positive numbers, because a flat test file has a zero.
+- Task 1: the result of structuresUnder is now sorted by distance, then sid, then side. Before Task 2, add a test to apps/web/src/area/under.test.ts with the left and the right copy of one structure at the same distance, given in both orders, and make it pass. Commit it as "Give the depth list a fixed order for equal distances".
+
+Then build Task 2 from its Step 1, then Tasks 3 and 4.
+
+Keep in mind:
+- If the size is outside 0.8 to 1.4, treat Task 2 as blocked. Do not tune the depth constants.
+- Rays look at every mesh, also the ones the layers hide.
+- The panel text must never say or suggest what causes a symptom. docs/phase2/medical-device-wording.md, section 5 rule 4, also asks that no text says "tap where it hurts". Follow it.
+- If the end-to-end click in Task 4 lands beside the model, find out why before moving the click.
+
+Replace the earlier phase-2b-build-report.md with a full report for all four tasks and update the progress file.
 ```
 
 ---

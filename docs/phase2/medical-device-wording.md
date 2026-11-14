@@ -185,5 +185,5 @@ Stricter rules that the reading suggests (builder's suggestions, the owner decid
 
 Fill in "yes" or "no" and a date.
 
-Notebook log, backup and summary: 
+Notebook log, backup and summary: yes, 2026-11-14 (given by the owner in the planning session with Claude Fable)
 Comparison (structures to look into): 
