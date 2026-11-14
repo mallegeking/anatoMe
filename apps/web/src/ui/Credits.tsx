@@ -1,3 +1,4 @@
+import { CORRECTION_URL, REPO_URL } from "../config";
 import type { Translate } from "../i18n/t";
 
 // The credit lines below are copies of the "Credit text" column in ATTRIBUTION.md.
@@ -56,6 +57,12 @@ export function Credits({ t }: { t: Translate }) {
           <a href={LIBRARY_LICENCES} target="_blank" rel="noopener noreferrer">
             {t("credits.librariesLink")}
           </a>
+        </p>
+        <p>{t("about.version", { version: __APP_VERSION__ })}</p>
+        <p>
+          <a href={REPO_URL} target="_blank" rel="noopener noreferrer">{t("about.source")}</a>
+          {" · "}
+          <a href={CORRECTION_URL} target="_blank" rel="noopener noreferrer">{t("about.report")}</a>
         </p>
       </details>
     </>

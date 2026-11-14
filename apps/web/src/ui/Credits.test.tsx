@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, test } from "vitest";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
+import { CORRECTION_URL, REPO_URL } from "../config";
 import { Credits, EducationalLine } from "./Credits";
 
 afterEach(cleanup);
@@ -34,4 +35,13 @@ test("the brackets around a licence link come from en.json", () => {
   // The credit lines live inside the closed details, but they are still in the document.
   expect(screen.getAllByText(/\[/).length).toBe(2);
   expect(screen.queryByText(/\(/)).toBeNull();
+});
+
+test("the credits show the version and the two links", () => {
+  render(<Credits t={createT(en)} />);
+  expect(screen.getByText(/^Version \d+\.\d+\.\d+$/)).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Source code" }).getAttribute("href")).toBe(REPO_URL);
+  const report = screen.getByRole("link", { name: "Report a mistake in the data" });
+  expect(report.getAttribute("href")).toBe(CORRECTION_URL);
+  expect(report.getAttribute("rel")).toBe("noopener noreferrer");
 });
