@@ -26,12 +26,16 @@ type Props = {
   onPrint: (entries: NotebookEntry[]) => void;
 };
 
+// A status line keeps its text key and the numbers that fill it, not the finished text,
+// so it is translated when it shows and reads in the new language after a switch.
+type Status = { key: string; vars?: Record<string, string> };
+
 // The Notebook tab: the notes, the structures to look into, and the print and backup buttons.
 // Every store error is caught here and shown as one plain line. Nothing is ever logged.
 export function NotebookPanel({ t, lang, bundle, store, storeError, showComparison, onFocusStructure, onPrint }: Props) {
   const [entries, setEntries] = useState<NotebookEntry[] | null>(null);
   const [listFailed, setListFailed] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -71,13 +75,13 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
   const ready = store;
 
   // Runs a store change, then shows the list as the store now has it. A failure only shows the line.
-  async function change(work: () => Promise<string | null>) {
+  async function change(work: () => Promise<Status | null>) {
     try {
       const message = await work();
       setEntries(await ready.list());
       setStatus(message);
     } catch {
-      setStatus(t("notebook.unavailable"));
+      setStatus({ key: "notebook.unavailable" });
     }
   }
 
@@ -109,25 +113,25 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
     e.target.value = "";
     if (!file) return;
     if (file.size > BACKUP_MAX_BYTES) {
-      setStatus(t("notebook.loadError.too-large"));
+      setStatus({ key: "notebook.loadError.too-large" });
       return;
     }
     let text: string;
     try {
       text = await file.text();
     } catch {
-      setStatus(t("notebook.loadError.not-json"));
+      setStatus({ key: "notebook.loadError.not-json" });
       return;
     }
     const parsed = parseBackup(text);
     if (!parsed.ok) {
-      setStatus(t(`notebook.loadError.${parsed.reason}`));
+      setStatus({ key: `notebook.loadError.${parsed.reason}` });
       return;
     }
     await change(async () => {
       const { toAdd, skipped } = mergeEntries(await ready.list(), parsed.entries);
       if (toAdd.length > 0) await ready.putMany(toAdd);
-      return t("notebook.loaded", { added: String(toAdd.length), skipped: String(skipped) });
+      return { key: "notebook.loaded", vars: { added: String(toAdd.length), skipped: String(skipped) } };
     });
   }
 
@@ -141,7 +145,7 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
   );
   const statusLine = status && (
     <p className="muted" role="status">
-      {status}
+      {t(status.key, status.vars)}
     </p>
   );
 

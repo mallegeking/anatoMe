@@ -3,7 +3,7 @@ import type { BundleStructure, RegionBundle } from "./data/bundle";
 import de from "./i18n/de.json";
 import en from "./i18n/en.json";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Lang } from "./i18n/lang";
-import { createT } from "./i18n/t";
+import { createT, type Translate } from "./i18n/t";
 import { hideStructure, initialLayers, revealFor, type LayerState } from "./layers/layers";
 import type { AreaState } from "./area/AreaPanel";
 import { makeIsShown } from "./layers/shown";
@@ -42,6 +42,17 @@ function browserLanguages(): readonly string[] {
   return navigator.languages ?? (navigator.language ? [navigator.language] : []);
 }
 
+// A notice keeps its text key and what fills it, not the finished text, so it is translated when it shows
+// and reads in the new language after a switch. A search notice keeps the structure, so its name follows too.
+type Notice = { key: string; count?: number; structure?: BundleStructure };
+
+function noticeText(notice: Notice, t: Translate, lang: Lang): string {
+  const vars: Record<string, string> = {};
+  if (notice.count !== undefined) vars.count = String(notice.count);
+  if (notice.structure) vars.name = nameOf(notice.structure, lang);
+  return t(notice.key, vars);
+}
+
 export function App() {
   // The language is read once at start: the stored choice, else the browser's, else English.
   const [lang, setLang] = useState<Lang>(() => pickLanguage(readStoredLanguage(), browserLanguages()));
@@ -57,7 +68,7 @@ export function App() {
   const [bundle, setBundle] = useState<RegionBundle | null>(null);
   const [focus, setFocus] = useState<Selection | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("atlas");
   const [movement, setMovement] = useState<MovementState>(initialMovementState);
@@ -148,7 +159,7 @@ export function App() {
     setFocus({ ...sel });
     setLayersOpen(false);
     setMode("atlas");
-    setNotice(peeledNow === 0 ? null : t(peeledNow === 1 ? "search.peeledOne" : "search.peeled", { count: String(peeledNow), name: nameOf(structure, lang) }));
+    setNotice(peeledNow === 0 ? null : { key: peeledNow === 1 ? "search.peeledOne" : "search.peeled", count: peeledNow, structure });
   }
 
   // A structure in the movement panel: select it and turn the camera to it.
@@ -193,9 +204,9 @@ export function App() {
     try {
       const [{ makeEntry }, store] = await Promise.all([import("./notebook/store"), openStore()]);
       await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
-      setNotice(t("notebook.saved"));
+      setNotice({ key: "notebook.saved" });
     } catch {
-      setNotice(t("notebook.unavailable"));
+      setNotice({ key: "notebook.unavailable" });
     }
   }
 
@@ -318,7 +329,7 @@ export function App() {
           <div className="panel-scroll" data-testid="panel-scroll">
             {notice && (
               <p className="muted search-notice" role="status">
-                {notice}
+                {noticeText(notice, t, lang)}
               </p>
             )}
             <ModelErrorBoundary t={t} messageKey="error.dataLoad">

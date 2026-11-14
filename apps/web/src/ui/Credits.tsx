@@ -3,8 +3,9 @@ import { LANGS, type Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 
 // The credit lines below are copies of the "Credit text" column in ATTRIBUTION.md.
-// The app cannot read that file when it runs, so en.json holds the copies.
-// If one changes, change the other to match.
+// The app cannot read that file when it runs, so en.json and de.json hold the copies.
+// The licences prescribe this wording, so de.json keeps the English lines word for word.
+// If one changes, change the others to match.
 // licence is the key of the link text and the address of the licence deed, for the credits that need one.
 const CREDITS: { key: string; licence?: { key: string; href: string } }[] = [
   {

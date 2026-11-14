@@ -16,3 +16,9 @@ test("every German text keeps the placeholders of the English one", () => {
 test("no German text is empty", () => {
   expect(Object.entries(de).filter(([, text]) => text.trim() === "").map(([key]) => key)).toEqual([]);
 });
+
+// The two licence credit lines keep the wording their licences prescribe, so German shows them as written.
+test("the German licence credit lines are the English ones word for word", () => {
+  expect(de["credits.bodyparts3d"]).toBe(en["credits.bodyparts3d"]);
+  expect(de["credits.zanatomy"]).toBe(en["credits.zanatomy"]);
+});

@@ -4,7 +4,9 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "./data/bundle";
 import { App } from "./App";
 import { clearRegionDataCache } from "./data/useRegionData";
+import de from "./i18n/de.json";
 import en from "./i18n/en.json";
+import { createT } from "./i18n/t";
 import { makeBundle } from "./ui/fixture";
 import type { Selection } from "./viewer/pick";
 
@@ -113,6 +115,8 @@ function serveFiles(bundle: RegionBundle | null, manifest: unknown = oneRegion) 
 beforeEach(clearRegionDataCache);
 afterEach(() => {
   cleanup();
+  // A test that switches the language must not leave the next one in German.
+  localStorage.clear();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -255,6 +259,22 @@ test("choosing a search result switches to the Structures tab", async () => {
   expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
 });
 
+// Picks a language in the switch below the credits.
+const pickLanguage = (lang: "en" | "de") => fireEvent.change(screen.getByRole("combobox", { name: en["lang.label"] }), { target: { value: lang } });
+
+test("the search notice shown in English reads in German after the language changes", async () => {
+  const bundle = makeBundle();
+  bundle.structures = bundle.structures.map((s) => (s.id === "piriformis" ? { ...s, german: "Birnenförmiger Muskel" } : s));
+  serve(bundle);
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "pirif" } });
+  fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
+  expect(screen.getByRole("status").textContent).toBe(createT(en)("search.peeledOne", { name: "Piriformis" }));
+  pickLanguage("de");
+  expect(screen.getByRole("status").textContent).toBe(createT(de)("search.peeledOne", { name: "Birnenförmiger Muskel" }));
+});
+
 test("the Area tab shows the hint", async () => {
   serve(makeBundle());
   render(<App />);
@@ -376,6 +396,23 @@ test("a logged movement is saved, says so and shows in the Notebook tab", async 
   fireEvent.click(tab(en["mode.notebook"]));
   expect(await screen.findByText(/^\d{4}-\d{2}-\d{2}: Hip external rotation, It hurts, Left$/)).toBeTruthy();
   expect(screen.getByText("on the stairs")).toBeTruthy();
+});
+
+test("the saved notice shown in English reads in German after the language changes", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
+  pickLanguage("de");
+  expect(screen.getByText(de["notebook.saved"])).toBeTruthy();
+  expect(screen.queryByText(en["notebook.saved"])).toBeNull();
 });
 
 test("a structure to look into is made visible, selected and turned to", async () => {

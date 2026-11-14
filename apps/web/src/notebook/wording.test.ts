@@ -6,8 +6,10 @@ import en from "../i18n/en.json";
 const banned = /diagnos|injur|damag|treat|cure|caus|you have|assess|monitor|detect|track|symptom|patient|likel|risk|source of|relie|recover|rehab|heal/i;
 
 // The same rule for the German texts, with German word stems. "Physiotherapeut" would match "therap",
-// so these texts say "Physio".
-const bannedGerman = /diagnos|verletz|schädig|schaedig|behand|heil|ursach|therap/i;
+// so these texts say "Physio". The stems after "therap" follow the English rule: symptom, patient,
+// risk (Risiko), rehab and recover (erholen, genesen). "erhol" also matches "wiederholen",
+// so a text with that word needs another one.
+const bannedGerman = /diagnos|verletz|schädig|schaedig|behand|heil|ursach|therap|symptom|patient|risik|rehab|erhol|genes/i;
 
 // The keys the word rule covers, in both languages.
 const ruled = (key: string) =>

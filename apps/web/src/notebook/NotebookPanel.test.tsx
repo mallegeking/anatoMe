@@ -321,3 +321,17 @@ test("a note logged in English reads in German after the switch", async () => {
   show({ store, bundle, lang: "en" });
   expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
 });
+
+test("the status line shown in English reads in German after the language changes", async () => {
+  const store = await storeWith([entry()]);
+  const bundle = makeMovementBundle();
+  const panel = (lang: Lang) => (
+    <NotebookPanel t={lang === "de" ? createT(de, en) : t} lang={lang} bundle={bundle} store={store} storeError={false} showComparison onFocusStructure={vi.fn()} onPrint={vi.fn()} />
+  );
+  const { rerender } = render(panel("en"));
+  await screen.findByRole("heading", { name: en["notebook.entries"] });
+  upload(toBackup([entry(), entry({ id: "e2", createdAt: 2 })], new Date(2026, 10, 13)));
+  expect(await screen.findByText(t("notebook.loaded", { added: "1", skipped: "1" }))).toBeTruthy();
+  rerender(panel("de"));
+  expect(screen.getByRole("status").textContent).toBe(createT(de)("notebook.loaded", { added: "1", skipped: "1" }));
+});
