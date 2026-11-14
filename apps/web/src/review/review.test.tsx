@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
+import { makeMovementBundle } from "../movement/fixture";
 import { makeBundle } from "../ui/fixture";
 import { InfoPanel } from "../ui/InfoPanel";
 import { ReviewBanner } from "./ReviewBanner";
@@ -69,4 +70,12 @@ test("review list close button calls onClose", () => {
   render(<ReviewList bundle={makeBundle("review")} t={t} onClose={onClose} />);
   fireEvent.click(screen.getByText(en["review.close"]));
   expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test("a draft exercise is listed with its phases, row code and question", () => {
+  render(<ReviewList bundle={makeMovementBundle("review")} t={t} onClose={() => {}} />);
+  expect(screen.getByRole("heading", { name: "Exercises" })).toBeTruthy();
+  expect(screen.getByText("Lifting: the hip bent from 60 to 0 degrees. Working: Hip extension")).toBeTruthy();
+  expect(screen.getByText("Row code: bridge")).toBeTruthy();
+  expect(screen.getByText("Question for the reviewer: Is the range right?")).toBeTruthy();
 });
