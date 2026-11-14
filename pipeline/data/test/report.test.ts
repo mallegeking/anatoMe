@@ -50,3 +50,7 @@ test("a muscle with only an origin row is listed as incomplete", () => {
   const section = formatReport(c).split("Muscles without an origin or without an insertion row")[1].split("\n## ")[0];
   expect(section).toContain("Iliacus");
 });
+
+test("an unknown region has no structures", () => {
+  expect(coverage(valid, "hips").structures).toEqual([]);
+});

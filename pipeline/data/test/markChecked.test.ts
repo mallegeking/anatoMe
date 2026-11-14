@@ -132,3 +132,14 @@ test("the same id twice is marked once", () => {
   expect(run.ok).toBe(true);
   expect(run.marked).toEqual(["piriformis-insertion-femur"]);
 });
+
+test("marks one row inside a whole fixture file and changes nothing else", () => {
+  const file = fileURLToPath(new URL("./fixtures/valid/actions/hip.yaml", import.meta.url));
+  const original = readFileSync(file, "utf8");
+  const rowStart = original.indexOf("- id: piriformis-hip-internal-rotation");
+  const line = "  checked_by: null";
+  const at = original.indexOf(line, rowStart);
+  const expected = original.slice(0, at) + "  checked_by: physio-1\n  checked_on: 2026-11-20" + original.slice(at + line.length);
+  const out = markInText(original, ["piriformis-hip-internal-rotation"], "physio-1", "2026-11-20");
+  expect(out.text).toBe(expected);
+});

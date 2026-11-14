@@ -85,7 +85,13 @@ async function main(args: string[]): Promise<number> {
     return run.ok ? 0 : 1;
   }
   if (command === "data-report" && rest.length === 2) {
-    console.log(formatReport(coverage(rest[0], rest[1])));
+    const report = coverage(rest[0], rest[1]);
+    // A typo in the region name would otherwise look like an empty but healthy report.
+    if (report.structures.length === 0) {
+      console.error(`no structures found for region "${rest[1]}"`);
+      return 1;
+    }
+    console.log(formatReport(report));
     return 0;
   }
   if (command === "build-data") {

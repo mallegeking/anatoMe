@@ -25,14 +25,14 @@ Send the list back to the owner. Use the label you were given, such as `physio-1
 3. Edit the `change` rows by hand and show them to the reviewer again before marking them.
 4. Delete the `remove` rows and note why in the commit message.
 
-The command changes only two lines per row, `checked_by` and the new `checked_on` line. Comments, blank lines and quotes stay exactly as they were. It prints one line per row: `marked`, `already checked` or `not found`. If any row is missing or already checked, or if the data no longer validates afterwards, it writes nothing and exits with an error.
+The command changes only two lines per row, `checked_by` and the new `checked_on` line. Comments, blank lines and quotes stay exactly as they were. It prints one line per row: `marked`, `already checked`, `not found` or `not written`. The last one means the row was fine but the run was refused or failed, so nothing was saved. If any row is missing or already checked, or if the data no longer validates afterwards, it writes nothing and exits with an error.
 
 ## Who may check what
 
 - Action rows and exercise rows need a physio label such as `physio-1`.
 - Attachment rows are plain textbook facts, so they may also be checked by `owner`.
 
-The validator refuses an action row checked by `owner`, and the command then puts the files back as they were.
+The validator refuses an action row or an exercise row checked by `owner`, and the command then puts the files back as they were.
 
 ## After marking
 
