@@ -1,14 +1,17 @@
 import { useFrame, useLoader, useThree, type ThreeEvent } from "@react-three/fiber";
 import type CameraControlsImpl from "camera-controls";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, type Object3D } from "three";
+import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, Vector3, type Camera, type Object3D } from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { HIGHLIGHT_COLORS } from "../movement/colors";
 import { HIGHLIGHT_ORDER, type Highlight } from "../movement/roles";
 import { markInteractive } from "../perf/loadTimer";
+import { structuresUnder } from "../area/under";
 import { paintOf } from "./appearance";
+import { castFingerRays, pointAlong } from "./castRays";
 import { pickVisibleHit, shouldSelect, type Selection, type Side } from "./pick";
+import type { AreaTap } from "./Scene";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
 const DRACO_PATH = `${import.meta.env.BASE_URL}draco/`;
@@ -74,9 +77,17 @@ type Props = {
   onLoaded: () => void;
   // Told about every click that landed on the model, so the scene does not treat it as a tap on empty space.
   onModelClick: (event: Event) => void;
+  // In area mode a tap lists what lies under the spot and onSelect is not called.
+  areaMode: boolean;
+  // Called after an area tap. null means the tap hit nothing.
+  onAreaTap: (tap: AreaTap | null) => void;
+  // Where to draw the marker, or null for none.
+  areaMarker: [number, number, number] | null;
+  // A structure to look through. A new object each time makes it run again.
+  areaProbe: Selection | null;
 };
 
-export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick }: Props) {
+export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick, areaMode, onAreaTap, areaMarker, areaProbe }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -89,6 +100,11 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
   const invalidate = useThree((state) => state.invalidate);
 
   const scenes = useMemo(() => gltfs.map((g) => g.scene), [gltfs]);
+  const size = useThree((state) => state.size);
+  const camera = useThree((state) => state.camera);
+  // The probe effect should run only when the probe changes, so it reads the latest callback from here.
+  const areaTapRef = useRef(onAreaTap);
+  areaTapRef.current = onAreaTap;
 
   // useLoader only gets past its first line once every file is in, so reaching this point means the load finished.
   useEffect(() => {
@@ -152,21 +168,67 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
     }
   });
 
+  // Casts the five rays through a spot and reports what lies under it.
+  function areaTapAt(pointer: { x: number; y: number }, cam: Camera, probe: Selection | null, boxMiddle?: [number, number, number]) {
+    const { center, around } = castFingerRays(pointer, size, cam, scenes);
+    if (center.length === 0) {
+      areaTapRef.current(null);
+      return;
+    }
+    const nearest = Math.min(...center.map((h) => h.distance));
+    const entries = structuresUnder(center, around, probe ?? undefined);
+    areaTapRef.current({ entries, point: boxMiddle ?? pointAlong(pointer, cam, nearest), through: probe });
+  }
+
+  // Look through a structure the panel chose: aim at the middle of its box, as the camera sees it now.
+  useEffect(() => {
+    if (!areaProbe || !ready) return;
+    const box = new Box3();
+    for (const scene of scenes) {
+      scene.traverse((node: Object3D) => {
+        if (node instanceof Mesh && node.userData.sid === areaProbe.sid && (node.userData.side ?? "") === areaProbe.side) box.expandByObject(node);
+      });
+    }
+    if (box.isEmpty()) return;
+    const middle = box.getCenter(new Vector3());
+    const ndc = middle.clone().project(camera);
+    areaTapAt({ x: ndc.x, y: ndc.y }, camera, areaProbe, [middle.x, middle.y, middle.z]);
+    // Only a new probe should run this.
+  }, [areaProbe, ready]);
+
+  // The marker shows only when asked for, so ask for a frame when it changes.
+  useEffect(() => {
+    invalidate();
+  }, [areaMarker, invalidate]);
+
   function handleClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
     onModelClick(event.nativeEvent);
     // Dragging to rotate also ends in a click. Only a real tap selects.
     if (!shouldSelect(event.delta)) return;
+    if (areaMode) {
+      areaTapAt(event.pointer, event.camera, null);
+      return;
+    }
     // Hidden meshes still show up in the hit list, so we pass them over.
     const hit = pickVisibleHit(event.intersections, isShown);
     onSelect(hit ? { sid: hit.structure.sid, side: hit.structure.side } : null, hit?.structure.label);
   }
 
   return (
-    <group onClick={handleClick}>
-      {scenes.map((scene, i) => (
-        <primitive key={urls[i]} object={scene} />
-      ))}
-    </group>
+    <>
+      <group onClick={handleClick}>
+        {scenes.map((scene, i) => (
+          <primitive key={urls[i]} object={scene} />
+        ))}
+      </group>
+      {areaMarker && (
+        // Opaque and drawn last, ignoring depth, so it shows through the model. It cannot be tapped.
+        <mesh position={areaMarker} renderOrder={999} raycast={() => null}>
+          <sphereGeometry args={[0.006, 16, 12]} />
+          <meshBasicMaterial color="#ffffff" depthTest={false} />
+        </mesh>
+      )}
+    </>
   );
 }

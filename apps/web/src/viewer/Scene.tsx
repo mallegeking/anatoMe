@@ -4,6 +4,7 @@ import { CameraControls } from "@react-three/drei";
 import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
 import { loadManifest, regionFiles, type Manifest } from "./manifest";
+import type { UnderEntry } from "../area/under";
 import { shouldClear, type Selection, type Side } from "./pick";
 import type { Highlight } from "../movement/roles";
 import { redrawWhenBack } from "./redraw";
@@ -20,7 +21,17 @@ export type SceneProps = {
   onSelect: (sel: Selection | null, label?: string) => void;
   // Called once, when the model files have finished loading.
   onLoaded: () => void;
+  // In area mode a tap lists what lies under the spot, and does not select. Off when left out.
+  areaMode?: boolean;
+  // Called after an area tap. null means the tap hit nothing.
+  onAreaTap?: (tap: AreaTap | null) => void;
+  // Where to draw the marker, or null for none.
+  areaMarker?: [number, number, number] | null;
+  // A structure to look through. A new object each time makes it run again, like focus.
+  areaProbe?: Selection | null;
 };
+
+export type AreaTap = { entries: UnderEntry[]; point: [number, number, number]; through: Selection | null };
 
 // Reads the manifest and hands back the file URLs. A failure is thrown during render so the error boundary can show it.
 function useRegionUrls(region: string): string[] | null {
@@ -76,18 +87,32 @@ function RedrawWhenBack() {
   return null;
 }
 
-export default function Scene({ region, selection, focus, isShown, highlights, onSelect, onLoaded }: SceneProps) {
+export default function Scene({
+  region,
+  selection,
+  focus,
+  isShown,
+  highlights,
+  onSelect,
+  onLoaded,
+  areaMode = false,
+  onAreaTap = () => {},
+  areaMarker = null,
+  areaProbe = null,
+}: SceneProps) {
   const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
   const modelClick = useRef<Event | null>(null);
 
   // Every click on the canvas comes here, after the model has seen it.
-  // A tap on empty space clears the selection. A drag to rotate must not, so we measure how far the finger moved.
+  // A tap on empty space clears the selection, or in area mode the list. A drag to rotate must not, so we measure how far the finger moved.
   function handleClick(event: MouseEvent) {
     if (event.nativeEvent === modelClick.current) return;
     const moved = Math.hypot(event.clientX - downAt.current[0], event.clientY - downAt.current[1]);
-    if (shouldClear(moved)) onSelect(null);
+    if (!shouldClear(moved)) return;
+    if (areaMode) onAreaTap(null);
+    else onSelect(null);
   }
 
   // Do not give this Canvas a custom eventSource. The check in handleClick relies on R3F's own click listener
@@ -120,6 +145,10 @@ export default function Scene({ region, selection, focus, isShown, highlights, o
             isShown={isShown}
             highlights={highlights}
             onSelect={onSelect}
+            areaMode={areaMode}
+            onAreaTap={onAreaTap}
+            areaMarker={areaMarker}
+            areaProbe={areaProbe}
             onLoaded={onLoaded}
             onModelClick={(event) => {
               modelClick.current = event;

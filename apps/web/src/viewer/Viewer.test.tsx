@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import en from "../i18n/en.json";
@@ -29,10 +29,26 @@ function newLoad() {
 
 vi.mock("@react-three/fiber", async () => {
   const { Group } = await import("three");
-  const state = { controls: { fitToBox: () => Promise.resolve() }, invalidate: () => {}, clock: { getDelta: () => 0 }, gl: { domElement: document.createElement("canvas") } };
+  const { PerspectiveCamera } = await import("three");
+  const camera = new PerspectiveCamera(40, 1, 0.01, 20);
+  camera.position.z = 5;
+  camera.updateMatrixWorld();
+  const state = {
+    controls: { fitToBox: () => Promise.resolve() },
+    invalidate: () => {},
+    clock: { getDelta: () => 0 },
+    gl: { domElement: document.createElement("canvas") },
+    size: { width: 400, height: 400 },
+    camera,
+  };
   return {
     // A plain box in place of the 3D canvas.
-    Canvas: ({ children }: { children: ReactNode }) => <div data-testid="canvas">{children}</div>,
+    // It passes on the pointer and click handlers, so the scene's own tap rules can run.
+    Canvas: ({ children, onClick, onPointerDown }: { children: ReactNode; onClick?: never; onPointerDown?: never }) => (
+      <div data-testid="canvas" onClick={onClick} onPointerDown={onPointerDown}>
+        {children}
+      </div>
+    ),
     // Waits like the real useLoader until the test finishes the download.
     useLoader: (_loader: unknown, urls: string[]) => {
       if (!load.done) throw load.promise;
@@ -163,4 +179,84 @@ test("switching to the other side lights up that side's mesh and puts the first 
   await settle();
   expect(right.material).toBe(lit);
   expect(left.material).toBe(plain);
+});
+
+// Area mode taps. The fake canvas has no pointer events, so we call the model's click handler directly
+// with the fields R3F would give it, and click the canvas div for taps that miss the model.
+async function loadBox() {
+  const { BoxGeometry, Group, Mesh } = await import("three");
+  const mesh = new Mesh(new BoxGeometry(1, 1, 0.1));
+  mesh.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
+  const scene = new Group();
+  scene.add(mesh);
+  scene.updateMatrixWorld(true);
+  load.result = [{ scene }];
+}
+
+async function showArea() {
+  withWebGL(true);
+  await loadBox();
+  const onAreaTap = vi.fn();
+  const onSelect = vi.fn();
+  render(
+    <Viewer region="hip" t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={onSelect} areaMode onAreaTap={onAreaTap} areaMarker={null} areaProbe={null} />,
+  );
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  return { onAreaTap, onSelect };
+}
+
+// The click handler React put on the model's group.
+function modelClick(): (event: unknown) => void {
+  const group = screen.getByTestId("canvas").querySelector("group") as Element;
+  const key = Object.keys(group).find((k) => k.startsWith("__reactProps"))!;
+  return (group as unknown as Record<string, { onClick: (event: unknown) => void }>)[key].onClick;
+}
+
+async function clickModel(delta: number, pointer = { x: 0, y: 0 }) {
+  const { PerspectiveCamera } = await import("three");
+  const camera = new PerspectiveCamera(40, 1, 0.01, 20);
+  camera.position.z = 5;
+  camera.updateMatrixWorld();
+  act(() => modelClick()({ stopPropagation: () => {}, nativeEvent: new MouseEvent("click"), delta, pointer, camera, intersections: [] }));
+}
+
+test("area mode: a drag over the model calls neither onAreaTap nor onSelect", async () => {
+  const { onAreaTap, onSelect } = await showArea();
+  await clickModel(20);
+  expect(onAreaTap).not.toHaveBeenCalled();
+  expect(onSelect).not.toHaveBeenCalled();
+});
+
+test("area mode: a tap on the model calls onAreaTap with the list and never onSelect", async () => {
+  const { onAreaTap, onSelect } = await showArea();
+  await clickModel(0);
+  expect(onSelect).not.toHaveBeenCalled();
+  expect(onAreaTap).toHaveBeenCalledTimes(1);
+  const tap = onAreaTap.mock.calls[0][0];
+  expect(tap.entries.map((e: { sid: string }) => e.sid)).toEqual(["piriformis"]);
+  expect(tap.through).toBeNull();
+  expect(tap.point[2]).toBeCloseTo(0.05);
+});
+
+test("area mode: a tap that misses the model calls onAreaTap(null)", async () => {
+  const { onAreaTap } = await showArea();
+  await clickModel(0, { x: 0.95, y: 0.95 });
+  expect(onAreaTap).toHaveBeenCalledWith(null);
+});
+
+test("area mode: a tap on empty canvas calls onAreaTap(null) and a drag over it does not", async () => {
+  const { onAreaTap, onSelect } = await showArea();
+  const canvas = screen.getByTestId("canvas");
+  fireEvent.pointerDown(canvas, { clientX: 10, clientY: 10 });
+  fireEvent.click(canvas, { clientX: 40, clientY: 10 });
+  expect(onAreaTap).not.toHaveBeenCalled();
+  fireEvent.pointerDown(canvas, { clientX: 10, clientY: 10 });
+  fireEvent.click(canvas, { clientX: 11, clientY: 10 });
+  expect(onAreaTap).toHaveBeenCalledWith(null);
+  expect(onSelect).not.toHaveBeenCalled();
 });

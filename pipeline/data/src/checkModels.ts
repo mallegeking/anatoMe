@@ -5,7 +5,7 @@
 
 import { existsSync, statSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { NodeIO, type Document } from "@gltf-transform/core";
+import { getBounds, NodeIO, type Document } from "@gltf-transform/core";
 import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
 import type { StructureInfo, ValidationError, ValidationResult } from "./validate.ts";
@@ -127,7 +127,7 @@ export async function checkModelMapping(
   return { ok: errors.length === 0, errors };
 }
 
-export async function modelStats(file: string): Promise<{ meshes: number; triangles: number; bytes: number }> {
+export async function modelStats(file: string): Promise<{ meshes: number; triangles: number; bytes: number; size: [number, number, number] }> {
   const doc = await (await io()).read(file);
   let meshes = 0;
   let triangles = 0;
@@ -141,7 +141,18 @@ export async function modelStats(file: string): Promise<{ meshes: number; triang
       triangles += count / 3;
     }
   }
-  return { meshes, triangles, bytes: statSync(file).size };
+  // Size of the whole file in model units: the box around all scenes, from getBounds (world space).
+  const lo = [Infinity, Infinity, Infinity];
+  const hi = [-Infinity, -Infinity, -Infinity];
+  for (const scene of doc.getRoot().listScenes()) {
+    const { min, max } = getBounds(scene);
+    for (let i = 0; i < 3; i++) {
+      lo[i] = Math.min(lo[i], min[i]);
+      hi[i] = Math.max(hi[i], max[i]);
+    }
+  }
+  const size = lo.map((v, i) => (Number.isFinite(v) ? hi[i] - v : 0)) as [number, number, number];
+  return { meshes, triangles, bytes: statSync(file).size, size };
 }
 
 function meshNodes(doc: Document) {

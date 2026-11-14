@@ -39,7 +39,7 @@ async function main(args: string[]): Promise<number> {
     const totals = new Map<string, number>();
     for (const f of manifestFiles(modelsDir)) {
       const s = await modelStats(join(modelsDir, f.path));
-      console.log(`${f.path}: ${s.meshes} meshes, ${s.triangles} triangles, ${s.bytes} bytes`);
+      console.log(`${f.path}: ${s.meshes} meshes, ${s.triangles} triangles, ${s.bytes} bytes, size ${s.size.map((n) => n.toFixed(3)).join(" x ")}`);
       totals.set(f.region, (totals.get(f.region) ?? 0) + s.triangles);
     }
     let code = 0;

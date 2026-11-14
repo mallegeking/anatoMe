@@ -88,6 +88,17 @@ test("modelStats counts mesh nodes, triangles and bytes", async () => {
   expect(stats.bytes).toBeGreaterThan(0);
 });
 
+test("modelStats reports the size of the model", async () => {
+  const d = await dir([{}, { sid: "tibia" }]);
+  const { size } = await modelStats(join(d, "test.glb"));
+  expect(size).toHaveLength(3);
+  // The test file is flat, so a side may be zero.
+  for (const n of size) {
+    expect(Number.isFinite(n)).toBe(true);
+    expect(n).toBeGreaterThanOrEqual(0);
+  }
+});
+
 test("fails on a side that is not l, r or empty", async () =>
   expectError(await checkModelMapping(await dir([{ side: "left" }]), femur), /side must be/));
 

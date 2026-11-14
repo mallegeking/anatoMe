@@ -29,7 +29,7 @@ export function shouldClear(dragPx: number): boolean {
 }
 
 // Looks at the object and then its parents until one carries a structure id.
-function structureOf(object: Object3D): PickedStructure | null {
+export function structureOf(object: Object3D): PickedStructure | null {
   for (let node: Object3D | null = object; node; node = node.parent) {
     const data = node.userData as Partial<PickedStructure>;
     if (typeof data.sid === "string" && data.sid) {
