@@ -97,6 +97,19 @@ vi.mock("./viewer/Viewer", () => ({
   },
 }));
 
+// The model manifest the app reads first. One region, like the real one today.
+const oneRegion = { regions: { hip: { files: [{ path: "hip.glb", source: "bp3d", license: "CC-BY-4.0" }] } } };
+
+// Answers the manifest with the given manifest and every other request with the data, or with a 404 when there is none.
+function serveFiles(bundle: RegionBundle | null, manifest: unknown = oneRegion) {
+  const fetch = vi.fn(async (url: string) => {
+    if (url.endsWith("models/manifest.json")) return new Response(JSON.stringify(manifest));
+    return bundle ? new Response(JSON.stringify(bundle)) : new Response("", { status: 404 });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+
 beforeEach(clearRegionDataCache);
 afterEach(() => {
   cleanup();
@@ -105,7 +118,7 @@ afterEach(() => {
 });
 
 test("tapping the model closes the search list", async () => {
-  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(makeBundle()))));
+  serveFiles(makeBundle());
   render(<App />);
   // The panel hint shows once the data is in, so search knows the structures by then.
   await screen.findByText(en["info.tapHint"]);
@@ -116,7 +129,7 @@ test("tapping the model closes the search list", async () => {
 });
 
 test("show the other side selects that side and turns the camera to it", async () => {
-  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(makeBundle()))));
+  serveFiles(makeBundle());
   render(<App />);
   await screen.findByText(en["info.tapHint"]);
   fireEvent.click(screen.getByText("tap piriformis"));
@@ -127,7 +140,7 @@ test("show the other side selects that side and turns the camera to it", async (
 });
 
 test("the educational line stays outside the part of the panel that scrolls", async () => {
-  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(makeBundle()))));
+  serveFiles(makeBundle());
   render(<App />);
   await screen.findByText(en["info.tapHint"]);
   const line = screen.getByText(en["about.educational"]);
@@ -137,7 +150,7 @@ test("the educational line stays outside the part of the panel that scrolls", as
 
 test("a data failure shows the data message and keeps the credits and the educational line", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 404 })));
+  serveFiles(null);
   render(<App />);
   // The model is fine here, so the message must not blame it.
   expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
@@ -147,7 +160,7 @@ test("a data failure shows the data message and keeps the credits and the educat
 });
 
 function serve(bundle: RegionBundle) {
-  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(bundle))));
+  serveFiles(bundle);
 }
 
 const tab = (name: string) => screen.getByRole("tab", { name });
@@ -286,6 +299,45 @@ test("over and under in the info panel switches to the Area tab and probes that 
   fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
   expect(tab(en["mode.area"]).getAttribute("aria-selected")).toBe("true");
   expect(viewer.areaProbe).toEqual({ sid: "piriformis", side: "l" });
+});
+
+test("one region shows no region picker", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.queryByLabelText(en["region.label"])).toBeNull();
+});
+
+test("picking another region loads its data and clears the selection, the layers, the movement and the area", async () => {
+  const file = { path: "x.glb", source: "bp3d", license: "CC-BY-4.0" };
+  const fetch = serveFiles(makeBundle(), { regions: { hip: { files: [file] }, shoulder: { files: [file] } } });
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(fetch.mock.calls.some(([url]) => url.endsWith("data/hip.json"))).toBe(true);
+  // A selection, a look through it, an area list, a movement pick and a peeled layer.
+  fireEvent.click(screen.getByText("tap piriformis"));
+  fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
+  fireEvent.click(screen.getByText("area tap"));
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(tab(en["mode.atlas"]));
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["layers.peel"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["layers.close"] }));
+  expect(viewer.isShown("rectus-femoris", "l")).toBe(false);
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
+
+  fireEvent.change(screen.getByLabelText(en["region.label"]), { target: { value: "shoulder" } });
+
+  await screen.findByText(en["info.tapHint"]);
+  expect(fetch.mock.calls.some(([url]) => url.endsWith("data/shoulder.json"))).toBe(true);
+  expect(viewer.selection).toBeNull();
+  expect(viewer.areaProbe).toBeNull();
+  expect(viewer.isShown("rectus-femoris", "l")).toBe(true);
+  fireEvent.click(tab(en["mode.movement"]));
+  expect(screen.getByRole("heading", { name: en["movement.pick"] })).toBeTruthy();
+  fireEvent.click(tab(en["mode.area"]));
+  expect(screen.getByText(en["area.hint"])).toBeTruthy();
 });
 
 // The notebook tests give the app its own empty in-memory IndexedDB.

@@ -26,6 +26,11 @@
         "description": "Where the depth comes from. Written for every muscle.",
         "type": "string",
         "minLength": 1
+      },
+      "gap": {
+        "description": "A part of this structure that the model does not show yet. The app shows the text gap.<value> from the language file.",
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
       }
     }
   }

@@ -19,16 +19,6 @@ type Props = {
   onOverUnder: () => void;
 };
 
-// One line for each structure with a part that the model does not show yet. The value is the en.json key.
-const GAP_LINES: Record<string, string> = {
-  "rectus-femoris": "info.gap.quadriceps",
-  "vastus-lateralis": "info.gap.quadriceps",
-  "vastus-medialis": "info.gap.quadriceps",
-  "vastus-intermedius": "info.gap.quadriceps",
-  // The vertebrae are not modelled, so psoas major has no origin row.
-  "psoas-major": "info.gap.psoasOrigin",
-};
-
 export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle: RegionBundle; t: Translate }) {
   const [open, setOpen] = useState(false);
   if (uses.length === 0) return null;
@@ -65,7 +55,7 @@ export function Sources({ uses, bundle, t }: { uses: BundleCitationUse[]; bundle
   );
 }
 
-// The lines under an action's sentence: which hips it applies to, if limited, and how well supported it is.
+// The lines under an action's sentence: who it applies to, if limited, and how well supported it is.
 // The review list shows the same lines, so the reviewer sees the whole claim.
 export function ActionNotes({ action, t }: { action: BundleAction; t: Translate }) {
   return (
@@ -100,7 +90,7 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
   // In the review build the draft rows are shown above, so the waiting line would only repeat them.
   const pending = structure && bundle.mode !== "review" ? (bundle.pendingByStructure[selection.sid] ?? 0) : 0;
 
-  // Group the rows by joint (hip, knee) and then by movement, keeping the order of the bundle's movement list.
+  // Group the rows by joint and then by movement, keeping the order of the bundle's movement list.
   // A joint gets its heading only when it has rows.
   const joints = [...new Set(bundle.movements.map(jointOf))]
     .map((joint) => ({
@@ -111,7 +101,6 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
         .filter((g) => g.rows.length > 0),
     }))
     .filter((j) => j.groups.length > 0);
-  const gap = GAP_LINES[selection.sid];
 
   return (
     <section className="info-panel" data-testid="info-panel">
@@ -136,7 +125,7 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
 
       {joints.map(({ joint, groups }) => (
         <div key={joint}>
-          <h3>{t(`info.does.${joint}`)}</h3>
+          <h3>{t("info.does", { joint: t(`joint.${joint}`) })}</h3>
           {groups.map(({ movement, rows }) => (
             <div key={movement.id}>
               <h4>
@@ -155,7 +144,8 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
       ))}
 
       {pending > 0 && <p className="muted">{t("info.pending")}</p>}
-      {gap && <p className="muted">{t(gap)}</p>}
+      {/* A part of this structure that the model does not show yet. */}
+      {structure?.gap && <p className="muted">{t(`gap.${structure.gap}`)}</p>}
 
       <div className="panel-actions">
         {selection.side !== "" && (

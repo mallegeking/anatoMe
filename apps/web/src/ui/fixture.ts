@@ -11,7 +11,7 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
       { id: "sacrum", type: "bone", english: "Sacrum", latin: "Os sacrum", depth: 4, paired: false },
       { id: "femur", type: "bone", english: "Femur", latin: "Os femoris", depth: 3, paired: true },
       { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2, paired: true },
-      { id: "rectus-femoris", type: "muscle", english: "Rectus femoris", depth: 1, paired: true },
+      { id: "rectus-femoris", type: "muscle", english: "Rectus femoris", depth: 1, paired: true, gap: "quadriceps-tendon" },
     ],
     movements: [{ id: "hip-ext-rot", english: "Hip external rotation", dof: "hip.rotation", direction: "positive" }],
     attachments: [

@@ -17,7 +17,20 @@ const structures: BundleStructure[] = [
 // The app keeps the open state of the list, so the tests do the same.
 function Harness({ onChoose }: { onChoose: (s: BundleStructure) => void }) {
   const [open, setOpen] = useState(false);
-  return <TopBar t={t} structures={structures} layersOpen={false} onToggleLayers={() => {}} onChoose={onChoose} open={open} onOpenChange={setOpen} />;
+  return (
+    <TopBar
+      t={t}
+      structures={structures}
+      layersOpen={false}
+      onToggleLayers={() => {}}
+      onChoose={onChoose}
+      open={open}
+      onOpenChange={setOpen}
+      regions={["hip"]}
+      region="hip"
+      onRegion={() => {}}
+    />
+  );
 }
 
 function show(onChoose = vi.fn()) {
@@ -88,4 +101,37 @@ test("after Escape closed the list, Enter chooses nothing", () => {
   fireEvent.keyDown(field, { key: "Escape" });
   fireEvent.keyDown(field, { key: "Enter" });
   expect(onChoose).not.toHaveBeenCalled();
+});
+
+// The region picker. These render the bar directly, because the search state does not matter here.
+function showRegions(regions: string[], onRegion = vi.fn()) {
+  render(
+    <TopBar
+      t={t}
+      structures={structures}
+      layersOpen={false}
+      onToggleLayers={() => {}}
+      onChoose={() => {}}
+      open={false}
+      onOpenChange={() => {}}
+      regions={regions}
+      region="hip"
+      onRegion={onRegion}
+    />,
+  );
+  return onRegion;
+}
+
+test("one region shows no picker", () => {
+  showRegions(["hip"]);
+  expect(screen.queryByLabelText(en["region.label"])).toBeNull();
+});
+
+test("two regions show a picker that reports the choice", () => {
+  const onRegion = showRegions(["hip", "shoulder"]);
+  const picker = screen.getByLabelText(en["region.label"]) as HTMLSelectElement;
+  expect(picker.value).toBe("hip");
+  expect(screen.getByRole("option", { name: en["region.hip"] })).toBeTruthy();
+  fireEvent.change(picker, { target: { value: "shoulder" } });
+  expect(onRegion).toHaveBeenCalledWith("shoulder");
 });

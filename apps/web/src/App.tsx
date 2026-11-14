@@ -19,6 +19,8 @@ import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
 import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
+import { chooseRegion, regionIds } from "./region/regions";
+import { loadManifest, regionFiles, type Manifest, type ModelFiles } from "./viewer/manifest";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
 import type { Selection } from "./viewer/pick";
@@ -27,9 +29,13 @@ import type { Selection } from "./viewer/pick";
 const PrintSummary = lazy(() => import("./notebook/PrintSummary"));
 
 const t = createT(en);
-const REGION = "hip";
+const BASE = import.meta.env.BASE_URL;
 
 export function App() {
+  // The model manifest, read once. It says which body regions there are and which files each one has.
+  const [models, setModels] = useState<{ manifest: Manifest } | { error: unknown } | null>(null);
+  // The body region shown. null until the manifest is in.
+  const [region, setRegion] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [label, setLabel] = useState<string | undefined>(undefined);
   const [layers, setLayers] = useState<LayerState>(initialLayers);
@@ -48,6 +54,45 @@ export function App() {
   const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
+
+  // Reads the manifest and picks the region the address asks for, or the first one.
+  useEffect(() => {
+    let cancelled = false;
+    loadManifest(`${BASE}models/manifest.json`)
+      .then((loaded) => {
+        const first = chooseRegion(regionIds(loaded), location.search);
+        if (cancelled) return;
+        setModels({ manifest: loaded });
+        setRegion(first);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setModels({ error });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const regions = useMemo(() => (models && "manifest" in models ? regionIds(models.manifest) : []), [models]);
+
+  // The model files for the region. A manifest that failed goes to the viewer, which shows the model error.
+  const files = useMemo<ModelFiles>(() => {
+    if (!models) return null;
+    if ("error" in models) return models;
+    return region ? { urls: regionFiles(models.manifest, region).map((path) => BASE + path) } : null;
+  }, [models, region]);
+
+  // Another region starts afresh: no selection, every layer back, no movement and no area spot.
+  function changeRegion(id: string) {
+    setRegion(id);
+    setBundle(null);
+    select(null);
+    setFocus(null);
+    setLayers(initialLayers);
+    setMovement(initialMovementState);
+    setArea(null);
+    setAreaProbe(null);
+  }
 
   function select(sel: Selection | null, fileLabel?: string) {
     setSelection(sel);
@@ -219,6 +264,9 @@ export function App() {
           onChoose={chooseResult}
           open={searchOpen}
           onOpenChange={setSearchOpen}
+          regions={regions}
+          region={region ?? ""}
+          onRegion={changeRegion}
         />
         <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area", "notebook"]} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
@@ -227,7 +275,8 @@ export function App() {
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown}
+          {/* A new region gets a fresh viewer, with its own loading text and time limit. */}
+          <Viewer key={region ?? ""} files={files} t={t} selection={selection} focus={focus} isShown={isShown}
             highlights={highlights}
             onSelect={tapModel}
             areaMode={mode === "area"}
@@ -246,35 +295,40 @@ export function App() {
               </p>
             )}
             <ModelErrorBoundary t={t} messageKey="error.dataLoad">
-              <Suspense fallback={<Hint t={t} />}>
-                <PanelArea
-                  region={REGION}
-                  t={t}
-                  mode={mode}
-                  selection={selection}
-                  label={label}
-                  layersOpen={layersOpen}
-                  layers={layers}
-                  setLayers={setLayers}
-                  movement={movement}
-                  onMovementChange={setMovement}
-                  onBundle={setBundle}
-                  onSwitchSide={switchSide}
-                  onHideSelected={hideSelected}
-                  onOpenMovement={openMovement}
-                  onFocusStructure={focusStructure}
-                  onOpenStructure={openStructure}
-                  area={area}
-                  onFocusAreaStructure={focusAreaStructure}
-                  onAreaClear={() => setArea(null)}
-                  onOverUnder={overUnder}
-                  onLog={logMovement}
-                  notebookStore={notebookStore}
-                  notebookError={notebookError}
-                  onFocusNotebookStructure={focusAreaStructure}
-                  onPrintNotebook={printNotebook}
-                />
-              </Suspense>
+              {/* Until the manifest says which region to show, the panel shows the same hint as while the data loads. */}
+              {region === null ? (
+                <Hint t={t} />
+              ) : (
+                <Suspense fallback={<Hint t={t} />}>
+                  <PanelArea
+                    region={region}
+                    t={t}
+                    mode={mode}
+                    selection={selection}
+                    label={label}
+                    layersOpen={layersOpen}
+                    layers={layers}
+                    setLayers={setLayers}
+                    movement={movement}
+                    onMovementChange={setMovement}
+                    onBundle={setBundle}
+                    onSwitchSide={switchSide}
+                    onHideSelected={hideSelected}
+                    onOpenMovement={openMovement}
+                    onFocusStructure={focusStructure}
+                    onOpenStructure={openStructure}
+                    area={area}
+                    onFocusAreaStructure={focusAreaStructure}
+                    onAreaClear={() => setArea(null)}
+                    onOverUnder={overUnder}
+                    onLog={logMovement}
+                    notebookStore={notebookStore}
+                    notebookError={notebookError}
+                    onFocusNotebookStructure={focusAreaStructure}
+                    onPrintNotebook={printNotebook}
+                  />
+                </Suspense>
+              )}
             </ModelErrorBoundary>
             <Credits t={t} />
           </div>

@@ -1,7 +1,8 @@
 // The shape of the compiled data for one region (public/data/<region>.json).
 // Types only. The app reads it and pipeline/data/src/compile.ts writes it.
 
-export type BundleStructure = { id: string; type: string; english: string; latin?: string; depth: number; paired: boolean };
+// gap names a part the model does not show yet. The info panel shows the text gap.<gap> for it.
+export type BundleStructure = { id: string; type: string; english: string; latin?: string; depth: number; paired: boolean; gap?: string };
 
 export type BundleMovement = { id: string; english: string; dof: string; direction: "positive" | "negative" };
 

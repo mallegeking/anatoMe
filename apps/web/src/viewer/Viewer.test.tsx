@@ -65,12 +65,9 @@ vi.mock("@react-three/fiber", async () => {
 
 vi.mock("@react-three/drei", () => ({ CameraControls: () => null }));
 
-vi.mock("./manifest", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("./manifest")>()),
-  loadManifest: async () => ({ regions: { hip: { files: [{ path: "hip.glb", source: "bp3d", license: "CC-BY-4.0" }] } } }),
-}));
-
 const t = createT(en);
+// The model files the app hands the viewer once it has read the manifest.
+const files = { urls: ["/models/hip.glb"] };
 
 function withWebGL(available: boolean) {
   const context = { getExtension: () => null };
@@ -92,7 +89,7 @@ afterEach(() => {
 });
 
 function show() {
-  render(<Viewer region="hip" t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  render(<Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
 }
 
 // A model with a left and a right piriformis, like the real files.
@@ -152,6 +149,21 @@ test("watchdog is satisfied when loading finishes, not on the first frame", asyn
   expect(screen.queryByRole("alert")).toBeNull();
 });
 
+test("while the manifest is still loading, the loading text shows and nothing fails", async () => {
+  withWebGL(true);
+  render(<Viewer files={null} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  await settle();
+  expect(screen.getByText(en["loading.model"])).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("a manifest that could not be loaded shows the model load message", async () => {
+  withWebGL(true);
+  render(<Viewer files={{ error: new Error("Could not load models/manifest.json (404)") }} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  await settle();
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+});
+
 test("a WebGL failure shows the WebGL message, not the connection message", () => {
   withWebGL(false);
   show();
@@ -162,7 +174,7 @@ test("a WebGL failure shows the WebGL message, not the connection message", () =
 test("switching to the other side lights up that side's mesh and puts the first one back", async () => {
   withWebGL(true);
   const { left, right } = await loadPiriformisPair();
-  const props = { region: "hip", t, isShown: () => true, highlights: null, onSelect: () => {} };
+  const props = { files, t, isShown: () => true, highlights: null, onSelect: () => {} };
   const { rerender } = render(<Viewer {...props} selection={{ sid: "piriformis", side: "l" }} focus={null} />);
   await settle();
   await act(async () => {
@@ -199,7 +211,7 @@ async function showArea() {
   const onAreaTap = vi.fn();
   const onSelect = vi.fn();
   render(
-    <Viewer region="hip" t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={onSelect} areaMode onAreaTap={onAreaTap} areaMarker={null} areaProbe={null} />,
+    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={onSelect} areaMode onAreaTap={onAreaTap} areaMarker={null} areaProbe={null} />,
   );
   await settle();
   await act(async () => {
@@ -273,7 +285,7 @@ test("area mode: a probe whose rays miss still reports through the probe, not nu
   scene.updateMatrixWorld(true);
   load.result = [{ scene }];
   const onAreaTap = vi.fn();
-  const props = { region: "hip", t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
   const probe = { sid: "piriformis", side: "l" as const };
   const { rerender } = render(<Viewer {...props} areaProbe={null} />);
   await settle();

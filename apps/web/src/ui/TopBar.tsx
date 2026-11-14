@@ -13,11 +13,15 @@ type Props = {
   // Whether the result list shows. The app keeps this, so a tap on the model can close the list too.
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // The body regions in the model manifest, the one shown, and what to call when the person picks another.
+  regions: string[];
+  region: string;
+  onRegion: (id: string) => void;
 };
 
-// The bar above the model: the search field and the layers button.
+// The bar above the model: the search field, the layers button and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
-export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange }: Props) {
+export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
   const [query, setQuery] = useState("");
   const field = useRef<HTMLInputElement>(null);
   const drop = useRef<HTMLDivElement>(null);
@@ -65,6 +69,15 @@ export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, op
         <button type="button" className="layers-toggle" aria-expanded={layersOpen} onClick={onToggleLayers}>
           {t(layersOpen ? "layers.close" : "layers.open")}
         </button>
+        {regions.length > 1 && (
+          <select className="region-picker" aria-label={t("region.label")} value={region} onChange={(e) => onRegion(e.target.value)}>
+            {regions.map((id) => (
+              <option key={id} value={id}>
+                {t(`region.${id}`)}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       {open && (
         // Pressing on the list would take the focus from the field, and the blur would close the list

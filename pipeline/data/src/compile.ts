@@ -98,7 +98,10 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
   return {
     region,
     mode,
-    structures: structures.map(({ id, type, english, latin, depth, midline }) => ({ id, type, english, latin, depth, paired: !midline })),
+    // gap goes in only when the row has one, so the other structures carry no empty field.
+    structures: structures.map(({ id, type, english, latin, depth, midline, gap }) => ({
+      id, type, english, latin, depth, paired: !midline, ...(gap !== undefined ? { gap } : {}),
+    })),
     movements,
     attachments,
     actions,

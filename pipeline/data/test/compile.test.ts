@@ -48,3 +48,10 @@ test("a checked exercise keeps its citation in the bundle", () => {
   expect(b.exercises[0].citations[0].ref).toBe("used-source");
   expect(JSON.stringify(b)).not.toContain("review_note");
 });
+
+test("gap is passed through to the bundle", () => {
+  const byId = new Map(compileRegion(fx("valid"), "hip", "normal").structures.map((s) => [s.id, s]));
+  expect(byId.get("gluteus-maximus")?.gap).toBe("test-gap");
+  // A structure without a gap gets no gap field at all.
+  expect(byId.get("piriformis")).not.toHaveProperty("gap");
+});

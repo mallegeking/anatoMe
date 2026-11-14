@@ -2,8 +2,7 @@
 // because it pulls in three.js, which is most of the app's size.
 import { CameraControls } from "@react-three/drei";
 import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
-import { loadManifest, regionFiles, type Manifest } from "./manifest";
+import { Suspense, useEffect, useRef, type MouseEvent } from "react";
 import type { UnderEntry } from "../area/under";
 import { shouldClear, type Selection, type Side } from "./pick";
 import type { Highlight } from "../movement/roles";
@@ -11,7 +10,8 @@ import { redrawWhenBack } from "./redraw";
 import { RegionModel } from "./RegionModel";
 
 export type SceneProps = {
-  region: string;
+  // The glb files to show, or null while the app is still reading the manifest.
+  urls: string[] | null;
   selection: Selection | null;
   // Where the camera should go. A new object each time makes it move again, even for the same structure.
   focus: Selection | null;
@@ -32,29 +32,6 @@ export type SceneProps = {
 };
 
 export type AreaTap = { entries: UnderEntry[]; point: [number, number, number]; through: Selection | null };
-
-// Reads the manifest and hands back the file URLs. A failure is thrown during render so the error boundary can show it.
-function useRegionUrls(region: string): string[] | null {
-  const [state, setState] = useState<{ urls: string[] } | { error: unknown } | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const base = import.meta.env.BASE_URL;
-    loadManifest(`${base}models/manifest.json`)
-      .then((manifest: Manifest) => {
-        if (!cancelled) setState({ urls: regionFiles(manifest, region).map((path) => base + path) });
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) setState({ error });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [region]);
-
-  if (state && "error" in state) throw state.error;
-  return state?.urls ?? null;
-}
 
 // The canvas clock keeps counting while nothing is drawn. Without this, the first frame after a rest
 // would see a long gap, and a camera glide would jump most of the way in one step.
@@ -88,7 +65,7 @@ function RedrawWhenBack() {
 }
 
 export default function Scene({
-  region,
+  urls,
   selection,
   focus,
   isShown,
@@ -100,7 +77,6 @@ export default function Scene({
   areaMarker = null,
   areaProbe = null,
 }: SceneProps) {
-  const urls = useRegionUrls(region);
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
   const modelClick = useRef<Event | null>(null);
