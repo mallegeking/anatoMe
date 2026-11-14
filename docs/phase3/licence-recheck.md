@@ -4,7 +4,7 @@ Read on 2026-11-14. Every licence page was opened again and compared with what t
 
 ## Summary
 
-- Sources checked: 59. These are the 49 entries in `data/citations.yaml`, BodyParts3D, Z-Anatomy, seven libraries (three.js, the shipped Draco decoder, the draco3d package, React, React Three Fiber, drei, camera-controls) and the two pages the spec marked as blocked (OpenSim full-body model, AnatomyScope).
+- Sources checked: 60. These are the 49 entries in `data/citations.yaml`, BodyParts3D, Z-Anatomy, seven libraries (three.js, the shipped Draco decoder, the draco3d package, React, React Three Fiber, drei, camera-controls) and the two pages the spec marked as blocked (OpenSim full-body model, AnatomyScope).
 - Differed: 4. Three citations and the OpenSim row. AnatomyScope could not be compared because it states no licence of its own.
 - Changed in the repo: 3 citations in `data/citations.yaml` (pottorf-2026, park-2026, uebayashi-2026). Their pages say "Creative Commons Attribution" in words and give no number, but the licence link on each page points to the CC BY 4.0 deed. `license` now says what the page says plus the version from the link, and `license_id` is now `CC-BY-4.0` instead of `CC-BY-unversioned`. `npm run validate` passes.
 - Not changed: `ATTRIBUTION.md`, `models/LICENSE` and the `credits.*` keys in `apps/web/src/i18n/en.json`. The BodyParts3D and Z-Anatomy credit lines are word for word what the pages ask for.
@@ -33,13 +33,13 @@ Credit lines, word for word:
 
 | source | link | licence as the page states it | date read | what the repo says | match |
 |---|---|---|---|---|---|
-| three | /home/ticha/build/anatoMe/node_modules/three/LICENSE (package.json version 0.187.0) | "The MIT License  Copyright (c) 2010-2026 three.js authors" (package.json "license": "MIT") Note: Installed version 0.187.0. | 2026-11-14 | MIT (ATTRIBUTION.md) | yes |
-| draco decoder (shipped) | /home/ticha/build/anatoMe/apps/web/public/draco/LICENSE | Full text begins "Apache License Version 2.0, January 2004" Note: File has the unfilled appendix boilerplate, no copyright holder line. Decoder files: draco_decoder.js, .wasm, draco_wasm_wrapper.js. | 2026-11-14 | Apache 2.0 | yes |
-| draco3d package | /home/ticha/build/anatoMe/node_modules/draco3d/package.json (version 1.5.9) | package.json "license": "Apache-2.0" Note: No LICENSE file in the package folder (README.md only), so licence taken from package.json. | 2026-11-14 | Apache 2.0 | yes |
-| react | /home/ticha/build/anatoMe/node_modules/react/LICENSE (version 19.3.1) | "MIT License  Copyright (c) Meta Platforms, Inc. and affiliates." | 2026-11-14 | MIT (ATTRIBUTION.md, as "other npm libraries") | yes |
-| @react-three/fiber | /home/ticha/build/anatoMe/node_modules/@react-three/fiber/package.json (version 9.8.2) | package.json "license": "MIT" (no LICENSE file in the package) Note: Matches the repo's own note that the package has no licence file. | 2026-11-14 | MIT, no text shipped (ATTRIBUTION.md note) | yes |
-| @react-three/drei | /home/ticha/build/anatoMe/node_modules/@react-three/drei/LICENSE (version 10.7.9) | "MIT License  Copyright (c) 2020 react-spring" | 2026-11-14 | MIT | yes |
-| camera-controls | /home/ticha/build/anatoMe/node_modules/camera-controls/LICENSE (version 3.1.2) | "MIT License  Copyright (c) 2017 @yomotsu" | 2026-11-14 | MIT | yes |
+| three | node_modules/three/LICENSE (package.json version 0.187.0) | "The MIT License  Copyright (c) 2010-2026 three.js authors" (package.json "license": "MIT") Note: Installed version 0.187.0. | 2026-11-14 | MIT (ATTRIBUTION.md) | yes |
+| draco decoder (shipped) | apps/web/public/draco/LICENSE | Full text begins "Apache License Version 2.0, January 2004" Note: File has the unfilled appendix boilerplate, no copyright holder line. Decoder files: draco_decoder.js, .wasm, draco_wasm_wrapper.js. | 2026-11-14 | Apache 2.0 | yes |
+| draco3d package | node_modules/draco3d/package.json (version 1.5.9) | package.json "license": "Apache-2.0" Note: No LICENSE file in the package folder (README.md only), so licence taken from package.json. | 2026-11-14 | Apache 2.0 | yes |
+| react | node_modules/react/LICENSE (version 19.3.1) | "MIT License  Copyright (c) Meta Platforms, Inc. and affiliates." | 2026-11-14 | MIT (ATTRIBUTION.md, as "other npm libraries") | yes |
+| @react-three/fiber | node_modules/@react-three/fiber/package.json (version 9.8.2) | package.json "license": "MIT" (no LICENSE file in the package) Note: Matches the repo's own note that the package has no licence file. | 2026-11-14 | MIT, no text shipped (ATTRIBUTION.md note) | yes |
+| @react-three/drei | node_modules/@react-three/drei/LICENSE (version 10.7.9) | "MIT License  Copyright (c) 2020 react-spring" | 2026-11-14 | MIT | yes |
+| camera-controls | node_modules/camera-controls/LICENSE (version 3.1.2) | "MIT License  Copyright (c) 2017 @yomotsu" | 2026-11-14 | MIT | yes |
 
 ## Citations in `data/citations.yaml`
 
