@@ -20,6 +20,7 @@ function Harness({ bundle, selection, onFocusStructure, onLog }: HarnessProps) {
   return (
     <MovementPanel
       t={t}
+      lang="en"
       bundle={bundle}
       state={state}
       onChange={setState}

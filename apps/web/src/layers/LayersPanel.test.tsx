@@ -20,6 +20,7 @@ function show(state = initialLayers(), handlers: Partial<Parameters<typeof Layer
   render(
     <LayersPanel
       t={t}
+      lang="en"
       state={state}
       structures={structures}
       onPeel={noop}

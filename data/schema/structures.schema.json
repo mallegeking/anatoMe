@@ -13,6 +13,7 @@
         "enum": ["bone", "muscle", "tendon", "ligament", "joint", "capsule", "labrum", "bursa", "nerve", "meniscus", "fascia"]
       },
       "english": { "type": "string", "minLength": 1 },
+      "german": { "description": "The German name, from a source opened when it was written. The app shows the English name where it is missing.", "type": "string", "minLength": 1 },
       "latin": { "type": "string", "minLength": 1 },
       "fma": { "type": "string", "pattern": "^FMA[0-9]+$" },
       "region": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },

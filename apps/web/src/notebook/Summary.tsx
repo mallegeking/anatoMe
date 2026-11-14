@@ -1,4 +1,5 @@
 import type { RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import { formatAngles } from "./angles";
 import { candidateText, entryName, ruledOutText } from "./NotebookPanel";
@@ -7,7 +8,7 @@ import type { NotebookEntry } from "./types";
 
 // The one-page summary. It is hidden on screen and is the only thing the print layout shows.
 // Every text is plain text, so a note can never turn into HTML.
-export function Summary({ t, bundle, model }: { t: Translate; bundle: RegionBundle; model: SummaryModel }) {
+export function Summary({ t, lang, bundle, model }: { t: Translate; lang: Lang; bundle: RegionBundle; model: SummaryModel }) {
   const table = (rows: NotebookEntry[], more: number) => (
     <>
       <table>
@@ -24,7 +25,7 @@ export function Summary({ t, bundle, model }: { t: Translate; bundle: RegionBund
           {rows.map((entry) => (
             <tr key={entry.id}>
               <td>{entry.date}</td>
-              <td>{entryName(entry, bundle, t)}</td>
+              <td>{entryName(entry, bundle, t, lang)}</td>
               <td>{t(`notebook.side.${entry.side}`)}</td>
               <td>{formatAngles(entry.pose, bundle, t)}</td>
               <td>{entry.note}</td>
@@ -56,11 +57,11 @@ export function Summary({ t, bundle, model }: { t: Translate; bundle: RegionBund
               {c.candidates.length > 0 && (
                 <ul>
                   {c.candidates.map((cand) => (
-                    <li key={cand.sid}>{candidateText(t, bundle, cand, c.painfulCount)}</li>
+                    <li key={cand.sid}>{candidateText(t, bundle, cand, c.painfulCount, lang)}</li>
                   ))}
                 </ul>
               )}
-              {c.ruledOut.length > 0 && <p>{ruledOutText(t, bundle, c.ruledOut)}</p>}
+              {c.ruledOut.length > 0 && <p>{ruledOutText(t, bundle, c.ruledOut, lang)}</p>}
               {c.fineCount === 0 && <p>{t("notebook.needFine")}</p>}
               {c.incomplete && <p>{t("notebook.incomplete")}</p>}
             </div>

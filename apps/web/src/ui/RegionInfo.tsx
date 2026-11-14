@@ -1,4 +1,5 @@
 import { useRegionData } from "../data/useRegionData";
+import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
 import { InfoPanel } from "./InfoPanel";
@@ -8,6 +9,7 @@ type Props = {
   selection: Selection | null;
   fallbackLabel?: string;
   t: Translate;
+  lang: Lang;
   // Called with the same structure on the other side.
   onSwitchSide: (sel: Selection) => void;
   onHide: () => void;
@@ -16,7 +18,7 @@ type Props = {
 };
 
 // Loads the region data and shows the panel for the selection, or the tap hint.
-export function RegionInfo({ region, selection, fallbackLabel, t, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
+export function RegionInfo({ region, selection, fallbackLabel, t, lang, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
   const bundle = useRegionData(region);
   if (!selection) return <Hint t={t} />;
   return (
@@ -24,6 +26,7 @@ export function RegionInfo({ region, selection, fallbackLabel, t, onSwitchSide, 
       selection={selection}
       bundle={bundle}
       t={t}
+      lang={lang}
       fallbackLabel={fallbackLabel}
       onSwitchSide={() => onSwitchSide({ sid: selection.sid, side: selection.side === "l" ? "r" : "l" })}
       onHide={onHide}

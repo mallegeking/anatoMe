@@ -1,9 +1,11 @@
 - id: bodyweight-squat
   english: Bodyweight squat
+  german: Kniebeuge
   regions: [hip]
   phases:
     - id: lowering
       english: Phase
+      german: Abwärtsbewegung
       path:
         - {angle: hip.flexion, from: 0, to: 100}
         - {angle: hip.rotation, from: 0, to: 10}

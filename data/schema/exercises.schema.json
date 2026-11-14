@@ -10,6 +10,7 @@
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
       "english": { "type": "string", "minLength": 1 },
+      "german": { "description": "The German name, from a source opened when it was written. The app shows the English name where it is missing.", "type": "string", "minLength": 1 },
       "regions": {
         "type": "array",
         "minItems": 1,
@@ -25,6 +26,7 @@
           "properties": {
             "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
             "english": { "type": "string", "minLength": 1 },
+            "german": { "description": "The German name, from a source opened when it was written. The app shows the English name where it is missing.", "type": "string", "minLength": 1 },
             "path": {
               "description": "How the joints move through the phase. Angles are in degrees.",
               "type": "array",

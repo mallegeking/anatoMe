@@ -1,9 +1,13 @@
 import type { BundleStructure } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { hiddenKey, isVisibleOnAnySide, tissueOf, type LayerState, type TissueGroup } from "./layers";
 
 type Props = {
   t: Translate;
+  // The language the names show in.
+  lang: Lang;
   state: LayerState;
   structures: BundleStructure[];
   onPeel: () => void;
@@ -16,12 +20,12 @@ type Props = {
 const GROUPS: TissueGroup[] = ["bone", "muscle", "soft"];
 
 // Peel buttons, tissue switches and the list of things hidden one by one.
-export function LayersPanel({ t, state, structures, onPeel, onRestore, onToggleTissue, onShow }: Props) {
+export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onToggleTissue, onShow }: Props) {
   // One entry per hidden side, so hiding the left piriformis lists "Piriformis (left)".
   const hidden = structures.flatMap((s) =>
     (["l", "r", ""] as const)
       .filter((side) => state.hiddenIds.has(hiddenKey(s.id, side)))
-      .map((side) => ({ key: hiddenKey(s.id, side), name: side === "" ? s.english : t(side === "l" ? "side.left" : "side.right", { label: s.english }) })),
+      .map((side) => ({ key: hiddenKey(s.id, side), name: side === "" ? nameOf(s, lang) : t(side === "l" ? "side.left" : "side.right", { label: nameOf(s, lang) }) })),
   );
   // Peeling needs at least one visible muscle left.
   const canPeel = structures.some((s) => tissueOf(s.type) === "muscle" && isVisibleOnAnySide(state, s));

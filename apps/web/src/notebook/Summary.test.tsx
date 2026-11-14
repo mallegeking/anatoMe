@@ -29,8 +29,8 @@ const entry = (over: Partial<NotebookEntry> = {}): NotebookEntry => ({
 });
 
 function page(entries: NotebookEntry[], withComparison = true) {
-  const model = summaryModel(entries, b, now, withComparison);
-  return render(<Summary t={t} bundle={b} model={model} />);
+  const model = summaryModel(entries, b, now, withComparison, "en");
+  return render(<Summary t={t} lang="en" bundle={b} model={model} />);
 }
 
 test("the page shows the disclaimer and both tables", () => {
@@ -99,7 +99,7 @@ test("print runs once per press and only after the summary is in the document", 
   const print = vi.spyOn(window, "print").mockImplementation(() => {
     seen = document.querySelector("section.print-summary") !== null;
   });
-  const props = { t, bundle: b, entries: [entry()] };
+  const props = { t, lang: "en" as const, bundle: b, entries: [entry()] };
   const { rerender } = render(<PrintSummary {...props} press={1} />);
   expect(print).not.toHaveBeenCalled();
   expect(document.querySelector("section.print-summary")).toBeTruthy();
@@ -129,8 +129,8 @@ test("a list that may be incomplete says so on the page", () => {
 });
 
 test("the review build prints the review banner instead of the basis line", () => {
-  const model = summaryModel([entry()], makeMovementBundle("review"), now, true);
-  render(<Summary t={t} bundle={makeMovementBundle("review")} model={model} />);
+  const model = summaryModel([entry()], makeMovementBundle("review"), now, true, "en");
+  render(<Summary t={t} lang="en" bundle={makeMovementBundle("review")} model={model} />);
   expect(screen.getByText(en["review.banner"])).toBeTruthy();
   expect(screen.queryByText(en["summary.basis"])).toBeNull();
 });

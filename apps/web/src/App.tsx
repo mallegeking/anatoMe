@@ -15,6 +15,7 @@ import { QuietBoundary } from "./ui/QuietBoundary";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
+import { nameOf } from "./i18n/names";
 import { selectBySearch } from "./search/search";
 import { Credits, EducationalLine } from "./ui/Credits";
 import { ModeBar, type Mode } from "./ui/ModeBar";
@@ -147,7 +148,7 @@ export function App() {
     setFocus({ ...sel });
     setLayersOpen(false);
     setMode("atlas");
-    setNotice(peeledNow === 0 ? null : t(peeledNow === 1 ? "search.peeledOne" : "search.peeled", { count: String(peeledNow), name: structure.english }));
+    setNotice(peeledNow === 0 ? null : t(peeledNow === 1 ? "search.peeledOne" : "search.peeled", { count: String(peeledNow), name: nameOf(structure, lang) }));
   }
 
   // A structure in the movement panel: select it and turn the camera to it.
@@ -240,9 +241,10 @@ export function App() {
   const highlights = useMemo(() => {
     const query = mode === "movement" && bundle ? queryOf(movement, bundle) : null;
     if (!bundle || !query) return null;
-    const result = involved(bundle, query, movement.pose);
+    // The colours do not depend on the order, so the language makes no difference here.
+    const result = involved(bundle, query, movement.pose, lang);
     return result.rows.length > 0 ? result.bySid : null;
-  }, [mode, bundle, movement]);
+  }, [mode, bundle, movement, lang]);
 
   // Structures the data does not know are always shown, unless a movement hides what is not involved.
   const isShown = useMemo(() => makeIsShown(structures, layers, highlights), [structures, layers, highlights]);
@@ -282,6 +284,7 @@ export function App() {
         <ReviewBanner bundle={bundle} t={t} onOpenList={() => setReviewOpen(true)} />
         <TopBar
           t={t}
+          lang={lang}
           structures={structures}
           layersOpen={layersOpen}
           onToggleLayers={() => setLayersOpen(!layersOpen)}
@@ -295,7 +298,7 @@ export function App() {
         <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area", "notebook"]} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
-            <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
+            <ReviewList bundle={bundle} t={t} lang={lang} onClose={() => setReviewOpen(false)} />
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
@@ -327,6 +330,7 @@ export function App() {
                   <PanelArea
                     region={region}
                     t={t}
+                    lang={lang}
                     mode={mode}
                     selection={selection}
                     label={label}
@@ -361,7 +365,7 @@ export function App() {
       {bundle && printJob && (
         <QuietBoundary>
           <Suspense fallback={null}>
-            <PrintSummary t={t} bundle={bundle} entries={printJob.entries} press={printJob.press} />
+            <PrintSummary t={t} lang={lang} bundle={bundle} entries={printJob.entries} press={printJob.press} />
           </Suspense>
         </QuietBoundary>
       )}

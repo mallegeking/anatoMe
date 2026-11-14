@@ -23,6 +23,7 @@ function show(over: { bundle?: RegionBundle; area?: AreaState; selection?: { sid
   render(
     <AreaPanel
       t={t}
+      lang="en"
       bundle={over.bundle ?? makeMovementBundle()}
       area={over.area === undefined ? area : over.area}
       selection={over.selection ?? null}
@@ -105,7 +106,7 @@ test("an entry the bundle does not know shows its sid and nothing else", () => {
 
 test("the clear button calls onClear", () => {
   const onClear = vi.fn();
-  render(<AreaPanel t={t} bundle={makeMovementBundle()} area={area} selection={null} onFocusStructure={() => {}} onOpenMovement={() => {}} onClear={onClear} />);
+  render(<AreaPanel t={t} lang="en" bundle={makeMovementBundle()} area={area} selection={null} onFocusStructure={() => {}} onOpenMovement={() => {}} onClear={onClear} />);
   fireEvent.click(screen.getByRole("button", { name: en["area.clear"] }));
   expect(onClear).toHaveBeenCalled();
 });

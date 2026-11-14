@@ -55,3 +55,18 @@ test("gap is passed through to the bundle", () => {
   // A structure without a gap gets no gap field at all.
   expect(byId.get("piriformis")).not.toHaveProperty("gap");
 });
+
+test("german is passed through for structures, movements and exercises", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  const structures = new Map(b.structures.map((s) => [s.id, s]));
+  expect(structures.get("gluteus-maximus")?.german).toBe("Großer Gesäßmuskel");
+  // A row without a German name gets no german field at all.
+  expect(structures.get("piriformis")).not.toHaveProperty("german");
+  const movements = new Map(b.movements.map((m) => [m.id, m]));
+  expect(movements.get("hip-flexion")?.german).toBe("Beugung im Hüftgelenk");
+  expect(movements.get("hip-extension")).not.toHaveProperty("german");
+  expect(b.exercises[0].german).toBe("Kniebeuge");
+  expect(b.exercises[0].phases[0].german).toBe("Abwärtsbewegung");
+  // An exercise without a German name gets no german field either.
+  expect(compileRegion(fx("valid"), "hip", "review").exercises.find((e) => e.id === "goblet-squat")).not.toHaveProperty("german");
+});

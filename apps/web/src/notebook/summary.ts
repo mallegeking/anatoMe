@@ -1,4 +1,5 @@
 import type { RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
 import { compare, type Comparison } from "./compare";
 import type { NotebookEntry } from "./types";
 
@@ -21,12 +22,13 @@ const two = (n: number) => String(n).padStart(2, "0");
 const newestFirst = (a: NotebookEntry, b: NotebookEntry) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt;
 
 // Everything the printed page shows, worked out once so the page itself stays plain.
-export function summaryModel(entries: NotebookEntry[], bundle: RegionBundle, now: Date, withComparison: boolean): SummaryModel {
+// lang only orders the structures in the comparison, the same way the Notebook tab does.
+export function summaryModel(entries: NotebookEntry[], bundle: RegionBundle, now: Date, withComparison: boolean, lang: Lang): SummaryModel {
   const sorted = [...entries].sort(newestFirst);
   const painful = sorted.filter((x) => x.feeling === "painful");
   const fine = sorted.filter((x) => x.feeling === "fine");
   const comparisons = withComparison
-    ? (["l", "r"] as const).map((side) => compare(entries, bundle, side)).filter((c) => c.painfulCount > 0)
+    ? (["l", "r"] as const).map((side) => compare(entries, bundle, side, lang)).filter((c) => c.painfulCount > 0)
     : [];
   return {
     printedOn: `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`,

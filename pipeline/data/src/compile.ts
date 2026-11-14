@@ -81,8 +81,11 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
     if (draft) pendingExercises++;
     if (draft && !review) continue;
     // Pick the fields one by one, so checked_by, checked_on and (in normal mode) review_note never leak.
-    const { id, english, phases, citations, review_note } = row;
-    exercises.push({ id, english, phases, citations, draft, ...(review && review_note !== undefined ? { review_note } : {}) });
+    const { id, english, german, phases, citations, review_note } = row;
+    exercises.push({
+      id, english, ...(german !== undefined ? { german } : {}), phases, citations, draft,
+      ...(review && review_note !== undefined ? { review_note } : {}),
+    });
   }
 
   // Only sources that a kept row points to.
@@ -91,16 +94,17 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
     .filter((c) => used.has(c.id))
     .map(({ id, title, authors, year, url, license }) => ({ id, title, authors, year, url, license }));
 
-  const movements = readRows<BundleMovement>(dataDir, "movements.yaml").map(({ id, english, dof, direction }) => ({
-    id, english, dof, direction,
+  // german goes in only when the row has one, like gap below. The app falls back to english.
+  const movements = readRows<BundleMovement>(dataDir, "movements.yaml").map(({ id, english, german, dof, direction }) => ({
+    id, english, ...(german !== undefined ? { german } : {}), dof, direction,
   }));
 
   return {
     region,
     mode,
-    // gap goes in only when the row has one, so the other structures carry no empty field.
-    structures: structures.map(({ id, type, english, latin, depth, midline, gap }) => ({
-      id, type, english, latin, depth, paired: !midline, ...(gap !== undefined ? { gap } : {}),
+    // gap and german go in only when the row has them, so the other structures carry no empty field.
+    structures: structures.map(({ id, type, english, german, latin, depth, midline, gap }) => ({
+      id, type, english, ...(german !== undefined ? { german } : {}), latin, depth, paired: !midline, ...(gap !== undefined ? { gap } : {}),
     })),
     movements,
     attachments,

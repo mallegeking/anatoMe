@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import type { RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
 import { formatAngles } from "./angles";
@@ -13,6 +15,8 @@ export const SHOW_COMPARISON = true;
 
 type Props = {
   t: Translate;
+  // The language the names show in. The notes keep ids, so the same notes read in any language.
+  lang: Lang;
   bundle: RegionBundle;
   store: NotebookStore | null; // null while it opens
   storeError: boolean; // true when it could not be opened
@@ -24,7 +28,7 @@ type Props = {
 
 // The Notebook tab: the notes, the structures to look into, and the print and backup buttons.
 // Every store error is caught here and shown as one plain line. Nothing is ever logged.
-export function NotebookPanel({ t, bundle, store, storeError, showComparison, onFocusStructure, onPrint }: Props) {
+export function NotebookPanel({ t, lang, bundle, store, storeError, showComparison, onFocusStructure, onPrint }: Props) {
   const [entries, setEntries] = useState<NotebookEntry[] | null>(null);
   const [listFailed, setListFailed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -160,10 +164,10 @@ export function NotebookPanel({ t, bundle, store, storeError, showComparison, on
       <h3>{t("notebook.entries")}</h3>
       <ul className="notebook-entries">
         {list.map((entry) => (
-          <EntryItem key={entry.id} t={t} bundle={bundle} entry={entry} onDelete={() => remove(entry.id)} />
+          <EntryItem key={entry.id} t={t} lang={lang} bundle={bundle} entry={entry} onDelete={() => remove(entry.id)} />
         ))}
       </ul>
-      {showComparison && <LookInto t={t} bundle={bundle} entries={list} onFocusStructure={onFocusStructure} />}
+      {showComparison && <LookInto t={t} lang={lang} bundle={bundle} entries={list} onFocusStructure={onFocusStructure} />}
       <div className="panel-actions">
         <button type="button" onClick={() => onPrint(list)}>
           {t("notebook.print")}
@@ -179,29 +183,37 @@ export function NotebookPanel({ t, bundle, store, storeError, showComparison, on
 }
 
 // The movement's name, the exercise and phase, or a plain word when this version does not know it.
-export function entryName(entry: NotebookEntry, bundle: RegionBundle, t: Translate): string {
+export function entryName(entry: NotebookEntry, bundle: RegionBundle, t: Translate, lang: Lang): string {
   if (!isKnown(entry, bundle)) return t("notebook.unknown");
   const pick = entry.pick;
-  if (pick.kind === "movement") return bundle.movements.find((m) => m.id === pick.id)?.english ?? pick.id;
+  if (pick.kind === "movement") {
+    const movement = bundle.movements.find((m) => m.id === pick.id);
+    return movement ? nameOf(movement, lang) : pick.id;
+  }
   const exercise = bundle.exercises.find((x) => x.id === pick.id);
   const phase = exercise?.phases.find((p) => p.id === pick.phase);
-  return t("notebook.entryPhase", { exercise: exercise?.english ?? pick.id, phase: phase?.english ?? pick.phase });
+  return t("notebook.entryPhase", { exercise: exercise ? nameOf(exercise, lang) : pick.id, phase: phase ? nameOf(phase, lang) : pick.phase });
+}
+
+// A structure's name in the language shown, or its id when this version does not know it.
+function structureName(bundle: RegionBundle, sid: string, lang: Lang): string {
+  const structure = bundle.structures.find((s) => s.id === sid);
+  return structure ? nameOf(structure, lang) : sid;
 }
 
 // One candidate line. The panel and the printed summary both use it, so they say the same.
-export function candidateText(t: Translate, bundle: RegionBundle, cand: Candidate, total: number): string {
-  const name = bundle.structures.find((s) => s.id === cand.sid)?.english ?? cand.sid;
+export function candidateText(t: Translate, bundle: RegionBundle, cand: Candidate, total: number, lang: Lang): string {
+  const name = structureName(bundle, cand.sid, lang);
   return t("notebook.candidate", { name, painful: String(cand.painful), total: String(total) });
 }
 
 // The line naming structures that movements feeling fine also load. The printed summary uses it too.
-export function ruledOutText(t: Translate, bundle: RegionBundle, ruledOut: string[]): string {
-  const nameOf = (sid: string) => bundle.structures.find((s) => s.id === sid)?.english ?? sid;
-  return t("notebook.ruledOut", { names: ruledOut.map(nameOf).join(", ") });
+export function ruledOutText(t: Translate, bundle: RegionBundle, ruledOut: string[], lang: Lang): string {
+  return t("notebook.ruledOut", { names: ruledOut.map((sid) => structureName(bundle, sid, lang)).join(", ") });
 }
 
 // One note. The note text is shown as plain text, never as HTML.
-function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: RegionBundle; entry: NotebookEntry; onDelete: () => void }) {
+function EntryItem({ t, lang, bundle, entry, onDelete }: { t: Translate; lang: Lang; bundle: RegionBundle; entry: NotebookEntry; onDelete: () => void }) {
   const angles = formatAngles(entry.pose, bundle, t);
   const lineId = useId();
   return (
@@ -209,7 +221,7 @@ function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: Regio
       <p id={lineId}>
         {t("notebook.entry", {
           date: entry.date,
-          name: entryName(entry, bundle, t),
+          name: entryName(entry, bundle, t, lang),
           feeling: t(`notebook.${entry.feeling}`),
           side: t(`notebook.side.${entry.side}`),
         })}
@@ -225,8 +237,8 @@ function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: Regio
 
 // The structures to look into, side by side apart. The disclaimer sits right under the heading,
 // next to the result. The candidates come in the order compare() gives, by name, with plain counts.
-function LookInto({ t, bundle, entries, onFocusStructure }: { t: Translate; bundle: RegionBundle; entries: NotebookEntry[]; onFocusStructure: (sel: Selection) => void }) {
-  const sides = (["l", "r"] as const).map((side) => compare(entries, bundle, side)).filter((c) => c.painfulCount > 0);
+function LookInto({ t, lang, bundle, entries, onFocusStructure }: { t: Translate; lang: Lang; bundle: RegionBundle; entries: NotebookEntry[]; onFocusStructure: (sel: Selection) => void }) {
+  const sides = (["l", "r"] as const).map((side) => compare(entries, bundle, side, lang)).filter((c) => c.painfulCount > 0);
   return (
     <div className="notebook-look-into">
       <h3>{t("notebook.lookInto")}</h3>
@@ -243,14 +255,14 @@ function LookInto({ t, bundle, entries, onFocusStructure }: { t: Translate; bund
               {c.candidates.map((cand) => (
                 <li key={cand.sid}>
                   <button type="button" className="link-button" onClick={() => onFocusStructure({ sid: cand.sid, side: c.side })}>
-                    {candidateText(t, bundle, cand, c.painfulCount)}
+                    {candidateText(t, bundle, cand, c.painfulCount, lang)}
                   </button>
                 </li>
               ))}
             </ul>
             )
           )}
-          {c.ruledOut.length > 0 && <p className="muted">{ruledOutText(t, bundle, c.ruledOut)}</p>}
+          {c.ruledOut.length > 0 && <p className="muted">{ruledOutText(t, bundle, c.ruledOut, lang)}</p>}
           {c.fineCount === 0 && <p className="muted">{t("notebook.needFine")}</p>}
           {c.incomplete && <p className="muted">{t("notebook.incomplete")}</p>}
         </div>

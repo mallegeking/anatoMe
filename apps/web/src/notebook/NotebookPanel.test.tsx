@@ -1,8 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, expect, test, vi } from "vitest";
+import de from "../i18n/de.json";
 import en from "../i18n/en.json";
+import type { Lang } from "../i18n/lang";
 import { createT } from "../i18n/t";
+import type { RegionBundle } from "../data/bundle";
 import { makeMovementBundle } from "../movement/fixture";
 import { toBackup } from "./backup";
 import { NotebookPanel } from "./NotebookPanel";
@@ -34,15 +37,16 @@ async function storeWith(entries: NotebookEntry[]): Promise<NotebookStore> {
   return store;
 }
 
-type Options = { store?: NotebookStore | null; storeError?: boolean; showComparison?: boolean };
+type Options = { store?: NotebookStore | null; storeError?: boolean; showComparison?: boolean; lang?: Lang; bundle?: RegionBundle };
 
-function show({ store = null, storeError = false, showComparison = true }: Options = {}) {
+function show({ store = null, storeError = false, showComparison = true, lang = "en", bundle = makeMovementBundle() }: Options = {}) {
   const onFocusStructure = vi.fn();
   const onPrint = vi.fn();
   render(
     <NotebookPanel
-      t={t}
-      bundle={makeMovementBundle()}
+      t={lang === "de" ? createT(de, en) : t}
+      lang={lang}
+      bundle={bundle}
       store={store}
       storeError={storeError}
       showComparison={showComparison}
@@ -300,4 +304,20 @@ test("each Delete button points at the line of its own note", async () => {
     expect(document.getElementById(id!)).toBe(item.querySelector("p"));
   }
   expect(new Set(items.map((i) => i.querySelector("button")!.getAttribute("aria-describedby"))).size).toBe(2);
+});
+
+test("a note logged in English reads in German after the switch", async () => {
+  // The same store, with a note saved while the app was in English. The note keeps only the movement's id.
+  const store = await storeWith([entry()]);
+  const bundle = makeMovementBundle();
+  bundle.movements = bundle.movements.map((m) => (m.id === "hip-external-rotation" ? { ...m, german: "Außenrotation im Hüftgelenk" } : m));
+  show({ store, bundle, lang: "en" });
+  expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  cleanup();
+  show({ store, bundle, lang: "de" });
+  expect(await screen.findByText(`2026-11-13: Außenrotation im Hüftgelenk, ${de["notebook.painful"]}, ${de["notebook.side.l"]}`)).toBeTruthy();
+  // And back to English, from the same note.
+  cleanup();
+  show({ store, bundle, lang: "en" });
+  expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
 });

@@ -1,11 +1,15 @@
 import { useRef, useState, type FocusEvent } from "react";
 import type { BundleStructure } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { SearchResults } from "../search/SearchResults";
 import { searchStructures } from "../search/search";
 
 type Props = {
   t: Translate;
+  // The search finds and shows names in this language, and in English and Latin too.
+  lang: Lang;
   structures: BundleStructure[];
   layersOpen: boolean;
   onToggleLayers: () => void;
@@ -21,11 +25,11 @@ type Props = {
 
 // The bar above the model: the search field, the layers button and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
-export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
+export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
   const [query, setQuery] = useState("");
   const field = useRef<HTMLInputElement>(null);
   const drop = useRef<HTMLDivElement>(null);
-  const results = searchStructures(query, structures);
+  const results = searchStructures(query, structures, lang);
 
   function change(value: string) {
     setQuery(value);
@@ -33,7 +37,7 @@ export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, op
   }
 
   function choose(structure: BundleStructure) {
-    setQuery(structure.english);
+    setQuery(nameOf(structure, lang));
     onOpenChange(false);
     // The field kept the focus during the tap, so let go of it now. On a phone this closes the keyboard.
     field.current?.blur();
@@ -83,7 +87,7 @@ export function TopBar({ t, structures, layersOpen, onToggleLayers, onChoose, op
         // Pressing on the list would take the focus from the field, and the blur would close the list
         // before the tap on a result arrives. Cancelling the press keeps the focus in the field.
         <div ref={drop} className="search-drop" onMouseDown={(e) => e.preventDefault()}>
-          <SearchResults t={t} results={results} onChoose={choose} />
+          <SearchResults t={t} lang={lang} results={results} onChoose={choose} />
         </div>
       )}
     </header>

@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect, useId, useRef, useState, type ReactNode } fr
 import type { BundleAction, RegionBundle } from "../data/bundle";
 import { describeAction, jointOf } from "../data/describe";
 import { QuietBoundary } from "../ui/QuietBoundary";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import type { EntrySide, Feeling } from "../notebook/types";
 import { DraftMark } from "../review/DraftMark";
@@ -17,6 +19,8 @@ type LogInput = { feeling: Feeling; side: EntrySide; note: string };
 
 type Props = {
   t: Translate;
+  // The language the names show in.
+  lang: Lang;
   bundle: RegionBundle;
   state: MovementState;
   onChange: (state: MovementState) => void;
@@ -31,10 +35,10 @@ type Props = {
 
 // The panel of the Movements tab: the list to pick from, or the picked movement or exercise with its result.
 export function MovementPanel(props: Props) {
-  const { t, bundle, state, onChange } = props;
+  const { t, lang, bundle, state, onChange } = props;
   const query = queryOf(state, bundle);
   // A pick the data does not know (any more) is treated as no pick.
-  if (!state.pick || !query) return <Picker t={t} bundle={bundle} onChange={onChange} />;
+  if (!state.pick || !query) return <Picker t={t} lang={lang} bundle={bundle} onChange={onChange} />;
 
   const back = (
     <div className="panel-actions">
@@ -59,7 +63,7 @@ export function MovementPanel(props: Props) {
   const movement = bundle.movements.find((m) => m.id === pickedId)!;
   return (
     <section className="movement-panel" data-testid="movement-panel">
-      <h2>{movement.english}</h2>
+      <h2>{nameOf(movement, lang)}</h2>
       {back}
       {contextAngles(bundle, query).map(({ angle, min, max }) => {
         const value = state.pose[angle] ?? 0;
@@ -113,7 +117,7 @@ function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => v
 }
 
 // Nothing picked: the movements grouped by joint, then the exercises.
-function Picker({ t, bundle, onChange }: Pick<Props, "t" | "bundle" | "onChange">) {
+function Picker({ t, lang, bundle, onChange }: Pick<Props, "t" | "lang" | "bundle" | "onChange">) {
   const joints = [...new Set(bundle.movements.map(jointOf))];
   // In the review build the waiting exercises are listed as drafts, so the waiting line would only repeat them.
   const exercisesPending = bundle.exercises.length === 0 && bundle.pendingExercises > 0 && bundle.mode !== "review";
@@ -128,7 +132,7 @@ function Picker({ t, bundle, onChange }: Pick<Props, "t" | "bundle" | "onChange"
               .filter((m) => jointOf(m) === joint)
               .map((m) => (
                 <button key={m.id} type="button" onClick={() => onChange(pickMovement(bundle, m.id))}>
-                  {m.english}
+                  {nameOf(m, lang)}
                 </button>
               ))}
           </div>
@@ -141,7 +145,7 @@ function Picker({ t, bundle, onChange }: Pick<Props, "t" | "bundle" | "onChange"
           <div className="movement-choices">
             {bundle.exercises.map((e) => (
               <button key={e.id} type="button" onClick={() => onChange(pickExercise(bundle, e.id))}>
-                {e.english}
+                {nameOf(e, lang)}
               </button>
             ))}
           </div>
@@ -154,14 +158,14 @@ function Picker({ t, bundle, onChange }: Pick<Props, "t" | "bundle" | "onChange"
 // An exercise: its phases, how far through the phase, and the result.
 type ExerciseProps = Props & { pick: Extract<MovementPick, { kind: "exercise" }>; back: ReactNode; log: ReactNode; children: ReactNode };
 
-function ExerciseView({ t, bundle, state, onChange, pick, back, log, children }: ExerciseProps) {
+function ExerciseView({ t, lang, bundle, state, onChange, pick, back, log, children }: ExerciseProps) {
   const phaseLabel = useId();
   const exercise = bundle.exercises.find((e) => e.id === pick.id)!;
   const percent = Math.round(state.progress * 100);
   const review = bundle.mode === "review";
   return (
     <section className="movement-panel" data-testid="movement-panel">
-      <h2>{exercise.english}</h2>
+      <h2>{nameOf(exercise, lang)}</h2>
       {review && exercise.draft && <DraftMark id={exercise.id} note={exercise.review_note} t={t} />}
       {review && !exercise.draft && exercise.review_note && <div className="review-note">{t("review.note", { note: exercise.review_note })}</div>}
       <Sources uses={exercise.citations} bundle={bundle} t={t} />
@@ -172,7 +176,7 @@ function ExerciseView({ t, bundle, state, onChange, pick, back, log, children }:
         </span>
         {exercise.phases.map((p) => (
           <button key={p.id} type="button" aria-pressed={p.id === pick.phase} onClick={() => onChange(pickPhase(state, bundle, p.id))}>
-            {p.english}
+            {nameOf(p, lang)}
           </button>
         ))}
       </div>
@@ -188,10 +192,10 @@ function ExerciseView({ t, bundle, state, onChange, pick, back, log, children }:
 }
 
 // The structures involved, grouped by role, then the ones with nothing recorded at this angle.
-function Result({ t, bundle, state, query, selection, onFocusStructure, onOpenStructure }: Props & { query: Query }) {
-  const { rows, silent, candidates } = involved(bundle, query, state.pose);
-  const names = new Map(bundle.structures.map((s) => [s.id, s.english]));
-  const nameOf = (sid: string) => names.get(sid) ?? sid;
+function Result({ t, lang, bundle, state, query, selection, onFocusStructure, onOpenStructure }: Props & { query: Query }) {
+  const { rows, silent, candidates } = involved(bundle, query, state.pose, lang);
+  const names = new Map(bundle.structures.map((s) => [s.id, nameOf(s, lang)]));
+  const structureName = (sid: string) => names.get(sid) ?? sid;
   // In the review build the waiting rows are shown as drafts, so the waiting line would only repeat them.
   const pending = bundle.mode !== "review" && [...query.working, ...query.position].some((m) => (bundle.pendingByMovement[m] ?? 0) > 0);
   const review = bundle.mode === "review";
@@ -204,7 +208,7 @@ function Result({ t, bundle, state, query, selection, onFocusStructure, onOpenSt
         aria-current={selection?.sid === action.structure ? "true" : undefined}
         onClick={() => onFocusStructure(action.structure)}
       >
-        {nameOf(action.structure)}
+        {structureName(action.structure)}
       </button>
       <div>{describeAction(action, t)}</div>
       <ActionNotes action={action} t={t} />
@@ -238,7 +242,7 @@ function Result({ t, bundle, state, query, selection, onFocusStructure, onOpenSt
           <h3>{t("movement.silent")}</h3>
           <ul>
             {silent.map((sid) => (
-              <li key={sid}>{nameOf(sid)}</li>
+              <li key={sid}>{structureName(sid)}</li>
             ))}
           </ul>
         </div>

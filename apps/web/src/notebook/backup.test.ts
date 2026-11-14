@@ -68,3 +68,13 @@ test("a pose key named __proto__ stays a plain key", () => {
   const r = parseBackup(text);
   expect(r.ok && Object.getPrototypeOf(r.entries[0].pose)).toBe(Object.prototype);
 });
+
+// Review Focus 5: a backup made in one language must load in the other. The file holds ids and the
+// format fields only, so nothing in it, and nothing in its name, depends on the language shown.
+test("the backup format has no language in it", () => {
+  const data = JSON.parse(toBackup([a, b], now));
+  expect(Object.keys(data).sort()).toEqual(["entries", "exportedAt", "format", "version"]);
+  expect(data.entries).toEqual([a, b]);
+  expect(Object.keys(data.entries[0]).sort()).toEqual(["createdAt", "date", "feeling", "id", "note", "pick", "pose", "side"]);
+  expect(backupFileName(now)).toBe("anatome-notebook-2026-11-13.json");
+});

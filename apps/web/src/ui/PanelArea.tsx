@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import type { RegionBundle } from "../data/bundle";
 import { useRegionData } from "../data/useRegionData";
+import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import { peel, restore, showStructure, toggleTissue, type LayerState } from "../layers/layers";
 import { LayersPanel } from "../layers/LayersPanel";
@@ -21,6 +22,8 @@ const NotebookPanel = lazy(() => import("../notebook/NotebookPanel"));
 type Props = {
   region: string;
   t: Translate;
+  // The language the names show in.
+  lang: Lang;
   mode: Mode;
   selection: Selection | null;
   label: string | undefined;
@@ -49,13 +52,14 @@ type Props = {
 // Loads the data, tells the app which structures exist, and shows one of the panels:
 // the layers panel when it is open, else the movement panel in the Movements tab, else the area panel in the Area tab,
 // else the notebook in the Notebook tab, else the info panel.
-export function PanelArea({ region, t, mode, selection, label, layersOpen, layers, setLayers, movement, onBundle, ...on }: Props) {
+export function PanelArea({ region, t, lang, mode, selection, label, layersOpen, layers, setLayers, movement, onBundle, ...on }: Props) {
   const bundle = useRegionData(region);
   useEffect(() => onBundle(bundle), [bundle, onBundle]);
   if (layersOpen) {
     return (
       <LayersPanel
         t={t}
+        lang={lang}
         state={layers}
         structures={bundle.structures}
         onPeel={() => setLayers((s) => peel(s, bundle.structures))}
@@ -69,6 +73,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
     return (
       <MovementPanel
         t={t}
+        lang={lang}
         bundle={bundle}
         state={movement}
         onChange={on.onMovementChange}
@@ -83,6 +88,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
     return (
       <AreaPanel
         t={t}
+        lang={lang}
         bundle={bundle}
         area={on.area}
         selection={selection}
@@ -98,6 +104,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
         <Suspense fallback={null}>
           <NotebookPanel
             t={t}
+            lang={lang}
             bundle={bundle}
             store={on.notebookStore}
             storeError={on.notebookError}
@@ -114,6 +121,7 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
       selection={selection}
       fallbackLabel={label}
       t={t}
+      lang={lang}
       onSwitchSide={on.onSwitchSide}
       onHide={on.onHideSelected}
       onOpenMovement={on.onOpenMovement}

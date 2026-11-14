@@ -1,4 +1,6 @@
 import type { RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import { involved, neutralPose, queryForMovement, queryForPhase, type Query } from "../movement/roles";
 import type { NotebookEntry } from "./types";
 
@@ -10,8 +12,8 @@ export type Comparison = {
   painfulCount: number; // known painful entries for this side
   fineCount: number; // known fine entries for this side
   unknownCount: number; // entries for this side whose pick the bundle does not know
-  candidates: Candidate[]; // plain counts, ordered by English name (then by id), not by count
-  ruledOut: string[]; // loaded by a painful and by a fine entry, by English name
+  candidates: Candidate[]; // plain counts, ordered by the name in the language shown (then by id), not by count
+  ruledOut: string[]; // loaded by a painful and by a fine entry, by the name in the language shown
   incomplete: boolean;
 };
 
@@ -30,12 +32,13 @@ export function isKnown(entry: NotebookEntry, bundle: RegionBundle): boolean {
 }
 
 // Structure id to the ids of the action rows that load it. Empty for an unknown entry.
+// The order of the rows does not matter here, so it asks involved() for the English order.
 export function loadedBy(entry: NotebookEntry, bundle: RegionBundle): Map<string, string[]> {
   const out = new Map<string, string[]>();
   const query = queryOf(entry, bundle);
   if (!query) return out;
   const pose = { ...neutralPose(bundle), ...entry.pose };
-  for (const row of involved(bundle, query, pose).rows) {
+  for (const row of involved(bundle, query, pose, "en").rows) {
     const ids = out.get(row.action.structure) ?? [];
     ids.push(row.action.id);
     out.set(row.action.structure, ids);
@@ -43,10 +46,11 @@ export function loadedBy(entry: NotebookEntry, bundle: RegionBundle): Map<string
   return out;
 }
 
-export function compare(entries: NotebookEntry[], bundle: RegionBundle, side: "l" | "r"): Comparison {
+// lang changes only the order of the candidates and of the ruled out structures.
+export function compare(entries: NotebookEntry[], bundle: RegionBundle, side: "l" | "r", lang: Lang): Comparison {
   const mine = entries.filter((x) => x.side === side || x.side === "both");
-  const name = new Map(bundle.structures.map((s) => [s.id, s.english]));
-  const byName = (a: string, b: string) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b) || a.localeCompare(b);
+  const name = new Map(bundle.structures.map((s) => [s.id, nameOf(s, lang)]));
+  const byName = (a: string, b: string) => (name.get(a) ?? a).localeCompare(name.get(b) ?? b, lang) || a.localeCompare(b);
 
   let painfulCount = 0;
   let fineCount = 0;

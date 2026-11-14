@@ -6,19 +6,23 @@
 # effort lists the movements that the working muscles produce or hold back in that phase. It is not the way
 # the joint travels: lowering into a squat bends the hip, but the hip extensors do the work.
 # Exercises without a source for their joint angles are listed in docs/phase2/data-gaps.md.
+# German names from the German Wikipedia article Kniebeuge, read on 2026-11-14. german is left out where no opened source gave one.
 
 - id: bodyweight-squat
   english: Bodyweight squat
+  german: Kniebeuge
   regions: [hip]
   phases:
     - id: lowering
       english: Lowering
+      german: Abwärtsbewegung
       path:
         - {angle: hip.flexion, from: 0, to: 90.3}
         - {angle: knee.flexion, from: 0, to: 94.0}
       effort: [hip-extension, knee-extension]
     - id: rising
       english: Rising
+      german: Aufwärtsbewegung
       path:
         - {angle: hip.flexion, from: 90.3, to: 0}
         - {angle: knee.flexion, from: 94.0, to: 0}

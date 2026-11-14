@@ -27,7 +27,7 @@ test("review bundle shows the banner and a button that opens the list", () => {
 });
 
 test("draft rows are marked and show their review note", () => {
-  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} lang="en" onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
   // One mark for the draft action and one for the draft attachment. The checked row has none.
   expect(screen.getAllByText(en["review.draft"])).toHaveLength(2);
   expect(screen.getByText(t("review.note", { note: NOTE }))).toBeTruthy();
@@ -35,15 +35,15 @@ test("draft rows are marked and show their review note", () => {
 });
 
 test("review mode hides the waiting line, normal mode keeps it", () => {
-  const { unmount } = render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
+  const { unmount } = render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} lang="en" onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
   expect(screen.queryByText(en["info.pending"])).toBeNull();
   unmount();
-  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("normal")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("normal")} t={t} lang="en" onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
   expect(screen.getByText(en["info.pending"])).toBeTruthy();
 });
 
 test("review list groups drafts by structure and shows row codes", () => {
-  render(<ReviewList bundle={makeBundle("review")} t={t} onClose={() => {}} />);
+  render(<ReviewList bundle={makeBundle("review")} t={t} lang="en" onClose={() => {}} />);
   expect(screen.getByRole("heading", { name: "Piriformis" })).toBeTruthy();
   expect(screen.getByText(t("review.rowId", { id: "x2" }))).toBeTruthy();
   expect(screen.getByText(t("review.rowId", { id: "a2" }))).toBeTruthy();
@@ -54,26 +54,26 @@ test("review list groups drafts by structure and shows row codes", () => {
 });
 
 test("review list shows the whole claim of a draft row, like the info panel", () => {
-  render(<ReviewList bundle={makeBundle("review")} t={t} onClose={() => {}} />);
+  render(<ReviewList bundle={makeBundle("review")} t={t} lang="en" onClose={() => {}} />);
   expect(screen.getByText("Hip external rotation: is stretched, with the hip bent between 0 and 30 degrees")).toBeTruthy();
   expect(screen.getByText(t("info.appliesTo", { text: "Test hips only" }))).toBeTruthy();
   expect(screen.getByText(en["confidence.low"])).toBeTruthy();
 });
 
 test("the punctuation between movement and claim comes from the text file", () => {
-  render(<ReviewList bundle={makeBundle("review")} t={createT({ ...en, "review.action": "{movement} >> {text}" })} onClose={() => {}} />);
+  render(<ReviewList bundle={makeBundle("review")} t={createT({ ...en, "review.action": "{movement} >> {text}" })} lang="en" onClose={() => {}} />);
   expect(screen.getByText("Hip external rotation >> is stretched, with the hip bent between 0 and 30 degrees")).toBeTruthy();
 });
 
 test("review list close button calls onClose", () => {
   const onClose = vi.fn();
-  render(<ReviewList bundle={makeBundle("review")} t={t} onClose={onClose} />);
+  render(<ReviewList bundle={makeBundle("review")} t={t} lang="en" onClose={onClose} />);
   fireEvent.click(screen.getByText(en["review.close"]));
   expect(onClose).toHaveBeenCalledTimes(1);
 });
 
 test("a draft exercise is listed with its phases, row code and question", () => {
-  render(<ReviewList bundle={makeMovementBundle("review")} t={t} onClose={() => {}} />);
+  render(<ReviewList bundle={makeMovementBundle("review")} t={t} lang="en" onClose={() => {}} />);
   expect(screen.getByRole("heading", { name: "Exercises" })).toBeTruthy();
   expect(screen.getByText("Lifting: the hip bent from 60 to 0 degrees. Working: Hip extension")).toBeTruthy();
   expect(screen.getByText("Row code: bridge")).toBeTruthy();

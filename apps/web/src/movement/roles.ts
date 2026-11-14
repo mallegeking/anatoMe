@@ -1,4 +1,6 @@
 import type { BundleAction, BundleMovement, BundlePhase, RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 
 // An angle id such as "hip.flexion" to degrees.
 export type Pose = Record<string, number>;
@@ -72,10 +74,11 @@ export function contextAngles(bundle: RegionBundle, query: Query): { angle: stri
   return [...out.values()];
 }
 
-export function involved(bundle: RegionBundle, query: Query, pose: Pose): Involved {
-  const name = new Map(bundle.structures.map((s) => [s.id, s.english]));
-  const nameOf = (id: string) => name.get(id) ?? id;
-  const byName = (a: string, b: string) => nameOf(a).localeCompare(nameOf(b));
+// Rows sort by highlight, then by the structure's name in the language shown. lang changes only the order.
+export function involved(bundle: RegionBundle, query: Query, pose: Pose, lang: Lang): Involved {
+  const name = new Map(bundle.structures.map((s) => [s.id, nameOf(s, lang)]));
+  const nameFor = (id: string) => name.get(id) ?? id;
+  const byName = (a: string, b: string) => nameFor(a).localeCompare(nameFor(b), lang);
   const candidates = candidatesOf(bundle, query);
   const rows: InvolvedRow[] = candidates.filter((a) => appliesAt(a, pose)).map((action) => ({ action, highlight: highlightOf(action) }));
   rows.sort(

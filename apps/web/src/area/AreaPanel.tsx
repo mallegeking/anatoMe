@@ -1,5 +1,7 @@
 import type { RegionBundle } from "../data/bundle";
 import { loadWord } from "../data/describe";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import type { AreaTap } from "../viewer/Scene";
 import type { Selection } from "../viewer/pick";
@@ -9,6 +11,8 @@ export type AreaState = AreaTap | null;
 
 type Props = {
   t: Translate;
+  // The language the names show in.
+  lang: Lang;
   bundle: RegionBundle;
   area: AreaState;
   selection: Selection | null;
@@ -24,21 +28,24 @@ function centimetres(depth: number): string {
 }
 
 // Lists what the model has under the tapped spot, from the surface inwards.
-export function AreaPanel({ t, bundle, area, selection, onFocusStructure, onOpenMovement, onClear }: Props) {
+export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, onOpenMovement, onClear }: Props) {
   if (!area) return <p className="info-label info-label--hint">{t("area.hint")}</p>;
   const { through } = area;
-  const nameOf = (sid: string) => bundle.structures.find((s) => s.id === sid)?.english ?? sid;
+  const structureName = (sid: string) => {
+    const structure = bundle.structures.find((s) => s.id === sid);
+    return structure ? nameOf(structure, lang) : sid;
+  };
   const same = (a: Selection | null, sid: string, side: string) => a !== null && a.sid === sid && a.side === side;
 
   return (
     <section className="area-panel" data-testid="area-panel">
-      <h2>{through ? t("area.throughTitle", { name: nameOf(through.sid) }) : t("area.title")}</h2>
+      <h2>{through ? t("area.throughTitle", { name: structureName(through.sid) }) : t("area.title")}</h2>
       <p className="muted">{t("area.note")}</p>
       <p className="muted">{t("area.noSkin")}</p>
       <ol>
         {area.entries.map((entry) => {
           const structure = bundle.structures.find((s) => s.id === entry.sid);
-          const name = nameOf(entry.sid);
+          const name = structureName(entry.sid);
           const label = entry.side === "l" ? t("side.left", { label: name }) : entry.side === "r" ? t("side.right", { label: name }) : name;
           const current = same(selection, entry.sid, entry.side) || same(through, entry.sid, entry.side);
           // One button for each distinct movement and load, in the order of the bundle's movement list.
@@ -63,7 +70,7 @@ export function AreaPanel({ t, bundle, area, selection, onFocusStructure, onOpen
                   <h3>{t("area.loadedBy")}</h3>
                   {loads.map(({ movement, load }) => (
                     <button key={`${movement.id}-${load}`} type="button" className="link-button" onClick={() => onOpenMovement(movement.id)}>
-                      {t("area.movement", { movement: movement.english, load: loadWord(load, t) })}
+                      {t("area.movement", { movement: nameOf(movement, lang), load: loadWord(load, t) })}
                     </button>
                   ))}
                 </div>

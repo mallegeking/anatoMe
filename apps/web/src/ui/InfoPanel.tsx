@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { BundleAction, BundleCitationUse, RegionBundle } from "../data/bundle";
 import { describeAction, jointOf } from "../data/describe";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { DraftMark } from "../review/DraftMark";
 import type { Selection } from "../viewer/pick";
@@ -9,6 +11,8 @@ type Props = {
   selection: Selection;
   bundle: RegionBundle;
   t: Translate;
+  // The language the names show in.
+  lang: Lang;
   // Name from the 3D file, used when the bundle does not know this structure.
   fallbackLabel?: string;
   onSwitchSide: () => void;
@@ -79,12 +83,20 @@ function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: Region
   );
 }
 
-export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
+// A bone's name inside a sentence such as "Starts at: ... of the femur". English writes it in lower case.
+// German keeps the capital, because German nouns always have one.
+export function boneLabel(bundle: RegionBundle, id: string, lang: Lang): string {
+  const bone = bundle.structures.find((s) => s.id === id);
+  const name = bone ? nameOf(bone, lang) : id;
+  return lang === "de" ? name : name.toLowerCase();
+}
+
+export function InfoPanel({ selection, bundle, t, lang, fallbackLabel, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
   const structure = bundle.structures.find((s) => s.id === selection.sid);
-  const name = structure?.english ?? fallbackLabel ?? selection.sid;
+  const name = structure ? nameOf(structure, lang) : (fallbackLabel ?? selection.sid);
   const sideText = selection.side === "l" ? t("side.left", { label: name }) : selection.side === "r" ? t("side.right", { label: name }) : name;
 
-  const boneName = (id: string) => (bundle.structures.find((s) => s.id === id)?.english ?? id).toLowerCase();
+  const boneName = (id: string) => boneLabel(bundle, id, lang);
   const attachments = structure ? bundle.attachments.filter((a) => a.muscle === selection.sid) : [];
   const actions = structure ? bundle.actions.filter((a) => a.structure === selection.sid) : [];
   // In the review build the draft rows are shown above, so the waiting line would only repeat them.
@@ -130,7 +142,7 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
             <div key={movement.id}>
               <h4>
                 <button type="button" className="link-button" onClick={() => onOpenMovement(movement.id)}>
-                  {movement.english}
+                  {nameOf(movement, lang)}
                 </button>
               </h4>
               <ul>
