@@ -1152,3 +1152,86 @@
       says_kind: quote
   checked_by: null
   review_note: "Physio: both sources are clinical tests, not length measurements. They read resistance to adduction as the tract being tight. The classic test keeps the hip straight or slightly extended, and no source gives an angle. Is stretched in adduction at any amount of hip flexion fair?"
+
+# Hamstrings, rectus femoris and psoas major: stretched by the hip movement that lengthens them.
+
+- id: biceps-femoris-long-head-hip-flexion-stretched
+  structure: biceps-femoris-long-head
+  movement: hip-flexion
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: kellis-2022
+      locator: Main text, section Length-tension and force-length relationships in hamstring muscles, Passive tension, Implications, paragraph beginning "With the knee extended"
+      says: "With the knee extended, passive resistance to stretch during hip flexion (lengthening) starts to increase from about 45° of hip flexion and is provided by all hamstrings. As the hip flexes beyond 45°, passive resistance increases almost three-fold (relative to neutral position) and mainly results from SM and BFlh resistance to elongation. Owing to its longer fibers, ST can operate over a greater range of motion without over-stretch."
+      says_kind: quote
+    - ref: danielsson-2020
+      locator: Conclusion
+      says: "A stretch-type injury to the hamstrings is caused by extensive hip flexion with an extended knee."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: both sources speak of hip flexion with the knee straight, and a range cannot hold a single knee angle, so the row has no angle range and also shows with the knee bent. Kellis 2022 says resistance rises from about 45 degrees of hip flexion but gives no upper end. Is stretched in hip flexion with the knee straight right for the long head?"
+
+- id: semimembranosus-hip-flexion-stretched
+  structure: semimembranosus
+  movement: hip-flexion
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: kellis-2022
+      locator: Main text, section Length-tension and force-length relationships in hamstring muscles, Passive tension, Implications, paragraph beginning "With the knee extended"
+      says: "With the knee extended, passive resistance to stretch during hip flexion (lengthening) starts to increase from about 45° of hip flexion and is provided by all hamstrings. As the hip flexes beyond 45°, passive resistance increases almost three-fold (relative to neutral position) and mainly results from SM and BFlh resistance to elongation. Owing to its longer fibers, ST can operate over a greater range of motion without over-stretch."
+      says_kind: quote
+    - ref: danielsson-2020
+      locator: Conclusion
+      says: "A stretch-type injury to the hamstrings is caused by extensive hip flexion with an extended knee."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: both sources speak of hip flexion with the knee straight, and a range cannot hold a single knee angle, so the row has no angle range and also shows with the knee bent. Kellis 2022 says resistance rises from about 45 degrees of hip flexion but gives no upper end. Is stretched in hip flexion with the knee straight right for semimembranosus?"
+
+- id: semitendinosus-hip-flexion-stretched
+  structure: semitendinosus
+  movement: hip-flexion
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: kellis-2022
+      locator: Main text, section Length-tension and force-length relationships in hamstring muscles, Passive tension, Implications, paragraph beginning "With the knee extended"
+      says: "With the knee extended, passive resistance to stretch during hip flexion (lengthening) starts to increase from about 45° of hip flexion and is provided by all hamstrings. As the hip flexes beyond 45°, passive resistance increases almost three-fold (relative to neutral position) and mainly results from SM and BFlh resistance to elongation. Owing to its longer fibers, ST can operate over a greater range of motion without over-stretch."
+      says_kind: quote
+    - ref: danielsson-2020
+      locator: Conclusion
+      says: "A stretch-type injury to the hamstrings is caused by extensive hip flexion with an extended knee."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: both sources speak of hip flexion with the knee straight, and a range cannot hold a single knee angle, so the row has no angle range and also shows with the knee bent. Kellis 2022 says resistance rises from about 45 degrees of hip flexion but gives no upper end. Kellis 2022 says semitendinosus tolerates more range because of its longer fibres. Should its row be weaker or left out?"
+
+- id: rectus-femoris-hip-extension-stretched
+  structure: rectus-femoris
+  movement: hip-extension
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: chanel-2025
+      locator: Discussion, first paragraph. Shear wave velocity measured at 0 and 80 degrees of hip flexion, knee bent 30 to 110 degrees.
+      says: "Our results confirmed that a 0° hip joint angle position would induce higher stiffness for RF as compared to 80°. ... a hip extension leads to greater lengthening compared to a flexed position."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the study compared only 0 and 80 degrees of hip flexion, with the knee bent. It did not test the hip behind neutral, so filing the row under hip extension is our reading. The stretch also grew as the knee bent further. Is the row fair without an angle range?"
+
+- id: psoas-major-hip-extension-stretched
+  structure: psoas-major
+  movement: hip-extension
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: zerbinati-2026
+      locator: Procedure Performance, Setup, first paragraph
+      says: "To cut the psoas tendon, the team holds the treated hip and knee in full extension, with the other hip fully bent as in the Thomas test, so that the psoas tendon is as tight as it gets."
+      says_kind: summary
+    - ref: aali-2025
+      locator: Methods, paragraph on the hip extension range of motion and Fig. 1
+      says: "The study measures how far the hip extends in the modified Thomas test, with the other leg held fully bent, and uses that as its measure of iliopsoas tightness."
+      says_kind: summary
+  checked_by: null
+  review_note: "Physio: both sources take it as given that hip extension tightens psoas (one in surgery, one as a flexibility test). Neither gives an angle. Is stretched in hip extension right? We left iliacus out for want of a source of its own. Should iliacus get the same row?"

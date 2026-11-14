@@ -282,3 +282,38 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13693282/
   license: CC BY 4.0
   access: open
+- id: kellis-2022
+  title: "Hamstrings force-length relationships and their implications for angle-specific joint torques: a narrative review"
+  authors: Kellis E, Blazevich AJ
+  year: 2022
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9446565/
+  license: CC BY 4.0
+  access: open
+- id: danielsson-2020
+  title: "The mechanism of hamstring injuries: a systematic review"
+  authors: Danielsson A, Horvath A, Senorski C, Alentorn-Geli E, Garrett WE, Cugat R, Samuelsson K, Hamrin Senorski E
+  year: 2020
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7526261/
+  license: CC BY 4.0
+  access: open
+- id: chanel-2025
+  title: "Influence of the Knee and Hip Joint Angles on the Knee Extensor Muscles and Tendon Shear Wave Velocity in Men and Prepubertal Boys"
+  authors: Chanel B, Cometti C, Babault N
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12782349/
+  license: CC BY 4.0
+  access: open
+- id: zerbinati-2026
+  title: "Iliopsoas Tenotomy in Patients With Neurological Diseases. A Novel Closed Technique Using an Ultrasound-Guided Minimally Invasive Approach in Neuro-Orthopaedics"
+  authors: Zerbinati P, Tristano I, Glorioso D, Bemporad J
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13387791/
+  license: CC BY-NC-ND 4.0
+  access: open
+- id: aali-2025
+  title: "Altered lower extremity muscle activity patterns due to Iliopsoas tightness during single-leg landing"
+  authors: Aali S, Rezazadeh F, Ardigò LP, Badicu G
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11923245/
+  license: CC BY-NC-ND 4.0
+  access: open
