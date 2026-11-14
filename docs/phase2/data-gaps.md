@@ -48,3 +48,11 @@ Two of the six exercises were added (bodyweight squat, side-lying hip abduction)
 ## Task 5: knee rows for the thigh muscles
 
 No gap. On 2026-11-14 each of the ten muscles already had a working knee row from Phase 1, so no row was added: rectus femoris, vastus lateralis, vastus medialis and vastus intermedius (knee extension), sartorius, gracilis, biceps femoris long head, biceps femoris short head, semitendinosus and semimembranosus (knee flexion).
+
+## Not modelled
+
+Structures that the hip region does not have, and why.
+
+- **Quadriceps tendon and patellar ligament.** Neither mesh source has them, and drawing them by hand was ruled out in Phase 0. The info panel keeps its gap line for them.
+- **Psoas minor.** No mesh in either source.
+- **The origin of psoas major on the spine.** The lumbar vertebrae belong to a later region, so psoas major has no origin row (the data report lists it as "no origin").

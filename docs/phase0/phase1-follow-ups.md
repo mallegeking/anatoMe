@@ -47,7 +47,7 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 
 Found in the Phase 1 reviews and left for Phase 2.
 
-- Iliacus and psoas major are at depth 1, so the first peel hides them together with sartorius and rectus femoris. Decide how deep they should show.
+- Done 2026-11-14 (Phase 2d Task 6): Iliacus and psoas major are at depth 1, so the first peel hides them together with sartorius and rectus femoris. Decide how deep they should show. Both are now at depth 2, because an ultrasound guide shows sartorius as the outermost muscle over the iliopsoas at the front of the hip.
 - Done 2026-11-13 (Phase 2a Task 1 or 2): "Hide this" hides both sides of a paired structure. Let it hide one side only.
 - Done 2026-11-13 (Phase 2a Task 1 or 2): Search opens paired structures on the left and keeps a hard-coded list of unpaired ones (only the sacrum). Give the bundle a `paired` flag instead, before the next region adds midline structures.
 - Done 2026-11-13 (Phase 2a Task 1 or 2): After Escape closed the search list, Enter still chooses the first result. Make Enter do nothing while the list is closed.
