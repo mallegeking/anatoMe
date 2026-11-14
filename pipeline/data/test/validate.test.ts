@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
@@ -66,7 +67,14 @@ test("the valid fixture with an exercise passes", () => {
   expect(validateDataDir(fx("valid")).ok).toBe(true);
 });
 test("a data folder without exercises.yaml passes", () => {
-  const dir = fileURLToPath(new URL("../../../data", import.meta.url));
-  expect(existsSync(join(dir, "exercises.yaml"))).toBe(false);
-  expect(validateDataDir(dir).ok).toBe(true);
+  // Work on a copy of the valid fixture, so this does not depend on the real data folder.
+  const tmp = mkdtempSync(join(tmpdir(), "anatome-noex-"));
+  try {
+    cpSync(fx("valid"), tmp, { recursive: true });
+    rmSync(join(tmp, "exercises.yaml"));
+    expect(existsSync(join(tmp, "exercises.yaml"))).toBe(false);
+    expect(validateDataDir(tmp).ok).toBe(true);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 });
