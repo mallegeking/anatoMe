@@ -33,7 +33,7 @@ The knowledge base is in `data/`. Each claim is a row that cites a source. The f
 Follow these steps for every row.
 
 1. Find a source you can open in full. Good places: PubMed Central (open-access subset), the OERI Human Anatomy text on LibreTexts, open-access journals. A paywalled abstract is not enough.
-2. Read the licence on the page itself. Copy it into the citation's `license` as stated, and set its `license_id`.
+2. Read the licence on the page itself. Copy it into the citation's `license` as stated, and set its `license_id`. Pick the id from the list in `data/schema/citations.schema.json`. If the source's licence text does not name exactly one licence on that list, use `other`, which never allows a quote.
 3. Find the sentence, table row or figure that supports the claim. Write its place into `locator` so that another person finds it in under a minute.
 4. Write `says`. Use the source's own words (`quote`) only when its `license_id` is CC BY, CC0 or public domain, because those fit our CC BY 4.0 data. For any other licence, write one or two sentences of your own (`summary`). The validator refuses a quote from any other source.
 5. Write the row. Take angles for `when` only from what the source states. Set `confidence` by the header rule in `data/actions/hip.yaml`.

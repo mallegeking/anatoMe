@@ -14,3 +14,4 @@ test("the draft check runs after the build and before the upload", () => {
   expect(upload).toBeGreaterThan(check);
 });
 test("the deploy is skipped while the repo is private", () => expect(text).toContain("github.event.repository.private == false"));
+test("no step is allowed to fail silently", () => expect(text).not.toMatch(/continue-on-error/));

@@ -26,3 +26,17 @@ test("in a diff of two files the result names the file that sets checked_by", ()
   expect(found).toHaveLength(1);
   expect(found[0]).toContain("data/attachments/hip.yaml");
 });
+
+test("checked_by as the first key of a list item is caught", () => expect(findReviewEdits(diff(["+- checked_by: physio-1"]))).toHaveLength(1));
+test("checked_on as the first key of an indented list item is caught", () => expect(findReviewEdits(diff(["+  - checked_on: 2026-12-01"]))).toHaveLength(1));
+test("a quoted checked_by key is caught", () => expect(findReviewEdits(diff(['+  "checked_by": physio-1']))).toHaveLength(1));
+test("a single-quoted checked_on key is caught", () => expect(findReviewEdits(diff(["+  'checked_on': 2026-12-01"]))).toHaveLength(1));
+test("flow style with both keys counts as one offending line", () =>
+  expect(findReviewEdits(diff(["+- {id: x, checked_by: physio-1, checked_on: 2026-12-01}"]))).toHaveLength(1));
+test("flow style with only checked_by set is caught", () => expect(findReviewEdits(diff(["+- {id: x, checked_by: physio-1}"]))).toHaveLength(1));
+test("null stays fine in quoted-key and flow forms", () => {
+  expect(findReviewEdits(diff(['+  "checked_by": null']))).toEqual([]);
+  expect(findReviewEdits(diff(["+- {id: x, checked_by: null}"]))).toEqual([]);
+  expect(findReviewEdits(diff(["+- {id: x, 'checked_by': null, note: y}"]))).toEqual([]);
+  expect(findReviewEdits(diff(["+- checked_by: null"]))).toEqual([]);
+});

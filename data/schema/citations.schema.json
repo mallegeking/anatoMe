@@ -15,6 +15,7 @@
       "url": { "type": "string", "pattern": "^https://" },
       "license": { "type": "string", "minLength": 1 },
       "license_id": {
+        "description": "Pick the id from this list. If the source licence text does not name exactly one licence on it, use other, which never allows a quote.",
         "enum": [
           "CC-BY-4.0", "CC-BY-3.0", "CC-BY-2.0", "CC-BY-unversioned",
           "CC-BY-SA-4.0", "CC-BY-SA-3.0",

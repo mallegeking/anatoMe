@@ -1,14 +1,17 @@
 // Fails when a diff of data/ records a review. Only the project owner does that.
 // Usage: git diff origin/main...HEAD -- data | node scripts/check-review-guard.mjs
 // It looks at added lines only. A line is flagged when it sets checked_by to anything but null,
-// or when it adds a checked_on line. Text inside a quoted value never matches, because the
-// match needs the key at the start of the line.
+// or when it adds a checked_on line, in block, list-item, quoted-key or flow style. Text inside a
+// quoted value does not match, because the key must start the line or follow a brace or comma.
 
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-const SETS_CHECKED_BY = /^\+\s*checked_by:\s*(?=\S)(?!null\s*$)/;
-const ADDS_CHECKED_ON = /^\+\s*checked_on:/;
+// The key may start the line, follow list dashes ("- key:"), be quoted, or follow "{" or ","
+// in flow style. A comma or brace is needed before it, so words inside a quoted text do not match.
+const KEY_START = String.raw`(?:^\+(?:\s*-)*\s*|[{,]\s*)`;
+const SETS_CHECKED_BY = new RegExp(KEY_START + String.raw`["']?checked_by["']?\s*:\s*(?=\S)(?!null\s*(?:$|[,}#]))`);
+const ADDS_CHECKED_ON = new RegExp(KEY_START + String.raw`["']?checked_on["']?\s*:`);
 
 // Returns the offending added lines, each with the file it belongs to.
 export function findReviewEdits(diff) {

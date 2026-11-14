@@ -26,7 +26,7 @@ Content searches looked at added and removed lines of `git log --all -p -U0`, co
 ## Result in short
 
 - Real findings (a key, token, password, real hostname, real address, e-mail address in file content, or a file that should never have been committed): 0.
-- Doubtful items for the owner to judge: 6 (D1 to D6 below).
+- Doubtful items for the owner to judge: 7 (D1 to D7 below).
 - Nothing needs to be rotated.
 
 ## Harmless hits
@@ -54,7 +54,7 @@ Content searches looked at added and removed lines of `git log --all -p -U0`, co
 
 ## Findings
 
-No real finding. Six doubtful items are open. None of them is a secret. Each one may matter only for the owner's privacy. All six are open, and the owner decides what to do with each: leave it, rewrite history, or start the public repo from a fresh commit. Nothing was changed.
+No real finding. Seven doubtful items are open. None of them is a secret. Each one may matter only for the owner's privacy. All seven are open, and the owner decides what to do with each: leave it, rewrite history, or start the public repo from a fresh commit. Nothing was changed.
 
 - **D1.** Commit 769fb8d, file `docs/superpowers/specs/2026-11-02-anatome-design.md` (first written there, still in later edits such as 63dfd00, 3c46bf4 and ab155a0, and at the tip). Kind: the owner's online handle written as an at-mention in the header. It may matter because on GitHub an at-mention in a public file links to whoever owns that handle. Check that this is the account the owner wants linked.
 - **D2.** Same file, same commit and later versions, at the tip. Kind: statements about the owner's own pain. The motivation paragraph names pain in three body regions, which is the allowed general statement. The decision table, the roadmap and the success paragraph repeat which joints hurt and what the owner would choose to move. It may matter because it goes beyond the single general statement.
@@ -62,8 +62,9 @@ No real finding. Six doubtful items are open. None of them is a secret. Each one
 - **D4.** `docs/deploy-homelab.md` (commits 0605104, 7ee0c3f, 77ada8f, f21abf1, f2b2a77, at the tip) and the phase 0 plan (commit 9711834). Kind: description of the owner's home server layout. It names a service file, folders under `/srv`, ports, the fact that the site is only reachable on a private tailnet, and that a physiotherapist is invited. All host names are placeholders. It may matter only because it describes private home infrastructure.
 - **D5.** Author and committer identities (see Authors). Kind: one personal webmail address, used on 6 human commits as author or committer, in the content of git metadata rather than files. It may matter because it becomes public in `git log` and cannot be removed without rewriting history.
 - **D6.** Commits edb5979, 3eeeeed and 396d1c9. Kind: an author name that reads like a computer name, a device name leaking through the git config. It is in history only, not in the tip contents. It may matter because it exposes a name of the owner's home machine.
+- **D7.** Commit ed43141, file `docs/phase3/licence-recheck.md`. Kind: a local home folder path, with the local user name in it, in seven library rows. Commit bceabaa fixed it in the file, but it is still in the history of this branch. Found by the final review after the audit ran. It may matter because it exposes the owner's local user name.
 
-D1, D5 and D6 can only be fixed by rewriting history (an author mapping, and replacing the spec text from commit 769fb8d onward). D2, D3 and D4 can also be fixed by editing the files for the future, but the old text would stay in history.
+D1, D5, D6 and D7 can only be fixed by rewriting history (an author mapping, and replacing the spec text from commit 769fb8d onward). D2, D3 and D4 can also be fixed by editing the files for the future, but the old text would stay in history.
 
 ## Authors
 

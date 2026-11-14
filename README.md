@@ -9,7 +9,6 @@ The link is added when the site is live
 ![Searching for a structure](docs/phase1/screenshot-search.png)
 ![Peeling the layers](docs/phase1/screenshot-layers.png)
 ![The info panel with sources](docs/phase1/screenshot-info-panel.png)
-![The review build with drafts marked](docs/phase1/screenshot-review.png)
 
 ## What it does
 
