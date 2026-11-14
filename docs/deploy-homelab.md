@@ -134,7 +134,7 @@ If the service cannot read the folder, you get a blank or error page on the phon
 
 ### Update the site later
 
-Repeat steps 2 and 3. Do not run step 4 again. Tailscale reads the files fresh on each request.
+Repeat steps 2 and 3. Do not run step 4 again. The new files should show up the next time the page loads, but Tailscale may keep an old copy for a while. After an update, do a hard refresh on the phone (or clear the site data for the address) so you see the new version.
 
 ### Stop serving
 

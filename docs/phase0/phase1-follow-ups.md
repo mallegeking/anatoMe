@@ -38,10 +38,10 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 
 ## Tooling and docs
 
-- `perf-check.mjs` and `error-check.mjs`: handle a failed server start, a busy port 4173, and rename the `URL` constant.
-- Deploy guide: soften "Tailscale reads the files fresh on each request" and mention a hard refresh after updates.
-- README: describe the goal in future tense until the app does all of it.
-- Spike report: add a pointer to the tap pass criteria when the phone result is recorded.
+- Done 2026-11-14: `perf-check.mjs` and `error-check.mjs` now handle a failed server start and a busy port 4173, and the `URL` constant is renamed `PAGE_URL` (Phase 3 Task 4).
+- Done 2026-11-14: the deploy guide no longer promises that Tailscale reads the files fresh, and it tells you to do a hard refresh on the phone after an update (Phase 3 Task 4).
+- Done (done by Task 5 of the Phase 3 plan): README describes the goal in future tense until the app does all of it.
+- Done 2026-11-14: the spike report points to the tap checks in the phone measurements sheet (Phase 3 Task 4).
 
 ## Phase 2
 

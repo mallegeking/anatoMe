@@ -4,6 +4,7 @@
 // Run "npm run build" first. Then run: node apps/web/scripts/perf-check.mjs
 // Exit code 0 means the median is under 5000 ms. Exit code 1 means it is not.
 import { spawn } from "node:child_process";
+import { connect } from "node:net";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,7 +17,7 @@ const { chromium } = createRequire(import.meta.url)("playwright");
 const LIMIT_MS = 5000;
 const RUNS = 5;
 const PORT = 4173;
-const URL = `http://localhost:${PORT}/?perf=1`;
+const PAGE_URL = `http://localhost:${PORT}/?perf=1`;
 const webDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function median(numbers) {
@@ -25,26 +26,74 @@ function median(numbers) {
   return sorted.length % 2 ? sorted[middle] : Math.round((sorted[middle - 1] + sorted[middle]) / 2);
 }
 
-// Wait until the preview server answers.
+// True if something already answers on the port.
+function portInUse() {
+  return new Promise((resolve) => {
+    const socket = connect({ port: PORT, host: "localhost" });
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+  });
+}
+
+// Stop the server and the npx and vite processes under it. Safe to call more than once.
+let server;
+function stopServer() {
+  if (!server || !server.pid) return;
+  try {
+    process.kill(-server.pid);
+  } catch {
+    // Already gone.
+  }
+  server = undefined;
+}
+
+function fail(text) {
+  console.log(text);
+  stopServer();
+  process.exit(1);
+}
+
+// Make sure the server is stopped if you press Ctrl+C.
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => {
+    stopServer();
+    process.exit(1);
+  });
+}
+
+if (await portInUse()) fail(`Port ${PORT} is in use. Stop the other server and run this again.`);
+
+// "detached" gives the server its own process group, so we can stop npx and vite together at the end.
+server = spawn("npx", ["vite", "preview", "--port", String(PORT), "--strictPort"], {
+  cwd: webDir,
+  stdio: "ignore",
+  detached: true,
+});
+let serverExited = false;
+server.on("exit", () => {
+  serverExited = true;
+});
+server.on("error", () => {
+  serverExited = true;
+});
+
+// Wait up to 15 seconds until the preview server answers.
 async function waitForServer() {
-  for (let i = 0; i < 60; i++) {
+  const giveUp = Date.now() + 15000;
+  while (Date.now() < giveUp && !serverExited) {
     try {
-      const response = await fetch(URL);
+      const response = await fetch(PAGE_URL);
       if (response.ok) return;
     } catch {
       // Not up yet, try again.
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error(`The preview server did not start on port ${PORT}. Did you run "npm run build"?`);
+  fail('The preview server did not start. Run "npm run build" first and check the output above.');
 }
-
-// "detached" gives the server its own process group, so we can stop npx and vite together at the end.
-const server = spawn("npx", ["vite", "preview", "--port", String(PORT), "--strictPort"], {
-  cwd: webDir,
-  stdio: "ignore",
-  detached: true,
-});
 
 let browser;
 let failed = false;
@@ -59,7 +108,7 @@ try {
     const cdp = await context.newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
     await cdp.send("Network.setCacheDisabled", { cacheDisabled: true });
-    await page.goto(URL);
+    await page.goto(PAGE_URL);
     await page.waitForFunction(() => window.__anatomeInteractiveMs !== undefined, undefined, { timeout: 60000 });
     const ms = await page.evaluate(() => window.__anatomeInteractiveMs);
     samples.push(ms);
@@ -77,6 +126,6 @@ try {
   failed = true;
 } finally {
   if (browser) await browser.close();
-  process.kill(-server.pid);
+  stopServer();
 }
 process.exit(failed ? 1 : 0);
