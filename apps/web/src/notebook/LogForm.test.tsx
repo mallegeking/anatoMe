@@ -58,3 +58,13 @@ test("cancel reports it and saves nothing", () => {
   expect(onCancel).toHaveBeenCalledTimes(1);
   expect(onSave).not.toHaveBeenCalled();
 });
+
+test("opening the form puts focus on the first feeling button", () => {
+  show();
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: en["notebook.painful"] }));
+});
+
+test("the note box is kept away from online spell check", () => {
+  show();
+  expect(screen.getByLabelText(en["notebook.note"]).getAttribute("spellcheck")).toBe("false");
+});

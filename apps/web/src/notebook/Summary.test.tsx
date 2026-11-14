@@ -115,3 +115,22 @@ test("print runs once per press and only after the summary is in the document", 
   expect(print).toHaveBeenCalledTimes(2);
   vi.useRealTimers();
 });
+
+test("a side with no fine notes carries the same ask as the panel, after the candidate lines", () => {
+  page([entry()]);
+  const ask = screen.getByText(en["notebook.needFine"]);
+  const last = screen.getAllByRole("listitem").at(-1)!;
+  expect(last.compareDocumentPosition(ask) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+test("a list that may be incomplete says so on the page", () => {
+  page([entry({ pick: { kind: "movement", id: "knee-flexion" } })]);
+  expect(screen.getByText(en["notebook.incomplete"])).toBeTruthy();
+});
+
+test("the review build prints the review banner instead of the basis line", () => {
+  const model = summaryModel([entry()], makeMovementBundle("review"), now, true);
+  render(<Summary t={t} bundle={makeMovementBundle("review")} model={model} />);
+  expect(screen.getByText(en["review.banner"])).toBeTruthy();
+  expect(screen.queryByText(en["summary.basis"])).toBeNull();
+});

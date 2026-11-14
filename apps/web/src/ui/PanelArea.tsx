@@ -5,6 +5,7 @@ import type { Translate } from "../i18n/t";
 import { peel, restore, showStructure, toggleTissue, type LayerState } from "../layers/layers";
 import { LayersPanel } from "../layers/LayersPanel";
 import { AreaPanel, type AreaState } from "../area/AreaPanel";
+import { QuietBoundary } from "./QuietBoundary";
 import { MovementPanel } from "../movement/MovementPanel";
 import type { MovementState } from "../movement/state";
 import type { NotebookStore } from "../notebook/store";
@@ -14,6 +15,7 @@ import type { Mode } from "./ModeBar";
 import { RegionInfo } from "./RegionInfo";
 
 // The Notebook tab is its own chunk, so it loads only when the tab is first opened.
+// If that chunk fails to load, the failure stays inside the tab and the other tabs keep working.
 const NotebookPanel = lazy(() => import("../notebook/NotebookPanel"));
 
 type Props = {
@@ -92,16 +94,18 @@ export function PanelArea({ region, t, mode, selection, label, layersOpen, layer
   }
   if (mode === "notebook") {
     return (
-      <Suspense fallback={null}>
-        <NotebookPanel
-          t={t}
-          bundle={bundle}
-          store={on.notebookStore}
-          storeError={on.notebookError}
-          onFocusStructure={on.onFocusNotebookStructure}
-          onPrint={on.onPrintNotebook}
-        />
-      </Suspense>
+      <QuietBoundary fallback={<p>{t("notebook.unavailable")}</p>}>
+        <Suspense fallback={null}>
+          <NotebookPanel
+            t={t}
+            bundle={bundle}
+            store={on.notebookStore}
+            storeError={on.notebookError}
+            onFocusStructure={on.onFocusNotebookStructure}
+            onPrint={on.onPrintNotebook}
+          />
+        </Suspense>
+      </QuietBoundary>
     );
   }
   return (

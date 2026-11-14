@@ -2,7 +2,7 @@
 
 anatoMe is an educational tool for understanding how the body moves. It is not a diagnostic tool and it is not medical advice. If you have a health concern, please talk to a qualified health professional.
 
-anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip. Notes you write in the app never leave your device.
+anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip. Notes you write in the app stay in your browser. The app never sends them anywhere.
 
 ## What it does today
 

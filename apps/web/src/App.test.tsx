@@ -30,6 +30,29 @@ vi.mock("./notebook/PrintSummary", async (original) => {
   };
 });
 
+// Lets one test make the lazy notebook pieces fail. Otherwise they are the real ones.
+const lazyParts = vi.hoisted(() => ({ panelFails: false, formFails: false }));
+vi.mock("./notebook/NotebookPanel", async (original) => {
+  const real = await original<typeof import("./notebook/NotebookPanel")>();
+  return {
+    ...real,
+    default: (props: Parameters<typeof real.default>[0]) => {
+      if (lazyParts.panelFails) throw new Error("chunk failed");
+      return real.default(props);
+    },
+  };
+});
+vi.mock("./notebook/LogForm", async (original) => {
+  const real = await original<typeof import("./notebook/LogForm")>();
+  return {
+    ...real,
+    default: (props: Parameters<typeof real.default>[0]) => {
+      if (lazyParts.formFails) throw new Error("chunk failed");
+      return real.default(props);
+    },
+  };
+});
+
 // jsdom cannot draw 3D, so the model is plain buttons here. "model" is a tap on empty space,
 // "tap piriformis" a tap on the left piriformis.
 vi.mock("./viewer/Viewer", () => ({
@@ -397,4 +420,82 @@ test("a print summary that fails to load leaves the rest of the app on screen", 
   } finally {
     printSummary.fails = false;
   }
+});
+
+test("a notebook tab that fails to load stays inside that tab", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  lazyParts.panelFails = true;
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  try {
+    render(<App />);
+    await screen.findByText(en["info.tapHint"]);
+    fireEvent.click(tab(en["mode.notebook"]));
+    expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+    expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
+    fireEvent.click(tab(en["mode.atlas"]));
+    expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
+    fireEvent.click(tab(en["mode.movement"]));
+    expect(screen.getByRole("heading", { name: en["movement.pick"] })).toBeTruthy();
+    expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
+  } finally {
+    lazyParts.panelFails = false;
+  }
+});
+
+test("a log form that fails to load stays inside the Movements panel", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  lazyParts.formFails = true;
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  try {
+    render(<App />);
+    await screen.findByText(en["info.tapHint"]);
+    fireEvent.click(tab(en["mode.movement"]));
+    fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+    fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+    expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+    expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
+    expect(screen.getByRole("heading", { name: "Hip external rotation", level: 2 })).toBeTruthy();
+    fireEvent.click(tab(en["mode.atlas"]));
+    expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
+  } finally {
+    lazyParts.formFails = false;
+  }
+});
+
+// Logs one painful note and presses print, so a summary is on the page.
+async function printOnce() {
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  await screen.findByText(en["notebook.saved"]);
+  fireEvent.click(tab(en["mode.notebook"]));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.print"] }));
+  await waitFor(() => expect(document.querySelector("section.print-summary")).not.toBeNull());
+}
+
+test("the print summary goes away on afterprint", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  vi.spyOn(window, "print").mockImplementation(() => {});
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  await printOnce();
+  fireEvent(window, new Event("afterprint"));
+  await waitFor(() => expect(document.querySelector("section.print-summary")).toBeNull());
+});
+
+test("the print summary goes away when the person leaves the Notebook tab", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  vi.spyOn(window, "print").mockImplementation(() => {});
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  await printOnce();
+  fireEvent.click(tab(en["mode.atlas"]));
+  expect(document.querySelector("section.print-summary")).toBeNull();
 });

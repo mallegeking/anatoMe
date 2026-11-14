@@ -203,3 +203,19 @@ test("without a log handler there is no log button", () => {
   pick("Hip external rotation");
   expect(screen.queryByRole("button", { name: en["notebook.log"] })).toBeNull();
 });
+
+test("focus moves into the form when it opens and back to the log button when it closes", async () => {
+  show();
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  const painful = await screen.findByRole("button", { name: en["notebook.painful"] });
+  expect(document.activeElement).toBe(painful);
+  pick(en["notebook.cancel"]);
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: en["notebook.log"] }));
+  // Saving puts focus back the same way.
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  pick(en["notebook.side.l"]);
+  pick(en["notebook.save"]);
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: en["notebook.log"] }));
+});

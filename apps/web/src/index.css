@@ -430,7 +430,7 @@ body,
   font-size: 0.8125rem;
 }
 
-/* The tabs under the top bar: one row of equal buttons that never wraps, even at 360 px. */
+/* The tabs under the top bar: one row of buttons that never wraps, even at 360 px. Each is as wide as its word plus a share of the rest. */
 .mode-bar {
   flex: 0 0 auto;
   display: flex;
@@ -727,5 +727,10 @@ body,
     text-align: left;
     vertical-align: top;
     overflow-wrap: anywhere;
+  }
+
+  /* Notes keep the line breaks the person typed. */
+  .print-summary td:last-child {
+    white-space: pre-wrap;
   }
 }

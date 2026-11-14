@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import type { RegionBundle } from "../data/bundle";
 import type { Translate } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
@@ -203,9 +203,10 @@ export function ruledOutText(t: Translate, bundle: RegionBundle, ruledOut: strin
 // One note. The note text is shown as plain text, never as HTML.
 function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: RegionBundle; entry: NotebookEntry; onDelete: () => void }) {
   const angles = formatAngles(entry.pose, bundle, t);
+  const lineId = useId();
   return (
     <li>
-      <p>
+      <p id={lineId}>
         {t("notebook.entry", {
           date: entry.date,
           name: entryName(entry, bundle, t),
@@ -215,7 +216,7 @@ function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: Regio
       </p>
       {angles && <p className="muted">{t("notebook.angles", { angles })}</p>}
       {entry.note && <p className="notebook-note">{entry.note}</p>}
-      <button type="button" className="link-button" onClick={onDelete}>
+      <button type="button" className="link-button" aria-describedby={lineId} onClick={onDelete}>
         {t("notebook.delete")}
       </button>
     </li>

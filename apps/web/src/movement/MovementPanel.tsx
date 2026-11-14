@@ -1,6 +1,7 @@
-import { lazy, Suspense, useId, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { BundleAction, RegionBundle } from "../data/bundle";
 import { describeAction, jointOf } from "../data/describe";
+import { QuietBoundary } from "../ui/QuietBoundary";
 import type { Translate } from "../i18n/t";
 import type { EntrySide, Feeling } from "../notebook/types";
 import { DraftMark } from "../review/DraftMark";
@@ -76,28 +77,38 @@ export function MovementPanel(props: Props) {
 }
 
 // "Log this movement" opens the form in place. Saving or cancelling closes it again.
+// If the form's chunk fails to load, the failure stays here and the rest of the panel keeps working.
 function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => void }) {
   const [open, setOpen] = useState(false);
+  const logButton = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+  // When the form closes, focus goes back to the button that opened it.
+  useEffect(() => {
+    if (wasOpen.current && !open) logButton.current?.focus();
+    wasOpen.current = open;
+  }, [open]);
   if (!open) {
     return (
       <div className="panel-actions">
-        <button type="button" onClick={() => setOpen(true)}>
+        <button ref={logButton} type="button" onClick={() => setOpen(true)}>
           {t("notebook.log")}
         </button>
       </div>
     );
   }
   return (
-    <Suspense fallback={null}>
-      <LogForm
-        t={t}
-        onSave={(input) => {
-          setOpen(false);
-          onLog(input);
-        }}
-        onCancel={() => setOpen(false)}
-      />
-    </Suspense>
+    <QuietBoundary fallback={<p>{t("notebook.unavailable")}</p>}>
+      <Suspense fallback={null}>
+        <LogForm
+          t={t}
+          onSave={(input) => {
+            setOpen(false);
+            onLog(input);
+          }}
+          onCancel={() => setOpen(false)}
+        />
+      </Suspense>
+    </QuietBoundary>
   );
 }
 

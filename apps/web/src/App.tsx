@@ -135,6 +135,17 @@ export function App() {
     setPrintJob((job) => ({ entries, press: (job?.press ?? 0) + 1 }));
   }
 
+  // The summary goes away after the print dialog closes and when the person leaves the Notebook tab,
+  // so the browser's own Print menu never prints an old snapshot.
+  useEffect(() => {
+    const clear = () => setPrintJob(null);
+    window.addEventListener("afterprint", clear);
+    return () => window.removeEventListener("afterprint", clear);
+  }, []);
+  useEffect(() => {
+    if (mode !== "notebook") setPrintJob(null);
+  }, [mode]);
+
   // "See what lies over and under it": switch to the Area tab and look through the selected structure.
   function overUnder() {
     if (!selection) return;

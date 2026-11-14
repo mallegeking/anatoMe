@@ -61,9 +61,12 @@ export function Summary({ t, bundle, model }: { t: Translate; bundle: RegionBund
                 </ul>
               )}
               {c.ruledOut.length > 0 && <p>{ruledOutText(t, bundle, c.ruledOut)}</p>}
+              {c.fineCount === 0 && <p>{t("notebook.needFine")}</p>}
+              {c.incomplete && <p>{t("notebook.incomplete")}</p>}
             </div>
           ))}
-          <p>{t("summary.basis")}</p>
+          {/* The review build lists unchecked draft rows too, so it prints the review banner and not the basis line. */}
+          <p>{bundle.mode === "review" ? t("review.banner") : t("summary.basis")}</p>
         </>
       )}
     </section>

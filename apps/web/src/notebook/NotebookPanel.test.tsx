@@ -290,3 +290,14 @@ test("with the comparison off no look-into heading shows", async () => {
   expect(screen.queryByText(en["notebook.needFine"])).toBeNull();
   expect(screen.queryByRole("button", { name: /: loaded in/ })).toBeNull();
 });
+
+test("each Delete button points at the line of its own note", async () => {
+  await showWith([entry(), entry({ id: "e2", createdAt: 2, note: "second" })]);
+  const items = listItems();
+  for (const item of items) {
+    const id = within(item).getByRole("button", { name: en["notebook.delete"] }).getAttribute("aria-describedby");
+    expect(id).toBeTruthy();
+    expect(document.getElementById(id!)).toBe(item.querySelector("p"));
+  }
+  expect(new Set(items.map((i) => i.querySelector("button")!.getAttribute("aria-describedby"))).size).toBe(2);
+});
