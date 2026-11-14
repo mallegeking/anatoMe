@@ -2,20 +2,35 @@
 
 anatoMe is an educational tool for understanding how the body moves. It is not a diagnostic tool and it is not medical advice. If you have a health concern, please talk to a qualified health professional.
 
-anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip. Notes you write in the app stay in your browser. The app never sends them anywhere.
+anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip, the pelvis and the thigh down to the knee. It is for students, movement teachers, physiotherapists and anyone curious about what lies under the skin and which structures a movement loads.
 
-## What it does today
+The link is added when the site is live
 
-anatoMe covers the hip, the pelvis and the thigh down to the knee:
+![Searching for a structure](docs/phase1/screenshot-search.png)
+![Peeling the layers](docs/phase1/screenshot-layers.png)
+![The info panel with sources](docs/phase1/screenshot-info-panel.png)
+![The review build with drafts marked](docs/phase1/screenshot-review.png)
+
+## What it does
 
 - **Search** by English or Latin name. Choosing a result selects the structure, turns the camera to it and peels away the layers in front of it.
 - **Layers:** hide bones, muscles or the other soft tissue, peel the muscles one layer at a time, or hide a single structure.
 - **Info panel:** the name, Latin name and type of the selected structure, where a muscle attaches, and what it does at the hip and the knee, each claim with its sources.
-- **Movements:** pick a hip or knee movement or an exercise. Structures are coloured by their role in it, and a slider changes the joint angle. The model itself does not bend. Movement information shows only after review.
-- **Area:** tap a spot on the model and read which structures lie under it, from the surface inwards, with the movements that load each one. "See what lies over and under it" in the info panel does the same for the selected structure. It lists what the model holds and nothing more.
-- **Notebook:** log how a movement feels, read your notes in the Notebook tab, print a one-page summary, and save or load a backup file. Your notes stay in this browser on this device. They are never sent anywhere.
-- **Review gate:** a claim only shows in the app after a person has checked it. Action rows need a physiotherapist, attachment rows can be checked by the owner against the cited source. Unchecked rows never reach the normal build.
-- **Review build:** `npm run build:review -w apps/web` makes a separate copy that shows the unchecked rows, marked as drafts, with a review list for the physiotherapist. It is for the homelab only, never for publishing. See [docs/deploy-homelab.md](docs/deploy-homelab.md).
+- **Movements:** pick a hip or knee movement or an exercise. Structures are coloured by their role in it, and a slider changes the joint angle. The model itself does not bend.
+- **Area:** tap a spot on the model and read which structures lie under it, from the surface inwards, with the movements that load each one. It lists what the model holds and nothing more.
+- **Notebook:** log how a movement feels, read your notes in the Notebook tab, print a one-page summary, and save or load a backup file.
+
+## What comes next
+
+More of the body will follow the hip, one region at a time. The movement information will grow as more rows are checked.
+
+## Your notes stay on your device
+
+Notes you write in the Notebook stay in your browser on this device. The app never sends them anywhere and makes no request to another host while you use it. You can save a backup file and load it again, for example on a new phone.
+
+## How the data is checked
+
+Every claim in the app is a row that cites a published source. A row only shows after a person has checked it, a physiotherapist for movement rows and the owner for attachment rows. Unchecked rows never reach the normal build, and a test fails the build if one does. A separate review build shows them as drafts for the checkers, and it is never published. See [docs/deploy-homelab.md](docs/deploy-homelab.md).
 
 ## How to run it
 
@@ -67,6 +82,10 @@ tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blend
 ```
 
 Why each mesh comes from the source it does is explained in [docs/phase0/mesh-source-decision.md](docs/phase0/mesh-source-decision.md).
+
+## How to help
+
+Found a wrong or missing claim? Open a "Data correction" issue, see [docs/data-corrections.md](docs/data-corrections.md). Want to add or fix a row, a text or some code? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
