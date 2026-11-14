@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { BundleStructure, RegionBundle } from "./data/bundle";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
@@ -7,8 +7,8 @@ import type { AreaState } from "./area/AreaPanel";
 import { makeIsShown } from "./layers/shown";
 import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
+import type { NotebookEntry, EntrySide, Feeling } from "./notebook/types";
 import type { NotebookStore } from "./notebook/store";
-import type { EntrySide, Feeling } from "./notebook/types";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
@@ -21,6 +21,9 @@ import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
 import type { Selection } from "./viewer/pick";
+
+// The printed summary is notebook code, so it loads only when the person presses print.
+const PrintSummary = lazy(() => import("./notebook/PrintSummary"));
 
 const t = createT(en);
 const REGION = "hip";
@@ -42,6 +45,7 @@ export function App() {
   const [notebookStore, setNotebookStore] = useState<NotebookStore | null>(null);
   const [notebookError, setNotebookError] = useState(false);
   const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
+  const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
@@ -124,8 +128,11 @@ export function App() {
     }
   }
 
-  // The printed summary comes with the next part of the notebook. Until then the button does nothing.
-  function printNotebook() {}
+  // The summary is built and printed by its own lazy part, after it is on the page and painted.
+  // Each press counts up, so pressing again prints again.
+  function printNotebook(entries: NotebookEntry[]) {
+    setPrintJob((job) => ({ entries, press: (job?.press ?? 0) + 1 }));
+  }
 
   // "See what lies over and under it": switch to the Area tab and look through the selected structure.
   function overUnder() {
@@ -261,6 +268,11 @@ export function App() {
           </div>
         </footer>
       </main>
+      {bundle && printJob && (
+        <Suspense fallback={null}>
+          <PrintSummary t={t} bundle={bundle} entries={printJob.entries} press={printJob.press} />
+        </Suspense>
+      )}
     </ModelErrorBoundary>
   );
 }

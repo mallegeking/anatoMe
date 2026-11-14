@@ -175,5 +175,17 @@
   "notebook.loadError.not-json": "That file is not a notebook backup.",
   "notebook.loadError.wrong-format": "That file is not a notebook backup.",
   "notebook.loadError.newer-version": "That backup was made by a newer version of anatoMe.",
-  "notebook.loadError.bad-entry": "That backup is damaged, so nothing was loaded."
+  "notebook.loadError.bad-entry": "That backup is damaged, so nothing was loaded.",
+  "summary.title": "anatoMe notebook summary",
+  "summary.printed": "Printed on {date}",
+  "summary.range": "Notes from {from} to {to}",
+  "summary.painful": "Movements marked as hurting",
+  "summary.fine": "Movements marked as feeling fine",
+  "summary.more": "and {count} older notes",
+  "summary.basis": "The list of structures uses only movement information that a physiotherapist has checked. Sources are shown in the app.",
+  "summary.column.date": "Date",
+  "summary.column.movement": "Movement",
+  "summary.column.side": "Side",
+  "summary.column.angles": "Angles",
+  "summary.column.note": "Note"
 }

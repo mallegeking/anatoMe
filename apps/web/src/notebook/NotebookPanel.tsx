@@ -4,12 +4,12 @@ import type { Translate } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
 import { formatAngles } from "./angles";
 import { BACKUP_MAX_BYTES, backupFileName, mergeEntries, parseBackup, toBackup } from "./backup";
-import { compare, isKnown } from "./compare";
+import { compare, isKnown, type Candidate } from "./compare";
 import type { NotebookStore } from "./store";
 import type { NotebookEntry } from "./types";
 
 // Shows the structures to look into. Set it to false to show the notes only, without the comparison.
-const SHOW_COMPARISON = true;
+export const SHOW_COMPARISON = true;
 
 type Props = {
   t: Translate;
@@ -179,13 +179,19 @@ export function NotebookPanel({ t, bundle, store, storeError, showComparison, on
 }
 
 // The movement's name, the exercise and phase, or a plain word when this version does not know it.
-function entryName(entry: NotebookEntry, bundle: RegionBundle, t: Translate): string {
+export function entryName(entry: NotebookEntry, bundle: RegionBundle, t: Translate): string {
   if (!isKnown(entry, bundle)) return t("notebook.unknown");
   const pick = entry.pick;
   if (pick.kind === "movement") return bundle.movements.find((m) => m.id === pick.id)?.english ?? pick.id;
   const exercise = bundle.exercises.find((x) => x.id === pick.id);
   const phase = exercise?.phases.find((p) => p.id === pick.phase);
   return t("notebook.entryPhase", { exercise: exercise?.english ?? pick.id, phase: phase?.english ?? pick.phase });
+}
+
+// One candidate line. The panel and the printed summary both use it, so they say the same.
+export function candidateText(t: Translate, bundle: RegionBundle, cand: Candidate, total: number): string {
+  const name = bundle.structures.find((s) => s.id === cand.sid)?.english ?? cand.sid;
+  return t("notebook.candidate", { name, painful: String(cand.painful), total: String(total) });
 }
 
 // One note. The note text is shown as plain text, never as HTML.
@@ -231,7 +237,7 @@ function LookInto({ t, bundle, entries, onFocusStructure }: { t: Translate; bund
               {c.candidates.map((cand) => (
                 <li key={cand.sid}>
                   <button type="button" className="link-button" onClick={() => onFocusStructure({ sid: cand.sid, side: c.side })}>
-                    {t("notebook.candidate", { name: nameOf(cand.sid), painful: String(cand.painful), total: String(c.painfulCount) })}
+                    {candidateText(t, bundle, cand, c.painfulCount)}
                   </button>
                 </li>
               ))}

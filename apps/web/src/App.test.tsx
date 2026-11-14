@@ -329,3 +329,31 @@ test("without storage a log says the notebook is unavailable and the tab says so
   fireEvent.click(tab(en["mode.atlas"]));
   expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
 });
+
+test("the print button prints once per press, after the summary is on the page", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  const seen: boolean[] = [];
+  const print = vi.spyOn(window, "print").mockImplementation(() => {
+    seen.push(document.querySelector("section.print-summary") !== null);
+  });
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  await screen.findByText(en["notebook.saved"]);
+  fireEvent.click(tab(en["mode.notebook"]));
+  const button = await screen.findByRole("button", { name: en["notebook.print"] });
+  expect(print).not.toHaveBeenCalled();
+  fireEvent.click(button);
+  await waitFor(() => expect(print).toHaveBeenCalledTimes(1));
+  expect(seen).toEqual([true]);
+  fireEvent.click(button);
+  await waitFor(() => expect(print).toHaveBeenCalledTimes(2));
+  expect(seen).toEqual([true, true]);
+  print.mockRestore();
+});
