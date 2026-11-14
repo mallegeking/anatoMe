@@ -19,9 +19,20 @@ type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | 
 type Joint = { id: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
 type Structure = { id: string; type: string };
-type Citation = { id: string };
+type Citation = { id: string; license_id: string };
+
+// Licences a quote may come from, because they fit CC BY 4.0. Share-alike, non-commercial,
+// no-derivatives and other licences may be cited, but only with a summary in our own words.
+export const QUOTABLE: ReadonlySet<string> = new Set([
+  "CC-BY-4.0",
+  "CC-BY-3.0",
+  "CC-BY-2.0",
+  "CC-BY-unversioned",
+  "CC0-1.0",
+  "public-domain",
+]);
 // The fields every row that makes a claim has, so the review gate can check them the same way.
-type Gated = { id: string; citations: { ref: string }[]; checked_by: string | null; checked_on?: string };
+type Gated = { id: string; citations: { ref: string; says_kind?: string }[]; checked_by: string | null; checked_on?: string };
 type Action = Gated & {
   structure: string;
   movement: string;
@@ -93,7 +104,7 @@ export function validateDataDir(dir: string): ValidationResult {
 
   const structureById = new Map(structures.flatMap((s) => s.rows).map((s) => [s.id, s]));
   const movementIds = new Set(movements.rows.map((m) => m.id));
-  const citationIds = new Set(citations.rows.map((c) => c.id));
+  const licenseById = new Map(citations.rows.map((c) => [c.id, c.license_id]));
 
   for (const { file, rows } of actions) {
     for (const [i, a] of rows.entries()) {
@@ -126,7 +137,7 @@ export function validateDataDir(dir: string): ValidationResult {
       if (a.checked_by !== null && !a.checked_by.startsWith("physio-")) {
         errors.push({ file, path: at("/checked_by"), message: "action rows can only be checked by a physio, use a label like physio-1" });
       }
-      checkGated(file, i, a, citationIds, errors);
+      checkGated(file, i, a, licenseById, errors);
     }
   }
 
@@ -136,7 +147,7 @@ export function validateDataDir(dir: string): ValidationResult {
     for (const [i, a] of rows.entries()) {
       checkStructureType(file, `/${i}/muscle`, "muscle", a.muscle, structureById, errors);
       checkStructureType(file, `/${i}/bone`, "bone", a.bone, structureById, errors);
-      checkGated(file, i, a, citationIds, errors);
+      checkGated(file, i, a, licenseById, errors);
     }
   }
 
@@ -166,17 +177,26 @@ export function validateDataDir(dir: string): ValidationResult {
       if (x.checked_by !== null && !x.checked_by.startsWith("physio-")) {
         errors.push({ file, path: `/${i}/checked_by`, message: "exercise rows can only be checked by a physio, use a label like physio-1" });
       }
-      checkGated(file, i, x, citationIds, errors);
+      checkGated(file, i, x, licenseById, errors);
     }
   }
 
   return { ok: errors.length === 0, errors };
 }
 
-// The review gate rules shared by actions and attachments: known citations, and a date once checked.
-function checkGated(file: string, i: number, row: Gated, citationIds: Set<string>, errors: ValidationError[]) {
+// The rules shared by actions, attachments and exercises: known citations, quotes only from
+// sources whose licence fits, and the review gate dates.
+function checkGated(file: string, i: number, row: Gated, licenseById: Map<string, string>, errors: ValidationError[]) {
   for (const [j, c] of row.citations.entries()) {
-    if (!citationIds.has(c.ref)) errors.push({ file, path: `/${i}/citations/${j}/ref`, message: `unknown citation ${c.ref}` });
+    if (!licenseById.has(c.ref)) {
+      errors.push({ file, path: `/${i}/citations/${j}/ref`, message: `unknown citation ${c.ref}` });
+    } else if (c.says_kind === "quote" && !QUOTABLE.has(licenseById.get(c.ref) as string)) {
+      errors.push({
+        file,
+        path: `/${i}/citations/${j}/says_kind`,
+        message: `a quote needs a source whose licence fits CC BY 4.0, ${c.ref} is ${licenseById.get(c.ref)}. Write a summary in our own words instead`,
+      });
+    }
   }
   if (row.checked_by !== null && row.checked_on === undefined) {
     errors.push({ file, path: `/${i}`, message: "checked_on is required when checked_by is set" });

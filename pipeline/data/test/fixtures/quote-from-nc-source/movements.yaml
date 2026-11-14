@@ -1,0 +1,4 @@
+- {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion}
+- {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension}
+- {id: hip-internal-rotation, dof: hip.rotation, direction: positive, english: Hip internal rotation}
+- {id: hip-external-rotation, dof: hip.rotation, direction: negative, english: Hip external rotation}

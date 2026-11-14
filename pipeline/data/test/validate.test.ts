@@ -3,9 +3,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { validateDataDir, type ValidationResult } from "../src/validate.ts";
+import { QUOTABLE, validateDataDir, type ValidationResult } from "../src/validate.ts";
 
 // Each case is a small data folder under test/fixtures.
+const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 
 // Passes when the folder fails validation with at least one message matching the pattern.
@@ -81,3 +82,16 @@ test("a data folder without exercises.yaml passes", () => {
 
 test("a labrum cannot work", () => expectError(fx("labrum-working"), /load must be stretched or pinched for type labrum/));
 test("a joint cannot appear in actions", () => expectError(fx("joint-in-actions"), /type joint cannot appear in actions/));
+
+// Licence ids: every citation names its licence, and a quote only comes from a source that fits CC BY 4.0.
+test("a quote from a non-commercial source is refused", () =>
+  expectError(fx("quote-from-nc-source"), /actions\/hip\.yaml \/0\/citations\/0\/says_kind: a quote needs a source whose licence fits CC BY 4\.0, test-book is CC-BY-NC-4\.0\. Write a summary in our own words instead/));
+test("a quote in an attachment from a non-commercial source is refused", () =>
+  expectError(fx("quote-from-nc-source"), /attachments\/hip\.yaml \/0\/citations\/0\/says_kind: a quote needs a source whose licence fits CC BY 4\.0/));
+test("a quote from a source with licence id other is refused", () =>
+  expectError(fx("quote-from-other-licence"), /a quote needs a source whose licence fits CC BY 4\.0, test-book is other/));
+test("a summary of a non-commercial source is fine", () => expect(validateDataDir(fx("summary-from-nc-source")).ok).toBe(true));
+test("a citation without license_id is refused", () => expectError(fx("no-license-id"), /citations\.yaml \/0: license_id is required/));
+test("the real data has no quote from an incompatible source", () => expect(validateDataDir(realDataDir).ok).toBe(true));
+test("the quotable licences are the six that fit CC BY 4.0", () =>
+  expect([...QUOTABLE].sort()).toEqual(["CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0", "CC-BY-unversioned", "CC0-1.0", "public-domain"]));
