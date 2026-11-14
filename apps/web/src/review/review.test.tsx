@@ -26,7 +26,7 @@ test("review bundle shows the banner and a button that opens the list", () => {
 });
 
 test("draft rows are marked and show their review note", () => {
-  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   // One mark for the draft action and one for the draft attachment. The checked row has none.
   expect(screen.getAllByText(en["review.draft"])).toHaveLength(2);
   expect(screen.getByText(t("review.note", { note: NOTE }))).toBeTruthy();
@@ -34,10 +34,10 @@ test("draft rows are marked and show their review note", () => {
 });
 
 test("review mode hides the waiting line, normal mode keeps it", () => {
-  const { unmount } = render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  const { unmount } = render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("review")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   expect(screen.queryByText(en["info.pending"])).toBeNull();
   unmount();
-  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("normal")} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle("normal")} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   expect(screen.getByText(en["info.pending"])).toBeTruthy();
 });
 

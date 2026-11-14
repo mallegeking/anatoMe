@@ -10,7 +10,7 @@ const t = createT(en);
 afterEach(cleanup);
 
 function show(sid: string, side: "l" | "r" | "" = "", mode: "normal" | "review" = "normal", onSwitchSide = () => {}) {
-  render(<InfoPanel selection={{ sid, side }} bundle={makeBundle(mode)} t={t} onSwitchSide={onSwitchSide} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid, side }} bundle={makeBundle(mode)} t={t} onSwitchSide={onSwitchSide} onHide={() => {}} onOpenMovement={() => {}} />);
 }
 
 test("shows English and Latin names", () => {
@@ -64,7 +64,7 @@ function withKneeRow(): RegionBundle {
 }
 
 test("rows are grouped under the joint they move", () => {
-  render(<InfoPanel selection={{ sid: "rectus-femoris", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "rectus-femoris", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   const hip = screen.getByRole("heading", { name: en["info.does.hip"] }).parentElement!;
   const knee = screen.getByRole("heading", { name: en["info.does.knee"] }).parentElement!;
   expect(within(hip).getByText("Hip flexion")).toBeTruthy();
@@ -74,7 +74,7 @@ test("rows are grouped under the joint they move", () => {
 });
 
 test("a joint without rows gets no heading", () => {
-  render(<InfoPanel selection={{ sid: "piriformis", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "l" }} bundle={withKneeRow()} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   expect(screen.getByRole("heading", { name: en["info.does.hip"] })).toBeTruthy();
   expect(screen.queryByRole("heading", { name: en["info.does.knee"] })).toBeNull();
 });
@@ -132,15 +132,23 @@ test("review bundle renders the review note", () => {
 });
 
 test("an unknown structure shows its file label and no data sections", () => {
-  render(<InfoPanel selection={{ sid: "mystery", side: "" }} bundle={makeBundle()} t={t} fallbackLabel="Mystery part" onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "mystery", side: "" }} bundle={makeBundle()} t={t} fallbackLabel="Mystery part" onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   expect(screen.getByText("Mystery part")).toBeTruthy();
   expect(screen.queryByText(en["info.pending"])).toBeNull();
 });
 
 test("the punctuation around the action words comes from the text file", () => {
   const custom = createT({ ...en, "info.actionRole": "{load} [{role}]", "info.actionWhen": "{text} / {when}", "source.label": "{kind} >" });
-  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle()} t={custom} onSwitchSide={() => {}} onHide={() => {}} />);
+  render(<InfoPanel selection={{ sid: "piriformis", side: "" }} bundle={makeBundle()} t={custom} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} />);
   expect(screen.getByText("works [main] / with the hip bent between 0 and 60 degrees")).toBeTruthy();
   fireEvent.click(screen.getAllByText(en["info.sources"])[1]);
   expect(screen.getByText(en["source.quote"] + " >")).toBeTruthy();
+});
+
+test("a movement heading opens that movement", () => {
+  const onOpenMovement = vi.fn();
+  render(<InfoPanel selection={{ sid: "piriformis", side: "l" }} bundle={makeBundle()} t={t} onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={onOpenMovement} />);
+  const heading = screen.getByRole("heading", { name: "Hip external rotation", level: 4 });
+  fireEvent.click(within(heading).getByRole("button", { name: "Hip external rotation" }));
+  expect(onOpenMovement).toHaveBeenCalledWith("hip-ext-rot");
 });

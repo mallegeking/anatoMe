@@ -13,6 +13,8 @@ type Props = {
   fallbackLabel?: string;
   onSwitchSide: () => void;
   onHide: () => void;
+  // Opens the Movements tab with this movement picked.
+  onOpenMovement: (movementId: string) => void;
 };
 
 // One line for each structure with a part that the model does not show yet. The value is the en.json key.
@@ -85,7 +87,7 @@ function ActionRow({ action, bundle, t }: { action: BundleAction; bundle: Region
   );
 }
 
-export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, onHide }: Props) {
+export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, onHide, onOpenMovement }: Props) {
   const structure = bundle.structures.find((s) => s.id === selection.sid);
   const name = structure?.english ?? fallbackLabel ?? selection.sid;
   const sideText = selection.side === "l" ? t("side.left", { label: name }) : selection.side === "r" ? t("side.right", { label: name }) : name;
@@ -135,7 +137,11 @@ export function InfoPanel({ selection, bundle, t, fallbackLabel, onSwitchSide, o
           <h3>{t(`info.does.${joint}`)}</h3>
           {groups.map(({ movement, rows }) => (
             <div key={movement.id}>
-              <h4>{movement.english}</h4>
+              <h4>
+                <button type="button" className="link-button" onClick={() => onOpenMovement(movement.id)}>
+                  {movement.english}
+                </button>
+              </h4>
               <ul>
                 {rows.map((action) => (
                   <ActionRow key={action.id} action={action} bundle={bundle} t={t} />

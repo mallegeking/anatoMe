@@ -429,3 +429,138 @@ body,
   color: #fff3cd;
   font-size: 0.8125rem;
 }
+
+/* The tabs under the top bar: one row of equal buttons that never wraps, even at 360 px. */
+.mode-bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  background: var(--panel);
+  border-bottom: 1px solid #2c323b;
+}
+
+.mode-bar button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mode-bar button[aria-selected="true"] {
+  border-bottom-color: #8ab4f8;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.movement-panel {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.movement-panel h2,
+.movement-panel h3 {
+  margin: 8px 0 4px;
+}
+
+.movement-panel h2 {
+  margin-top: 0;
+  font-size: 1.125rem;
+}
+
+.movement-panel h3 {
+  font-size: 0.9375rem;
+}
+
+.movement-panel p,
+.movement-panel ul {
+  margin: 4px 0;
+}
+
+.movement-panel ul {
+  padding-left: 18px;
+}
+
+.movement-choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.movement-choices button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #3a414c;
+  border-radius: 6px;
+  background: #262b33;
+  color: var(--text);
+  font: inherit;
+}
+
+.movement-choices button[aria-pressed="true"] {
+  border-color: #8ab4f8;
+  background: #2f3a4a;
+  font-weight: 600;
+}
+
+/* The angle and progress controls take the full width, so they are easy to drag with a thumb. */
+.movement-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.movement-slider input {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+
+.movement-structure {
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.movement-structure[aria-current="true"] {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #2f3a4a;
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* The colour next to each group heading. The same colours paint the model. */
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+.swatch--primary {
+  background: #d1495b;
+}
+
+.swatch--secondary {
+  background: #edae49;
+}
+
+.swatch--pinched {
+  background: #7b2cbf;
+}
+
+.swatch--stretched {
+  background: #00798c;
+}

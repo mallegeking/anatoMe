@@ -1,17 +1,19 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import type { BundleStructure, RegionBundle } from "./data/bundle";
-import { useRegionData } from "./data/useRegionData";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
-import { hideStructure, initialLayers, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
-import { LayersPanel } from "./layers/LayersPanel";
+import { hideStructure, initialLayers, revealFor, type LayerState } from "./layers/layers";
 import { makeIsShown } from "./layers/shown";
+import { involved } from "./movement/roles";
+import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
 import { selectBySearch } from "./search/search";
 import { Credits, EducationalLine } from "./ui/Credits";
-import { Hint, RegionInfo } from "./ui/RegionInfo";
+import { ModeBar, type Mode } from "./ui/ModeBar";
+import { PanelArea } from "./ui/PanelArea";
+import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
@@ -19,37 +21,6 @@ import type { Selection } from "./viewer/pick";
 
 const t = createT(en);
 const REGION = "hip";
-
-type PanelAreaProps = {
-  selection: Selection | null;
-  label: string | undefined;
-  layersOpen: boolean;
-  layers: LayerState;
-  setLayers: (update: (state: LayerState) => LayerState) => void;
-  onBundle: (bundle: RegionBundle) => void;
-  onSwitchSide: (sel: Selection) => void;
-  onHideSelected: () => void;
-};
-
-// Loads the data, tells the app which structures exist, and shows the layers panel or the info panel.
-function PanelArea({ selection, label, layersOpen, layers, setLayers, onBundle, onSwitchSide, onHideSelected }: PanelAreaProps) {
-  const bundle = useRegionData(REGION);
-  useEffect(() => onBundle(bundle), [bundle, onBundle]);
-  if (layersOpen) {
-    return (
-      <LayersPanel
-        t={t}
-        state={layers}
-        structures={bundle.structures}
-        onPeel={() => setLayers((s) => peel(s, bundle.structures))}
-        onRestore={() => setLayers(restore)}
-        onToggleTissue={(group) => setLayers((s) => toggleTissue(s, group))}
-        onShow={(key) => setLayers((s) => showStructure(s, key))}
-      />
-    );
-  }
-  return <RegionInfo region={REGION} selection={selection} fallbackLabel={label} t={t} onSwitchSide={onSwitchSide} onHide={onHideSelected} />;
-}
 
 export function App() {
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -61,6 +32,8 @@ export function App() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>("atlas");
+  const [movement, setMovement] = useState<MovementState>(initialMovementState);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
 
   function select(sel: Selection | null, fileLabel?: string) {
@@ -91,11 +64,42 @@ export function App() {
     setLabel(undefined);
     setFocus({ ...sel });
     setLayersOpen(false);
+    setMode("atlas");
     setNotice(peeledNow === 0 ? null : t(peeledNow === 1 ? "search.peeledOne" : "search.peeled", { count: String(peeledNow), name: structure.english }));
   }
 
-  // Structures the data does not know are always shown.
-  const isShown = useMemo(() => makeIsShown(structures, layers, null), [structures, layers]);
+  // A structure in the movement panel: select it and turn the camera to it.
+  function focusStructure(sid: string) {
+    if (!bundle) return;
+    const sel = selectBySearch(sid, bundle);
+    select(sel);
+    setFocus({ ...sel });
+  }
+
+  // "Read about this structure" works like a search result, so it also switches to the Structures tab.
+  function openStructure(sid: string) {
+    const structure = structures.find((s) => s.id === sid);
+    if (structure) chooseResult(structure);
+  }
+
+  // A movement named in the info panel: open the Movements tab with it picked.
+  function openMovement(id: string) {
+    if (!bundle) return;
+    setMode("movement");
+    setMovement(pickMovement(bundle, id));
+  }
+
+  // The colours of the involved structures. Only while the Movements tab has a pick with at least one
+  // row that applies. Otherwise there is nothing to colour, so the model stays whole.
+  const highlights = useMemo(() => {
+    const query = mode === "movement" && bundle ? queryOf(movement, bundle) : null;
+    if (!bundle || !query) return null;
+    const result = involved(bundle, query, movement.pose);
+    return result.rows.length > 0 ? result.bySid : null;
+  }, [mode, bundle, movement]);
+
+  // Structures the data does not know are always shown, unless a movement hides what is not involved.
+  const isShown = useMemo(() => makeIsShown(structures, layers, highlights), [structures, layers, highlights]);
 
   // If the selected structure disappears, the panel should not keep describing it.
   useEffect(() => {
@@ -139,13 +143,14 @@ export function App() {
           open={searchOpen}
           onOpenChange={setSearchOpen}
         />
+        <ModeBar t={t} mode={mode} modes={["atlas", "movement"]} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} onClose={() => setReviewOpen(false)} />
           </div>
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
-          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} highlights={null} onSelect={tapModel} />
+          <Viewer region={REGION} t={t} selection={selection} focus={focus} isShown={isShown} highlights={highlights} onSelect={tapModel} />
           <PerfOverlay t={t} />
         </div>
         <footer className="panel">
@@ -159,14 +164,22 @@ export function App() {
             <ModelErrorBoundary t={t} messageKey="error.dataLoad">
               <Suspense fallback={<Hint t={t} />}>
                 <PanelArea
+                  region={REGION}
+                  t={t}
+                  mode={mode}
                   selection={selection}
                   label={label}
                   layersOpen={layersOpen}
                   layers={layers}
                   setLayers={setLayers}
+                  movement={movement}
+                  onMovementChange={setMovement}
                   onBundle={setBundle}
                   onSwitchSide={switchSide}
                   onHideSelected={hideSelected}
+                  onOpenMovement={openMovement}
+                  onFocusStructure={focusStructure}
+                  onOpenStructure={openStructure}
                 />
               </Suspense>
             </ModelErrorBoundary>
