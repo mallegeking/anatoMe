@@ -260,3 +260,30 @@ test("area mode: a tap on empty canvas calls onAreaTap(null) and a drag over it 
   expect(onAreaTap).toHaveBeenCalledWith(null);
   expect(onSelect).not.toHaveBeenCalled();
 });
+
+test("area mode: a probe whose rays miss still reports through the probe, not null", async () => {
+  withWebGL(true);
+  const { BoxGeometry, Group, Mesh } = await import("three");
+  // The mesh has a box but cannot be hit, so every ray misses it.
+  const mesh = new Mesh(new BoxGeometry(1, 1, 0.1));
+  mesh.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
+  mesh.raycast = () => {};
+  const scene = new Group();
+  scene.add(mesh);
+  scene.updateMatrixWorld(true);
+  load.result = [{ scene }];
+  const onAreaTap = vi.fn();
+  const props = { region: "hip", t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const probe = { sid: "piriformis", side: "l" as const };
+  const { rerender } = render(<Viewer {...props} areaProbe={null} />);
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  rerender(<Viewer {...props} areaProbe={probe} />);
+  await settle();
+  expect(onAreaTap).toHaveBeenCalledTimes(1);
+  expect(onAreaTap).toHaveBeenCalledWith({ entries: [], point: [0, 0, 0], through: probe });
+});

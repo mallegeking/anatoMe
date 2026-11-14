@@ -171,11 +171,12 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
   // Casts the five rays through a spot and reports what lies under it.
   function areaTapAt(pointer: { x: number; y: number }, cam: Camera, probe: Selection | null, boxMiddle?: [number, number, number]) {
     const { center, around } = castFingerRays(pointer, size, cam, scenes);
-    if (center.length === 0) {
+    // Only a tap reports null for a miss. A probe always reports, even with an empty list.
+    if (center.length === 0 && !boxMiddle) {
       areaTapRef.current(null);
       return;
     }
-    const nearest = Math.min(...center.map((h) => h.distance));
+    const nearest = center.length > 0 ? Math.min(...center.map((h) => h.distance)) : 0;
     const entries = structuresUnder(center, around, probe ?? undefined);
     areaTapRef.current({ entries, point: boxMiddle ?? pointAlong(pointer, cam, nearest), through: probe });
   }
