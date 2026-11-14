@@ -78,7 +78,24 @@ Tap "Area" in the row of tabs. Tap the side of the hip, then the same spot again
 | Does a tap on a list entry turn the camera to it? (yes or no) | |
 | Is the fingertip size right, or do taps list too much or too little? (write which) | |
 
-## 7. Questions for the physio
+## 7. Notebook
+
+Open the Movements tab and log one movement as "It hurts" and one as "It feels fine". Use the Notebook tab for the rest. Use the review build.
+
+| Check | Answer |
+| --- | --- |
+| Close the browser fully and open it again. Are both notes still there? (yes or no) | |
+| Save a backup file. Where did the phone put it? (write where) | |
+| Delete a note, then load the backup. Is the note back? (yes or no) | |
+| Print the summary. Does the phone offer "Save as PDF"? (yes or no) | |
+| Is the printed summary one page? (yes or no) | |
+| Switch the phone to flight mode and log a movement. Does it still work? (yes or no) | |
+
+Does any sentence in the Notebook tab read like a diagnosis or like advice? Write it down.
+
+Answer: (write here)
+
+## 8. Questions for the physio
 
 Between two measured angles the app says nothing about a muscle, for example obturator externus between 60 and 75 degrees of hip flexion. Is that the right thing to show, or should the app carry the nearest measured role across the gap?
 
@@ -88,7 +105,7 @@ Does the order of structures under the front of the hip and under the buttock lo
 
 Answer: (write here)
 
-## 8. Notes
+## 9. Notes
 
 Anything else you noticed, for example slow parts, things that looked odd, or a moment where the page froze.
 
