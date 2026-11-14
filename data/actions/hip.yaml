@@ -1133,3 +1133,22 @@
       says_kind: quote
   checked_by: null
   review_note: "Physio: van Arkel 2015 found only a small role, with the hip bent 60 degrees or more and the thigh in neutral or full adduction. The range 60 to 90 holds only the angles that study names (full flexion has no number there). Is the row worth showing, given the role is small?"
+
+# Iliotibial tract. No opened source measured how far it lengthens. These rows rest on the Ober test,
+# which judges how far the tract lets the hip drop into adduction.
+- id: iliotibial-tract-hip-adduction-stretched
+  structure: iliotibial-tract
+  movement: hip-adduction
+  load: stretched
+  confidence: medium
+  citations:
+    - ref: borghi-2025
+      locator: Introduction, paragraph beginning "The Ober test, introduced in 1937", and Materials and methods, test step 4 (Measurement)
+      says: "The Ober test, introduced in 1937, is the main clinical method used to evaluate ITB extensibility. ... The angle of hip adduction is then visually assessed, assigning a value in degrees. This angle represents, by extension, the extensibility of the ITB."
+      says_kind: quote
+    - ref: zhao-2026
+      locator: Discussion, paragraph beginning "The SOT achieves ITB tension modulation"
+      says: "The SOT achieves ITB tension modulation and snapping provocation without patient repositioning through a combined sequence of hip adduction, internal rotation, and subsequent flexion in the supine position."
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: both sources are clinical tests, not length measurements. They read resistance to adduction as the tract being tight. The classic test keeps the hip straight or slightly extended, and no source gives an angle. Is stretched in adduction at any amount of hip flexion fair?"
