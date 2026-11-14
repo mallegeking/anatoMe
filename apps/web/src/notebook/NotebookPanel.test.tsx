@@ -118,6 +118,11 @@ test("lists the newest note first and an exercise with its phase", async () => {
   expect(screen.getByText("Logged with the hip bent at 50 degrees, the knee bent at 55 degrees")).toBeTruthy();
 });
 
+test("an exercise logged part way through shows its angles in whole degrees", async () => {
+  await showWith([entry({ pick: { kind: "exercise", id: "squat", phase: "lowering" }, pose: { "hip.flexion": 31.604999999999997, "hip.rotation": 0, "knee.flexion": 32.9 } })]);
+  expect(screen.getByText("Logged with the hip bent at 32 degrees, the knee bent at 33 degrees")).toBeTruthy();
+});
+
 test("a note for a movement the bundle lacks is listed as unknown", async () => {
   await showWith([entry({ pick: { kind: "movement", id: "shoulder-shrug" } })]);
   expect(screen.getByText((text) => text.includes(en["notebook.unknown"]))).toBeTruthy();

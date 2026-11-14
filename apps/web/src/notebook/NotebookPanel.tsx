@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { RegionBundle } from "../data/bundle";
 import type { Translate } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
+import { formatAngles } from "./angles";
 import { BACKUP_MAX_BYTES, backupFileName, mergeEntries, parseBackup, toBackup } from "./backup";
 import { compare, isKnown } from "./compare";
 import type { NotebookStore } from "./store";
@@ -189,11 +190,7 @@ function entryName(entry: NotebookEntry, bundle: RegionBundle, t: Translate): st
 
 // One note. The note text is shown as plain text, never as HTML.
 function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: RegionBundle; entry: NotebookEntry; onDelete: () => void }) {
-  // Only angles this version has a word for, and only the ones that are not zero.
-  const known = new Set(bundle.movements.map((m) => m.dof));
-  const angles = Object.entries(entry.pose)
-    .filter(([angle, value]) => value !== 0 && known.has(angle))
-    .map(([angle, value]) => t("notebook.angle", { angle: t(`angle.${angle}`), value: String(value) }));
+  const angles = formatAngles(entry.pose, bundle, t);
   return (
     <li>
       <p>
@@ -204,7 +201,7 @@ function EntryItem({ t, bundle, entry, onDelete }: { t: Translate; bundle: Regio
           side: t(`notebook.side.${entry.side}`),
         })}
       </p>
-      {angles.length > 0 && <p className="muted">{t("notebook.angles", { angles: angles.join(", ") })}</p>}
+      {angles && <p className="muted">{t("notebook.angles", { angles })}</p>}
       {entry.note && <p className="notebook-note">{entry.note}</p>}
       <button type="button" className="link-button" onClick={onDelete}>
         {t("notebook.delete")}
