@@ -1,5 +1,9 @@
 import type { NotebookEntry } from "./types";
 
+// The app loads this module on its own when a note is first saved, so it also hands out makeEntry.
+// One lazy module for both keeps the first screen free of any extra notebook code.
+export { makeEntry } from "./types";
+
 export type NotebookStore = {
   list(): Promise<NotebookEntry[]>; // newest first
   put(entry: NotebookEntry): Promise<void>;

@@ -116,7 +116,7 @@ export function App() {
     const { pick, pose } = movement;
     if (!pick) return;
     try {
-      const [{ makeEntry }, store] = await Promise.all([import("./notebook/types"), openStore()]);
+      const [{ makeEntry }, store] = await Promise.all([import("./notebook/store"), openStore()]);
       await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
       setNotice(t("notebook.saved"));
     } catch {
