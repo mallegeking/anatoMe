@@ -36,14 +36,63 @@ How it was built: subagent-driven, one implementer per task, then a review of ea
 8. **Task 4, the click position.** The plan said to click the middle of the canvas, and to find out why before moving the click if it lands beside the model. It does land beside the model. I checked in a browser at the e2e size (412 x 915): the middle of the canvas falls in the gap between the two thighs, and a click there brings the hint back. The framing has not changed since the first viewer commit `bb7525b` (`fitToBox` over everything loaded, padding 0.05). The cause is the model itself. It holds both legs from the ankles to the top of psoas major, while the plan assumed a model from the pelvis to below the knee (the same wrong assumption as the first size range). The test now clicks the right thigh, placed from the canvas middle in canvas heights (`x = width / 2 - 0.065 * height`, `y = height / 2`), with a comment saying why. With the click in the middle the test fails, with the new position it passes.
 9. **Task 4, the hint check.** After "Clear the spot" the test looks for `area.hint` with `page.getByText`, not inside `data-testid="area-panel"`, because the panel shows the hint as a plain line outside that element. The assertion is the plan's ("expect `area.hint`"), not a looser one.
 10. **Task 4, phone sheet numbering.** The new section is "6. Area tab". The old sections 6 and 7 are now 7 and 8. Nothing in the repo refers to those numbers. The physio question is in the new section and in "Questions for the physio".
+11. **Review fix, three tests that pass first.** The review fix asked to see all five new `under.test.ts` tests fail first. Three of them ("a midline structure stays", "both sides stay when the centre ray meets them within 1 cm", "through a target nothing is dropped by side") describe what the old rule already did, so they passed before the change. They were kept as written. They guard the new rule against dropping too much.
 
 ## Review Focus
 
 1. **A drag in the Area tab is not a tap, a tap on empty space clears the list.** `Viewer.test.tsx` the four "area mode" tests in Deviation 2. `App.test.tsx` "a tap in the Area tab shows the list and a missed tap brings the hint back". Also seen in a browser (see Checks).
 2. **A ray that leaves one thigh must not list the other leg.** `under.test.ts` "without a bone the list stops 0.12 under the surface" and "a far bone does not lift the depth limit". **These pass, but on the real model the rule does not hold when the model is turned.** See "For the owner", item 1.
+   **After the review fix (2026-11-15):** `under.test.ts` "a deeper hit of the other side is left out", "the other side is left out when only an outer ray hits it", "a midline structure stays", "both sides stay when the centre ray meets them within 1 cm" and "through a target nothing is dropped by side". On the real model the sweep in "Review fixes" finds no list with an entry of an untapped side at the front view, at 60° or at 120°.
 3. **A hidden or peeled structure is still listed, and choosing it shows it again.** `castRays.test.ts` "a mesh that is switched off is still hit". `App.test.tsx` "choosing a list entry for a hidden structure makes it visible and selects it". In a browser, the list was the same after peeling two layers.
 4. **With no checked rows an entry shows name, type, depth, the waiting line and no empty heading.** `AreaPanel.test.tsx` "a structure with waiting rows shows the waiting line and no empty heading", "lists the entries in order with side, type and depth" and "a bone has no movement heading".
 5. **A tap that only the outer rays hit gives an empty list.** `under.test.ts` "an empty centre ray gives nothing, even when outer rays hit". `castRays.test.ts` "a tap beside everything gives empty rays". `Viewer.test.tsx` "area mode: a tap that misses the model calls onAreaTap(null)".
+   **After the review fix (2026-11-15):** `Viewer.test.tsx` "area mode: a tap where only an outer ray hits calls onAreaTap(null)" covers the case itself through `RegionModel`, and fails when the miss guard needs all five rays empty. The probe wiring is covered by "area mode: a probe lists what lies in front of its structure, past bone".
+
+## Review fixes
+
+Added on 2026-11-15. The owner overruled design decision 3: without a target the list keeps to the tapped side (see the plan, decision 3). Nothing else about the feature changed. `CAP_M`, `BEHIND_TARGET_M`, the bone stop and the probe are as before.
+
+**The rule.** `apps/web/src/area/under.ts` has `SIDE_BAND_M = 0.01`. The tapped side is the side of the nearest sided centre hit. The other side also counts when its nearest centre hit is within `SIDE_BAND_M` of that one. Sided entries of an untapped side are dropped from every ray. Midline entries always stay. A centre ray without a sided hit drops nothing, and with `through` nothing is dropped by side.
+
+**New tests in `apps/web/src/area/under.test.ts`,** written first:
+
+- "a deeper hit of the other side is left out" and "the other side is left out when only an outer ray hits it" failed before the change (the right semitendinosus and the right gracilis were listed) and pass after it.
+- "a midline structure stays", "both sides stay when the centre ray meets them within 1 cm" and "through a target nothing is dropped by side" already passed before the change. They guard against dropping too much. See Deviations.
+- Every existing test in the file is unchanged and green, also the equal-distance left and right test.
+
+**New tests in `apps/web/src/viewer/Viewer.test.tsx`:**
+
+- "area mode: a tap where only an outer ray hits calls onAreaTap(null)". Proved by making the miss guard in `RegionModel.tsx` need all five rays empty: the test failed (it got a tap with an empty list). Restored.
+- "area mode: a probe lists what lies in front of its structure, past bone". Proved by calling `structuresUnder` without the probe: the test failed (the list stopped at the femur). Restored.
+
+**Real-model sweep.** The grid from "For the owner" item 1, rerun with the real `castFingerRays` and `structuresUnder` against `hip.glb` and `hip-z-anatomy.glb` (103 meshes, 48909 triangles): canvas 360 x 441, camera 1.75 from the box middle, elevations -0.3, 0 and 0.3, a tap every 0.05 across the canvas. The tapped sides are worked out in the sweep script from the raw centre hits, not with the code under test. The script stays outside the repo.
+
+| View | Taps | Other side 3 cm or deeper, before | after | Sided entry of an untapped side, before | after |
+| --- | --- | --- | --- | --- | --- |
+| Front | 768 | 14 | 0 | 36 | 0 |
+| Turned 60° | 573 | 93 | 0 | 137 | 0 |
+| Turned 120° | 599 | 121 | 0 | 146 | 0 |
+
+The "before" numbers of the first metric match the ones in item 1. Taps where the centre ray meets both sides within 1 cm: 2 at the front, 0 at 60°, 1 at 120°. Those keep both sides on purpose.
+
+Checks with these fixes, run in the Linux clone on top of `4f7f18f`, all exit 0:
+
+```
+npm run validate                  data in data is valid
+npm run check-models              region hip: 48909 triangles (budget 150000)
+                                  every mesh maps to one of 52 structures
+npm test                          web: Test Files 39 passed (39), Tests 379 passed (379)
+                                  pipeline: Test Files 8 passed (8), Tests 127 passed (127)
+npm run build:review -w apps/web  hip.json (review): 137917 bytes, 64 actions, 63 attachments, 2 exercises
+npm run build                     hip.json (normal): 10381 bytes, 0 actions, 0 attachments, 0 exercises
+npm run e2e -w apps/web           area, atlas, movement, notebook: 4 passed
+node scripts/check-no-drafts.mjs  apps/web/dist/data: 1 bundle(s), no drafts
+perf-check                        median interactive ms: 3276 (limit 5000)
+error-check                       ok decoder download fails: message shown after 1373 ms
+                                  ok decoder never answers: message shown after 20766 ms
+                                  ok model file missing: message shown after 1017 ms
+npm run test:py                   14 passed in 4.05s
+```
 
 ## Checks
 
@@ -101,7 +150,7 @@ Three.js stays out of the main bundle. `App` and `AreaPanel` import only types f
 
 ## For the owner
 
-1. **The other leg shows up when the model is turned (Review Focus 2).** The final review ran the real `castFingerRays` and `structuresUnder` code against the real model files over a grid of taps, and I re-ran it. Share of taps that list a structure of the other side 3 cm or more under the surface: front view 14 of 768, turned 60° 93 of 573, turned 120° 121 of 599. Some of these are fair taps right on the middle line, but many are not. Example at 120°: biceps femoris, semitendinosus and adductor magnus of the left leg, then semitendinosus of the right leg "about 8 cm deeper". There are two causes:
+1. **The other leg shows up when the model is turned (Review Focus 2).** Decided on 2026-11-15: the list keeps to the tapped side, see "Review fixes". The final review ran the real `castFingerRays` and `structuresUnder` code against the real model files over a grid of taps, and I re-ran it. Share of taps that list a structure of the other side 3 cm or more under the surface: front view 14 of 768, turned 60° 93 of 573, turned 120° 121 of 599. Some of these are fair taps right on the middle line, but many are not. Example at 120°: biceps femoris, semitendinosus and adductor magnus of the left leg, then semitendinosus of the right leg "about 8 cm deeper". There are two causes:
    - The 0.12 m limit is longer than the gap between the thighs when the model is turned.
    - Only a bone on the centre ray stops the list. A femur that only an outer ray hits is listed but does not stop it. Example at 60°: femur (left) at the surface, then four more left structures, then gracilis and sartorius of the right leg at 11 cm.
 

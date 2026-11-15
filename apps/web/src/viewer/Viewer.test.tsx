@@ -261,6 +261,42 @@ test("area mode: a tap that misses the model calls onAreaTap(null)", async () =>
   expect(onAreaTap).toHaveBeenCalledWith(null);
 });
 
+test("area mode: a tap where only an outer ray hits calls onAreaTap(null)", async () => {
+  const { onAreaTap } = await showArea();
+  // The centre ray passes just beside the box, the left outer ray still meets it.
+  await clickModel(0, { x: 0.3, y: 0 });
+  expect(onAreaTap).toHaveBeenCalledWith(null);
+});
+
+test("area mode: a probe lists what lies in front of its structure, past bone", async () => {
+  withWebGL(true);
+  const { BoxGeometry, Group, Mesh } = await import("three");
+  const piriformis = new Mesh(new BoxGeometry(1, 1, 0.1));
+  piriformis.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
+  // A bone between the camera and the piriformis. A tap would stop at it, a probe goes on.
+  const femur = new Mesh(new BoxGeometry(1, 1, 0.1));
+  femur.userData = { sid: "femur", label: "Femur", side: "l", kind: "bone" };
+  femur.position.z = 1;
+  const scene = new Group();
+  scene.add(piriformis, femur);
+  scene.updateMatrixWorld(true);
+  load.result = [{ scene }];
+  const onAreaTap = vi.fn();
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const probe = { sid: "piriformis", side: "l" as const };
+  const { rerender } = render(<Viewer {...props} areaProbe={null} />);
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  rerender(<Viewer {...props} areaProbe={probe} />);
+  await settle();
+  expect(onAreaTap).toHaveBeenCalledTimes(1);
+  expect(onAreaTap.mock.calls[0][0].entries.map((e: { sid: string }) => e.sid)).toEqual(["femur", "piriformis"]);
+});
+
 test("area mode: a tap on empty canvas calls onAreaTap(null) and a drag over it does not", async () => {
   const { onAreaTap, onSelect } = await showArea();
   const canvas = screen.getByTestId("canvas");

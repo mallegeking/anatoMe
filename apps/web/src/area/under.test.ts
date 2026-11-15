@@ -45,3 +45,25 @@ test("the left and right copy at the same distance come out in the same order, w
   expect(keys([left, right])).toEqual(["gracilis|l", "gracilis|r"]);
   expect(keys([right, left])).toEqual(["gracilis|l", "gracilis|r"]);
 });
+
+// Without a target the list keeps to the tapped side. The other side counts as tapped only when the centre ray meets it within SIDE_BAND_M.
+const keys = (out: { sid: string; side: Side }[]) => out.map((e) => `${e.sid}|${e.side}`);
+test("a deeper hit of the other side is left out", () => {
+  const center = [hit("biceps-femoris-long-head", 1.0), hit("semitendinosus", 1.02), hit("semitendinosus", 1.08, "muscle", "r")];
+  expect(keys(structuresUnder(center, []))).toEqual(["biceps-femoris-long-head|l", "semitendinosus|l"]);
+});
+test("the other side is left out when only an outer ray hits it", () => {
+  expect(keys(structuresUnder([hit("sartorius", 1.0)], [[hit("gracilis", 1.05, "muscle", "r")]]))).toEqual(["sartorius|l"]);
+});
+test("a midline structure stays", () => {
+  const center = [hit("gluteus-maximus", 1.0, "muscle", "r"), hit("sacrum", 1.03, "bone", "")];
+  expect(keys(structuresUnder(center, []))).toEqual(["gluteus-maximus|r", "sacrum|"]);
+});
+test("both sides stay when the centre ray meets them within 1 cm", () => {
+  const center = [hit("pectineus", 1.0), hit("pectineus", 1.005, "muscle", "r"), hit("adductor-brevis", 1.03, "muscle", "r")];
+  expect(keys(structuresUnder(center, []))).toEqual(["pectineus|l", "pectineus|r", "adductor-brevis|r"]);
+});
+test("through a target nothing is dropped by side", () => {
+  const center = [hit("gluteus-maximus", 1.0, "muscle", "r"), hit("piriformis", 1.05)];
+  expect(keys(structuresUnder(center, [], { sid: "piriformis", side: "l" }))).toEqual(["gluteus-maximus|r", "piriformis|l"]);
+});

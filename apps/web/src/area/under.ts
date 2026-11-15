@@ -9,6 +9,8 @@ export type UnderEntry = { sid: string; side: Side; distance: number; depth: num
 export const CAP_M = 0.12;
 // How far past a chosen structure the list reaches.
 export const BEHIND_TARGET_M = 0.03;
+// The other side counts as tapped too when the centre ray meets it this close to the tapped side.
+export const SIDE_BAND_M = 0.01;
 
 // Lists the structures under a tapped spot, nearest first.
 // center is the ray through the spot, around are the nearby rays.
@@ -30,9 +32,14 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
   }
   if (stop === undefined) stop = normalStop();
 
+  // Without a target the list keeps to the side the centre ray meets first (owner's decision after review, 2026-11-15).
+  // Midline structures always stay. A centre ray with no sided hit drops nothing.
+  const tapped = through ? null : tappedSides(center);
+
   // Each structure and side keeps its nearest distance.
   const nearest = new Map<string, UnderEntry>();
   for (const h of all) {
+    if (tapped && h.side !== "" && !tapped.has(h.side)) continue;
     const key = `${h.sid}|${h.side}`;
     const seen = nearest.get(key);
     if (!seen || h.distance < seen.distance) {
@@ -41,6 +48,16 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
   }
   // Ties go by sid and then by side ("" before "l" before "r"), so the order never depends on the order of the hits.
   return [...nearest.values()].filter((e) => e.distance <= stop).sort((a, b) => a.distance - b.distance || order(a.sid, b.sid) || order(a.side, b.side));
+}
+
+// The side of the nearest sided centre hit, plus the other side when its nearest centre hit is within SIDE_BAND_M. null when no centre hit has a side.
+function tappedSides(center: RayHit[]): Set<Side> | null {
+  const near = (side: Side) => Math.min(...center.filter((h) => h.side === side).map((h) => h.distance));
+  const l = near("l");
+  const r = near("r");
+  const first = Math.min(l, r);
+  if (first === Infinity) return null;
+  return new Set((["l", "r"] as const).filter((side) => (side === "l" ? l : r) - first <= SIDE_BAND_M));
 }
 
 function order(a: string, b: string): number {
