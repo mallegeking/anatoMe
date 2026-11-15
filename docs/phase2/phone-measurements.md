@@ -88,7 +88,7 @@ Open the Movements tab and log one movement as "It hurts" and one as "It feels f
 | Save a backup file. Where did the phone put it? (write where) | |
 | Delete a note, then load the backup. Is the note back? (yes or no) | |
 | Print the summary. Does the phone offer "Save as PDF"? (yes or no) | |
-| Is the printed summary one page? (yes or no) | |
+| How many pages is the printed summary? (write the number) | |
 | Switch the phone to flight mode and log a movement. Does it still work? (yes or no) | |
 
 Does any sentence in the Notebook tab read like a diagnosis or like advice? Write it down.

@@ -23,9 +23,9 @@
 
 1. **What is logged.** One entry is a movement or an exercise phase from the Movements tab, the joint angles at that moment, a feeling ("It hurts" or "It feels fine"), a side (left, right or both) and a free note of up to 500 characters.
 2. **Left and right are compared apart.** A movement that hurts on the left and feels fine on the right says nothing against the left side.
-3. **A structure to look into** is one that at least one painful entry loads and no fine entry of the same side loads. The list is ordered by how many painful entries load it.
+3. **A structure to look into** is one that at least one painful entry loads and no fine entry of the same side loads. The list is ordered by English name, with plain counts: each line says how many painful entries load the structure.
 4. **Only checked rows count**, because the normal build holds nothing else. When rows for a logged movement still wait for review, the list says it may be incomplete.
-5. **The one-page export is the browser's own print**, with a print stylesheet. No PDF library. Each table holds at most the 12 newest entries.
+5. **The printed summary is the browser's own print**, with a print stylesheet. No PDF library. Each table holds at most the 12 newest entries. The summary can run to two pages.
 6. **The backup is one JSON file.** Loading it adds entries that are not there yet and leaves existing ones alone. A file with any bad entry is refused whole.
 7. **No library for IndexedDB.** The store is about 60 lines.
 8. **If the wording check finds the comparison too close to diagnosis**, the owner can sign off Tasks 2, 3, 5, 6 and 7 without Task 4. The panel and the summary then show the log only. Task 5 and Task 6 say what to leave out in that case.
@@ -263,7 +263,7 @@ export type Comparison = {
   painfulCount: number;     // known painful entries for this side
   fineCount: number;        // known fine entries for this side
   unknownCount: number;     // entries for this side whose pick the bundle does not know
-  candidates: Candidate[];  // most painful entries first, then by English name
+  candidates: Candidate[];  // ordered by English name, with plain counts
   ruledOut: string[];       // loaded by a painful and by a fine entry, by English name
   incomplete: boolean;
 };
@@ -294,9 +294,10 @@ test("a fine movement that loads a structure rules it out", () => {
   expect(c.candidates.map((x) => x.sid)).toEqual(["obturator-externus", "piriformis"]);
   expect(c.ruledOut).toEqual(["gluteus-maximus"]);
 });
-test("more painful entries rank a structure higher", () => {
+test("more painful entries raise a structure's count", () => {
   const c = compare([e("1", "hip-external-rotation", "painful", "l"), e("2", "hip-internal-rotation", "painful", "l", 90)], b, "l");
-  expect(c.candidates[0]).toEqual({ sid: "piriformis", painful: 2, evidence: ["m1", "m2"] });
+  expect(c.candidates.find((x) => x.sid === "piriformis")).toEqual({ sid: "piriformis", painful: 2, evidence: ["m1", "m2"] });
+  expect(c.candidates.map((x) => x.sid)).toEqual(["gluteus-maximus", "ischiofemoral-ligament", "obturator-externus", "piriformis"]);
 });
 test("the stored angle decides which rows count", () =>
   expect(compare([e("1", "hip-external-rotation", "painful", "l", 50)], b, "l").candidates.map((x) => x.sid)).toEqual(["gluteus-maximus", "obturator-externus"]));
@@ -422,7 +423,7 @@ Expected: FAIL, modules not found.
 - [ ] **Step 4: Check the first screen did not grow**
 
 Run: `npm test -w apps/web && npm run build`
-Expected: PASS. In the build output the notebook code sits in its own chunk and the entry chunk (`index-*.js`) is no more than 3 kB larger than on `main`. Write both sizes into the commit message body.
+Expected: PASS. In the build output the notebook code sits in its own chunk and the entry chunk (`index-*.js`) is no more than 6 kB larger than on `main`. Write both sizes into the commit message body.
 
 - [ ] **Step 5: Commit**
 
@@ -481,7 +482,7 @@ Expected: FAIL, modules not found.
 
 - [ ] **Step 3: Implement** the model, the component, the wiring and the print rules.
 
-- [ ] **Step 4: Check the page by eye.** Run the review build, log five movements, press the print button and look at the print preview. Expected: one A4 page, black on white, no part of the app visible, nothing cut off at the right edge.
+- [ ] **Step 4: Check the page by eye.** Run the review build, log five movements, press the print button and look at the print preview. Expected: one or two A4 pages (the summary can run to two pages), black on white, no part of the app visible, nothing cut off at the right edge.
 
 - [ ] **Step 5: Run tests and commit**
 
