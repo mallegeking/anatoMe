@@ -64,6 +64,26 @@ describe("compare", () => {
     };
     expect(compare([entry], b, "l", "en").candidates.map((x) => x.sid)).toEqual(["gluteus-maximus"]);
   });
+  test("an exercise note with exercises waiting marks the list incomplete", () => {
+    const entry: NotebookEntry = {
+      ...e("1", "x", "painful", "l"),
+      pick: { kind: "exercise", id: "squat", phase: "lowering" },
+      pose: { "hip.flexion": 50 },
+    };
+    expect(compare([entry], b, "l", "en").incomplete).toBe(false);
+    expect(compare([entry], { ...b, pendingExercises: 1 }, "l", "en").incomplete).toBe(true);
+  });
+  test("a review bundle is never marked incomplete", () => {
+    const review = makeMovementBundle("review");
+    const exercise: NotebookEntry = {
+      ...e("2", "x", "painful", "l"),
+      pick: { kind: "exercise", id: "squat", phase: "lowering" },
+      pose: { "hip.flexion": 50 },
+    };
+    expect(review.pendingExercises).toBeGreaterThan(0);
+    expect(compare([e("1", "knee-flexion", "painful", "l")], review, "l", "en").incomplete).toBe(false);
+    expect(compare([exercise], review, "l", "en").incomplete).toBe(false);
+  });
   test("an unknown exercise or phase is unknown with an empty map", () => {
     const entry: NotebookEntry = { ...e("1", "x", "painful", "l"), pick: { kind: "exercise", id: "squat", phase: "nope" } };
     expect(isKnown(entry, b)).toBe(false);
