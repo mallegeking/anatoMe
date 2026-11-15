@@ -109,7 +109,7 @@
   "area.title": "Under this spot, from the surface inwards",
   "area.throughTitle": "Over and under {name}, seen from here",
   "area.notOnLine": "{name} is not on this line of sight from here. Turn the model and try again.",
-  "area.note": "This lists what the model has under the spot. It does not say what causes a symptom.",
+  "area.note": "This lists what the model has under the spot. It shows general anatomy, the same for everyone.",
   "area.noSkin": "The model has no skin or fat, so depth starts at the outermost muscle or bone.",
   "area.atSurface": "outermost here",
   "area.depth": "about {cm} cm deeper",

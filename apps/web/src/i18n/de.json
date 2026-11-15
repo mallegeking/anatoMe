@@ -109,7 +109,7 @@
   "area.title": "Unter dieser Stelle, von außen nach innen",
   "area.throughTitle": "{name}: was darüber und darunter liegt, von hier aus gesehen",
   "area.notOnLine": "{name} liegt von hier aus nicht auf dieser Sichtlinie. Dreh das Modell und versuch es noch einmal.",
-  "area.note": "Diese Liste zeigt, was das Modell unter der Stelle hat. Sie sagt nicht, was ein Symptom verursacht.",
+  "area.note": "Diese Liste zeigt, was das Modell unter der Stelle hat. Sie zeigt allgemeine Anatomie, die für alle gleich ist.",
   "area.noSkin": "Das Modell hat keine Haut und kein Fett, darum beginnt die Tiefe beim äußersten Muskel oder Knochen.",
   "area.atSurface": "hier ganz außen",
   "area.depth": "etwa {cm} cm tiefer",

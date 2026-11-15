@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "../data/bundle";
+import de from "../i18n/de.json";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import { makeMovementBundle } from "../movement/fixture";
@@ -122,4 +123,16 @@ test("a probe with no entries at all shows the same line", () => {
   show({ area: { point: null, through: { sid: "piriformis", side: "l" }, entries: [] } });
   expect(screen.getByText(createT(en)("area.notOnLine", { name: "Piriformis" }))).toBeTruthy();
   expect(screen.queryByRole("list")).toBeNull();
+});
+
+test("the note speaks of general anatomy and no area text says symptom", () => {
+  expect(en["area.note"]).toBe("This lists what the model has under the spot. It shows general anatomy, the same for everyone.");
+  expect(de["area.note"]).toBe("Diese Liste zeigt, was das Modell unter der Stelle hat. Sie zeigt allgemeine Anatomie, die für alle gleich ist.");
+  // Every text the Area tab shows: its own texts, the tab name, sides, types and the waiting line.
+  const shown = (texts: Record<string, string>) =>
+    Object.entries(texts).filter(([key]) => key.startsWith("area.") || key.startsWith("type.") || key.startsWith("side.") || key === "mode.area" || key === "info.pending");
+  for (const texts of [en, de]) {
+    expect(shown(texts).length).toBeGreaterThan(10);
+    expect(shown(texts).filter(([, text]) => /symptom/i.test(text))).toEqual([]);
+  }
 });
