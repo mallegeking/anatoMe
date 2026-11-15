@@ -144,3 +144,36 @@ The 3126 ms in the full run was measured while a preview server of mine was stil
 5. **The phone sheet line "Does any sentence in the Notebook tab read like a diagnosis or like advice?"** is the plan's text. It contains "diagnosis", but as a question to the tester. Keep it or reword it.
 6. **`area.note` from plan 2b** ("It does not say what causes a symptom.") would fail the stricter word list if rule 1 ("every public text counts") is applied to all of `en.json`. The word test checks only `notebook.` and `summary.` keys. This is still open from the 2b report.
 7. **Run section 7 "Notebook" of `docs/phase2/phone-measurements.md`** on the phone in the review build, including the question about diagnosis or advice.
+
+## Fixes after the review
+
+Run of 2026-11-15, at the tip of the working branch (plans 3 and 4a are built on top of 2c). No app code changed, only tests, the plan, the phone sheet, this report and the progress file.
+
+| Item | Commit |
+| --- | --- |
+| 1 Two missing tests in `compare.test.ts`: "an exercise note with exercises waiting marks the list incomplete" and "a review bundle is never marked incomplete" | `6136e1e` |
+| 2 Deviations 15 to 17 (the lazy `PrintSummary.tsx`, the new `angles.ts`, two printed pages) | `c940cd9` |
+| 3 The owner decisions of 2026-11-15 in the plan and the phone sheet | `1645cfe` |
+| 4 Items 1 to 3 of "For the owner" marked as decided, their lines removed from the progress file | `a9dac35` |
+
+Each new test was checked against `compare.ts` with its line removed, and `compare.ts` was put back unchanged. Without the line `if (entry.pick.kind === "exercise" && bundle.pendingExercises > 0) incomplete = true;` only "an exercise note with exercises waiting marks the list incomplete" fails. With `if (bundle.mode === "normal")` taken away only "a review bundle is never marked incomplete" fails. The exercise test logs the squat at 50 degrees of hip flexion and no knee flexion, so knee flexion, which has rows waiting, is not in its query and only the exercise line can mark the list incomplete.
+
+Not changed, because it is outside the list: the plan still says "one-page" in its goal line, in the title of Task 6 and in Task 7 Step 3 ("is it one page"). Also, since plan 4a, `compare.ts` orders the list by the name in the language shown, which is the English name in English.
+
+Checks, all exit 0:
+
+```
+npm run validate                  data in data is valid
+npm run check-models              every mesh maps to one of 52 structures
+npm test                          web: Tests 396 passed (396)
+                                  pipeline: Tests 127 passed (127)
+npm run build:review -w apps/web  hip.json (review): 137917 bytes, 64 actions, 63 attachments, 2 exercises
+npm run build                     hip.json (normal): 10381 bytes, 0 actions, 0 attachments, 0 exercises
+npm run e2e -w apps/web           4 passed (19.4s)
+node scripts/check-no-drafts.mjs  apps/web/dist/data: 1 bundle(s), no drafts
+perf-check                        median interactive ms: 3256 (limit 5000)
+error-check                       ok decoder download fails: message shown after 1049 ms
+                                  ok decoder never answers: message shown after 20962 ms
+                                  ok model file missing: message shown after 1183 ms
+npm run test:py                   14 passed in 4.51s
+```
