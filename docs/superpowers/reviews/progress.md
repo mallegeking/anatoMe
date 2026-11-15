@@ -25,8 +25,6 @@ Sessions of 2026-11-14:
 - Phase 2d tools: when the physio's answers arrive, record them with `npm run mark-checked` as `docs/review/how-to-record-a-review.md` describes.
 - Phase 2b: check on the phone whether the white dot (about 2 CSS pixels) can be seen (item 4).
 - Phase 2b: run section 6 "Area tab" of `docs/phase2/phone-measurements.md` on the phone in the review build, with its physio question.
-- Phase 2c: the entry chunk grew 5.96 kB raw (1.89 kB gzip), over the 3 kB budget of Task 5 Step 4. The 56 new texts are about 3.2 kB of it. Decide the budget. Item 1 of `phase-2c-build-report.md`, "For the owner".
-- Phase 2c: confirm that "Structures to look into" is ordered by name, not by count (wording rule 5), and decide what to do when the summary runs past one page (items 2 and 3).
 - Phase 2c: three texts that are slightly off, all plan wording (item 4), and the phone sheet question that contains "diagnosis" (item 5).
 - Phase 2c: run section 7 "Notebook" of `docs/phase2/phone-measurements.md` on the phone in the review build, including a real print preview.
 - Phase 2d data: 12 new action rows and 2 exercises wait for the physio in the review build. Gaps in `docs/phase2/data-gaps.md`.

@@ -126,9 +126,15 @@ The 3126 ms in the full run was measured while a preview server of mine was stil
 
 ## For the owner
 
-1. **The entry chunk is 5.96 kB larger (1.89 kB gzip) than before this plan, over the 3 kB in Task 5 Step 4.** The 56 new texts in `en.json` are about 3.2 kB on their own. Decide whether the budget should change, or whether the notebook texts should move out of the first download (that needs a change to how texts are loaded).
-2. **"Structures to look into" is ordered by name, not by count** (rule 5). Please confirm. The plan's design decision 3 says by count.
-3. **"One-page summary" is not always one page.** With the review build's draft rows, five notes already gave two pages. With up to 12 + 12 notes of 500 characters, the normal build will also run longer. Decide whether to cap the candidate lines, shorten what is printed, or rename the button.
+1. **Decided on 2026-11-15:** the entry chunk budget in Task 5 Step 4 is 6 kB, so the growth of 5.96 kB is within it.
+
+   Was: **The entry chunk is 5.96 kB larger (1.89 kB gzip) than before this plan, over the 3 kB in Task 5 Step 4.** The 56 new texts in `en.json` are about 3.2 kB on their own. Decide whether the budget should change, or whether the notebook texts should move out of the first download (that needs a change to how texts are loaded).
+2. **Decided on 2026-11-15:** the list of structures stays ordered by name with plain counts, and the plan now says so.
+
+   Was: **"Structures to look into" is ordered by name, not by count** (rule 5). Please confirm. The plan's design decision 3 says by count.
+3. **Decided on 2026-11-15:** a summary of two pages is accepted, and the button text "Print a one-page summary" stays.
+
+   Was: **"One-page summary" is not always one page.** With the review build's draft rows, five notes already gave two pages. With up to 12 + 12 notes of 500 characters, the normal build will also run longer. Decide whether to cap the candidate lines, shorten what is printed, or rename the button.
 4. **Texts that are slightly off, all plan wording:**
    - When the only painful notes are for movements this version does not know, the panel says "Log at least one movement that hurts", although the person did.
    - "{painful} of {total} movements" counts notes, not movements. One movement logged twice gives "2 of 2 movements".
