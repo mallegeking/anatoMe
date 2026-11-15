@@ -82,6 +82,20 @@ npm run test:py                   14 passed
 
 Noticed while doing this, not done: on a Windows checkout three print tests in `App.test.tsx` fail before any change. `apps/web/src/notebook/Summary.tsx` and `summary.ts` differ only by case, and Windows does not tell them apart, so `./Summary` loads the wrong file. On Linux and in CI all tests pass. Renaming one of the two files would fix it.
 
+## Follow-ups
+
+Added on 2026-11-15, one commit per item, each test written first and seen to fail before the code. The owner decided every point. Items 1 to 3 belong to plan 2b and are in the "Follow-ups" section of `phase-2b-build-report.md`, with the area sweep (0 untapped-side entries at the front, 60° and 120°) and the new probe miss counts (7, 6 and 4 of 103, before 18, 20 and 16).
+
+**Item 4, a movement keeps the selection (`a536078`).** The effect in `App.tsx` that clears a hidden selection now runs only while no movement highlights are active. A structure hidden by the layers or by "Hide this" still clears the selection. Test: `App.test.tsx` "a movement that hides the selected structure keeps the selection for the way back". It selects rectus femoris, picks "Hip external rotation" (which hides it), goes back to Structures and finds its heading. It failed before the change. The existing hide tests are unchanged and green. This was "Noticed, not done" item 2.
+
+**Item 5, the credit on either side of the licence link (`2d3e07b`).** `withLicence` in `Credits.tsx` fills in `{credit}` before and after `{licence}`. Test: `Credits.test.tsx` "a template with the licence before the credit still fills in the credit" (template `"{licence}: {credit}"`). It failed before (the literal `{credit}` showed). This was "Noticed, not done" item 5.
+
+**Item 6, arrow keys on the mode tabs (`ab8798c`).** Built after reading the tabs pattern of the WAI-ARIA Authoring Practices (the automatic activation example, page last updated 12 August 2025). Left and right arrows select the previous and next tab and move focus to it, wrapping at the ends. Home and End go to the first and the last tab. Only the selected tab has `tabIndex` 0, the others -1. Tests in `ModeBar.test.tsx`: "only the selected tab is in the Tab order", "the right arrow selects and focuses the next tab", "the left arrow selects and focuses the previous tab", "the arrows wrap at the ends", "Home and End go to the first and the last tab". All five failed before. "other keys do nothing" passed before and after. `aria-controls` and `tabpanel` were not added, because the item did not ask for them.
+
+The checks after all six items are in `phase-2b-build-report.md`, "Follow-ups". All exit 0.
+
+Noticed while doing this, not done: one full web test run after item 6 failed once in `App.test.tsx` "show the other side selects that side and turns the camera to it" (the "Show the other side" button was not found). The test passed alone twice and in three more full runs, including the final check run. It looks like a timing flake under load, not caused by these changes.
+
 ## Checks
 
 Run on `6f1eb01`, all exit 0.

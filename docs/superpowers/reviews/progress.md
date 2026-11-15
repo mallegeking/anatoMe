@@ -23,8 +23,7 @@ Sessions of 2026-11-14:
 
 - Phase 2a: run `docs/phase2/phone-measurements.md` (Movements tab, hiding one side) on the phone in the review build.
 - Phase 2d tools: when the physio's answers arrive, record them with `npm run mark-checked` as `docs/review/how-to-record-a-review.md` describes.
-- Phase 2b: "See what lies over and under it" misses its own structure for about 1 in 6 structures, because it aims at the middle of the bounding box. Decide whether to aim at the nearest point of the structure and add a line for a miss. Item 2 of the report.
-- Phase 2b: decide whether `area.note` keeps the word "symptom" (item 3), and check on the phone whether the white dot (about 2 CSS pixels) can be seen (item 4).
+- Phase 2b: check on the phone whether the white dot (about 2 CSS pixels) can be seen (item 4).
 - Phase 2b: run section 6 "Area tab" of `docs/phase2/phone-measurements.md` on the phone in the review build, with its physio question.
 - Phase 2c: the entry chunk grew 5.96 kB raw (1.89 kB gzip), over the 3 kB budget of Task 5 Step 4. The 56 new texts are about 3.2 kB of it. Decide the budget. Item 1 of `phase-2c-build-report.md`, "For the owner".
 - Phase 2c: confirm that "Structures to look into" is ordered by name, not by count (wording rule 5), and decide what to do when the summary runs past one page (items 2 and 3).

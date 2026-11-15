@@ -94,6 +94,57 @@ error-check                       ok decoder download fails: message shown after
 npm run test:py                   14 passed in 4.05s
 ```
 
+## Follow-ups
+
+Added on 2026-11-15, one commit per item, each test written first and seen to fail before the code. The owner decided every point.
+
+**Item 1, only a listed bone stops the list (`fef0ea8`).** Without a target, a centre bone of a dropped side no longer stops the list. Tests in `apps/web/src/area/under.test.ts`:
+
+- "a bone of the other side does not stop the list" failed before the change (the list ended at the right hip bone and left out the left iliacus) and passes after it.
+- "a bone of the tapped side still stops the list" passed before and after. It guards the rule that a shown bone still stops the list.
+
+Real-model sweep rerun after the change (same grid as "Review fixes"): front 0 of 768, turned 60° 0 of 573, turned 120° 0 of 599 taps hold an entry of a side that is not tapped. The report's older metric (other side 3 cm or deeper) is 0 in all three views as well.
+
+**Item 2, the probe aims at the structure (`b78be16`).** The probe aims at the vertex of the structure's meshes nearest to the box middle, in world space, and the marker sits there. When the structure is not among the entries, or has no mesh, the panel shows the heading, the new line `area.notOnLine` and no list. A probe with no mesh reports `point: null`, so no marker shows. Tests:
+
+- `Viewer.test.tsx` "area mode: a probe aims at the structure, not at the empty middle of its box": one structure in two boxes far apart. Proved by putting the aim back to the box middle: the test failed (the entries were empty). Restored.
+- `Viewer.test.tsx` "area mode: a probe whose structure has no mesh reports an empty list and no marker". It failed before (nothing was reported).
+- `AreaPanel.test.tsx` "a probe whose structure is not among the entries shows the title, one line and no list" and "a probe with no entries at all shows the same line". Both failed before.
+- Deviation: two existing probe tests in `Viewer.test.tsx` had to change. In a plain box the vertex nearest to the middle is a corner, and rays aimed at a corner only graze the box. "area mode: a probe lists what lies in front of its structure, past bone" now gives the piriformis box segments (`BoxGeometry(1, 1, 0.1, 2, 2, 1)`), so a vertex sits in the middle of each face. "area mode: a probe whose rays miss still reports through the probe, not null" got the same segments, and its expected marker point changed from the box middle `[0, 0, 0]` to that face vertex `[0, 0, 0.05]`. What both tests check is unchanged.
+
+Probe misses on the real model, counted as "the structure is not among the entries", which is when the panel now shows the new line (103 structures, the same camera as item 2 of "For the owner"):
+
+| View | Box middle (before) | Nearest vertex (now) |
+| --- | --- | --- |
+| Front | 18 | 7 |
+| Back | 20 | 6 |
+| Side | 16 | 4 |
+
+Still missed from the front: inferior gemellus (both sides), tibia (right), acetabular labrum (right), iliofemoral ligament (left), posterior cruciate ligament (left), sacrospinous ligament (right). For these the panel now says the structure is not on this line of sight. The final review's estimate was 6, 5 and 4. It counted any ray hit, and this count uses the real entries.
+
+**Item 3, the area note (`7db540c`).** `area.note` now reads "This lists what the model has under the spot. It shows general anatomy, the same for everyone." and in German "Diese Liste zeigt, was das Modell unter der Stelle hat. Sie zeigt allgemeine Anatomie, die für alle gleich ist." Test: `AreaPanel.test.tsx` "the note speaks of general anatomy and no area text says symptom". It checks both texts and that no text the Area tab shows (the `area.*`, `type.*` and `side.*` texts, the tab name and the waiting line) contains "symptom" in English or German. It failed before the change. No test held the old text word for word. No text in `en.json` or `de.json` contains "symptom" any more.
+
+Items 4 to 6 belong to plan 2a, see the "Follow-ups" section of `phase-2a-build-report.md`.
+
+Checks after all six items, run in the Linux clone on `ab8798c`, all exit 0:
+
+```
+npm run validate                  data in data is valid
+npm run check-models              region hip: 48909 triangles (budget 150000)
+                                  every mesh maps to one of 52 structures
+npm test                          web: Test Files 39 passed (39), Tests 394 passed (394)
+                                  pipeline: Test Files 8 passed (8), Tests 127 passed (127)
+npm run build:review -w apps/web  hip.json (review): 137917 bytes, 64 actions, 63 attachments, 2 exercises
+npm run build                     hip.json (normal): 10381 bytes, 0 actions, 0 attachments, 0 exercises
+npm run e2e -w apps/web           area, atlas, movement, notebook: 4 passed (21.4s)
+node scripts/check-no-drafts.mjs  apps/web/dist/data: 1 bundle(s), no drafts
+perf-check                        median interactive ms: 2960 (limit 5000)
+error-check                       ok decoder download fails: message shown after 1363 ms
+                                  ok decoder never answers: message shown after 20728 ms
+                                  ok model file missing: message shown after 1036 ms
+npm run test:py                   14 passed in 3.71s
+```
+
 ## Checks
 
 Run on `fc2a816`, all exit 0.
@@ -155,7 +206,7 @@ Three.js stays out of the main bundle. `App` and `AreaPanel` import only types f
    - Only a bone on the centre ray stops the list. A femur that only an outer ray hits is listed but does not stop it. Example at 60°: femur (left) at the surface, then four more left structures, then gracilis and sartorius of the right leg at 11 cm.
 
    The final review suggests stopping the list at the first centre hit of the opposite side (structures on the middle line do not count), and letting a bone on any ray stop it. That changes design decision 3 of the plan, so I left it. Decide whether to change the rule, then it is a small change in `under.ts` with a unit test.
-2. **"See what lies over and under it" often misses its own structure.** The rays go through the middle of the structure's bounding box, which for a curved or thin structure is often not on the structure. From the front, the back and the side, 18, 20 and 16 of 103 structures are not hit at all. Gracilis, the hip ligaments, the labrum and several knee ligaments are among them. The list then falls back to the normal rule under a heading that names the structure. Aiming at the point of the structure nearest to the box middle cuts the misses to 6, 5 and 4. A line saying "not on this line of sight from here" would cover the rest. That changes design decision 5 and needs a new text, so I left it.
-3. **The wording of `area.note`.** It is the plan's exact text: "This lists what the model has under the spot. It does not say what causes a symptom." It keeps rule 4 (no pain wording), but it puts the word "symptom" under every list. Section 5 of `docs/phase2/medical-device-wording.md` suggests banning that word in notebook text and says every public text counts. Decide whether to keep it or use something neutral, for example "It shows general anatomy, the same for everyone."
+2. **"See what lies over and under it" often misses its own structure.** Decided on 2026-11-15: aim at the nearest vertex and show `area.notOnLine` for a miss, see "Follow-ups". The rays go through the middle of the structure's bounding box, which for a curved or thin structure is often not on the structure. From the front, the back and the side, 18, 20 and 16 of 103 structures are not hit at all. Gracilis, the hip ligaments, the labrum and several knee ligaments are among them. The list then falls back to the normal rule under a heading that names the structure. Aiming at the point of the structure nearest to the box middle cuts the misses to 6, 5 and 4. A line saying "not on this line of sight from here" would cover the rest. That changes design decision 5 and needs a new text, so I left it.
+3. **The wording of `area.note`.** Decided on 2026-11-15: the new text speaks of general anatomy, see "Follow-ups". It is the plan's exact text: "This lists what the model has under the spot. It does not say what causes a symptom." It keeps rule 4 (no pain wording), but it puts the word "symptom" under every list. Section 5 of `docs/phase2/medical-device-wording.md` suggests banning that word in notebook text and says every public text counts. Decide whether to keep it or use something neutral, for example "It shows general anatomy, the same for everyone."
 4. **The white dot is about 2 CSS pixels wide.** Check it on the phone (phone sheet, section 6). If it is too small, decide a new radius or a size that follows the camera distance.
 5. **Run section 6 of `docs/phase2/phone-measurements.md`** on the phone in the review build, and ask the physio its question about the order under the front of the hip and under the buttock.
