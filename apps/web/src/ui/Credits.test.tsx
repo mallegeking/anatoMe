@@ -54,3 +54,9 @@ test("the language switch reports the choice", () => {
   fireEvent.change(select, { target: { value: deutsch.value } });
   expect(onLang).toHaveBeenCalledWith("de");
 });
+
+test("a template with the licence before the credit still fills in the credit", () => {
+  const { container } = render(<Credits t={createT({ ...en, "credits.withLicence": "{licence}: {credit}" })} lang="en" onLang={() => {}} />);
+  expect(container.textContent).toContain(`${en["credits.licenceCcBy"]}: ${en["credits.bodyparts3d"]}`);
+  expect(container.textContent).not.toContain("{credit}");
+});

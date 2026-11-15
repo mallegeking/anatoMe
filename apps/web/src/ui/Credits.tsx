@@ -29,14 +29,14 @@ export function EducationalLine({ t }: { t: Translate }) {
   return <p className="educational">{t("about.educational")}</p>;
 }
 
-// The credit, then the licence link, with the text around them taken from en.json.
+// The credit and the licence link, in the order and with the text around them that the language file gives.
 function withLicence(t: Translate, key: string, licence: { key: string; href: string }) {
   const [before, after] = t("credits.withLicence").split("{licence}");
   return (
     <>
       {before.replace("{credit}", t(key))}
       <a href={licence.href} target="_blank" rel="noopener noreferrer">{t(licence.key)}</a>
-      {after}
+      {after.replace("{credit}", t(key))}
     </>
   );
 }
