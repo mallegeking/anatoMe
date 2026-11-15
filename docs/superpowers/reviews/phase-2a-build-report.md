@@ -39,7 +39,10 @@ First: `7488c46`. Last: `6f1eb01`.
 - **Task 1.** `isVisibleOnAnySide` was added to `layers.ts`. `peel`, `revealFor` and the panel's peel button need to know whether any side of a muscle still shows, otherwise hiding one side of a layer's only muscle would make peel skip that layer. Two existing tests ("peel skips a layer whose muscles are all hidden by hand", "peel is off when no visible muscle is left") now hide both sides, because hiding one side no longer empties a layer. The old model check test "a midline mesh has an empty side and passes" used a paired femur with an empty side, which is now an error by design. It was replaced with a sacrum case.
 - **Task 2.** The Credits test asserts that two square brackets show (`getAllByText(/\[/).length` is 2), because two credits carry a licence link and `getByText` fails on more than one match. The "no round brackets" assertion is unchanged.
 - **Task 3.** The fixture joints have no knee, so the fixture exercises use hip angles. The "other region" compile fixture uses `regions: [elbow]`, which only compile reads. Task 3 has two commits: the review found that the test "a data folder without exercises.yaml passes" read the real `data/` folder and would break once plan 2d adds `data/exercises.yaml`. It now runs on a copy of the valid fixture.
+- **Task 3, compile test.** The test "normal mode drops an unchecked exercise and counts it" expects `["bodyweight-squat"]` and not `[]`, because the valid fixture also holds a checked exercise. The unchecked one is still dropped and counted.
 - **Task 6.** The exercise view also shows the exercise's own sources (the plan lists sources only for each row). Every claim in the app shows its source, and an exercise is a claim. `review.test.tsx` got the new `onOpenMovement` prop.
+- **Task 6, review note.** `MovementPanel` shows the review note on checked rows in the review build, as `InfoPanel` does.
+- **Task 6, old bundles.** `normalizeBundle` also fills `movements`, `attachments`, `actions`, `citations` and `pendingByStructure`, not only the three fields this plan adds.
 - **Final review fixes.** The phone sheet's example ("from stretched to working") could not happen with the real data and now names what does happen (Main movers to Helpers, with the silent line between). The README heading no longer says "Phase 1" above the new Movements bullet. One App test was added (see Review Focus 1).
 
 ## Review Focus
@@ -49,6 +52,35 @@ First: `7488c46`. Last: `6f1eb01`.
 3. **Exercise phase lights the effort muscles.** `roles.test.ts` "lowering into a squat lights the extensors, not the flexors" and "at the bottom of the squat the labrum row applies too". `apps/web/src/movement/state.test.ts` "a movement gives its own query and an exercise phase gives its effort". `MovementPanel.test.tsx` "an exercise shows its phases, the progress slider and the effort note".
 4. **Involved structures always show, hiding one side.** `apps/web/src/layers/shown.test.ts` "an involved structure shows even when it is hidden, peeled and its tissue is off" and "uninvolved muscles and soft tissue are hidden, bones stay". `apps/web/src/layers/layers.test.ts` "hiding the left side leaves the right side showing", "revealFor unhides only the side it was asked for", "peel counts a layer as showing while one side of a muscle is still visible".
 5. **Old cached bundle.** `apps/web/src/data/useRegionData.test.tsx` "normalizeBundle fills what an old bundle lacks".
+
+## Review fixes
+
+Added on 2026-11-15 after the review. Tests and docs only, no app code changed.
+
+- **Review Focus 4, at app level.** `apps/web/src/App.test.tsx` "choosing a list entry for a hidden structure makes it visible and selects it" now also expects the right piriformis to show after "Hide this" on the left one. Proved by making `hideSelected` in `App.tsx` hide both sides: the test failed on that line. The change was thrown away.
+- **Review Focus 5, through `useRegionData`.** `apps/web/src/App.test.tsx` "an old cached bundle without the new fields still opens the Movements tab". It serves a bundle without `exercises`, `pendingByMovement`, `pendingExercises` and without `paired` on every structure, opens the Movements tab and picks "Hip external rotation". Proved by storing the fetched bundle without `normalizeBundle` in `useRegionData.ts`: the test failed. The change was thrown away.
+- `docs/phase0/phase1-follow-ups.md` now names the real task in the five "Done" lines (Task 1 or Task 2).
+
+Checks with these fixes, run in the Linux clone on top of `2e41c4f`, all exit 0:
+
+```
+npm run validate                  data in data is valid
+npm run check-models              region hip: 48909 triangles (budget 150000)
+                                  every mesh maps to one of 52 structures
+npm test                          web: Test Files 39 passed (39), Tests 372 passed (372)
+                                  pipeline: Test Files 8 passed (8), Tests 127 passed (127)
+npm run build:review -w apps/web  hip.json (review): 137917 bytes, 64 actions, 63 attachments, 2 exercises
+npm run build                     hip.json (normal): 10381 bytes, 0 actions, 0 attachments, 0 exercises
+npm run e2e -w apps/web           area, atlas, movement, notebook: 4 passed
+node scripts/check-no-drafts.mjs  apps/web/dist/data: 1 bundle(s), no drafts
+perf-check                        median interactive ms: 1932
+error-check                       decoder download fails: message shown after 1083 ms
+                                  decoder never answers: message shown after 20668 ms
+                                  model file missing: message shown after 935 ms
+npm run test:py                   14 passed
+```
+
+Noticed while doing this, not done: on a Windows checkout three print tests in `App.test.tsx` fail before any change. `apps/web/src/notebook/Summary.tsx` and `summary.ts` differ only by case, and Windows does not tell them apart, so `./Summary` loads the wrong file. On Linux and in CI all tests pass. Renaming one of the two files would fix it.
 
 ## Checks
 

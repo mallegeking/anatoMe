@@ -223,6 +223,21 @@ test("a movement whose rows do not apply at the current angle leaves the model w
   expect(viewer.isShown("piriformis", "r")).toBe(true);
 });
 
+test("an old cached bundle without the new fields still opens the Movements tab", async () => {
+  // A bundle as it was compiled before plan 2a: no exercises, no waiting counts, no paired flag.
+  const old: Partial<RegionBundle> = makeBundle();
+  delete old.exercises;
+  delete old.pendingByMovement;
+  delete old.pendingExercises;
+  for (const s of old.structures!) delete (s as { paired?: boolean }).paired;
+  serve(old as RegionBundle);
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  expect(screen.getByRole("heading", { name: "Hip external rotation", level: 2 })).toBeTruthy();
+});
+
 test("a movement heading in the info panel opens that movement", async () => {
   serve(makeBundle());
   render(<App />);
@@ -303,6 +318,7 @@ test("choosing a list entry for a hidden structure makes it visible and selects 
   fireEvent.click(screen.getByText("tap piriformis"));
   fireEvent.click(screen.getByRole("button", { name: en["info.hide"] }));
   expect(viewer.isShown("piriformis", "l")).toBe(false);
+  expect(viewer.isShown("piriformis", "r")).toBe(true);
   fireEvent.click(tab(en["mode.area"]));
   fireEvent.click(screen.getByText("area tap"));
   fireEvent.click(screen.getByRole("button", { name: "Piriformis (left)" }));
