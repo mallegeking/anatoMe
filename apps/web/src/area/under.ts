@@ -19,8 +19,14 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
   const all = [center, ...around].flat();
   const surface = Math.min(...center.map((h) => h.distance));
 
+  // Without a target the list keeps to the side the centre ray meets first (owner's decision after review, 2026-11-15).
+  // Midline structures always stay. A centre ray with no sided hit drops nothing.
+  const tapped = through ? null : tappedSides(center);
+  const kept = (h: RayHit) => !tapped || h.side === "" || tapped.has(h.side);
+
+  // Only a bone that the list shows can stop it.
   const normalStop = (): number => {
-    const bones = center.filter((h) => h.kind === "bone").map((h) => h.distance);
+    const bones = center.filter((h) => h.kind === "bone" && kept(h)).map((h) => h.distance);
     const capped = surface + CAP_M;
     return bones.length > 0 ? Math.min(Math.min(...bones), capped) : capped;
   };
@@ -32,14 +38,10 @@ export function structuresUnder(center: RayHit[], around: RayHit[][], through?: 
   }
   if (stop === undefined) stop = normalStop();
 
-  // Without a target the list keeps to the side the centre ray meets first (owner's decision after review, 2026-11-15).
-  // Midline structures always stay. A centre ray with no sided hit drops nothing.
-  const tapped = through ? null : tappedSides(center);
-
   // Each structure and side keeps its nearest distance.
   const nearest = new Map<string, UnderEntry>();
   for (const h of all) {
-    if (tapped && h.side !== "" && !tapped.has(h.side)) continue;
+    if (!kept(h)) continue;
     const key = `${h.sid}|${h.side}`;
     const seen = nearest.get(key);
     if (!seen || h.distance < seen.distance) {

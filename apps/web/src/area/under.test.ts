@@ -67,3 +67,11 @@ test("through a target nothing is dropped by side", () => {
   const center = [hit("gluteus-maximus", 1.0, "muscle", "r"), hit("piriformis", 1.05)];
   expect(keys(structuresUnder(center, [], { sid: "piriformis", side: "l" }))).toEqual(["gluteus-maximus|r", "piriformis|l"]);
 });
+test("a bone of the other side does not stop the list", () => {
+  const center = [hit("sartorius", 1.0), hit("hip-bone", 1.04, "bone", "r"), hit("iliacus", 1.08)];
+  expect(keys(structuresUnder(center, []))).toEqual(["sartorius|l", "iliacus|l"]);
+});
+test("a bone of the tapped side still stops the list", () => {
+  const center = [hit("sartorius", 1.0), hit("femur", 1.04, "bone", "l"), hit("iliacus", 1.08)];
+  expect(keys(structuresUnder(center, []))).toEqual(["sartorius|l", "femur|l"]);
+});
