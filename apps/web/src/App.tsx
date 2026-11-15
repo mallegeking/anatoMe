@@ -260,13 +260,14 @@ export function App() {
   // Structures the data does not know are always shown, unless a movement hides what is not involved.
   const isShown = useMemo(() => makeIsShown(structures, layers, highlights), [structures, layers, highlights]);
 
-  // If the selected structure disappears, the panel should not keep describing it.
+  // If the layers hide the selected structure, the panel should not keep describing it.
+  // A movement that hides it only for a while keeps the selection, so it is back on the Structures tab.
   useEffect(() => {
-    if (selection && !isShown(selection.sid, selection.side)) {
+    if (!highlights && selection && !isShown(selection.sid, selection.side)) {
       setSelection(null);
       setLabel(undefined);
     }
-  }, [selection, isShown]);
+  }, [selection, isShown, highlights]);
 
   const hideSelected = useCallback(() => {
     if (!selection) return;

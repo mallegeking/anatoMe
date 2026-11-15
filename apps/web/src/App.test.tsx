@@ -238,6 +238,21 @@ test("an old cached bundle without the new fields still opens the Movements tab"
   expect(screen.getByRole("heading", { name: "Hip external rotation", level: 2 })).toBeTruthy();
 });
 
+test("a movement that hides the selected structure keeps the selection for the way back", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "rectus" } });
+  fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
+  expect(screen.getByRole("heading", { name: "Rectus femoris (left)" })).toBeTruthy();
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  // Rectus femoris is not involved, so the movement hides it.
+  expect(viewer.isShown("rectus-femoris", "l")).toBe(false);
+  fireEvent.click(tab(en["mode.atlas"]));
+  expect(screen.getByRole("heading", { name: "Rectus femoris (left)" })).toBeTruthy();
+});
+
 test("a movement heading in the info panel opens that movement", async () => {
   serve(makeBundle());
   render(<App />);
