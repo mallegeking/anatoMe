@@ -31,7 +31,8 @@ export type SceneProps = {
   areaProbe?: Selection | null;
 };
 
-export type AreaTap = { entries: UnderEntry[]; point: [number, number, number]; through: Selection | null };
+// point is where the marker goes, null when a probed structure has no mesh.
+export type AreaTap = { entries: UnderEntry[]; point: [number, number, number] | null; through: Selection | null };
 
 // The canvas clock keeps counting while nothing is drawn. Without this, the first frame after a rest
 // would see a long gap, and a camera glide would jump most of the way in one step.

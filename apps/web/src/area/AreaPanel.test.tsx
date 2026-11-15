@@ -110,3 +110,16 @@ test("the clear button calls onClear", () => {
   fireEvent.click(screen.getByRole("button", { name: en["area.clear"] }));
   expect(onClear).toHaveBeenCalled();
 });
+
+test("a probe whose structure is not among the entries shows the title, one line and no list", () => {
+  show({ area: { point: null, through: { sid: "piriformis", side: "l" }, entries: [{ sid: "gluteus-maximus", side: "l", distance: 1, depth: 0 }] } });
+  expect(screen.getByRole("heading", { name: createT(en)("area.throughTitle", { name: "Piriformis" }) })).toBeTruthy();
+  expect(screen.getByText(createT(en)("area.notOnLine", { name: "Piriformis" }))).toBeTruthy();
+  expect(screen.queryByRole("list")).toBeNull();
+});
+
+test("a probe with no entries at all shows the same line", () => {
+  show({ area: { point: null, through: { sid: "piriformis", side: "l" }, entries: [] } });
+  expect(screen.getByText(createT(en)("area.notOnLine", { name: "Piriformis" }))).toBeTruthy();
+  expect(screen.queryByRole("list")).toBeNull();
+});

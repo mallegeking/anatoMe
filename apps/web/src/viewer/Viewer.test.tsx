@@ -271,7 +271,8 @@ test("area mode: a tap where only an outer ray hits calls onAreaTap(null)", asyn
 test("area mode: a probe lists what lies in front of its structure, past bone", async () => {
   withWebGL(true);
   const { BoxGeometry, Group, Mesh } = await import("three");
-  const piriformis = new Mesh(new BoxGeometry(1, 1, 0.1));
+  // The segments put a vertex in the middle of each face. The probe aims at the vertex nearest to the box middle.
+  const piriformis = new Mesh(new BoxGeometry(1, 1, 0.1, 2, 2, 1));
   piriformis.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
   // A bone between the camera and the piriformis. A tap would stop at it, a probe goes on.
   const femur = new Mesh(new BoxGeometry(1, 1, 0.1));
@@ -297,6 +298,59 @@ test("area mode: a probe lists what lies in front of its structure, past bone", 
   expect(onAreaTap.mock.calls[0][0].entries.map((e: { sid: string }) => e.sid)).toEqual(["femur", "piriformis"]);
 });
 
+// Renders the viewer in area mode with this scene, finishes the load, then sets the probe.
+async function probeScene(scene: unknown, probe: { sid: string; side: "l" | "r" | "" }) {
+  withWebGL(true);
+  load.result = [{ scene }];
+  const onAreaTap = vi.fn();
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const { rerender } = render(<Viewer {...props} areaProbe={null} />);
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  rerender(<Viewer {...props} areaProbe={probe} />);
+  await settle();
+  return onAreaTap;
+}
+
+test("area mode: a probe aims at the structure, not at the empty middle of its box", async () => {
+  const { BoxGeometry, Group, Mesh } = await import("three");
+  // One structure in two pieces far apart, so the middle of its box is empty space.
+  // The segments put a vertex in the middle of each inner edge.
+  const piece = (x: number) => {
+    const mesh = new Mesh(new BoxGeometry(1, 1, 0.1, 2, 2, 1));
+    mesh.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
+    mesh.position.x = x;
+    return mesh;
+  };
+  const scene = new Group();
+  scene.add(piece(-1.5), piece(1.5));
+  scene.updateMatrixWorld(true);
+  const onAreaTap = await probeScene(scene, { sid: "piriformis", side: "l" });
+  expect(onAreaTap).toHaveBeenCalledTimes(1);
+  const tap = onAreaTap.mock.calls[0][0];
+  expect(tap.entries.map((e: { sid: string }) => e.sid)).toContain("piriformis");
+  // The marker sits on that vertex, on the inner edge of one piece.
+  expect(Math.abs(tap.point[0])).toBeCloseTo(1);
+  expect(tap.point[1]).toBeCloseTo(0);
+});
+
+test("area mode: a probe whose structure has no mesh reports an empty list and no marker", async () => {
+  const { BoxGeometry, Group, Mesh } = await import("three");
+  const mesh = new Mesh(new BoxGeometry(1, 1, 0.1));
+  mesh.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
+  const scene = new Group();
+  scene.add(mesh);
+  scene.updateMatrixWorld(true);
+  const probe = { sid: "gracilis", side: "l" as const };
+  const onAreaTap = await probeScene(scene, probe);
+  expect(onAreaTap).toHaveBeenCalledTimes(1);
+  expect(onAreaTap).toHaveBeenCalledWith({ entries: [], point: null, through: probe });
+});
+
 test("area mode: a tap on empty canvas calls onAreaTap(null) and a drag over it does not", async () => {
   const { onAreaTap, onSelect } = await showArea();
   const canvas = screen.getByTestId("canvas");
@@ -313,7 +367,8 @@ test("area mode: a probe whose rays miss still reports through the probe, not nu
   withWebGL(true);
   const { BoxGeometry, Group, Mesh } = await import("three");
   // The mesh has a box but cannot be hit, so every ray misses it.
-  const mesh = new Mesh(new BoxGeometry(1, 1, 0.1));
+  // The segments put a vertex in the middle of the front face, which is where the probe aims.
+  const mesh = new Mesh(new BoxGeometry(1, 1, 0.1, 2, 2, 1));
   mesh.userData = { sid: "piriformis", label: "Piriformis", side: "l", kind: "muscle" };
   mesh.raycast = () => {};
   const scene = new Group();
@@ -333,5 +388,5 @@ test("area mode: a probe whose rays miss still reports through the probe, not nu
   rerender(<Viewer {...props} areaProbe={probe} />);
   await settle();
   expect(onAreaTap).toHaveBeenCalledTimes(1);
-  expect(onAreaTap).toHaveBeenCalledWith({ entries: [], point: [0, 0, 0], through: probe });
+  expect(onAreaTap).toHaveBeenCalledWith({ entries: [], point: [0, 0, expect.closeTo(0.05)], through: probe });
 });

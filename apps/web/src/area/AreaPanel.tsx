@@ -37,6 +37,21 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
   };
   const same = (a: Selection | null, sid: string, side: string) => a !== null && a.sid === sid && a.side === side;
 
+  // A probe that did not meet its own structure would list something else under its name, so say so instead.
+  if (through && !area.entries.some((e) => same(through, e.sid, e.side))) {
+    return (
+      <section className="area-panel" data-testid="area-panel">
+        <h2>{t("area.throughTitle", { name: structureName(through.sid) })}</h2>
+        <p>{t("area.notOnLine", { name: structureName(through.sid) })}</p>
+        <div className="panel-actions">
+          <button type="button" onClick={onClear}>
+            {t("area.clear")}
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="area-panel" data-testid="area-panel">
       <h2>{through ? t("area.throughTitle", { name: structureName(through.sid) }) : t("area.title")}</h2>

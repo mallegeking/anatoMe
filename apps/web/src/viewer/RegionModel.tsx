@@ -87,6 +87,25 @@ type Props = {
   areaProbe: Selection | null;
 };
 
+// The vertex of these meshes nearest to a world point, in world space.
+function nearestVertex(meshes: Mesh[], target: Vector3): Vector3 {
+  const best = new Vector3();
+  const v = new Vector3();
+  let bestDistance = Infinity;
+  for (const mesh of meshes) {
+    const position = mesh.geometry.getAttribute("position");
+    for (let i = 0; i < position.count; i++) {
+      v.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+      const d = v.distanceToSquared(target);
+      if (d < bestDistance) {
+        bestDistance = d;
+        best.copy(v);
+      }
+    }
+  }
+  return best;
+}
+
 export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick, areaMode, onAreaTap, areaMarker, areaProbe }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
@@ -169,31 +188,38 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
   });
 
   // Casts the five rays through a spot and reports what lies under it.
-  function areaTapAt(pointer: { x: number; y: number }, cam: Camera, probe: Selection | null, boxMiddle?: [number, number, number]) {
+  function areaTapAt(pointer: { x: number; y: number }, cam: Camera, probe: Selection | null, aim?: [number, number, number]) {
     const { center, around } = castFingerRays(pointer, size, cam, scenes);
     // Only a tap reports null for a miss. A probe always reports, even with an empty list.
-    if (center.length === 0 && !boxMiddle) {
+    if (center.length === 0 && !aim) {
       areaTapRef.current(null);
       return;
     }
     const nearest = center.length > 0 ? Math.min(...center.map((h) => h.distance)) : 0;
     const entries = structuresUnder(center, around, probe ?? undefined);
-    areaTapRef.current({ entries, point: boxMiddle ?? pointAlong(pointer, cam, nearest), through: probe });
+    areaTapRef.current({ entries, point: aim ?? pointAlong(pointer, cam, nearest), through: probe });
   }
 
-  // Look through a structure the panel chose: aim at the middle of its box, as the camera sees it now.
+  // Look through a structure the panel chose, as the camera sees it now. The middle of its box is often
+  // empty space for a curved or split structure, so aim at the structure's vertex nearest to that middle.
   useEffect(() => {
     if (!areaProbe || !ready) return;
-    const box = new Box3();
+    const meshes: Mesh[] = [];
     for (const scene of scenes) {
       scene.traverse((node: Object3D) => {
-        if (node instanceof Mesh && node.userData.sid === areaProbe.sid && (node.userData.side ?? "") === areaProbe.side) box.expandByObject(node);
+        if (node instanceof Mesh && node.userData.sid === areaProbe.sid && (node.userData.side ?? "") === areaProbe.side) meshes.push(node);
       });
     }
-    if (box.isEmpty()) return;
-    const middle = box.getCenter(new Vector3());
-    const ndc = middle.clone().project(camera);
-    areaTapAt({ x: ndc.x, y: ndc.y }, camera, areaProbe, [middle.x, middle.y, middle.z]);
+    // No mesh: the panel says the structure is not in sight, and there is no spot to mark.
+    if (meshes.length === 0) {
+      areaTapRef.current({ entries: [], point: null, through: areaProbe });
+      return;
+    }
+    const box = new Box3();
+    for (const mesh of meshes) box.expandByObject(mesh);
+    const aim = nearestVertex(meshes, box.getCenter(new Vector3()));
+    const ndc = aim.clone().project(camera);
+    areaTapAt({ x: ndc.x, y: ndc.y }, camera, areaProbe, [aim.x, aim.y, aim.z]);
     // Only a new probe should run this.
   }, [areaProbe, ready]);
 
