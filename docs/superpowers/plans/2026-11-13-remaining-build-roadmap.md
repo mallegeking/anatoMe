@@ -22,6 +22,7 @@ This page is the index for the plans written on 2026-11-13. It says which plan c
 | [Phase 2d: hip data](2026-11-13-phase-2d-hip-data.md) | Tools for taking in review results, stretched and pinched rows, knee rows, exercises, open depth questions | Task 4 (exercises) needs the exercise schema from 2a Task 3 | Tools, then sourced data |
 | [Phase 3: publish v1](2026-11-13-phase-3-publish-v1.md) | Licence re-check, history audit, public README, CONTRIBUTING, data correction process, GitHub Pages | Phase 2 gate: the physio has reviewed the hip data | Research, docs, CI |
 | [Phase 4a: regions and German](2026-11-13-phase-4a-regions-and-german.md) | App and pipeline ready for more than one region, German UI, the region playbook | Phase 3 done | Code, translation |
+| [Phase 4b: whole-body meshes](2026-11-15-phase-4b-whole-body-meshes.md) | Meshes, names and measured layers for the lower leg, shoulder, arm, neck and trunk from BodyParts3D, a region switch in the app, the known gaps page | Phase 4a done | Pipeline, code, docs |
 
 ## Order
 
@@ -61,7 +62,7 @@ These are the builder's calls with the most weight. Each plan lists its own in a
 
 ## Not planned yet, and why
 
-- **Phase 4 region content** (spine and neck, shoulder girdle, upper limb, knee and ankle). Each region needs its own mesh inventory and source decision before anyone can list its files and structures, exactly as the hip did in Phase 0. Plan 4a makes the app and pipeline ready and writes the playbook. The next step after that is a short design for the first new region. The owner's shoulder is the natural pick.
+- **Phase 4 region content** (ligaments, attachments, movements and sourced data for each region). The meshes and names of the lower leg, shoulder, arm, neck and trunk are in since Phase 4b, from BodyParts3D only. What each region still needs is its ligaments and its sourced data, and each of those has to be planned. The gaps in the meshes are listed in [docs/regions/known-gaps.md](../../regions/known-gaps.md). The owner's shoulder is the natural first pick.
 - **Phase 5, simulation playback.** The OpenSim model licence is still an open item in the spec, and nothing in the app can play an animation yet. It needs its own design.
 - **Phase 6, video input.** A stretch goal in the spec. It needs its own design after Phase 5.
 - **Shona UI.** Waits for German and for a check of which anatomy terms exist in Shona.

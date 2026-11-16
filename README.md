@@ -2,7 +2,7 @@
 
 anatoMe is an educational tool for understanding how the body moves. It is not a diagnostic tool and it is not medical advice. If you have a health concern, please talk to a qualified health professional.
 
-anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip, the pelvis and the thigh down to the knee. It is for students, movement teachers, physiotherapists and anyone curious about what lies under the skin and which structures a movement loads.
+anatoMe is a free, open-source, browser-based 3D anatomy explorer. It starts with the hip, the pelvis and the thigh down to the knee. Five more regions have their meshes and names too: the lower leg and foot, the shoulder, the arm and hand, the head and neck, and the trunk. It is for students, movement teachers, physiotherapists and anyone curious about what lies under the skin and which structures a movement loads.
 
 The link is added when the site is live
 
@@ -21,7 +21,7 @@ The link is added when the site is live
 
 ## What comes next
 
-More of the body will follow the hip, one region at a time. The movement information will grow as more rows are checked.
+The six regions are chosen in the "Body region" list. Only the hip has movements, attachments and exercises so far. The other five show the structures, their names and their layers. Their ligaments and sourced movement data are still to be planned, and the movement information will grow as more rows are checked. What the new regions do not have is listed in [docs/regions/known-gaps.md](docs/regions/known-gaps.md).
 
 ## Your notes stay on your device
 
@@ -78,7 +78,11 @@ tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blend
     --region hip --source bp3d --out models/hip.glb
 tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blender.py -- \
     --region hip --source z-anatomy --out models/hip-z-anatomy.glb
+.venv/bin/python pipeline/assets/region_gen.py targets      # writes the target list of each new region
+.venv/bin/python pipeline/assets/region_gen.py structures   # writes data/structures/<region>.yaml from the same lists
 ```
+
+The other five regions are built with the same build command and `--region lower-leg`, `shoulder`, `arm`, `neck` or `trunk`, plus `--source bp3d --out models/<region>.glb`. Add `--depths-out sources/<region>-depths.json` to write the measured layers.
 
 Why each mesh comes from the source it does is explained in [docs/phase0/mesh-source-decision.md](docs/phase0/mesh-source-decision.md).
 
