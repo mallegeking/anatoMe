@@ -77,8 +77,8 @@ Wide layout (viewport at least 900 px wide):
 +-----------+--------------------------------+-----------------+
 ```
 
-- `nav` is about 208 px wide. Between 900 px and 1100 px it shrinks to icons only, about 64 px, and each link keeps its name as its accessible label and tooltip.
-- The right column is about 380 px wide. `panel` scrolls inside it. `layers` and `foot` do not scroll away.
+- `nav` is about 208 px wide and the right column about 380 px. Between 900 px and 1100 px both narrow, to about 176 px and 320 px, and nothing else changes. There is no icon-only rail. An earlier draft had one and it was dropped, because it added a third arrangement for little gain.
+- `panel` scrolls inside the right column. `layers` and `foot` do not scroll away.
 - `stage` takes the rest.
 
 Phone layout (narrower than 900 px):
@@ -103,6 +103,8 @@ Phone layout (narrower than 900 px):
 
 - The sheet keeps today's rule: at most 45 percent of the height, the rest scrolls inside it.
 - The bottom bar respects the safe area at the bottom of the screen.
+- The stage is never shorter than 220 px. On a short phone, 360 x 640 for example, the top bar becomes one row to make room: the search field collapses to a search button, and pressing it opens the field across the bar. If the stage would still be shorter than 220 px, the sheet gives way and gets less than its 45 percent.
+- On the phone the RIGHT and LEFT markers sit in the bottom corners beside the view badge, in one line, so the button stack on the right is only the layers and reset buttons.
 - The breakpoint value of 900 px is the builder's call. A tablet in portrait gets the phone layout.
 
 ### 7.2 Top bar
@@ -119,8 +121,8 @@ Phone layout (narrower than 900 px):
 - Each tab gets an icon next to its name. Icons are inline SVG, drawn with strokes, hidden from screen readers.
 - The tab called "Area" is renamed "Under a spot" in English. This is the builder's call from the mockup. The German tab stays "Stelle". The owner should confirm both.
 - The content area that the tabs control becomes a `tabpanel` tied to the selected tab.
-- Wide layout: the educational line and the credits sit at the bottom of the rail. In the icon-only width they move to the bottom of the right column instead, because the line cannot be read at 64 px.
-- Phone: the educational line stays pinned at the top of the sheet, as today. Credits move into the settings sheet.
+- Wide layout: the educational line and a "Credits" button sit at the bottom of the rail.
+- Phone: the educational line stays pinned at the top of the sheet, as today. The mockup shows it lower down and leaves it out when a structure is selected. The rule that it is always visible wins over the mockup. Credits move into the settings sheet.
 
 ### 7.4 Layers
 
@@ -135,10 +137,12 @@ Layers stops being a mode that overrides the tab panel.
 | Item | Wide layout | Phone |
 |---|---|---|
 | Language picker | `foot`, bottom of the right column, with a visible "Language" label | settings sheet |
-| Credits | bottom of the rail | settings sheet |
+| Credits | a "Credits" button at the bottom of the rail opens them | settings sheet |
 | Educational line | bottom of the rail | top of the sheet, pinned |
 
-The language picker is split out of `Credits` into its own small component. The last-resort error page keeps showing the educational line and the credits.
+The language picker is split out of `Credits` into its own small component.
+
+The credits text is too long to unfold inside the rail. On both layouts it opens in one shared component built on the native `dialog` element, which brings focus handling and the Escape key with it. On the phone that dialog also holds the language picker and is opened by the settings button. On the wide layout it holds the credits only. The last-resort error page keeps showing the educational line and the credits.
 
 ## 8. Stage controls
 
@@ -171,7 +175,7 @@ Two findings from the review are in scope because the new layout touches the sam
 2. **A failed load is never tried again.**
    - A failed fetch of a region's data is not kept in the cache. Switching region away and back, or pressing "Try again" in the panel, fetches again.
    - A failed load of the notebook's storage code is not kept either. The next attempt tries again.
-   - The model's load error gets a "Try again" button that remounts the viewer.
+   - The model's load error gets a "Try again" button. Remounting the viewer is not enough on its own, because three things remember the failure: the manifest result held in `App`, the model loader's cache and the lazy import of the 3D code. "Try again" clears all three.
    - The single message "This browser does not let the app store notes" is split in three: storage is blocked, the note could not be saved, this part of the app could not be loaded. English and German texts for all three.
    - The log form closes only after the note is saved, so a failed save does not throw away what the user typed.
 
@@ -185,7 +189,8 @@ Two findings from the review are in scope because the new layout touches the sam
 ## 11. Testing
 
 - Unit tests, written first, for: the view name and marker function, the vertical tab keys, Layers closing on a tab change and on a model tap, the retry paths, the three notebook messages, and the name chip as a status region.
-- Playwright gains three sizes: 360 x 640 with touch, 412 x 915 with touch, and 1280 x 800. A new layout spec runs at all three, in English and in German, and checks:
+- Playwright gains three sizes: 360 x 640 with touch, 412 x 915 with touch, and 1280 x 800. Only the new layout spec and the new stage flow run at all three. The five existing specs keep running once at 412 x 915 and are edited only where a control moved, for example the credits now sitting behind the settings button. `perf-check.mjs` and `error-check.mjs` stay at their current size.
+- The layout spec runs in English and in German and checks:
   - no sideways overflow of the page
   - no tab label is cut off
   - every button, tab and select is at least 44 px high
@@ -204,7 +209,9 @@ Two findings from the review are in scope because the new layout touches the sam
 
 ## 13. Calls the builder made that the owner should check
 
-- The breakpoint at 900 px, and the rail shrinking to icons between 900 px and 1100 px.
+- The breakpoint at 900 px.
+- On a short phone the search field collapses to a button so the stage keeps at least 220 px.
+- Credits open in a dialog on both layouts.
 - "Area" renamed "Under a spot" in English, German left as "Stelle".
 - Zoom buttons on the wide layout only.
 - Language and credits behind a settings button on the phone.
