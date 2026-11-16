@@ -11,7 +11,7 @@ Each region shows one line about its gaps in the app while nothing is selected. 
 - The layer (depth) of each muscle is measured from the model, not taken from a source. The note on each row says so. How well the layers read when peeling is not verified on a phone yet.
 - The new regions have no attachments, actions, movements or exercises, and no German names. They show only the Structures and Area tabs.
 - Eleven meshes have no name in their OBJ file header, so their names rest on the inventory's concept pick alone: FJ1451, FJ1454 and FJ1455 (the three intercostal layers), FJ1525, FJ1543, FJ1547, FJ1548, FJ1549, FJ1550, FJ1552 and FJ1553. Every other mesh in scope carries its inventory name in the header.
-- Some muscles are stored in BodyParts3D as one file plus a mirrored "M" file with no side word. The generator treats each as one midline structure and the build joins both sides into one mesh, so tapping one selects both sides. Splitting them into left and right is a later generator change. This affects the external, internal and innermost intercostals, the lateral and medial lumbar intertransversarius, the interspinales lumborum, spinalis and the thoracic rotator (trunk), and the sets of anterior and posterior cervical intertransversarii and of interspinales cervicis (neck). Rows with `midline: true` in `data/structures/trunk.yaml` and `neck.yaml` show the exact ids. The diaphragm and the unpaired bones are midline too, but they are single structures.
+- Some muscles are stored in BodyParts3D as one file plus a mirrored "M" file with no side word. The generator treats each as one midline structure and the build joins both sides into one mesh, so tapping one selects both sides. Splitting them into left and right is a later generator change. This affects the external, internal and innermost intercostals, the lateral and medial lumbar intertransversarius, the interspinales lumborum and the thoracic rotator (trunk), and spinalis and the sets of anterior and posterior cervical intertransversarii and of interspinales cervicis (neck). Rows with `midline: true` in `data/structures/trunk.yaml` and `neck.yaml` show the exact ids. The diaphragm and the unpaired bones are midline too, but they are single structures.
 - The external oblique is a large thin sheet that was reduced to 2000 faces, so it looks faceted in the trunk. The three intercostal meshes stay far above that cap (5600 to 7100 faces), because the reduction stops early on meshes made of many small pieces. The trunk is still inside its budget.
 
 ## Lower leg and foot
@@ -47,6 +47,8 @@ Dropped by the generator, because BodyParts3D has only one side of each:
 - Vertical intermediate part of longus colli (FJ1601).
 
 Longus colli is therefore missing from the neck entirely. A one-sided muscle would look wrong and would break the left and right pairing.
+
+Spinalis (FJ1543 and its mirror FJ1543M, "Spinalis" in the part lists) is filed under the neck. Its meshes reach from 1329 to 1435 mm in height, above spinalis thoracis (up to 1335 mm) and past the seventh cervical vertebra (1365 to 1392 mm), so in the trunk file it stood above the highest bone. Its header has no name, so whether it is the cervical part of spinalis is not checked.
 
 Left out on purpose: the muscles of the eye, larynx, pharynx, palate and tongue. BodyParts3D has them, but they do not move the skeleton the app teaches. Teeth are left out too.
 

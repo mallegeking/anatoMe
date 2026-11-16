@@ -465,17 +465,6 @@
       "midline": true
     },
     {
-      "sid": "spinalis",
-      "type": "muscle",
-      "english": "Spinalis",
-      "patterns": [
-        "^spinalis$"
-      ],
-      "required": true,
-      "source": "bp3d",
-      "midline": true
-    },
-    {
       "sid": "spinalis-thoracis",
       "type": "muscle",
       "english": "Spinalis thoracis",
