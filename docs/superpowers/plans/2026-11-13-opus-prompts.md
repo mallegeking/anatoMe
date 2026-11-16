@@ -218,6 +218,36 @@ Report: phase-4a-build-report.md
 
 ---
 
+## Prompt 6: Phase 4b, the rest of the body as meshes and names (added 2026-11-16)
+
+Start this one in the Linux clone that has `sources/` and `tools/blender` (on the owner's machine: the WSL distro `Ubuntu-24.04`, folder `~/build/anatoMe`). Tasks 3 and 4 cannot run anywhere else.
+
+```text
+You are building one implementation plan for anatoMe: docs/superpowers/plans/2026-11-15-phase-4b-whole-body-meshes.md, Tasks 1 to 5. Its design is docs/superpowers/specs/2026-11-15-whole-body-meshes-design.md. Read both from top to bottom before the first task.
+
+First read docs/superpowers/plans/2026-11-13-build-rules.md and follow it exactly. You work only on the branch claude/install-superpowers-plugin-v0gy65 and never on main. The owner is away for this whole run. Do not ask questions and do not wait for an answer. Where the build rules or the plan say stop, do what they say for a stop and carry on with what is left.
+
+Needs: nothing. Phase 4a Task 4 is blocked and Task 5 is not started. This plan does not need either. Do not apply or touch the saved Phase 4a patch.
+
+Before Task 3, check that this machine can run the mesh steps: tools/blender/blender exists, sources/bp3d/isa_BP3D_4.0_obj_99 holds the OBJ files, sources/z-anatomy/TA2.csv exists, sources/bp3d-inventory.jsonl exists (make it with .venv/bin/python pipeline/assets/bp3d_inventory.py if not) and .venv/bin/pytest runs. Set up what is missing with bash pipeline/get-blender.sh, bash pipeline/fetch-sources.sh and the README's .venv lines. If it still cannot run, finish Tasks 1 and 2, mark Tasks 3 to 5 "skipped" with the reason, and write the report.
+
+Keep in mind:
+- The hip does not change. Never rebuild or commit models/hip.glb or models/hip-z-anatomy.glb. Run git status --short models before every commit that touches models/.
+- BodyParts3D only. Nothing from Z-Anatomy is read or exported, apart from the Latin names in TA2.csv.
+- No name is typed by hand. Ids, names, patterns, FMA ids and Latin names of the new structures come out of pipeline/assets/region_gen.py. If generated output looks wrong, fix the rule in the generator, record it under Deviations, and generate again. Never edit a generated file.
+- The region rules, the CONTEXT table and the layer thresholds in the plan are decisions. Copy them as written. The plan's expected counts (60, 23, 70, 53 and 54 own structures, three dropped names) come from a dry run of exactly those rules, so a different count means your code differs from the plan.
+- The layer gate in Task 4 Step 3 has a fallback (flat depth). Use the fallback if the gate fails. Do not tune the thresholds and do not treat the task as blocked for that reason.
+- If a region is over the triangle budget, follow Task 4 Step 2 (lower the cap in steps of 250, not under 1,250).
+- No knowledge rows: no attachment, action, movement, exercise or joint is added, and no German structure name.
+- Keep the changes to pipeline/assets/build_region_blender.py to the two additions the plan names.
+
+Add to the report, besides the sections the build rules ask for: the structure, mesh and triangle count and the file size of each new region, the layer table of Task 4 Step 3 with the full list for the neck and the trunk, the generator's dropped list, the eleven meshes without a header name under "Not verified", and a section "For the owner to proofread" with the German texts of Task 2.
+
+Report: phase-4b-build-report.md
+```
+
+---
+
 ## Prompt for Fable: review a finished build
 
 Paste this into a Fable session in the repo after a run. Replace the plan name.
