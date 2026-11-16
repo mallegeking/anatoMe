@@ -711,3 +711,15 @@ test("the gap line of the region shows under the tap hint, and nothing shows for
   expect(await screen.findByText("Not in the model yet: latissimus dorsi.")).toBeTruthy();
   expect(container.querySelector(".region-gap")).not.toBeNull();
 });
+
+test("switching region empties the search field", async () => {
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  const field = screen.getByPlaceholderText(en["search.placeholder"]) as HTMLInputElement;
+  fireEvent.change(field, { target: { value: "pirif" } });
+  expect(field.value).toBe("pirif");
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  expect(field.value).toBe("");
+});

@@ -27,6 +27,12 @@ type Props = {
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
 export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
   const [query, setQuery] = useState("");
+  // Another region has other structures, so the typed text goes. State set while rendering is the React way to reset on a change.
+  const [queryRegion, setQueryRegion] = useState(region);
+  if (queryRegion !== region) {
+    setQueryRegion(region);
+    setQuery("");
+  }
   const field = useRef<HTMLInputElement>(null);
   const drop = useRef<HTMLDivElement>(null);
   const results = searchStructures(query, structures, lang);
