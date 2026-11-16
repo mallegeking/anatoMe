@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState, type ComponentProps } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "../data/bundle";
@@ -32,7 +32,7 @@ function Harness({ bundle, selection, onFocusStructure, onLog }: HarnessProps) {
   );
 }
 
-function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn(), onLog = vi.fn(), noLog = false } = {}) {
+function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn(), onLog = vi.fn(async () => true), noLog = false } = {}) {
   render(<Harness bundle={bundle} selection={selection} onFocusStructure={onFocusStructure} onLog={noLog ? undefined : onLog} />);
   return { onFocusStructure, onLog };
 }
@@ -170,9 +170,9 @@ test("a picked movement can be logged", async () => {
   pick(en["notebook.save"]);
   expect(onLog).toHaveBeenCalledTimes(1);
   expect(onLog).toHaveBeenCalledWith({ feeling: "painful", side: "l", note: "" });
-  // The form closes and the button is back.
+  // Once the note is saved, the form closes and the button is back.
+  expect(await screen.findByRole("button", { name: en["notebook.log"] })).toBeTruthy();
   expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
-  expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
 });
 
 test("an exercise phase can be logged too", async () => {
@@ -217,6 +217,34 @@ test("focus moves into the form when it opens and back to the log button when it
   pick(en["notebook.log"]);
   fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
   pick(en["notebook.side.l"]);
-  pick(en["notebook.save"]);
+  await act(async () => pick(en["notebook.save"]));
   expect(document.activeElement).toBe(screen.getByRole("button", { name: en["notebook.log"] }));
+});
+
+test("a save that fails keeps the form open with what was typed", async () => {
+  const { onLog } = show(makeMovementBundle(), { onLog: vi.fn(async () => false) });
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  pick(en["notebook.side.l"]);
+  fireEvent.change(screen.getByLabelText(en["notebook.note"]), { target: { value: "sharp pain" } });
+  await act(async () => pick(en["notebook.save"]));
+  expect(onLog).toHaveBeenCalledTimes(1);
+  expect((screen.getByLabelText(en["notebook.note"]) as HTMLTextAreaElement).value).toBe("sharp pain");
+  expect(screen.getByRole("button", { name: en["notebook.save"] })).toBeTruthy();
+});
+
+test("pressing save again while a save is under way saves only once", async () => {
+  let finish: (saved: boolean) => void = () => {};
+  const onLog = vi.fn(() => new Promise<boolean>((resolve) => (finish = resolve)));
+  show(makeMovementBundle(), { onLog });
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  pick(en["notebook.side.l"]);
+  pick(en["notebook.save"]);
+  pick(en["notebook.save"]);
+  expect(onLog).toHaveBeenCalledTimes(1);
+  await act(async () => finish(true));
+  expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
 });

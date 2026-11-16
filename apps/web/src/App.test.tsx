@@ -26,6 +26,9 @@ const viewer = vi.hoisted(() => ({
   throws: false,
   // What the app asked of the viewer's handle, in order: "reset" or a zoom factor.
   calls: [] as unknown[],
+  // The model files and the Try again callback the viewer was last given.
+  files: null as unknown,
+  onRetry: (() => {}) as () => void,
 }));
 
 // Lets one test make the lazy print summary fail. Otherwise it is the real one.
@@ -63,12 +66,31 @@ vi.mock("./notebook/LogForm", async (original) => {
   };
 });
 
+// Lets a test make opening the notebook or saving a note fail. Otherwise the store is the real one.
+const storeParts = vi.hoisted(() => ({ openFails: 0, putFails: false }));
+vi.mock("./notebook/store", async (original) => {
+  const real = await original<typeof import("./notebook/store")>();
+  return {
+    ...real,
+    openNotebook: async () => {
+      if (storeParts.openFails > 0) {
+        storeParts.openFails--;
+        throw new Error("The notebook could not be opened.");
+      }
+      const store = await real.openNotebook();
+      return { ...store, put: (entry: Parameters<typeof store.put>[0]) => (storeParts.putFails ? Promise.reject(new Error("full")) : store.put(entry)) };
+    },
+  };
+});
+
 // jsdom cannot draw 3D, so the model is plain buttons here. "model" is a tap on empty space,
 // "tap piriformis" a tap on the left piriformis.
 vi.mock("./viewer/Viewer", async () => {
   const { useEffect, useImperativeHandle } = await import("react");
   return {
   Viewer: ({
+    files,
+    onRetry,
     handle,
     onView,
     onSelect,
@@ -79,6 +101,8 @@ vi.mock("./viewer/Viewer", async () => {
     onAreaTap,
     areaProbe,
   }: {
+    files: unknown;
+    onRetry: () => void;
     handle?: Ref<ViewerHandle>;
     onView?: (direction: ViewDirection) => void;
     onAreaTap: (tap: unknown) => void;
@@ -90,6 +114,8 @@ vi.mock("./viewer/Viewer", async () => {
     isShown: typeof viewer.isShown;
   }) => {
     if (viewer.throws) throw new Error("viewer broke");
+    viewer.files = files;
+    viewer.onRetry = onRetry;
     viewer.selection = selection;
     viewer.focus = focus;
     viewer.areaProbe = areaProbe;
@@ -145,6 +171,8 @@ function serveFiles(bundle: RegionBundle | null, manifest: unknown = oneRegion) 
 beforeEach(() => {
   clearRegionDataCache();
   viewer.calls = [];
+  storeParts.openFails = 0;
+  storeParts.putFails = false;
   // Every test starts on a phone, unless it asks for another screen.
   setViewport("phone");
 });
@@ -594,7 +622,7 @@ test("a notebook tab that fails to load stays inside that tab", async () => {
     render(<App />);
     await screen.findByText(en["info.tapHint"]);
     fireEvent.click(tab(en["mode.notebook"]));
-    expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+    expect(await screen.findByText(en["notebook.loadFailed"])).toBeTruthy();
     expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
     fireEvent.click(tab(en["mode.atlas"]));
     expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
@@ -617,7 +645,7 @@ test("a log form that fails to load stays inside the Movements panel", async () 
     fireEvent.click(tab(en["mode.movement"]));
     fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
     fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
-    expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+    expect(await screen.findByText(en["notebook.loadFailed"])).toBeTruthy();
     expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
     expect(screen.getByRole("heading", { name: "Hip external rotation", level: 2 })).toBeTruthy();
     fireEvent.click(tab(en["mode.atlas"]));
@@ -675,6 +703,7 @@ function serveTwo(shoulderOk = true, hipOk = true) {
     return hipOk ? new Response(JSON.stringify(hip)) : new Response("", { status: 404 });
   });
   vi.stubGlobal("fetch", fetch);
+  return fetch;
 }
 const pickRegion = (id: string) => fireEvent.change(screen.getByLabelText(en["region.label"]), { target: { value: id } });
 
@@ -1041,4 +1070,148 @@ test("wide: the zoom and reset buttons ask the viewer", async () => {
   fireEvent.click(screen.getByRole("button", { name: en["stage.zoomOut"] }));
   fireEvent.click(screen.getByRole("button", { name: en["stage.reset"] }));
   expect(viewer.calls).toEqual([0.8, 1.25, "reset"]);
+});
+
+// Answers the manifest and fails the hip data the given number of times before it works.
+function serveFlakyData(failures: number) {
+  const bundle = makeBundle();
+  const fetch = vi.fn(async (url: string) => {
+    if (url.endsWith("models/manifest.json")) return new Response(JSON.stringify(oneRegion));
+    if (failures > 0) {
+      failures--;
+      return new Response("", { status: 404 });
+    }
+    return new Response(JSON.stringify(bundle));
+  });
+  vi.stubGlobal("fetch", fetch);
+  return fetch;
+}
+const callsTo = (fetch: { mock: { calls: unknown[][] } }, end: string) => fetch.mock.calls.filter(([url]) => String(url).endsWith(end)).length;
+const retryButton = () => screen.getByRole("button", { name: en["error.retry"] });
+
+test("data: Try again fetches the data once more and shows the panel", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const fetch = serveFlakyData(1);
+  render(<App />);
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  fireEvent.click(retryButton());
+  expect(await screen.findByText(en["info.tapHint"])).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(callsTo(fetch, "data/hip.json")).toBe(2);
+});
+
+test("data: Try again while still offline shows the error and the button again, one request per press", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const fetch = serveFlakyData(3);
+  render(<App />);
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  fireEvent.click(retryButton());
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  expect(retryButton()).toBeTruthy();
+  expect(callsTo(fetch, "data/hip.json")).toBe(2);
+  fireEvent.click(retryButton());
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  expect(retryButton()).toBeTruthy();
+  expect(callsTo(fetch, "data/hip.json")).toBe(3);
+});
+
+test("data: going to another region and back fetches again", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const fetch = serveTwo(true, false);
+  render(<App />);
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  pickRegion("hip");
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  expect(callsTo(fetch, "data/hip.json")).toBe(2);
+});
+
+test("model: Try again reads the manifest again after it failed", async () => {
+  let manifestFails = 1;
+  const fetch = vi.fn(async (url: string) => {
+    if (url.endsWith("models/manifest.json")) {
+      if (manifestFails-- > 0) return new Response("", { status: 404 });
+      return new Response(JSON.stringify(oneRegion));
+    }
+    return new Response(JSON.stringify(makeBundle()));
+  });
+  vi.stubGlobal("fetch", fetch);
+  render(<App />);
+  await waitFor(() => expect(viewer.files).toEqual({ error: expect.any(Error) }));
+  act(() => viewer.onRetry());
+  await waitFor(() => expect(viewer.files).toEqual({ urls: [expect.stringMatching(/hip\.glb$/)] }));
+  expect(callsTo(fetch, "models/manifest.json")).toBe(2);
+  expect(await screen.findByText(en["info.tapHint"])).toBeTruthy();
+});
+
+test("notebook: a store that is blocked says so", async () => {
+  vi.stubGlobal("indexedDB", undefined);
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.notebook"]));
+  expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+  expect(screen.queryByText(en["notebook.loadFailed"])).toBeNull();
+});
+
+// Opens the log form for external rotation and chooses painful and left.
+async function fillLogForm(note = "") {
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.log"] }));
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.side.l"] }));
+  if (note) fireEvent.change(screen.getByLabelText(en["notebook.note"]), { target: { value: note } });
+}
+
+test("notebook: a save that fails says so and keeps the typed note", async () => {
+  freshNotebook();
+  storeParts.putFails = true;
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  await fillLogForm("sharp pain");
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.saveFailed"])).toBeTruthy();
+  expect(screen.getByTestId("search-notice").textContent).toBe(en["notebook.saveFailed"]);
+  expect((screen.getByLabelText(en["notebook.note"]) as HTMLTextAreaElement).value).toBe("sharp pain");
+});
+
+test("notebook: a part that failed to load says so and can be tried again", async () => {
+  freshNotebook();
+  serve(makeBundle());
+  lazyParts.panelFails = true;
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  try {
+    render(<App />);
+    await screen.findByText(en["info.tapHint"]);
+    fireEvent.click(tab(en["mode.notebook"]));
+    expect(await screen.findByText(en["notebook.loadFailed"])).toBeTruthy();
+    expect(screen.queryByText(en["notebook.unavailable"])).toBeNull();
+    lazyParts.panelFails = false;
+    fireEvent.click(tab(en["mode.atlas"]));
+    fireEvent.click(tab(en["mode.notebook"]));
+    expect(await screen.findByText(en["notebook.empty"])).toBeTruthy();
+    expect(screen.queryByText(en["notebook.loadFailed"])).toBeNull();
+  } finally {
+    lazyParts.panelFails = false;
+  }
+});
+
+test("notebook: after a failed open the next log tries again", async () => {
+  freshNotebook();
+  storeParts.openFails = 1;
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  await fillLogForm("on the stairs");
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+  // The form stays open with the note, so the second press saves it.
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
+  expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
+  fireEvent.click(tab(en["mode.notebook"]));
+  expect(await screen.findByText("on the stairs")).toBeTruthy();
 });

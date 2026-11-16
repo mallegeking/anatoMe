@@ -1,13 +1,15 @@
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import type { RegionBundle } from "../data/bundle";
 import { useRegionData } from "../data/useRegionData";
 import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import { AreaPanel, type AreaState } from "../area/AreaPanel";
+import { lazyRetry } from "./lazyRetry";
 import { QuietBoundary } from "./QuietBoundary";
 import { MovementPanel } from "../movement/MovementPanel";
 import type { MovementState } from "../movement/state";
 import type { NotebookStore } from "../notebook/store";
+import type { StoreFailure } from "../notebook/NotebookPanel";
 import type { EntrySide, Feeling, NotebookEntry } from "../notebook/types";
 import type { Selection } from "../viewer/pick";
 import type { Mode } from "./ModeBar";
@@ -15,7 +17,8 @@ import { RegionInfo } from "./RegionInfo";
 
 // The Notebook tab is its own chunk, so it loads only when the tab is first opened.
 // If that chunk fails to load, the failure stays inside the tab and the other tabs keep working.
-const NotebookPanel = lazy(() => import("../notebook/NotebookPanel"));
+// Leaving the tab and coming back tries the download again.
+const notebookPanel = lazyRetry(() => import("../notebook/NotebookPanel"));
 
 type Props = {
   region: string;
@@ -37,9 +40,10 @@ type Props = {
   onAreaClear: () => void;
   onOverUnder: () => void;
   onOpenStructure: (sid: string) => void;
-  onLog: (input: { feeling: Feeling; side: EntrySide; note: string }) => void;
+  // Resolves to true once the note is saved.
+  onLog: (input: { feeling: Feeling; side: EntrySide; note: string }) => Promise<boolean>;
   notebookStore: NotebookStore | null;
-  notebookError: boolean;
+  storeFailure: StoreFailure;
   onFocusNotebookStructure: (sel: Selection) => void;
   onPrintNotebook: (entries: NotebookEntry[]) => void;
 };
@@ -80,15 +84,16 @@ export function PanelArea({ region, t, lang, mode, selection, label, movement, o
     );
   }
   if (mode === "notebook") {
+    const NotebookPanel = notebookPanel();
     return (
-      <QuietBoundary fallback={<p>{t("notebook.unavailable")}</p>}>
+      <QuietBoundary fallback={<p>{t("notebook.loadFailed")}</p>}>
         <Suspense fallback={null}>
           <NotebookPanel
             t={t}
             lang={lang}
             bundle={bundle}
             store={on.notebookStore}
-            storeError={on.notebookError}
+            storeFailure={on.storeFailure}
             onFocusStructure={on.onFocusNotebookStructure}
             onPrint={on.onPrintNotebook}
           />

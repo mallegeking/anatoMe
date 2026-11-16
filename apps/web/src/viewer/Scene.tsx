@@ -1,14 +1,15 @@
 // The 3D part of the viewer. Viewer.tsx loads this file on its own, after the first screen is up,
 // because it pulls in three.js, which is most of the app's size.
 import { CameraControls } from "@react-three/drei";
-import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
+import { addEffect, addTail, Canvas, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, type MouseEvent, type Ref } from "react";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { UnderEntry } from "../area/under";
 import { shouldClear, type Selection, type Side } from "./pick";
 import type { Highlight } from "../movement/roles";
 import { redrawWhenBack } from "./redraw";
 import type { ViewDirection, ViewerHandle } from "./handle";
-import { RegionModel } from "./RegionModel";
+import { RegionModel, renewDecoder } from "./RegionModel";
 
 export type SceneProps = {
   // The glb files to show, or null while the app is still reading the manifest.
@@ -35,6 +36,13 @@ export type SceneProps = {
   // Called after the first framing and each time the camera comes to rest.
   onView?: (direction: ViewDirection) => void;
 };
+
+// The loader keeps a failed download, so the same files would fail again at once.
+// "Try again" calls this first, so the files and the decoder are downloaded afresh.
+export function forgetModelFiles(urls: string[]) {
+  useLoader.clear(GLTFLoader, urls);
+  renewDecoder();
+}
 
 // point is where the marker goes, null when a probed structure has no mesh.
 export type AreaTap = { entries: UnderEntry[]; point: [number, number, number] | null; through: Selection | null };

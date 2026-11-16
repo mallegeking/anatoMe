@@ -18,12 +18,20 @@ export function normalizeBundle(raw: Partial<RegionBundle> & Pick<RegionBundle, 
   };
 }
 
-// One entry per region, so the file is fetched once.
+// One entry per region, so the file is fetched once. A failure stays until forgetFailedRegionData.
 const cache = new Map<string, Entry>();
 
 // Only tests need this, to start again with an empty cache.
 export function clearRegionDataCache() {
   cache.clear();
+}
+
+// Forgets every region whose data failed to load, so the next render fetches it again.
+// Data that is loading or loaded stays, so this never starts a second request for it.
+export function forgetFailedRegionData() {
+  for (const [region, entry] of cache) {
+    if (entry.status === "failed") cache.delete(region);
+  }
 }
 
 // Reads the compiled data for a region. While it loads, React waits (suspends).

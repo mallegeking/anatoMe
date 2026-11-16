@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import en from "../i18n/en.json";
@@ -154,4 +154,73 @@ test("the watchdog waits while the page is in a background tab and starts afresh
     // jsdom's own value lives on the prototype, so removing ours brings it back.
     delete (document as { hidden?: boolean }).hidden;
   }
+});
+
+// Fails while the test says so, then shows its content.
+const flaky = { fails: true, renders: 0 };
+function Flaky() {
+  flaky.renders++;
+  if (flaky.fails) throw new Error("offline");
+  return <p>model here</p>;
+}
+
+test("with onRetry a failed load shows Try again, and a click renders the children again", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  flaky.fails = true;
+  const onRetry = vi.fn();
+  render(
+    <ModelErrorBoundary t={t} onRetry={onRetry}>
+      <Flaky />
+    </ModelErrorBoundary>,
+  );
+  const button = screen.getByRole("button", { name: en["error.retry"] });
+  expect(button.classList.contains("btn")).toBe(true);
+  // The button sits under the message, not inside the alert.
+  expect(screen.getByRole("alert").contains(button)).toBe(false);
+  flaky.fails = false;
+  fireEvent.click(button);
+  expect(onRetry).toHaveBeenCalledTimes(1);
+  expect(screen.getByText("model here")).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("without onRetry there is no Try again button", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  render(
+    <ModelErrorBoundary t={t}>
+      <Thrower />
+    </ModelErrorBoundary>,
+  );
+  expect(screen.queryByRole("button", { name: en["error.retry"] })).toBeNull();
+});
+
+test("the WebGL message has no Try again button", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  function NoContext(): never {
+    throw new Error("THREE.WebGLRenderer: Error creating WebGL context.");
+  }
+  render(
+    <ModelErrorBoundary t={t} onRetry={() => {}}>
+      <NoContext />
+    </ModelErrorBoundary>,
+  );
+  expect(screen.getByRole("alert").textContent).toBe(en["error.webgl"]);
+  expect(screen.queryByRole("button", { name: en["error.retry"] })).toBeNull();
+});
+
+test("a child that fails again shows the message and the button again", () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  flaky.fails = true;
+  const onRetry = vi.fn();
+  render(
+    <ModelErrorBoundary t={t} onRetry={onRetry}>
+      <Flaky />
+    </ModelErrorBoundary>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: en["error.retry"] }));
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  fireEvent.click(screen.getByRole("button", { name: en["error.retry"] }));
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  expect(screen.getByRole("button", { name: en["error.retry"] })).toBeTruthy();
+  expect(onRetry).toHaveBeenCalledTimes(2);
 });

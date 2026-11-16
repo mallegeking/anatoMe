@@ -4,6 +4,7 @@ import de from "./i18n/de.json";
 import en from "./i18n/en.json";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Lang } from "./i18n/lang";
 import { createT, type Translate } from "./i18n/t";
+import { forgetFailedRegionData } from "./data/useRegionData";
 import { hideStructure, initialLayers, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
 import type { AreaState } from "./area/AreaPanel";
 import { LayersPanel } from "./layers/LayersPanel";
@@ -12,6 +13,7 @@ import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
 import type { NotebookEntry, EntrySide, Feeling } from "./notebook/types";
 import type { NotebookStore } from "./notebook/store";
+import type { StoreFailure } from "./notebook/NotebookPanel";
 import { QuietBoundary } from "./ui/QuietBoundary";
 import { ReviewBanner } from "./review/ReviewBanner";
 import { ReviewList } from "./review/ReviewList";
@@ -49,6 +51,15 @@ function browserLanguages(): readonly string[] {
   return navigator.languages ?? (navigator.language ? [navigator.language] : []);
 }
 
+// Why the notebook store could not be opened. The app tells the two apart, so the message says the right thing.
+class StoreOpenError extends Error {
+  readonly failure: "blocked" | "load";
+  constructor(failure: "blocked" | "load") {
+    super(failure === "blocked" ? "The browser does not let the app store notes." : "The notebook code could not be loaded.");
+    this.failure = failure;
+  }
+}
+
 // A notice keeps its text key and what fills it, not the finished text, so it is translated when it shows
 // and reads in the new language after a switch. A search notice keeps the structure, so its name follows too.
 type Notice = { key: string; count?: number; structure?: BundleStructure };
@@ -84,7 +95,7 @@ export function App() {
   const [area, setArea] = useState<AreaState>(null);
   const [areaProbe, setAreaProbe] = useState<Selection | null>(null);
   const [notebookStore, setNotebookStore] = useState<NotebookStore | null>(null);
-  const [notebookError, setNotebookError] = useState(false);
+  const [notebookFailure, setNotebookFailure] = useState<StoreFailure>(null);
   const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   // The wide layout puts the tabs in a column on the left, so the arrow keys that move between them change too.
@@ -114,23 +125,37 @@ export function App() {
     if (shownMode !== mode) setMode(shownMode);
   }, [shownMode, mode]);
 
+  // Counts the reads of the manifest, so only the answer to the latest one is used.
+  const manifestRead = useRef(0);
   // Reads the manifest and picks the region the address asks for, or the first one.
-  useEffect(() => {
-    let cancelled = false;
+  const readManifest = useCallback(() => {
+    const read = ++manifestRead.current;
     loadManifest(`${BASE}models/manifest.json`)
       .then((loaded) => {
         const first = chooseRegion(regionIds(loaded), location.search);
-        if (cancelled) return;
+        if (read !== manifestRead.current) return;
         setModels({ manifest: loaded });
         setRegion(first);
       })
       .catch((error: unknown) => {
-        if (!cancelled) setModels({ error });
+        if (read === manifestRead.current) setModels({ error });
       });
-    return () => {
-      cancelled = true;
-    };
   }, []);
+  useEffect(() => {
+    readManifest();
+    // An answer that arrives after the app is gone is ignored.
+    return () => {
+      manifestRead.current++;
+    };
+  }, [readManifest]);
+
+  // "Try again" on the model error. A manifest that failed is read again, and the viewer shows
+  // the loading text meanwhile. The viewer itself clears what it keeps of the failed load.
+  function retryModel() {
+    if (!models || !("error" in models)) return;
+    setModels(null);
+    readManifest();
+  }
 
   // Screen readers and the browser's hyphenation read the page in the chosen language.
   useEffect(() => {
@@ -154,6 +179,8 @@ export function App() {
 
   // Another region starts afresh: no selection, every layer back, no movement and no area spot.
   function changeRegion(id: string) {
+    // Data that failed to load is fetched again, here and when coming back to a region that failed.
+    forgetFailedRegionData();
     setRegion(id);
     // The new viewer reports its own view once it has framed the model.
     setView(null);
@@ -235,12 +262,31 @@ export function App() {
     setFocus({ ...sel });
   }
 
-  // Opens the notebook store once, the first time the Notebook tab opens or a movement is logged.
+  // Opens the notebook store the first time the Notebook tab opens or a movement is logged.
   // Its code loads only then, so the first screen stays as fast as before.
+  // A store that opened is kept. A failure is not, so the next try opens it afresh.
   const openStore = useCallback(() => {
     if (!notebookOpening.current) {
-      notebookOpening.current = import("./notebook/store").then((m) => m.openNotebook());
-      notebookOpening.current.then(setNotebookStore, () => setNotebookError(true));
+      const opening = import("./notebook/store").then(
+        (m) =>
+          m.openNotebook().catch(() => {
+            throw new StoreOpenError("blocked");
+          }),
+        () => {
+          throw new StoreOpenError("load");
+        },
+      );
+      notebookOpening.current = opening;
+      opening.then(
+        (store) => {
+          setNotebookStore(store);
+          setNotebookFailure(null);
+        },
+        (error: StoreOpenError) => {
+          if (notebookOpening.current === opening) notebookOpening.current = null;
+          setNotebookFailure(error.failure);
+        },
+      );
     }
     return notebookOpening.current;
   }, []);
@@ -250,17 +296,28 @@ export function App() {
   }, [mode, openStore]);
 
   // "Log this movement": saves the picked movement and its angles with the feeling, the side and the note.
-  // A browser that does not let the app store notes gets the plain line instead.
-  async function logMovement(input: { feeling: Feeling; side: EntrySide; note: string }) {
+  // Resolves to true once it is saved. A failure says what went wrong: the notebook code did not load,
+  // the browser does not let the app store notes, or this one note could not be saved.
+  async function logMovement(input: { feeling: Feeling; side: EntrySide; note: string }): Promise<boolean> {
     const { pick, pose } = movement;
-    if (!pick) return;
+    if (!pick) return false;
+    let opened: [typeof import("./notebook/store"), NotebookStore];
     try {
-      const [{ makeEntry }, store] = await Promise.all([import("./notebook/store"), openStore()]);
-      await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
-      setNotice({ key: "notebook.saved" });
-    } catch {
-      setNotice({ key: "notebook.unavailable" });
+      opened = await Promise.all([import("./notebook/store"), openStore()]);
+    } catch (error) {
+      const blocked = error instanceof StoreOpenError && error.failure === "blocked";
+      setNotice({ key: blocked ? "notebook.unavailable" : "notebook.loadFailed" });
+      return false;
     }
+    const [{ makeEntry }, store] = opened;
+    try {
+      await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
+    } catch {
+      setNotice({ key: "notebook.saveFailed" });
+      return false;
+    }
+    setNotice({ key: "notebook.saved" });
+    return true;
   }
 
   // The summary is built and printed by its own lazy part, after it is on the page and painted.
@@ -399,7 +456,7 @@ export function App() {
         ) : null}
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
           {/* A new region gets a fresh viewer, with its own loading text and time limit. */}
-          <Viewer key={region ?? ""} files={files} t={t} selection={selection} focus={focus} isShown={isShown}
+          <Viewer key={region ?? ""} files={files} t={t} onRetry={retryModel} selection={selection} focus={focus} isShown={isShown}
             handle={viewerHandle}
             onView={hearView}
             highlights={highlights}
@@ -454,7 +511,7 @@ export function App() {
                   {noticeText(notice, t, lang)}
                 </p>
               )}
-              <ModelErrorBoundary key={region ?? ""} t={t} messageKey="error.dataLoad">
+              <ModelErrorBoundary key={region ?? ""} t={t} messageKey="error.dataLoad" onRetry={forgetFailedRegionData}>
                 {/* Until the manifest says which region to show, the panel shows the same hint as while the data loads. */}
                 {region === null ? (
                   <Hint t={t} />
@@ -481,7 +538,7 @@ export function App() {
                       onOverUnder={overUnder}
                       onLog={logMovement}
                       notebookStore={notebookStore}
-                      notebookError={notebookError}
+                      storeFailure={notebookFailure}
                       onFocusNotebookStructure={focusAreaStructure}
                       onPrintNotebook={printNotebook}
                     />

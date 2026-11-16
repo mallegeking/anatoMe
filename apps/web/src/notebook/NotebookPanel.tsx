@@ -13,13 +13,16 @@ import type { NotebookEntry } from "./types";
 // Shows the structures to look into. Set it to false to show the notes only, without the comparison.
 export const SHOW_COMPARISON = true;
 
+// Why the store could not be opened: the browser blocks storage, or the store's code did not download.
+export type StoreFailure = "blocked" | "load" | null;
+
 type Props = {
   t: Translate;
   // The language the names show in. The notes keep ids, so the same notes read in any language.
   lang: Lang;
   bundle: RegionBundle;
   store: NotebookStore | null; // null while it opens
-  storeError: boolean; // true when it could not be opened
+  storeFailure: StoreFailure; // null unless it could not be opened
   showComparison: boolean;
   // Make the structure visible, select it and turn the camera to it.
   onFocusStructure: (sel: Selection) => void;
@@ -32,7 +35,7 @@ type Status = { key: string; vars?: Record<string, string> };
 
 // The Notebook tab: the notes, the structures to look into, and the print and backup buttons.
 // Every store error is caught here and shown as one plain line. Nothing is ever logged.
-export function NotebookPanel({ t, lang, bundle, store, storeError, showComparison, onFocusStructure, onPrint }: Props) {
+export function NotebookPanel({ t, lang, bundle, store, storeFailure, showComparison, onFocusStructure, onPrint }: Props) {
   const [entries, setEntries] = useState<NotebookEntry[] | null>(null);
   const [listFailed, setListFailed] = useState(false);
   const [status, setStatus] = useState<Status | null>(null);
@@ -57,11 +60,11 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
       <p className="muted">{t("notebook.private")}</p>
     </>
   );
-  if (storeError || listFailed) {
+  if (storeFailure || listFailed) {
     return (
       <section className="notebook-panel" data-testid="notebook-panel">
         {head}
-        <p>{t("notebook.unavailable")}</p>
+        <p>{t(storeFailure === "load" ? "notebook.loadFailed" : "notebook.unavailable")}</p>
       </section>
     );
   }

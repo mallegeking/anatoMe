@@ -31,10 +31,19 @@ const controls = vi.hoisted(() => {
 });
 
 const load = vi.hoisted(() => ({
+  // A failed download stays failed until the loader's cache is cleared, like the real one.
+  failed: false,
   done: false,
   finish: () => {},
   promise: Promise.resolve(),
   result: null as unknown,
+}));
+
+// The loader's cache. Try again empties it for the model files.
+const loaderCache = vi.hoisted(() => ({
+  clear: vi.fn(() => {
+    load.failed = false;
+  }),
 }));
 
 function newLoad() {
@@ -71,11 +80,15 @@ vi.mock("@react-three/fiber", async () => {
       </div>
     ),
     // Waits like the real useLoader until the test finishes the download.
-    useLoader: (_loader: unknown, urls: string[]) => {
-      if (!load.done) throw load.promise;
-      load.result ??= urls.map(() => ({ scene: new Group() }));
-      return load.result;
-    },
+    useLoader: Object.assign(
+      (_loader: unknown, urls: string[]) => {
+        if (load.failed) throw new Error("Could not load /models/hip.glb");
+        if (!load.done) throw load.promise;
+        load.result ??= urls.map(() => ({ scene: new Group() }));
+        return load.result;
+      },
+      { clear: loaderCache.clear },
+    ),
     useThree: (select: (s: typeof state) => unknown) => select(state),
     addEffect: () => () => {},
     addTail: () => () => {},
@@ -97,6 +110,8 @@ function withWebGL(available: boolean) {
 
 beforeEach(() => {
   newLoad();
+  load.failed = false;
+  loaderCache.clear.mockClear();
   controls.fitToBox.mockClear();
   controls.dollyTo.mockClear();
   controls.distance = 2;
@@ -115,7 +130,7 @@ afterEach(() => {
 });
 
 function show() {
-  render(<Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  render(<Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={() => {}} />);
 }
 
 // A model with a left and a right piriformis, like the real files.
@@ -177,7 +192,7 @@ test("watchdog is satisfied when loading finishes, not on the first frame", asyn
 
 test("while the manifest is still loading, the loading text shows and nothing fails", async () => {
   withWebGL(true);
-  render(<Viewer files={null} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  render(<Viewer files={null} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={() => {}} />);
   await settle();
   expect(screen.getByText(en["loading.model"])).toBeTruthy();
   expect(screen.queryByRole("alert")).toBeNull();
@@ -185,9 +200,55 @@ test("while the manifest is still loading, the loading text shows and nothing fa
 
 test("a manifest that could not be loaded shows the model load message", async () => {
   withWebGL(true);
-  render(<Viewer files={{ error: new Error("Could not load models/manifest.json (404)") }} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} />);
+  render(<Viewer files={{ error: new Error("Could not load models/manifest.json (404)") }} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={() => {}} />);
   await settle();
   expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+});
+
+test("Try again after a model failure loads the scene again", async () => {
+  withWebGL(true);
+  load.failed = true;
+  const onRetry = vi.fn();
+  render(<Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={onRetry} />);
+  await settle();
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  fireEvent.click(screen.getByRole("button", { name: en["error.retry"] }));
+  expect(onRetry).toHaveBeenCalledTimes(1);
+  // The loader forgets the failed files, so they are downloaded again.
+  expect(loaderCache.clear).toHaveBeenCalledWith(expect.anything(), files.urls);
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.getByText(en["loading.model"])).toBeTruthy();
+  await settle();
+  await act(async () => {
+    load.finish();
+    await load.promise;
+  });
+  await settle();
+  expect(screen.queryByText(en["loading.model"])).toBeNull();
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("Try again after a manifest failure asks the app to read it again", async () => {
+  withWebGL(true);
+  const onRetry = vi.fn();
+  render(<Viewer files={{ error: new Error("offline") }} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={onRetry} />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: en["error.retry"] }));
+  expect(onRetry).toHaveBeenCalledTimes(1);
+});
+
+test("the watchdog starts afresh after Try again", async () => {
+  withWebGL(true);
+  load.failed = true;
+  render(<Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={() => {}} />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: en["error.retry"] }));
+  await settle();
+  act(() => vi.advanceTimersByTime(LOAD_TIMEOUT_MS - 3000));
+  expect(screen.queryByRole("alert")).toBeNull();
+  act(() => vi.advanceTimersByTime(3000));
+  expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]);
+  expect(screen.getByRole("button", { name: en["error.retry"] })).toBeTruthy();
 });
 
 test("a WebGL failure shows the WebGL message, not the connection message", () => {
@@ -200,7 +261,7 @@ test("a WebGL failure shows the WebGL message, not the connection message", () =
 test("switching to the other side lights up that side's mesh and puts the first one back", async () => {
   withWebGL(true);
   const { left, right } = await loadPiriformisPair();
-  const props = { files, t, isShown: () => true, highlights: null, onSelect: () => {} };
+  const props = { files, t, isShown: () => true, highlights: null, onSelect: () => {}, onRetry: () => {} };
   const { rerender } = render(<Viewer {...props} selection={{ sid: "piriformis", side: "l" }} focus={null} />);
   await settle();
   await act(async () => {
@@ -237,7 +298,7 @@ async function showArea() {
   const onAreaTap = vi.fn();
   const onSelect = vi.fn();
   render(
-    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={onSelect} areaMode onAreaTap={onAreaTap} areaMarker={null} areaProbe={null} />,
+    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={onSelect} onRetry={() => {}} areaMode onAreaTap={onAreaTap} areaMarker={null} areaProbe={null} />,
   );
   await settle();
   await act(async () => {
@@ -309,7 +370,7 @@ test("area mode: a probe lists what lies in front of its structure, past bone", 
   scene.updateMatrixWorld(true);
   load.result = [{ scene }];
   const onAreaTap = vi.fn();
-  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, onRetry: () => {}, areaMode: true, onAreaTap, areaMarker: null };
   const probe = { sid: "piriformis", side: "l" as const };
   const { rerender } = render(<Viewer {...props} areaProbe={null} />);
   await settle();
@@ -329,7 +390,7 @@ async function probeScene(scene: unknown, probe: { sid: string; side: "l" | "r" 
   withWebGL(true);
   load.result = [{ scene }];
   const onAreaTap = vi.fn();
-  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, onRetry: () => {}, areaMode: true, onAreaTap, areaMarker: null };
   const { rerender } = render(<Viewer {...props} areaProbe={null} />);
   await settle();
   await act(async () => {
@@ -402,7 +463,7 @@ test("area mode: a probe whose rays miss still reports through the probe, not nu
   scene.updateMatrixWorld(true);
   load.result = [{ scene }];
   const onAreaTap = vi.fn();
-  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, areaMode: true, onAreaTap, areaMarker: null };
+  const props = { files, t, selection: null, focus: null, isShown: () => true, highlights: null, onSelect: () => {}, onRetry: () => {}, areaMode: true, onAreaTap, areaMarker: null };
   const probe = { sid: "piriformis", side: "l" as const };
   const { rerender } = render(<Viewer {...props} areaProbe={null} />);
   await settle();
@@ -423,7 +484,7 @@ async function showWithHandle(loadFirst = true) {
   const handle = createRef<ViewerHandle>();
   const onView = vi.fn();
   render(
-    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} handle={handle} onView={onView} />,
+    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} onRetry={() => {}} handle={handle} onView={onView} />,
   );
   await settle();
   if (loadFirst) {

@@ -18,7 +18,13 @@ import type { AreaTap } from "./Scene";
 const DRACO_PATH = `${import.meta.env.BASE_URL}draco/`;
 
 // One Draco decoder for every file. It starts its helper workers on first use.
-const draco = new DRACOLoader().setDecoderPath(DRACO_PATH);
+let draco = new DRACOLoader().setDecoderPath(DRACO_PATH);
+
+// A decoder whose download failed keeps that failure for good, so "Try again" starts a new one.
+export function renewDecoder() {
+  draco.dispose();
+  draco = new DRACOLoader().setDecoderPath(DRACO_PATH);
+}
 
 // We use three's own GLTFLoader here, not the one inside drei.
 // When the decoder cannot be downloaded, this one reports the failure, so the error boundary can show it.

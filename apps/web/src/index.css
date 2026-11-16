@@ -254,6 +254,23 @@ body,
   text-align: left;
 }
 
+/* A message with its "Try again" button. On the stage both sit in the middle, in the panel they follow the text. */
+.retry-box {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  height: 100%;
+}
+
+.retry-box .model-error {
+  height: auto;
+}
+
+.panel .retry-box {
+  display: block;
+  height: auto;
+}
+
 /* The last-resort error: the message fills the screen and the credits stay below it. */
 .error-page {
   display: flex;

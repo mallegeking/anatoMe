@@ -8,7 +8,7 @@ import { createT } from "../i18n/t";
 import type { RegionBundle } from "../data/bundle";
 import { makeMovementBundle } from "../movement/fixture";
 import { toBackup } from "./backup";
-import { NotebookPanel } from "./NotebookPanel";
+import { NotebookPanel, type StoreFailure } from "./NotebookPanel";
 import { openNotebook, type NotebookStore } from "./store";
 import type { NotebookEntry } from "./types";
 
@@ -37,9 +37,9 @@ async function storeWith(entries: NotebookEntry[]): Promise<NotebookStore> {
   return store;
 }
 
-type Options = { store?: NotebookStore | null; storeError?: boolean; showComparison?: boolean; lang?: Lang; bundle?: RegionBundle };
+type Options = { store?: NotebookStore | null; storeFailure?: StoreFailure; showComparison?: boolean; lang?: Lang; bundle?: RegionBundle };
 
-function show({ store = null, storeError = false, showComparison = true, lang = "en", bundle = makeMovementBundle() }: Options = {}) {
+function show({ store = null, storeFailure = null, showComparison = true, lang = "en", bundle = makeMovementBundle() }: Options = {}) {
   const onFocusStructure = vi.fn();
   const onPrint = vi.fn();
   render(
@@ -48,7 +48,7 @@ function show({ store = null, storeError = false, showComparison = true, lang = 
       lang={lang}
       bundle={bundle}
       store={store}
-      storeError={storeError}
+      storeFailure={storeFailure}
       showComparison={showComparison}
       onFocusStructure={onFocusStructure}
       onPrint={onPrint}
@@ -77,10 +77,16 @@ test("always shows the disclaimer and the privacy line", () => {
 });
 
 test("without storage it shows the unavailable line and no buttons", () => {
-  show({ storeError: true });
+  show({ storeFailure: "blocked" });
   expect(screen.getByText(en["notebook.unavailable"])).toBeTruthy();
   expect(screen.getByText(en["notebook.disclaimer"])).toBeTruthy();
   expect(screen.queryAllByRole("button")).toEqual([]);
+});
+
+test("a store whose code did not download says so, not that storage is blocked", () => {
+  show({ storeFailure: "load" });
+  expect(screen.getByText(en["notebook.loadFailed"])).toBeTruthy();
+  expect(screen.queryByText(en["notebook.unavailable"])).toBeNull();
 });
 
 test("a store that cannot list shows the unavailable line", async () => {
@@ -326,7 +332,7 @@ test("the status line shown in English reads in German after the language change
   const store = await storeWith([entry()]);
   const bundle = makeMovementBundle();
   const panel = (lang: Lang) => (
-    <NotebookPanel t={lang === "de" ? createT(de, en) : t} lang={lang} bundle={bundle} store={store} storeError={false} showComparison onFocusStructure={vi.fn()} onPrint={vi.fn()} />
+    <NotebookPanel t={lang === "de" ? createT(de, en) : t} lang={lang} bundle={bundle} store={store} storeFailure={null} showComparison onFocusStructure={vi.fn()} onPrint={vi.fn()} />
   );
   const { rerender } = render(panel("en"));
   await screen.findByRole("heading", { name: en["notebook.entries"] });
