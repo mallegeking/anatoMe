@@ -76,6 +76,6 @@ BodyParts3D has adductor minimus as its own mesh, but the hip region does not in
 
 - **Missing muscles.** Z-Anatomy has most of them. It would need the surface gate decision, because Z-Anatomy meshes are CC BY-SA 4.0, and new fitting code for every region, because the present fit only knows the hip bone and the femur. Ligaments, capsules and bursae would come the same way.
 - **Rib cartilages and discs.** These need a `cartilage` structure type in the data schema first, then meshes from either source.
-- **The right side of longus colli.** BodyParts3D has the muscle on the left side only. A mirrored copy would be a made-up mesh, so it needs the Z-Anatomy route too.
+- **Longus colli, both sides.** BodyParts3D has it on the left side only, so the generator drops it. A mirrored copy would be a made-up mesh, so it needs the Z-Anatomy route too.
 - **Left and right for the joined muscles.** A change in the generator and the build script, with no new source.
 - **Attachments, movements, exercises and German names.** Sourced data and review for each region, planned separately.
