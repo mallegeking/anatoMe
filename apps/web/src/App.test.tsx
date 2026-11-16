@@ -724,6 +724,17 @@ test("the gap line of the region shows under the tap hint, and nothing shows for
   expect(container.querySelector(".region-gap")).not.toBeNull();
 });
 
+test("the gap line of the region stays under the tap hint after the region's data has loaded", async () => {
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  pickRegion("shoulder");
+  // Only the shoulder's own data takes the Movements and Notebook tabs away, so the panel is no longer the loading fallback.
+  await waitFor(() => expect(screen.getAllByRole("tab").map((x) => x.textContent)).toEqual([en["mode.atlas"], en["mode.area"]]));
+  expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
+  expect(screen.getByText("Not in the model yet: latissimus dorsi.")).toBeTruthy();
+});
+
 test("switching region empties the search field", async () => {
   serveTwo();
   render(<App />);
