@@ -186,6 +186,10 @@ def build_targets(records, classes_of, hip_targets):
 # --- Latin and FMA --------------------------------------------------------------
 
 
+# TA2 row ids whose Latin has typos in the source table, so the structure gets no Latin rather than a wrong one.
+TA2_TYPO_IDS = {"1265*1", "1496*4", "2474", "2486"}
+
+
 def read_latin(path):
     """English name (lower case) -> set of Latin terms, from Z-Anatomy's TA2.csv."""
     latin = defaultdict(set)
@@ -196,6 +200,8 @@ def read_latin(path):
                 continue
             fields = line.strip('"').split(";")
             if len(fields) < 3:
+                continue
+            if fields[0] in TA2_TYPO_IDS:
                 continue
             latin[fields[1].lower()].add(fields[2])
     return dict(latin)

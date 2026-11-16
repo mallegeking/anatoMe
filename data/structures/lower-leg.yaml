@@ -33,7 +33,7 @@
 - {id: flexor-digitorum-longus, type: muscle, english: Flexor digitorum longus, latin: Musculus flexor digitorum longus, fma: "FMA51071", region: lower-leg, depth: 1, depth_note: "Measured from the model on 2026-11-16: 21 percent of the rays from its surface meet no other part. See the header."}
 - {id: flexor-hallucis-longus, type: muscle, english: Flexor hallucis longus, latin: Flexor longus hallucis, fma: "FMA22593", region: lower-leg, depth: 2, depth_note: "Measured from the model on 2026-11-16: 10 percent of the rays from its surface meet no other part. See the header."}
 - {id: fourth-lumbrical-of-foot, type: muscle, english: Fourth lumbrical of foot, fma: "FMA37482", region: lower-leg, depth: 1, depth_note: "Measured from the model on 2026-11-16: 36 percent of the rays from its surface meet no other part. See the header."}
-- {id: fourth-metatarsal-bone, type: bone, english: Fourth metatarsal bone, latin: Os quatum metatarsi, fma: "FMA24505", region: lower-leg, depth: 4}
+- {id: fourth-metatarsal-bone, type: bone, english: Fourth metatarsal bone, fma: "FMA24505", region: lower-leg, depth: 4}
 - {id: intermediate-cuneiform-bone, type: bone, english: Intermediate cuneiform bone, latin: Os cuneiforme intermedium, fma: "FMA24519", region: lower-leg, depth: 4}
 - {id: lateral-cuneiform-bone, type: bone, english: Lateral cuneiform bone, latin: Os cuneiforme laterale, fma: "FMA24520", region: lower-leg, depth: 4}
 - {id: lateral-head-of-flexor-hallucis-brevis, type: muscle, english: Lateral head of flexor hallucis brevis, latin: Caput laterale flexoris brevis hallucis, fma: "FMA45970", region: lower-leg, depth: 1, depth_note: "Measured from the model on 2026-11-16: 25 percent of the rays from its surface meet no other part. See the header."}

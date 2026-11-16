@@ -293,7 +293,7 @@ def triangles(mesh):
 
 
 def clean_and_decimate(obj, ratio, cap=None):
-    """Drop materials, UVs and colours, then decimate (never below MIN_FACES, never above cap)."""
+    """Drop materials, UVs and colours, then decimate (never below MIN_FACES). The cap is the target asked for, not a guarantee, because Blender can stop above it."""
     me = obj.data
     me.materials.clear()
     for uv in list(me.uv_layers):

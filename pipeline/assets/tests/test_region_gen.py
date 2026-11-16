@@ -176,3 +176,12 @@ def test_latin_lookup(tmp_path):
     assert latin_for("soleus", latin) == "Musculus soleus"      # found as "soleus muscle"
     assert latin_for("atlas", latin) is None                    # two different Latin terms: no Latin
     assert latin_for("talus", latin) is None
+
+
+def test_latin_skips_rows_with_typos(tmp_path):
+    path = tmp_path / "TA2.csv"
+    lines = ["1265*1;First metacarpal bone;Os primum metarcapi;x", "2;Humerus;Humerus;x"]
+    path.write_text("".join(f'"{line}"\n' for line in lines), encoding="utf-8")
+    latin = read_latin(path)
+    assert latin_for("first metacarpal bone", latin) is None
+    assert latin_for("humerus", latin) == "Humerus"

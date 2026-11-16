@@ -18,6 +18,15 @@ Pass mark: after you choose a region, the model can be turned within 5000 ms, tu
 
 Open the site and choose the region in the "Body region" list. Start a timer when you tap the region. Stop it when you can first turn the model with one finger and it follows. Then turn the model with one finger for 10 seconds. Then open "Layers", tap "Peel a layer" one time after another until only bones are left.
 
+### Pairs to look at when peeling
+
+These layers were measured from the model, and a few pairs may look wrong on the phone. Please say in the peeling column if one of them does.
+
+- Lower leg: flexor digitorum longus is layer 1 (21 percent of rays free), while soleus, which covers it, is layer 2 (17 percent).
+- Arm: flexor digitorum profundus is layer 1 (21 percent), while flexor digitorum superficialis is layer 2 (19 percent).
+- Arm: opponens pollicis is layer 1 (70 percent).
+- Arm: brachialis sits exactly on the 0.20 line (20 percent), so it is layer 1.
+
 ## Results
 
 | Region | Time until the model can be turned (ms) | Does turning stutter? (yes or no) | Does peeling a layer read as sensible? (yes or no, and which muscle looks wrong) | One free line |
