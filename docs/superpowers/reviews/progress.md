@@ -13,6 +13,7 @@ Session of 2026-11-16:
 - Sixth run: built plan 4b, the whole body as BodyParts3D meshes and names (Tasks 1 to 5). The saved Phase 4a patch was not touched and still applies to `build_region_blender.py`.
 - Seventh run: the fixes of the Phase 4b review. Fixes 2 to 4 are done (spinalis in the neck, the FMA id of infraspinatus, two generator tests). Fix 1 (a wrong side from BodyParts3D) stopped at its own stop rule and is not committed. See "Review fixes" in `phase-4b-build-report.md`.
 - Eighth run: the second review fixes (Fixes A to C) with the owner's decisions. Fix A is Fix 1 with option (b): only records a region's target list matches get the side they lie on, which corrects exactly FJ1469 and FJ1469M, and `arm.glb` is rebuilt. See "Second review fixes" in `phase-4b-build-report.md`.
+- Ninth run: built the three-column layout and stage controls (Tasks 1 to 14): a navigation rail, stage controls, Layers in its own section, retry after failed loads and four restyled panels. All checks are green except the known root-only `markChecked` pipeline test. German texts and eight open choices wait for the owner. See `three-column-layout-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -27,6 +28,7 @@ Session of 2026-11-16:
 | Phase 4b whole body meshes, Tasks 1 to 5 | done (with deviations, points for the owner below) | `phase-4b-build-report.md` |
 | Phase 4b review fixes, Fixes 1 to 4 | done (Fixes 2 to 4 in the seventh run, Fix 1 as Fix A of the second review fixes) | `phase-4b-build-report.md`, section "Review fixes" |
 | Phase 4b second review fixes, Fixes A to C | done (two App tests could not be written, see the report) | `phase-4b-build-report.md`, section "Second review fixes" |
+| Three-column layout and stage controls, Tasks 1 to 14 | done (with deviations, German drafts and open choices for the owner) | `three-column-layout-build-report.md` |
 
 ## Waiting for the owner
 

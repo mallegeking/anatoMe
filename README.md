@@ -16,7 +16,7 @@ The link is added when the site is live
 - **Layers:** hide bones, muscles or the other soft tissue, peel the muscles one layer at a time, or hide a single structure.
 - **Info panel:** the name, Latin name and type of the selected structure, where a muscle attaches, and what it does at the hip and the knee, each claim with its sources.
 - **Movements:** pick a hip or knee movement or an exercise. Structures are coloured by their role in it, and a slider changes the joint angle. The model itself does not bend.
-- **Area:** tap a spot on the model and read which structures lie under it, from the surface inwards, with the movements that load each one. It lists what the model holds and nothing more.
+- **Under a spot:** tap a spot on the model and read which structures lie under it, from the surface inwards, with the movements that load each one. It lists what the model holds and nothing more.
 - **Notebook:** log how a movement feels, read your notes in the Notebook tab, print a one-page summary, and save or load a backup file.
 
 ## What comes next
