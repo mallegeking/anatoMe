@@ -1,11 +1,11 @@
-import { useRef, useState, type FocusEvent } from "react";
+import { useEffect, useRef, useState, type FocusEvent } from "react";
 import type { BundleStructure } from "../data/bundle";
 import type { Lang } from "../i18n/lang";
 import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { SearchResults } from "../search/SearchResults";
 import { searchStructures } from "../search/search";
-import { SettingsIcon } from "./icons";
+import { SearchIcon, SettingsIcon } from "./icons";
 
 type Props = {
   t: Translate;
@@ -22,11 +22,25 @@ type Props = {
   onRegion: (id: string) => void;
   // Given on the phone, where the settings dialog holds the language and the credits. A button shows with it.
   onSettings?: () => void;
+  // True on a short phone. The field then hides behind a search button until it is needed.
+  compact: boolean;
 };
 
 // The bar above the model: the app name, the search field and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
-export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regions, region, onRegion, onSettings }: Props) {
+export function TopBar({
+  t,
+  lang,
+  structures,
+  onChoose,
+  open,
+  onOpenChange,
+  regions,
+  region,
+  onRegion,
+  onSettings,
+  compact,
+}: Props) {
   const [query, setQuery] = useState("");
   // Another region has other structures, so the typed text goes. State set while rendering is the React way to reset on a change.
   const [queryRegion, setQueryRegion] = useState(region);
@@ -34,8 +48,14 @@ export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regi
     setQueryRegion(region);
     setQuery("");
   }
+  // Compact only: whether the field is open across the bar.
+  const [fieldOpen, setFieldOpen] = useState(false);
+  const showField = !compact || fieldOpen;
   const field = useRef<HTMLInputElement>(null);
   const drop = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (fieldOpen) field.current?.focus();
+  }, [fieldOpen]);
   const results = searchStructures(query, structures, lang);
 
   function change(value: string) {
@@ -55,31 +75,43 @@ export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regi
   // (with the Tab key, for example) keeps it open.
   function leave(event: FocusEvent<HTMLElement>) {
     const next = event.relatedTarget as Node | null;
-    if (next && (next === field.current || drop.current?.contains(next))) return;
+    if (next && (next === field.current || drop.current?.contains(next)))
+      return;
     onOpenChange(false);
+    // An empty field has nothing to show, so it folds back into the button.
+    if (compact && query === "") setFieldOpen(false);
   }
 
   return (
     <header className="top-bar" onBlur={leave}>
-      <div className="top-bar-row">
+      <div
+        className={`top-bar-row${compact && fieldOpen ? " top-bar-row--searching" : ""}`}
+      >
         <h1 className="app-name">{t("app.name")}</h1>
-        <input
-          ref={field}
-          type="search"
-          className="field search-field"
-          value={query}
-          placeholder={t("search.placeholder")}
-          aria-label={t("search.label")}
-          autoComplete="off"
-          enterKeyHint="search"
-          onChange={(e) => change(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") onOpenChange(false);
-            if (e.key === "Enter" && open && results[0]) choose(results[0]);
-          }}
-        />
+        {showField && (
+          <input
+            ref={field}
+            type="search"
+            className="field search-field"
+            value={query}
+            placeholder={t("search.placeholder")}
+            aria-label={t("search.label")}
+            autoComplete="off"
+            enterKeyHint="search"
+            onChange={(e) => change(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") onOpenChange(false);
+              if (e.key === "Enter" && open && results[0]) choose(results[0]);
+            }}
+          />
+        )}
         {regions.length > 1 && (
-          <select className="field region-picker" aria-label={t("region.label")} value={region} onChange={(e) => onRegion(e.target.value)}>
+          <select
+            className="field region-picker"
+            aria-label={t("region.label")}
+            value={region}
+            onChange={(e) => onRegion(e.target.value)}
+          >
             {regions.map((id) => (
               <option key={id} value={id}>
                 {t(`region.${id}`)}
@@ -87,8 +119,24 @@ export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regi
             ))}
           </select>
         )}
+        {compact && (
+          <button
+            type="button"
+            className="btn top-icon-btn"
+            aria-label={t("search.open")}
+            aria-expanded={fieldOpen}
+            onClick={() => setFieldOpen(true)}
+          >
+            <SearchIcon size={20} />
+          </button>
+        )}
         {onSettings && (
-          <button type="button" className="btn top-icon-btn" aria-label={t("settings.title")} onClick={onSettings}>
+          <button
+            type="button"
+            className="btn top-icon-btn"
+            aria-label={t("settings.title")}
+            onClick={onSettings}
+          >
             <SettingsIcon size={20} />
           </button>
         )}
@@ -96,8 +144,17 @@ export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regi
       {open && (
         // Pressing on the list would take the focus from the field, and the blur would close the list
         // before the tap on a result arrives. Cancelling the press keeps the focus in the field.
-        <div ref={drop} className="search-drop" onMouseDown={(e) => e.preventDefault()}>
-          <SearchResults t={t} lang={lang} results={results} onChoose={choose} />
+        <div
+          ref={drop}
+          className="search-drop"
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <SearchResults
+            t={t}
+            lang={lang}
+            results={results}
+            onChoose={choose}
+          />
         </div>
       )}
     </header>

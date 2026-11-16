@@ -16,12 +16,13 @@ const structures: BundleStructure[] = [
 ];
 
 // The app keeps the open state of the list, so the tests do the same.
-function Harness({ onChoose, lang = "en" }: { onChoose: (s: BundleStructure) => void; lang?: Lang }) {
+function Harness({ onChoose, lang = "en", compact = false }: { onChoose: (s: BundleStructure) => void; lang?: Lang; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <TopBar
       t={t}
       lang={lang}
+      compact={compact}
       structures={structures}
       onChoose={onChoose}
       open={open}
@@ -109,6 +110,7 @@ function showRegions(regions: string[], onRegion = vi.fn()) {
     <TopBar
       t={t}
       lang="en"
+      compact={false}
       structures={structures}
       onChoose={() => {}}
       open={false}
@@ -152,4 +154,49 @@ test("the app name is a level-1 heading before the search field", () => {
   const { field } = show();
   const heading = screen.getByRole("heading", { level: 1, name: en["app.name"] });
   expect(heading.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+// On a short phone a button stands in for the field, so the model keeps its room.
+function showCompact() {
+  render(<Harness onChoose={vi.fn()} compact />);
+  return screen.getByRole("button", { name: en["search.open"] });
+}
+
+test("compact: a search button stands in for the field", () => {
+  const button = showCompact();
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(button.getAttribute("aria-expanded")).toBe("false");
+  fireEvent.click(button);
+  const field = screen.getByRole("searchbox");
+  expect(document.activeElement).toBe(field);
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("true");
+});
+
+test("compact: the field closes again when it is empty and loses focus", () => {
+  fireEvent.click(showCompact());
+  fireEvent.blur(screen.getByRole("searchbox"));
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
+});
+
+test("compact: the field stays open while it holds text", () => {
+  fireEvent.click(showCompact());
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.blur(field);
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+});
+
+test("compact: the field stays open while the focus moves into the results", () => {
+  fireEvent.click(showCompact());
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.blur(field, { relatedTarget: screen.getByRole("button", { name: /Piriformis/ }) });
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+});
+
+test("not compact: the field is always there and there is no search button", () => {
+  show();
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: en["search.open"] })).toBeNull();
 });

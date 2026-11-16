@@ -25,7 +25,7 @@ import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
 import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
-import { useWide } from "./ui/useMedia";
+import { useShort, useWide } from "./ui/useMedia";
 import { chooseRegion, regionIds } from "./region/regions";
 import { StageControls } from "./stage/StageControls";
 import { viewOf, type ViewName } from "./stage/view";
@@ -89,6 +89,7 @@ export function App() {
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   // The wide layout puts the tabs in a column on the left, so the arrow keys that move between them change too.
   const wide = useWide();
+  const short = useShort();
   // The viewer's handle for the reset and zoom buttons, and the view the camera last came to rest in.
   const viewerHandle = useRef<ViewerHandle>(null);
   const [view, setView] = useState<ViewName | null>(null);
@@ -369,6 +370,7 @@ export function App() {
           <TopBar
             t={t}
             lang={lang}
+            compact={short}
             structures={structures}
             onChoose={chooseResult}
             open={searchOpen}

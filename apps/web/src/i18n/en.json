@@ -100,6 +100,7 @@
   "search.peeled": "{count} layers peeled to show {name}",
   "search.peeledOne": "1 layer peeled to show {name}",
   "search.label": "Search structures",
+  "search.open": "Search",
   "region.label": "Body region",
   "region.hip": "Hip and thigh",
   "region.lower-leg": "Lower leg and foot",
