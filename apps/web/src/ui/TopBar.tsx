@@ -50,11 +50,22 @@ export function TopBar({
   }
   // Compact only: whether the field is open across the bar.
   const [fieldOpen, setFieldOpen] = useState(false);
+  // A bar that stops being compact forgets the open field, so it starts folded the next time.
+  const [wasCompact, setWasCompact] = useState(compact);
+  if (wasCompact !== compact) {
+    setWasCompact(compact);
+    if (!compact) setFieldOpen(false);
+  }
   const showField = !compact || fieldOpen;
   const field = useRef<HTMLInputElement>(null);
   const drop = useRef<HTMLDivElement>(null);
+  const openButton = useRef<HTMLButtonElement>(null);
+  // Set when a chosen result folds the field, so the focus goes to the search button and not to nowhere.
+  const refocus = useRef(false);
   useEffect(() => {
     if (fieldOpen) field.current?.focus();
+    else if (refocus.current) openButton.current?.focus();
+    refocus.current = false;
   }, [fieldOpen]);
   const results = searchStructures(query, structures, lang);
 
@@ -64,10 +75,18 @@ export function TopBar({
   }
 
   function choose(structure: BundleStructure) {
-    setQuery(nameOf(structure, lang));
     onOpenChange(false);
     // The field kept the focus during the tap, so let go of it now. On a phone this closes the keyboard.
     field.current?.blur();
+    if (compact) {
+      // On a short phone the open field covers the bar. The name chip on the stage shows the choice,
+      // so the field empties and folds back into its button.
+      setQuery("");
+      refocus.current = true;
+      setFieldOpen(false);
+    } else {
+      setQuery(nameOf(structure, lang));
+    }
     onChoose(structure);
   }
 
@@ -125,6 +144,7 @@ export function TopBar({
             className="btn top-icon-btn"
             aria-label={t("search.open")}
             aria-expanded={fieldOpen}
+            ref={openButton}
             onClick={() => setFieldOpen(true)}
           >
             <SearchIcon size={20} />

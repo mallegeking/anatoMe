@@ -200,3 +200,48 @@ test("not compact: the field is always there and there is no search button", () 
   expect(screen.getByRole("searchbox")).toBeTruthy();
   expect(screen.queryByRole("button", { name: en["search.open"] })).toBeNull();
 });
+
+test("compact: choosing a result empties and folds the field, so the bar shows again", () => {
+  const onChoose = vi.fn();
+  render(<Harness onChoose={onChoose} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "pirif" } });
+  fireEvent.click(screen.getByRole("button", { name: /Piriformis/ }));
+  expect(onChoose).toHaveBeenCalledWith(structures[0]);
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.queryByTestId("search-results")).toBeNull();
+  const button = screen.getByRole("button", { name: en["search.open"] });
+  expect(button.getAttribute("aria-expanded")).toBe("false");
+  // The focus does not get lost with the field. It lands on the button that opens it again.
+  expect(document.activeElement).toBe(button);
+  // Opened again, the field starts empty.
+  fireEvent.click(button);
+  expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("");
+});
+
+test("compact: Enter on the first result folds the field too", () => {
+  render(<Harness onChoose={vi.fn()} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.keyDown(field, { key: "Enter" });
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
+});
+
+test("not compact: choosing a result keeps its name in the field", () => {
+  const { field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.click(screen.getByRole("button", { name: /Piriformis/ }));
+  expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("Piriformis");
+});
+
+test("the open field is forgotten when the bar stops being compact", () => {
+  const { rerender } = render(<Harness onChoose={vi.fn()} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "pirif" } });
+  rerender(<Harness onChoose={vi.fn()} compact={false} />);
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+  rerender(<Harness onChoose={vi.fn()} compact />);
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
+});

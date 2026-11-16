@@ -195,6 +195,10 @@ for (const { lang, texts } of LANGUAGES) {
       await page.getByTestId("search-results").getByRole("button", { name: /piriformis/i }).first().click();
       await expect(page.getByTestId("info-panel").getByRole("heading", { name: "Piriformis", level: 2 })).toBeVisible();
       expect(await stageHeight(page)).toBeGreaterThanOrEqual(STAGE_MIN);
+      // The chosen name shows on the stage, so the field folds away and the bar is whole again.
+      await expect(page.getByRole("searchbox", { name: texts["search.label"] })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: texts["search.open"] })).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByRole("button", { name: texts["settings.title"] })).toBeVisible();
     });
 
     test("no request leaves the preview host", async ({ page, baseURL }) => {
