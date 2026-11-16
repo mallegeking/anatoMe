@@ -655,6 +655,18 @@ test("switching to a region without movements while on the Movements tab goes to
   await waitFor(() => expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true"));
 });
 
+test("switching to a region without movements while on the Notebook tab goes to Structures", async () => {
+  freshNotebook();
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.notebook"]));
+  await screen.findByText(en["notebook.empty"]);
+  pickRegion("shoulder");
+  await waitFor(() => expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true"));
+  expect(screen.queryByText(en["notebook.empty"])).toBeNull();
+});
+
 test("switching region closes the search, the layers panel and the print summary and clears the notice", async () => {
   freshNotebook();
   serveTwo();

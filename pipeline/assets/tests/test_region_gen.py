@@ -101,6 +101,7 @@ def test_region_of():
     assert region_of("splenius capitis", {MUSCLE}) == "neck"
     assert region_of("spinalis", {MUSCLE}) == "neck"
     assert region_of("spinalis thoracis", {MUSCLE}) == "trunk"
+    assert region_of("inferior oblique part of longus colli", set()) == "neck"
     assert region_of("fifth rib", {BONE, "FMA7574"}) == "trunk"
     assert region_of("manubrium", set()) == "trunk"
     assert region_of("diaphragm", {MUSCLE}) == "trunk"

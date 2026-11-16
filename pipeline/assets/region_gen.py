@@ -71,7 +71,7 @@ def region_of(name, classes):
         return "shoulder"
     if "FMA37348" in classes or re.search(r"triceps|biceps brachii|carpi|pronator|pollicis|of hand", name):
         return "arm"
-    if classes & {"FMA9617", "FMA9616"} or re.search(r"capitis|cervicis|cervical|platysma", name):   # neck, head
+    if classes & {"FMA9617", "FMA9616"} or re.search(r"capitis|cervicis|cervical|platysma|longus colli", name):   # neck, head
         return "neck"
     if name == "spinalis":   # BodyParts3D's plain "spinalis" lies above spinalis thoracis, up past C7
         return "neck"
