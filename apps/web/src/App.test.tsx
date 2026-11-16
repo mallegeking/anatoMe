@@ -1177,8 +1177,20 @@ test("notebook: a save that fails says so and keeps the typed note", async () =>
   await fillLogForm("sharp pain");
   fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
   expect(await screen.findByText(en["notebook.saveFailed"])).toBeTruthy();
-  expect(screen.getByTestId("search-notice").textContent).toBe(en["notebook.saveFailed"]);
+  // The message shows inside the log form, next to Save, not at the top of the panel, which may be scrolled away.
+  const alert = screen.getByRole("alert");
+  expect(alert.textContent).toBe(en["notebook.saveFailed"]);
+  expect(alert.closest(".log-form")).not.toBeNull();
+  expect(screen.queryByTestId("search-notice")).toBeNull();
   expect((screen.getByLabelText(en["notebook.note"]) as HTMLTextAreaElement).value).toBe("sharp pain");
+  // The next save works: the message goes, the form closes and the saved notice shows.
+  storeParts.putFails = false;
+  fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
+  expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
+  fireEvent.click(tab(en["mode.notebook"]));
+  expect(await screen.findByText("sharp pain")).toBeTruthy();
 });
 
 test("notebook: a part that failed to load says so and can be tried again", async () => {
@@ -1211,6 +1223,7 @@ test("notebook: after a failed open the next log tries again", async () => {
   await fillLogForm("on the stairs");
   fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
   expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
+  expect(screen.getByRole("alert").closest(".log-form")).not.toBeNull();
   // The form stays open with the note, so the second press saves it.
   fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
   expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();

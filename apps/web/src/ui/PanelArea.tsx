@@ -6,7 +6,7 @@ import type { Translate } from "../i18n/t";
 import { AreaPanel, type AreaState } from "../area/AreaPanel";
 import { lazyRetry } from "./lazyRetry";
 import { QuietBoundary } from "./QuietBoundary";
-import { MovementPanel } from "../movement/MovementPanel";
+import { MovementPanel, type LogFailure } from "../movement/MovementPanel";
 import type { MovementState } from "../movement/state";
 import type { NotebookStore } from "../notebook/store";
 import type { StoreFailure } from "../notebook/NotebookPanel";
@@ -41,7 +41,7 @@ type Props = {
   onOverUnder: () => void;
   onOpenStructure: (sid: string) => void;
   // Resolves to true once the note is saved.
-  onLog: (input: { feeling: Feeling; side: EntrySide; note: string }) => Promise<boolean>;
+  onLog: (input: { feeling: Feeling; side: EntrySide; note: string }) => Promise<LogFailure | null>;
   notebookStore: NotebookStore | null;
   storeFailure: StoreFailure;
   onFocusNotebookStructure: (sel: Selection) => void;

@@ -1164,6 +1164,16 @@ body,
   margin: 8px 0;
 }
 
+/* Why a save failed, right above the Save button. */
+.log-failure {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  overflow-wrap: anywhere;
+}
+
 .log-note {
   display: flex;
   flex-direction: column;

@@ -6,7 +6,7 @@ import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
 import { makeMovementBundle } from "./fixture";
-import { MovementPanel } from "./MovementPanel";
+import { MovementPanel, type LogFailure } from "./MovementPanel";
 import { HIGHLIGHT_COLORS } from "./colors";
 import { initialMovementState } from "./state";
 
@@ -33,7 +33,7 @@ function Harness({ bundle, selection, onFocusStructure, onLog }: HarnessProps) {
   );
 }
 
-function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn(), onLog = vi.fn(async () => true), noLog = false } = {}) {
+function show(bundle = makeMovementBundle(), { selection = null as Selection | null, onFocusStructure = vi.fn(), onLog = vi.fn(async (): Promise<LogFailure | null> => null), noLog = false } = {}) {
   render(<Harness bundle={bundle} selection={selection} onFocusStructure={onFocusStructure} onLog={noLog ? undefined : onLog} />);
   return { onFocusStructure, onLog };
 }
@@ -224,7 +224,7 @@ test("focus moves into the form when it opens and back to the log button when it
 });
 
 test("a save that fails keeps the form open with what was typed", async () => {
-  const { onLog } = show(makeMovementBundle(), { onLog: vi.fn(async () => false) });
+  const { onLog } = show(makeMovementBundle(), { onLog: vi.fn(async () => "notebook.saveFailed" as const) });
   pick("Hip external rotation");
   pick(en["notebook.log"]);
   fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
@@ -237,8 +237,8 @@ test("a save that fails keeps the form open with what was typed", async () => {
 });
 
 test("pressing save again while a save is under way saves only once", async () => {
-  let finish: (saved: boolean) => void = () => {};
-  const onLog = vi.fn(() => new Promise<boolean>((resolve) => (finish = resolve)));
+  let finish: (failure: LogFailure | null) => void = () => {};
+  const onLog = vi.fn(() => new Promise<LogFailure | null>((resolve) => (finish = resolve)));
   show(makeMovementBundle(), { onLog });
   pick("Hip external rotation");
   pick(en["notebook.log"]);
@@ -247,8 +247,86 @@ test("pressing save again while a save is under way saves only once", async () =
   pick(en["notebook.save"]);
   pick(en["notebook.save"]);
   expect(onLog).toHaveBeenCalledTimes(1);
-  await act(async () => finish(true));
+  await act(async () => finish(null));
   expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
+});
+
+// Opens the form for external rotation, chooses painful and left and types a note.
+async function fillForm(note: string) {
+  pick("Hip external rotation");
+  pick(en["notebook.log"]);
+  fireEvent.click(await screen.findByRole("button", { name: en["notebook.painful"] }));
+  pick(en["notebook.side.l"]);
+  fireEvent.change(screen.getByLabelText(en["notebook.note"]), { target: { value: note } });
+}
+
+const logForm = () => document.querySelector(".log-form") as HTMLElement;
+const note = () => (screen.getByLabelText(en["notebook.note"]) as HTMLTextAreaElement).value;
+
+for (const failure of ["notebook.saveFailed", "notebook.loadFailed", "notebook.unavailable"] as const) {
+  test(`a failed save says why next to the Save button: ${failure}`, async () => {
+    show(makeMovementBundle(), { onLog: vi.fn(async () => failure) });
+    await fillForm("sharp pain");
+    await act(async () => pick(en["notebook.save"]));
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toBe(en[failure]);
+    expect(logForm().contains(alert)).toBe(true);
+    // Right before the row with the Save button, so it is in view when Save is pressed.
+    const save = screen.getByRole("button", { name: en["notebook.save"] });
+    expect(alert.nextElementSibling?.contains(save)).toBe(true);
+    expect(note()).toBe("sharp pain");
+  });
+}
+
+test("the failure goes away when the form is changed", async () => {
+  show(makeMovementBundle(), { onLog: vi.fn(async () => "notebook.saveFailed" as const) });
+  await fillForm("sharp pain");
+  await act(async () => pick(en["notebook.save"]));
+  expect(screen.getByRole("alert")).toBeTruthy();
+  fireEvent.change(screen.getByLabelText(en["notebook.note"]), { target: { value: "sharp pain, left" } });
+  expect(screen.queryByRole("alert")).toBeNull();
+  await act(async () => pick(en["notebook.save"]));
+  expect(screen.getByRole("alert")).toBeTruthy();
+  pick(en["notebook.side.r"]);
+  expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("saving again clears the failure, and a save that works closes the form", async () => {
+  let finish: (failure: LogFailure | null) => void = () => {};
+  const onLog = vi.fn(async (): Promise<LogFailure | null> => "notebook.saveFailed");
+  show(makeMovementBundle(), { onLog });
+  await fillForm("sharp pain");
+  await act(async () => pick(en["notebook.save"]));
+  expect(screen.getByRole("alert").textContent).toBe(en["notebook.saveFailed"]);
+  onLog.mockImplementation(() => new Promise((resolve) => (finish = resolve)));
+  pick(en["notebook.save"]);
+  // The old failure goes while the second save is under way.
+  expect(screen.queryByRole("alert")).toBeNull();
+  await act(async () => finish(null));
+  expect(onLog).toHaveBeenCalledTimes(2);
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.queryByRole("button", { name: en["notebook.save"] })).toBeNull();
+  expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
+});
+
+test("while a save is under way, Save and Cancel wait and the note stays", async () => {
+  let finish: (failure: LogFailure | null) => void = () => {};
+  show(makeMovementBundle(), { onLog: vi.fn(() => new Promise<LogFailure | null>((resolve) => (finish = resolve))) });
+  await fillForm("sharp pain");
+  pick(en["notebook.save"]);
+  const save = screen.getByRole("button", { name: en["notebook.save"] }) as HTMLButtonElement;
+  const cancel = screen.getByRole("button", { name: en["notebook.cancel"] }) as HTMLButtonElement;
+  expect(save.disabled).toBe(true);
+  expect(cancel.disabled).toBe(true);
+  expect(logForm().getAttribute("aria-busy")).toBe("true");
+  fireEvent.click(cancel);
+  expect(note()).toBe("sharp pain");
+  // The save fails, so both buttons work again and the note is still there to save.
+  await act(async () => finish("notebook.saveFailed"));
+  expect(save.disabled).toBe(false);
+  expect(cancel.disabled).toBe(false);
+  expect(logForm().getAttribute("aria-busy")).toBe("false");
+  expect(note()).toBe("sharp pain");
 });
 
 test("the picker shows each joint's movements as buttons under a section heading", () => {

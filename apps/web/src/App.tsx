@@ -9,6 +9,7 @@ import { hideStructure, initialLayers, peel, restore, revealFor, showStructure, 
 import type { AreaState } from "./area/AreaPanel";
 import { LayersPanel } from "./layers/LayersPanel";
 import { makeIsShown } from "./layers/shown";
+import type { LogFailure } from "./movement/MovementPanel";
 import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
 import type { NotebookEntry, EntrySide, Feeling } from "./notebook/types";
@@ -296,28 +297,27 @@ export function App() {
   }, [mode, openStore]);
 
   // "Log this movement": saves the picked movement and its angles with the feeling, the side and the note.
-  // Resolves to true once it is saved. A failure says what went wrong: the notebook code did not load,
-  // the browser does not let the app store notes, or this one note could not be saved.
-  async function logMovement(input: { feeling: Feeling; side: EntrySide; note: string }): Promise<boolean> {
+  // Resolves to null once it is saved. A failure resolves to the text that says what went wrong: the notebook
+  // code did not load, the browser does not let the app store notes, or this one note could not be saved.
+  // The form shows that text next to its Save button, where the person is looking.
+  async function logMovement(input: { feeling: Feeling; side: EntrySide; note: string }): Promise<LogFailure | null> {
     const { pick, pose } = movement;
-    if (!pick) return false;
+    if (!pick) return "notebook.saveFailed";
     let opened: [typeof import("./notebook/store"), NotebookStore];
     try {
       opened = await Promise.all([import("./notebook/store"), openStore()]);
     } catch (error) {
       const blocked = error instanceof StoreOpenError && error.failure === "blocked";
-      setNotice({ key: blocked ? "notebook.unavailable" : "notebook.loadFailed" });
-      return false;
+      return blocked ? "notebook.unavailable" : "notebook.loadFailed";
     }
     const [{ makeEntry }, store] = opened;
     try {
       await store.put(makeEntry({ pick, pose, ...input }, new Date(), crypto.randomUUID()));
     } catch {
-      setNotice({ key: "notebook.saveFailed" });
-      return false;
+      return "notebook.saveFailed";
     }
     setNotice({ key: "notebook.saved" });
-    return true;
+    return null;
   }
 
   // The summary is built and printed by its own lazy part, after it is on the page and painted.

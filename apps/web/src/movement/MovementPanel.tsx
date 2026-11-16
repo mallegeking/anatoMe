@@ -22,6 +22,9 @@ const logForm = lazyRetry(() => import("../notebook/LogForm"));
 
 type LogInput = { feeling: Feeling; side: EntrySide; note: string };
 
+// Why a note could not be saved, as the key of the text that says so.
+export type LogFailure = "notebook.saveFailed" | "notebook.loadFailed" | "notebook.unavailable";
+
 type Props = {
   t: Translate;
   // The language the names show in.
@@ -34,8 +37,9 @@ type Props = {
   onFocusStructure: (sid: string) => void;
   // The same, and switch to the Structures tab.
   onOpenStructure: (sid: string) => void;
-  // Save the picked movement to the notebook. Resolves to true once it is saved. Without it there is no log button.
-  onLog?: (input: LogInput) => Promise<boolean>;
+  // Save the picked movement to the notebook. Resolves to null once it is saved, or to why it failed.
+  // Without it there is no log button.
+  onLog?: (input: LogInput) => Promise<LogFailure | null>;
 };
 
 // The panel of the Movements tab: the list to pick from, or the picked movement or exercise with its result.
@@ -106,14 +110,18 @@ export function MovementPanel(props: Props) {
 }
 
 // "Log this movement" opens the form in place. A save that worked or a cancel closes it again.
-// A save that failed keeps the form open with what was typed, so the person can try again.
+// A save that failed keeps the form open with what was typed and says why next to the Save button,
+// where the person is looking, so they can try again.
 // If the form's chunk fails to load, the failure stays here and the rest of the panel keeps working.
-function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => Promise<boolean> }) {
+function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => Promise<LogFailure | null> }) {
   const [open, setOpen] = useState(false);
   const logButton = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
   // True while a save is under way, so a second press does not save the same note twice.
+  // The ref guards at once, the state turns the buttons off on the next render.
   const saving = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<LogFailure | null>(null);
   // When the form closes, focus goes back to the button that opened it.
   useEffect(() => {
     if (wasOpen.current && !open) logButton.current?.focus();
@@ -131,17 +139,32 @@ function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => P
   async function save(input: LogInput) {
     if (saving.current) return;
     saving.current = true;
+    setBusy(true);
+    setFailure(null);
     try {
-      if (await onLog(input)) setOpen(false);
+      const failed = await onLog(input);
+      if (failed) setFailure(failed);
+      else setOpen(false);
     } finally {
       saving.current = false;
+      setBusy(false);
     }
   }
   const LogForm = logForm();
   return (
     <QuietBoundary fallback={<p>{t("notebook.loadFailed")}</p>}>
       <Suspense fallback={null}>
-        <LogForm t={t} onSave={(input) => void save(input)} onCancel={() => setOpen(false)} />
+        <LogForm
+          t={t}
+          onSave={(input) => void save(input)}
+          // Cancel waits for a save under way, so it cannot throw away a note that might still fail to save.
+          onCancel={() => {
+            if (!saving.current) setOpen(false);
+          }}
+          saving={busy}
+          failure={failure ? t(failure) : null}
+          onEdit={() => setFailure(null)}
+        />
       </Suspense>
     </QuietBoundary>
   );
