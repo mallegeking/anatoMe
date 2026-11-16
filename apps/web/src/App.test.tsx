@@ -176,9 +176,10 @@ test("a data failure shows the data message and keeps the credits and the educat
   // The model is fine here, so the message must not blame it.
   expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
   expect(screen.queryByText(en["error.modelLoad"])).toBeNull();
-  // The phone keeps the credits in the settings dialog, so look at the wide layout, where they have a button.
-  expect(screen.getByRole("button", { name: en["settings.title"] })).toBeTruthy();
   expect(screen.getByText(en["about.educational"])).toBeTruthy();
+  // On the phone the credits are in the settings dialog.
+  fireEvent.click(screen.getByRole("button", { name: en["settings.title"] }));
+  expect(within(screen.getByRole("dialog")).getByText(en["credits.modified"])).toBeTruthy();
 });
 
 function serve(bundle: RegionBundle) {
