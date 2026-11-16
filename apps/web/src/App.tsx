@@ -79,6 +79,16 @@ export function App() {
   const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
+  // A region without joints has no movements, so it has no Movements tab and no Notebook tab.
+  const modes = useMemo<Mode[]>(
+    () => (!bundle || bundle.movements.length > 0 ? ["atlas", "movement", "area", "notebook"] : ["atlas", "area"]),
+    [bundle],
+  );
+  // A tab the region does not have shows as Structures, and the state follows.
+  const shownMode: Mode = modes.includes(mode) ? mode : "atlas";
+  useEffect(() => {
+    if (shownMode !== mode) setMode(shownMode);
+  }, [shownMode, mode]);
 
   // Reads the manifest and picks the region the address asks for, or the first one.
   useEffect(() => {
@@ -128,6 +138,15 @@ export function App() {
     setMovement(initialMovementState);
     setArea(null);
     setAreaProbe(null);
+    setMode("atlas");
+    setSearchOpen(false);
+    setLayersOpen(false);
+    setPrintJob(null);
+    setNotice(null);
+    // The address follows the region, so a reload or a shared link opens the same one. No new history entry.
+    const params = new URLSearchParams(location.search);
+    params.set("region", id);
+    history.replaceState(null, "", `?${params.toString()}${location.hash}`);
   }
 
   function select(sel: Selection | null, fileLabel?: string) {
@@ -307,7 +326,7 @@ export function App() {
           region={region ?? ""}
           onRegion={changeRegion}
         />
-        <ModeBar t={t} mode={mode} modes={["atlas", "movement", "area", "notebook"]} onChange={setMode} />
+        <ModeBar t={t} mode={shownMode} modes={modes} onChange={setMode} />
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} lang={lang} onClose={() => setReviewOpen(false)} />
@@ -318,9 +337,9 @@ export function App() {
           <Viewer key={region ?? ""} files={files} t={t} selection={selection} focus={focus} isShown={isShown}
             highlights={highlights}
             onSelect={tapModel}
-            areaMode={mode === "area"}
+            areaMode={shownMode === "area"}
             onAreaTap={setArea}
-            areaMarker={mode === "area" ? (area?.point ?? null) : null}
+            areaMarker={shownMode === "area" ? (area?.point ?? null) : null}
             areaProbe={areaProbe}
           />
           <PerfOverlay t={t} />
@@ -333,17 +352,17 @@ export function App() {
                 {noticeText(notice, t, lang)}
               </p>
             )}
-            <ModelErrorBoundary t={t} messageKey="error.dataLoad">
+            <ModelErrorBoundary key={region ?? ""} t={t} messageKey="error.dataLoad">
               {/* Until the manifest says which region to show, the panel shows the same hint as while the data loads. */}
               {region === null ? (
                 <Hint t={t} />
               ) : (
-                <Suspense fallback={<Hint t={t} />}>
+                <Suspense fallback={<Hint t={t} region={region} />}>
                   <PanelArea
                     region={region}
                     t={t}
                     lang={lang}
-                    mode={mode}
+                    mode={shownMode}
                     selection={selection}
                     label={label}
                     layersOpen={layersOpen}

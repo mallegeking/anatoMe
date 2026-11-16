@@ -187,3 +187,9 @@ test("in German the names are German, the bone keeps its capital, and a name wit
   expect(screen.getByText(tDe("info.origin", { landmark: "anterior surface", bone: "Kreuzbein" }))).toBeTruthy();
   expect(screen.getByRole("button", { name: "Außenrotation im Hüftgelenk" })).toBeTruthy();
 });
+
+test("a structure without a Latin or German name shows its English name and no Latin line", () => {
+  show("rectus-femoris");
+  expect(screen.getByText("Rectus femoris")).toBeTruthy();
+  expect(screen.queryByText(/^Latin:/)).toBeNull();
+});

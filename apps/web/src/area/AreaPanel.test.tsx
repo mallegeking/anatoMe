@@ -136,3 +136,11 @@ test("the note speaks of general anatomy and no area text says symptom", () => {
     expect(shown(texts).filter(([, text]) => /symptom/i.test(text))).toEqual([]);
   }
 });
+
+test("the area list works in a region without movements", () => {
+  const bundle: RegionBundle = { ...makeMovementBundle(), movements: [], actions: [] };
+  show({ bundle });
+  expect(screen.getAllByRole("listitem").length).toBeGreaterThan(0);
+  expect(screen.getByRole("button", { name: "Piriformis (left)" })).toBeTruthy();
+  expect(screen.queryByText(en["area.loadedBy"])).toBeNull();
+});

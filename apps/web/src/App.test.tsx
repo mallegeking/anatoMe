@@ -117,6 +117,8 @@ afterEach(() => {
   cleanup();
   // A test that switches the language must not leave the next one in German.
   localStorage.clear();
+  // A test that switches region leaves ?region=... in the address.
+  history.replaceState(null, "", "/");
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -618,4 +620,94 @@ test("the print summary goes away when the person leaves the Notebook tab", asyn
   await printOnce();
   fireEvent.click(tab(en["mode.atlas"]));
   expect(document.querySelector("section.print-summary")).toBeNull();
+});
+
+// Two regions: the hip has movements, the shoulder has none. The shoulder bundle has no joints of its own.
+const twoFile = { path: "x.glb", source: "bp3d", license: "CC-BY-4.0" };
+const twoRegions = { regions: { hip: { files: [twoFile] }, shoulder: { files: [twoFile] } } };
+function serveTwo(shoulderOk = true, hipOk = true) {
+  const hip = makeBundle();
+  const shoulder: RegionBundle = { ...makeBundle(), region: "shoulder", movements: [], actions: [] };
+  const fetch = vi.fn(async (url: string) => {
+    if (url.endsWith("models/manifest.json")) return new Response(JSON.stringify(twoRegions));
+    if (url.endsWith("data/shoulder.json")) return shoulderOk ? new Response(JSON.stringify(shoulder)) : new Response("", { status: 404 });
+    return hipOk ? new Response(JSON.stringify(hip)) : new Response("", { status: 404 });
+  });
+  vi.stubGlobal("fetch", fetch);
+}
+const pickRegion = (id: string) => fireEvent.change(screen.getByLabelText(en["region.label"]), { target: { value: id } });
+
+test("a region without movements shows only the Structures and Area tabs", async () => {
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  await waitFor(() => expect(screen.getAllByRole("tab").map((x) => x.textContent)).toEqual([en["mode.atlas"], en["mode.area"]]));
+});
+
+test("switching to a region without movements while on the Movements tab goes to Structures", async () => {
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(tab(en["mode.movement"]));
+  pickRegion("shoulder");
+  await waitFor(() => expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true"));
+});
+
+test("switching region closes the search, the layers panel and the print summary and clears the notice", async () => {
+  freshNotebook();
+  serveTwo();
+  vi.spyOn(window, "print").mockImplementation(() => {});
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  // A print summary on the page.
+  await printOnce();
+  expect(document.querySelector("section.print-summary")).not.toBeNull();
+  fireEvent.click(tab(en["mode.atlas"]));
+  // Logging the movement left a notice. Now open the layers panel and the search list too.
+  expect(screen.getByRole("status")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "pirif" } });
+  expect(screen.getByTestId("search-results")).toBeTruthy();
+  expect(screen.getByRole("button", { name: en["layers.close"] })).toBeTruthy();
+
+  pickRegion("shoulder");
+
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.queryByTestId("search-results")).toBeNull();
+  expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
+  expect(screen.queryByRole("status")).toBeNull();
+  expect(document.querySelector("section.print-summary")).toBeNull();
+});
+
+test("switching region writes ?region=<id> into the address without a new history entry", async () => {
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  const before = history.length;
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  expect(history.length).toBe(before);
+  expect(location.search).toBe("?region=shoulder");
+});
+
+test("a data error in one region does not stay on screen after switching to another", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  serveTwo(true, false);
+  render(<App />);
+  expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.queryByText(en["error.dataLoad"])).toBeNull();
+});
+
+test("the gap line of the region shows under the tap hint, and nothing shows for a region without one", async () => {
+  serveTwo();
+  const { container } = render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(container.querySelector(".region-gap")).toBeNull();
+  pickRegion("shoulder");
+  expect(await screen.findByText("Not in the model yet: latissimus dorsi.")).toBeTruthy();
+  expect(container.querySelector(".region-gap")).not.toBeNull();
 });

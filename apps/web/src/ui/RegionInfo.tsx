@@ -20,7 +20,7 @@ type Props = {
 // Loads the region data and shows the panel for the selection, or the tap hint.
 export function RegionInfo({ region, selection, fallbackLabel, t, lang, onSwitchSide, onHide, onOpenMovement, onOverUnder }: Props) {
   const bundle = useRegionData(region);
-  if (!selection) return <Hint t={t} />;
+  if (!selection) return <Hint t={t} region={region} />;
   return (
     <InfoPanel
       selection={selection}
@@ -36,10 +36,17 @@ export function RegionInfo({ region, selection, fallbackLabel, t, lang, onSwitch
   );
 }
 
-export function Hint({ t }: { t: Translate }) {
+// The tap hint, and under it what the region's model does not have yet. A text that is missing
+// comes back as its own key, so a region with no gap line shows nothing.
+export function Hint({ t, region }: { t: Translate; region?: string }) {
+  const gapKey = region ? `regionGap.${region}` : null;
+  const gap = gapKey ? t(gapKey) : null;
   return (
-    <p className="info-label info-label--hint" aria-live="polite" data-testid="info-label">
-      {t("info.tapHint")}
-    </p>
+    <>
+      <p className="info-label info-label--hint" aria-live="polite" data-testid="info-label">
+        {t("info.tapHint")}
+      </p>
+      {gap && gap !== gapKey ? <p className="muted region-gap">{gap}</p> : null}
+    </>
   );
 }
