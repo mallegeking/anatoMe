@@ -1,0 +1,3 @@
+- {id: femur, type: bone, english: Femur, region: hip, depth: 4}
+- {id: tibia, type: bone, english: Tibia, region: hip, also_in: [lower-leg], depth: 4}
+- {id: talus, type: bone, english: Talus, region: lower-leg, depth: 4}

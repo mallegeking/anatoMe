@@ -95,3 +95,8 @@ test("a citation without license_id is refused", () => expectError(fx("no-licens
 test("the real data has no quote from an incompatible source", () => expect(validateDataDir(realDataDir).ok).toBe(true));
 test("the quotable licences are the six that fit CC BY 4.0", () =>
   expect([...QUOTABLE].sort()).toEqual(["CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0", "CC-BY-unversioned", "CC0-1.0", "public-domain"]));
+
+test("the multi-region fixture passes", () => expect(validateDataDir(fx("multi-region")).ok).toBe(true));
+test("also_in must name a region some structure has as its home", () => expectError(fx("also-in-ghost"), /unknown region ghost/));
+test("also_in must not repeat the home region", () => expectError(fx("also-in-home"), /also_in repeats the home region hip/));
+test("a joint's region must be a known region", () => expectError(fx("joint-bad-region"), /unknown region ghost/));

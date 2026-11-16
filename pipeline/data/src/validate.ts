@@ -16,9 +16,9 @@ const SCHEMA_DIR = fileURLToPath(new URL("../../../data/schema/", import.meta.ur
 
 type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations" | "exercises";
 
-type Joint = { id: string; dofs: { id: string }[] };
+type Joint = { id: string; region: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
-type Structure = { id: string; type: string };
+type Structure = { id: string; type: string; region?: string; also_in?: string[] };
 type Citation = { id: string; license_id: string };
 
 // Licences a quote may come from, because they fit CC BY 4.0. Share-alike, non-commercial,
@@ -151,7 +151,20 @@ export function validateDataDir(dir: string): ValidationResult {
     }
   }
 
-  const regions = new Set(structures.flatMap((s) => s.rows).map((s) => (s as Structure & { region?: string }).region));
+  const regions = new Set(structures.flatMap((s) => s.rows).map((s) => s.region));
+  for (const { file, rows } of structures) {
+    for (const [i, s] of rows.entries()) {
+      for (const [j, r] of (s.also_in ?? []).entries()) {
+        if (r === s.region) errors.push({ file, path: `/${i}/also_in/${j}`, message: `also_in repeats the home region ${r}` });
+        else if (!regions.has(r)) errors.push({ file, path: `/${i}/also_in/${j}`, message: `unknown region ${r}` });
+      }
+    }
+  }
+  for (const { file, rows } of [joints]) {
+    for (const [i, j] of rows.entries()) {
+      if (!regions.has(j.region)) errors.push({ file, path: `/${i}/region`, message: `unknown region ${j.region}` });
+    }
+  }
   for (const { file, rows } of exercises) {
     for (const [i, x] of rows.entries()) {
       for (const [j, r] of x.regions.entries()) {
@@ -223,16 +236,16 @@ function checkStructureType(
 // The ids of every structure in dir/structures, for the model check.
 // Returns an empty set when a file cannot be read, validateDataDir reports why.
 // What the mesh check needs to know about each structure. midline means it has no left and right copy.
-export type StructureInfo = { type: string; english: string; midline: boolean };
+export type StructureInfo = { type: string; english: string; midline: boolean; regions: string[] };
 
-// Reads data/structures into a map from structure id to its type, english name and midline flag.
+// Reads data/structures into a map from structure id to its type, english name, midline flag and regions (home first).
 export function loadStructures(dir: string): Map<string, StructureInfo> {
   const structures = new Map<string, StructureInfo>();
   for (const file of listYaml(dir, "structures")) {
     const rows = readYaml(dir, file, []);
     if (!Array.isArray(rows)) continue;
     for (const r of rows) {
-      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english), midline: r.midline === true });
+      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english), midline: r.midline === true, regions: [String(r.region), ...(Array.isArray(r.also_in) ? r.also_in.map(String) : [])] });
     }
   }
   return structures;

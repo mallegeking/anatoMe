@@ -98,6 +98,10 @@ export async function checkModelMapping(
       if (typeof sid === "string" && sid !== "" && !structure) {
         errors.push({ file: f.path, path: name, message: `unknown structure id ${sid}` });
       }
+      // A region may only draw structures that belong to it, at home or through also_in.
+      if (structure && !structure.regions.includes(f.region)) {
+        errors.push({ file: f.path, path: name, message: `${sid} belongs to ${structure.regions.join(" and ")}, not to ${f.region}` });
+      }
       // The app shows the label and colours by kind, so both must agree with the knowledge base.
       if (structure && extras.kind !== undefined && extras.kind !== structure.type) {
         errors.push({ file: f.path, path: name, message: `kind ${String(extras.kind)} but ${sid} is a ${structure.type}` });

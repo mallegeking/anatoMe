@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { compileRegion } from "../src/compile.ts";
+import { compileRegion, listRegions } from "../src/compile.ts";
 
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
@@ -70,3 +70,16 @@ test("german is passed through for structures, movements and exercises", () => {
   // An exercise without a German name gets no german field either.
   expect(compileRegion(fx("valid"), "hip", "review").exercises.find((e) => e.id === "goblet-squat")).not.toHaveProperty("german");
 });
+
+test("a structure is in its home region and in every also_in region", () => {
+  const dir = fx("multi-region");
+  expect(compileRegion(dir, "hip", "normal").structures.map((s) => s.id)).toContain("tibia");
+  expect(compileRegion(dir, "lower-leg", "normal").structures.map((s) => s.id).sort()).toEqual(["talus", "tibia"]);
+});
+test("a region gets only the movements of its own joints", () => {
+  const dir = fx("multi-region");
+  expect(compileRegion(dir, "hip", "normal").movements.length).toBeGreaterThan(0);
+  expect(compileRegion(dir, "lower-leg", "normal").movements).toEqual([]);
+});
+test("listRegions lists home regions only", () => expect(listRegions(fx("multi-region"))).toEqual(["hip", "lower-leg"]));
+test("also_in does not go into the bundle", () => expect(JSON.stringify(compileRegion(fx("multi-region"), "lower-leg", "normal"))).not.toContain("also_in"));

@@ -1,0 +1,2 @@
+- {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion}
+- {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension}

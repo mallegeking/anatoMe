@@ -36,10 +36,10 @@ const made: string[] = [];
 afterAll(() => made.forEach((d) => rmSync(d, { recursive: true, force: true })));
 
 // A models folder holding test.glb and a manifest that lists it.
-function makeDir(files: { path: string; source: string; license: string }[]) {
+function makeDir(files: { path: string; source: string; license: string }[], region = "test") {
   const d = mkdtempSync(join(tmpdir(), "anatome-models-"));
   made.push(d);
-  writeFileSync(join(d, "manifest.json"), JSON.stringify({ regions: { test: { files } } }));
+  writeFileSync(join(d, "manifest.json"), JSON.stringify({ regions: { [region]: { files } } }));
   return d;
 }
 const entry = (license = "CC-BY-4.0") => ({ path: "test.glb", source: "bp3d", license });
@@ -57,7 +57,7 @@ async function dirWithLicense(license: string) {
 }
 
 // The structures the checks know about, with the type and english name the meshes must match.
-const femur = new Map([["femur", { type: "bone", english: "Femur", midline: false }]]);
+const femur = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["test"] }]]);
 
 function expectError(result: ValidationResult, pattern: RegExp) {
   expect(result.ok).toBe(false);
@@ -119,7 +119,7 @@ test("fails when a mesh label differs from the structure name", async () =>
   expectError(await checkModelMapping(await dir([{ label: "Thigh bone" }]), femur), /label Thigh bone but femur is called Femur/));
 
 test("a midline structure with a sided mesh is an error", async () => {
-  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true }]]);
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }]]);
   expectError(await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "l" }]), sacrum), /sacrum is marked midline but mesh .* has side l/);
 });
 
@@ -127,15 +127,15 @@ test("a paired structure with an unsided mesh is an error", async () =>
   expectError(await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur), /femur is not marked midline but mesh .* has no side/));
 
 test("a midline structure with an unsided mesh passes", async () => {
-  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true }]]);
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }]]);
   expect((await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "" }]), sacrum)).ok).toBe(true);
 });
 
 // Structures in the data must have a mesh somewhere, the check works in both directions.
 test("a structure that no mesh carries is an error", async () => {
   const two = new Map([
-    ["femur", { type: "bone", english: "Femur", midline: false }],
-    ["sacrum", { type: "bone", english: "Sacrum", midline: true }],
+    ["femur", { type: "bone", english: "Femur", midline: false, regions: ["test"] }],
+    ["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }],
   ]);
   expectError(await checkModelMapping(await dir([{ sid: "femur" }]), two), /structure sacrum has no mesh in any file/);
 });
@@ -163,4 +163,21 @@ test("the model check reads a Draco-compressed file", async () => {
   const result = await checkModelMapping(d, femur);
   expect(result.errors).toEqual([]);
   expect(result.ok).toBe(true);
+});
+
+test("a mesh must sit in a region its structure belongs to", async () => {
+  const d = makeDir([{ path: "test.glb", source: "bp3d", license: "CC-BY-4.0" }], "lower-leg");
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur" }]);
+  const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip"] }]]);
+  const result = await checkModelMapping(d, structures);
+  expect(result.ok).toBe(false);
+  expect(result.errors).toEqual([
+    { file: "test.glb", path: "(unnamed node)", message: "femur belongs to hip, not to lower-leg" },
+  ]);
+});
+test("a mesh in an also_in region passes", async () => {
+  const d = makeDir([{ path: "test.glb", source: "bp3d", license: "CC-BY-4.0" }], "lower-leg");
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur" }]);
+  const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip", "lower-leg"] }]]);
+  expect((await checkModelMapping(d, structures)).ok).toBe(true);
 });

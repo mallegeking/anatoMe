@@ -15,9 +15,10 @@ import type {
 } from "../../../apps/web/src/data/bundle.ts";
 
 // Rows as they are written in the YAML files. validateDataDir has already checked them.
-type StructureRow = Omit<BundleStructure, "paired"> & { region: string; midline?: boolean };
+type StructureRow = Omit<BundleStructure, "paired"> & { region: string; also_in?: string[]; midline?: boolean };
 type ActionRow = Omit<BundleAction, "draft"> & { checked_by: string | null };
 type ExerciseRow = Omit<BundleExercise, "draft"> & { regions: string[]; checked_by: string | null };
+type JointRow = { id: string; region: string };
 type AttachmentRow = Omit<BundleAttachment, "draft"> & { checked_by: string | null };
 
 function readRows<T>(dir: string, file: string): T[] {
@@ -42,7 +43,7 @@ export function listRegions(dataDir: string): string[] {
 
 export function compileRegion(dataDir: string, region: string, mode: "normal" | "review"): RegionBundle {
   const review = mode === "review";
-  const structures = readFolder<StructureRow>(dataDir, "structures").filter((s) => s.region === region);
+  const structures = readFolder<StructureRow>(dataDir, "structures").filter((s) => s.region === region || s.also_in?.includes(region));
   const inRegion = new Set(structures.map((s) => s.id));
 
   const pendingByStructure: Record<string, number> = {};
@@ -95,7 +96,9 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
     .map(({ id, title, authors, year, url, license }) => ({ id, title, authors, year, url, license }));
 
   // german goes in only when the row has one, like gap below. The app falls back to english.
-  const movements = readRows<BundleMovement>(dataDir, "movements.yaml").map(({ id, english, german, dof, direction }) => ({
+  // A region gets only the movements of its own joints, the joint is the part of dof before the dot.
+  const ownJoints = new Set(readRows<JointRow>(dataDir, "joints.yaml").filter((j) => j.region === region).map((j) => j.id));
+  const movements = readRows<BundleMovement>(dataDir, "movements.yaml").filter((m) => ownJoints.has(m.dof.split(".")[0])).map(({ id, english, german, dof, direction }) => ({
     id, english, ...(german !== undefined ? { german } : {}), dof, direction,
   }));
 
