@@ -31,8 +31,10 @@ test("search piriformis and read about it", async ({ page, baseURL }) => {
   await expect(panel.getByRole("heading", { name: texts["info.does"].replace("{joint}", texts["joint.hip"]) })).toBeVisible();
   await expect(panel.getByText(texts["info.pending"])).toBeVisible();
 
-  await page.getByText(texts["credits.title"], { exact: true }).click();
+  // The phone keeps the educational line pinned. The credits are in the settings dialog.
   await expect(page.getByText(texts["about.educational"])).toBeVisible();
+  await page.getByRole("button", { name: texts["settings.title"] }).click();
+  await expect(page.getByRole("dialog").getByText(texts["credits.modified"])).toBeVisible();
 
   // Wait until the heavy files have really been asked for, so a late outside request cannot slip past.
   await page.waitForLoadState("networkidle");

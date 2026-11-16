@@ -43,6 +43,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    setupFiles: ["./src/test-setup.ts"],
     // The e2e folder belongs to Playwright, not vitest.
     exclude: ["e2e/**", "node_modules/**", "dist/**", "dist-review/**", "dist-e2e/**"],
   },

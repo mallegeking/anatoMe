@@ -20,6 +20,8 @@ const viewer = vi.hoisted(() => ({
   isShown: (() => true) as (sid: string, side: "l" | "r" | "") => boolean,
   // How often a viewer was mounted, so a test can see that a layout change keeps the same one.
   mounts: 0,
+  // Makes the next render of the stand-in viewer throw, to reach the outer error boundary.
+  throws: false,
 }));
 
 // Lets one test make the lazy print summary fail. Otherwise it is the real one.
@@ -79,6 +81,7 @@ vi.mock("./viewer/Viewer", async () => {
     highlights: unknown;
     isShown: typeof viewer.isShown;
   }) => {
+    if (viewer.throws) throw new Error("viewer broke");
     viewer.selection = selection;
     viewer.focus = focus;
     viewer.areaProbe = areaProbe;
@@ -173,7 +176,8 @@ test("a data failure shows the data message and keeps the credits and the educat
   // The model is fine here, so the message must not blame it.
   expect((await screen.findByRole("alert")).textContent).toBe(en["error.dataLoad"]);
   expect(screen.queryByText(en["error.modelLoad"])).toBeNull();
-  expect(screen.getByText(en["credits.title"])).toBeTruthy();
+  // The phone keeps the credits in the settings dialog, so look at the wide layout, where they have a button.
+  expect(screen.getByRole("button", { name: en["settings.title"] })).toBeTruthy();
   expect(screen.getByText(en["about.educational"])).toBeTruthy();
 });
 
@@ -303,8 +307,12 @@ test("choosing a search result switches to the Structures tab", async () => {
   expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
 });
 
-// Picks a language in the switch below the credits.
-const pickLanguage = (lang: "en" | "de") => fireEvent.change(screen.getByRole("combobox", { name: en["lang.label"] }), { target: { value: lang } });
+// Picks a language: on the phone the picker is in the settings dialog, on the wide layout in the side foot.
+function pickLanguage(lang: "en" | "de") {
+  const settings = screen.queryByRole("button", { name: en["settings.title"] });
+  if (settings) fireEvent.click(settings);
+  fireEvent.change(screen.getByRole("combobox", { name: en["lang.label"] }), { target: { value: lang } });
+}
 
 test("the search notice shown in English reads in German after the language changes", async () => {
   const bundle = makeBundle();
@@ -874,4 +882,75 @@ test("going from phone to wide with Layers open keeps Layers, the selection and 
   act(() => setViewport("phone"));
   expect(shown(screen.getByTestId("info-panel"))).toBe(true);
   expect(screen.queryByTestId("layers-panel")).toBeNull();
+});
+
+test("wide: the educational line and the credits button sit in the rail, the language picker in the side foot", async () => {
+  setViewport("wide");
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  const rail = screen.getByRole("navigation");
+  expect(shown(within(rail).getByText(en["about.educational"]))).toBe(true);
+  expect(screen.getAllByText(en["about.educational"])).toHaveLength(1);
+  expect(screen.queryByRole("button", { name: en["settings.title"] })).toBeNull();
+  fireEvent.click(within(rail).getByRole("button", { name: en["credits.title"] }));
+  const dialog = screen.getByRole("dialog", { name: en["credits.title"] });
+  expect(within(dialog).getByText(en["credits.modified"])).toBeTruthy();
+  // Only the credits, the language picker is not in the dialog.
+  expect(within(dialog).queryByLabelText(en["lang.label"])).toBeNull();
+  fireEvent.click(within(dialog).getByRole("button", { name: en["dialog.close"] }));
+  expect(screen.queryByRole("dialog")).toBeNull();
+  const picker = screen.getByLabelText(en["lang.label"]);
+  expect(picker.closest(".side-foot")).not.toBeNull();
+  expect(screen.getByText(en["lang.label"]).tagName).toBe("SPAN");
+});
+
+test("phone: settings opens the language picker and the credits", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.getAllByText(en["about.educational"])).toHaveLength(1);
+  // The educational line is the top of the panel, outside the part that scrolls.
+  expect(screen.getByTestId("panel-scroll").contains(screen.getByText(en["about.educational"]))).toBe(false);
+  expect(screen.queryByRole("button", { name: en["credits.title"] })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: en["settings.title"] }));
+  const dialog = screen.getByRole("dialog", { name: en["settings.title"] });
+  expect(within(dialog).getByText(en["credits.modified"])).toBeTruthy();
+  fireEvent.change(within(dialog).getByLabelText(en["lang.label"]), { target: { value: "de" } });
+  expect(document.documentElement.lang).toBe("de");
+  expect(within(screen.getByRole("dialog")).getByRole("button", { name: de["dialog.close"] })).toBeTruthy();
+});
+
+test("a dialog that is open closes when the layout changes", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByRole("button", { name: en["settings.title"] }));
+  expect(screen.getByRole("dialog")).toBeTruthy();
+  act(() => setViewport("wide"));
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+test("the tab panel holds only the tab content, never the credits or the language picker", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  const panel = screen.getByRole("tabpanel");
+  expect(panel.querySelector(".credits, select")).toBeNull();
+});
+
+test("the last-resort error page still shows the educational line and the credits", async () => {
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  serve(makeBundle());
+  // The real viewer catches its own failures. A throw from outside it reaches the outer boundary.
+  viewer.throws = true;
+  try {
+    render(<App />);
+    expect(await screen.findByRole("alert")).toBeTruthy();
+  } finally {
+    viewer.throws = false;
+  }
+  expect(screen.getByText(en["about.educational"])).toBeTruthy();
+  expect(screen.getByText(en["credits.modified"])).toBeTruthy();
+  expect(screen.queryByRole("dialog")).toBeNull();
 });

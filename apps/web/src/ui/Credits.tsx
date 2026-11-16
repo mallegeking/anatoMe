@@ -1,5 +1,4 @@
 import { CORRECTION_URL, REPO_URL } from "../config";
-import { LANGS, type Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 
 // The credit lines below are copies of the "Credit text" column in ATTRIBUTION.md.
@@ -23,8 +22,8 @@ const CREDITS: { key: string; licence?: { key: string; href: string } }[] = [
 // The build writes this file with the licence texts of every library inside the app, see vite.config.ts.
 const LIBRARY_LICENCES = `${import.meta.env.BASE_URL}third-party-licenses.txt`;
 
-// The educational line. The app pins it at the top of the panel, outside the part that scrolls,
-// so a long info panel can never push it out of view. It sits below the model, so it never covers it.
+// The educational line. On the phone the app pins it at the top of the panel, outside the part that scrolls,
+// so a long info panel can never push it out of view. On the wide layout it sits at the bottom of the rail. It never covers the model.
 export function EducationalLine({ t }: { t: Translate }) {
   return <p className="educational">{t("about.educational")}</p>;
 }
@@ -41,43 +40,30 @@ function withLicence(t: Translate, key: string, licence: { key: string; href: st
   );
 }
 
-// The language switch sits below the credits, outside the closed part, so it is easy to find.
-// Each language keeps its own name, the same in every language file.
-export function Credits({ t, lang, onLang }: { t: Translate; lang: Lang; onLang: (lang: Lang) => void }) {
+// The credit list and the lines under it. The app puts it in a dialog, and on the last-resort error page directly.
+export function CreditsBody({ t }: { t: Translate }) {
   return (
-    <>
-      <details className="credits">
-        <summary>{t("credits.title")}</summary>
-        <ul>
-          {CREDITS.map(({ key, licence }) => (
-            <li key={key}>
-              {licence ? withLicence(t, key, licence) : t(key)}
-            </li>
-          ))}
-        </ul>
-        <p>{t("credits.modified")}</p>
-        <p>
-          {t("credits.libraries")}{" "}
-          <a href={LIBRARY_LICENCES} target="_blank" rel="noopener noreferrer">
-            {t("credits.librariesLink")}
-          </a>
-        </p>
-        <p>{t("about.version", { version: __APP_VERSION__ })}</p>
-        <p>
-          <a href={REPO_URL} target="_blank" rel="noopener noreferrer">{t("about.source")}</a>
-          {" · "}
-          <a href={CORRECTION_URL} target="_blank" rel="noopener noreferrer">{t("about.report")}</a>
-        </p>
-      </details>
-      <p className="lang-switch">
-        <select className="field lang-picker" aria-label={t("lang.label")} value={lang} onChange={(e) => onLang(e.target.value as Lang)}>
-          {LANGS.map((id) => (
-            <option key={id} value={id}>
-              {t(`lang.${id}`)}
-            </option>
-          ))}
-        </select>
+    <div className="credits">
+      <ul>
+        {CREDITS.map(({ key, licence }) => (
+          <li key={key}>
+            {licence ? withLicence(t, key, licence) : t(key)}
+          </li>
+        ))}
+      </ul>
+      <p>{t("credits.modified")}</p>
+      <p>
+        {t("credits.libraries")}{" "}
+        <a href={LIBRARY_LICENCES} target="_blank" rel="noopener noreferrer">
+          {t("credits.librariesLink")}
+        </a>
       </p>
-    </>
+      <p>{t("about.version", { version: __APP_VERSION__ })}</p>
+      <p>
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer">{t("about.source")}</a>
+        {" · "}
+        <a href={CORRECTION_URL} target="_blank" rel="noopener noreferrer">{t("about.report")}</a>
+      </p>
+    </div>
   );
 }

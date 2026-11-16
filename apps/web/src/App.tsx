@@ -18,7 +18,9 @@ import { ReviewList } from "./review/ReviewList";
 import { PerfOverlay } from "./perf/PerfOverlay";
 import { nameOf } from "./i18n/names";
 import { selectBySearch } from "./search/search";
-import { Credits, EducationalLine } from "./ui/Credits";
+import { AppDialog } from "./ui/AppDialog";
+import { CreditsBody, EducationalLine } from "./ui/Credits";
+import { LanguagePicker } from "./ui/LanguagePicker";
 import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
 import { LayersIcon } from "./ui/icons";
@@ -68,6 +70,8 @@ export function App() {
   const [label, setLabel] = useState<string | undefined>(undefined);
   const [layers, setLayers] = useState<LayerState>(initialLayers);
   const [layersOpen, setLayersOpen] = useState(false);
+  // The dialog that is open. Settings is the phone's (language and credits), credits the wide layout's.
+  const [dialog, setDialog] = useState<"settings" | "credits" | null>(null);
   const [bundle, setBundle] = useState<RegionBundle | null>(null);
   const [focus, setFocus] = useState<Selection | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -89,6 +93,8 @@ export function App() {
   useEffect(() => {
     if (wide) setLayersOpen(false);
   }, [wide]);
+  // The two layouts have different dialogs, so a change of layout closes the open one.
+  useEffect(() => setDialog(null), [wide]);
   const phoneLayers = !wide && layersOpen;
   // A region without joints has no movements, so it has no Movements tab and no Notebook tab.
   const modes = useMemo<Mode[]>(
@@ -124,7 +130,7 @@ export function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
-  // A new choice from the switch in the credits. It is kept for the next visit.
+  // A new choice from the language picker. It is kept for the next visit.
   function changeLang(next: Lang) {
     setLang(next);
     storeLanguage(next);
@@ -325,7 +331,7 @@ export function App() {
   // The viewer and the panel each catch their own failures, so the rest of the screen and the credits stay.
   // A failure to load the data gets its own message in the panel, because the model may be fine.
   // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
-  // The educational line sits at the top of the panel, outside the part that scrolls, so it always shows.
+  // The educational line sits at the top of the panel on the phone, outside the part that scrolls, and at the bottom of the rail on the wide layout, so it always shows.
   // The grid in index.css places top, nav, stage and side. On a phone the nav sits at the bottom.
   // Every layout renders the same elements, so a change of layout never mounts the viewer again.
   return (
@@ -335,7 +341,8 @@ export function App() {
         <footer className="panel">
           <EducationalLine t={t} />
           <div className="panel-scroll">
-            <Credits t={t} lang={lang} onLang={changeLang} />
+            <LanguagePicker t={t} lang={lang} onLang={changeLang} showLabel />
+            <CreditsBody t={t} />
           </div>
         </footer>
       }
@@ -353,10 +360,19 @@ export function App() {
             regions={regions}
             region={region ?? ""}
             onRegion={changeRegion}
+            onSettings={wide ? undefined : () => setDialog("settings")}
           />
         </div>
         <nav className="nav">
           <ModeBar t={t} mode={shownMode} modes={modes} onChange={changeMode} vertical={wide} />
+          {wide && (
+            <div className="nav-foot">
+              <EducationalLine t={t} />
+              <button type="button" className="btn" onClick={() => setDialog("credits")}>
+                {t("credits.title")}
+              </button>
+            </div>
+          )}
         </nav>
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
@@ -399,7 +415,7 @@ export function App() {
             </div>
           )}
           <div className="panel">
-            <EducationalLine t={t} />
+            {!wide && <EducationalLine t={t} />}
             <div
               className="panel-scroll"
               data-testid="panel-scroll"
@@ -448,13 +464,24 @@ export function App() {
                   </Suspense>
                 )}
               </ModelErrorBoundary>
-              <Credits t={t} lang={lang} onLang={changeLang} />
             </div>
           </div>
-          {/* Filled when the language and the credits move out of the panel. */}
-          <div className="side-foot" />
+          {wide && (
+            <div className="side-foot">
+              <LanguagePicker t={t} lang={lang} onLang={changeLang} showLabel />
+            </div>
+          )}
         </aside>
       </main>
+      <AppDialog
+        open={dialog !== null}
+        title={dialog === "settings" ? t("settings.title") : t("credits.title")}
+        closeLabel={t("dialog.close")}
+        onClose={() => setDialog(null)}
+      >
+        {dialog === "settings" && <LanguagePicker t={t} lang={lang} onLang={changeLang} showLabel={false} />}
+        <CreditsBody t={t} />
+      </AppDialog>
       {bundle && printJob && (
         <QuietBoundary>
           <Suspense fallback={null}>

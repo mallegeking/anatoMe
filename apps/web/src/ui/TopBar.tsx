@@ -5,6 +5,7 @@ import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { SearchResults } from "../search/SearchResults";
 import { searchStructures } from "../search/search";
+import { SettingsIcon } from "./icons";
 
 type Props = {
   t: Translate;
@@ -19,11 +20,13 @@ type Props = {
   regions: string[];
   region: string;
   onRegion: (id: string) => void;
+  // Given on the phone, where the settings dialog holds the language and the credits. A button shows with it.
+  onSettings?: () => void;
 };
 
 // The bar above the model: the app name, the search field and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
-export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
+export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regions, region, onRegion, onSettings }: Props) {
   const [query, setQuery] = useState("");
   // Another region has other structures, so the typed text goes. State set while rendering is the React way to reset on a change.
   const [queryRegion, setQueryRegion] = useState(region);
@@ -83,6 +86,11 @@ export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regi
               </option>
             ))}
           </select>
+        )}
+        {onSettings && (
+          <button type="button" className="btn top-icon-btn" aria-label={t("settings.title")} onClick={onSettings}>
+            <SettingsIcon size={20} />
+          </button>
         )}
       </div>
       {open && (

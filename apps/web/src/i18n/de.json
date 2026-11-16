@@ -23,6 +23,8 @@
   "lang.label": "Sprache",
   "lang.en": "English",
   "lang.de": "Deutsch",
+  "settings.title": "Einstellungen",
+  "dialog.close": "Schließen",
   "about.educational": "anatoMe ist dafür da, zu lernen, wie sich der Körper bewegt. Es ist kein Diagnosewerkzeug und kein medizinischer Rat.",
   "perf.interactive": "Bedienbar nach {ms} ms",
   "info.latin": "Latein: {latin}",

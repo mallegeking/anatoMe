@@ -141,11 +141,6 @@ body,
   color: var(--muted);
 }
 
-.credits summary {
-  cursor: pointer;
-  padding: 4px 0;
-}
-
 .credits ul {
   margin: 4px 0;
   padding-left: 18px;
@@ -155,9 +150,92 @@ body,
   margin: 8px 0 0;
 }
 
-/* The language switch below the credits. */
+/* The language picker: the label, when shown, sits above the field. */
 .lang-switch {
-  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+/* The foot of the right column on the wide layout. */
+.side-foot {
+  flex: 0 0 auto;
+  padding: var(--gap-3) 16px;
+  border-top: 1px solid var(--divider);
+}
+
+.side-foot .lang-switch {
+  margin: 0;
+}
+
+/* The bottom of the rail: the educational line and the credits button. */
+.nav-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  margin-top: auto;
+  padding-top: var(--gap-3);
+}
+
+.nav-foot .educational {
+  margin: 0;
+}
+
+/* The settings button in the top bar, phone only. */
+.top-icon-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  padding: 0;
+}
+
+/* The native dialog. The box is the whole dialog, so a click on the dim backdrop has the dialog as its target. */
+.app-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(80dvh, 720px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.app-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.app-dialog-body {
+  max-height: min(80dvh, 720px);
+  padding: 16px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.app-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.app-dialog-head h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.app-dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  padding: 0;
 }
 
 .model-error {
@@ -299,7 +377,7 @@ body,
   font: inherit;
 }
 
-/* Only there when the manifest has more than one body region. The language switch in the credits looks the same. */
+/* Only there when the manifest has more than one body region. The language picker looks the same. */
 .region-picker,
 .lang-picker {
   flex: 0 1 auto;
@@ -437,7 +515,7 @@ body,
 }
 
 /* Only there when the manifest has more than one body region. Big enough for a thumb.
-   The language switch in the credits looks the same. */
+   The language picker looks the same. */
 
 
 /* The list floats over the model only while it is open. */
