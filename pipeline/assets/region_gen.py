@@ -233,6 +233,18 @@ def read_fma(path):
     return {en.lower(): concept for concept, _rep, en in read_tsv(path)}
 
 
+def fma_for(name, fma):
+    """The FMA concept id of a name, looked up as it is, then without a trailing " muscle"."""
+    name = name.lower()
+    keys = [name]
+    if name.endswith(" muscle"):
+        keys.append(name[: -len(" muscle")])
+    for key in keys:
+        if key in fma:
+            return fma[key]
+    return None
+
+
 # --- Structure files ------------------------------------------------------------
 
 _PLAIN = re.compile(r"^[A-Za-z][A-Za-z0-9 ()'./-]*[A-Za-z0-9)'.]$|^[A-Za-z]$")
@@ -340,7 +352,8 @@ def cmd_structures():
         own = [t for t in targets if not t.get("context")]
         latin_of = {t["sid"]: latin_for(t["english"], latin) for t in own}
         latin_of = {k: v for k, v in latin_of.items() if v}
-        fma_of = {t["sid"]: fma_by_name[t["english"].lower()] for t in own if t["english"].lower() in fma_by_name}
+        fma_of = {t["sid"]: fma_for(t["english"], fma_by_name) for t in own}
+        fma_of = {k: v for k, v in fma_of.items() if v}
         out = STRUCTURES_DIR / f"{region}.yaml"
         out.write_text(write_structures(region, targets, depths, latin_of, fma_of, today), encoding="utf-8")
         print(f"{region:10s} {len(own):4d} structures, Latin for {len(latin_of)}, FMA for {len(fma_of)}: wrote {out.relative_to(ROOT)}")

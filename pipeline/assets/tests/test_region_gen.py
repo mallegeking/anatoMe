@@ -11,6 +11,7 @@ from region_gen import (  # noqa: E402
     CONTEXT,
     MUSCLE,
     build_targets,
+    fma_for,
     latin_for,
     read_latin,
     region_of,
@@ -187,3 +188,11 @@ def test_latin_skips_rows_with_typos(tmp_path):
     latin = read_latin(path)
     assert latin_for("first metacarpal bone", latin) is None
     assert latin_for("humerus", latin) == "Humerus"
+
+
+def test_fma_lookup():
+    fma = {"infraspinatus": "FMA32546", "teres major": "FMA32549", "teres major muscle": "FMA1"}
+    assert fma_for("Infraspinatus muscle", fma) == "FMA32546"   # found without the trailing " muscle"
+    assert fma_for("Teres major muscle", fma) == "FMA1"          # the name itself comes first
+    assert fma_for("Teres major", fma) == "FMA32549"
+    assert fma_for("Talus", fma) is None
