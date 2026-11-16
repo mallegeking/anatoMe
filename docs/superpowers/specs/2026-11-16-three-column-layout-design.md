@@ -2,7 +2,9 @@
 
 Date: 2026-11-16
 Status: waiting for the owner's approval
-Mockup: https://claude.ai/artifact/GYYGq9Ug1JwybUuRkVeaEe (private to the owner). The screens that count are "Desktop blend", "Phone: bottom tabs, structure selected" and "Phone: first open". The first desktop screen on the canvas was not chosen.
+Mockup: https://claude.ai/artifact/GYYGq9Ug1JwybUuRkVeaEe (private to the owner). The screens that count are "Desktop blend", "Phone: bottom tabs, structure selected", "Phone: first open" and the four boards whose names start with "Panel:". The first desktop screen on the canvas was not chosen.
+
+The mockup is the guide for arrangement and for how the panels look. Where the mockup and this document disagree, this document wins. The model in the mockup is a flat drawing and the rows of anatomy in the panel boards are sample content, not data.
 
 ## 1. Intent
 
@@ -25,7 +27,7 @@ The owner sketched a desktop layout with navigation on the left, the model in th
 - No change to the data, the meshes, the pipeline or the review gate.
 - No rewrite of how `App.tsx` holds its state. Handlers change only where this layout needs it.
 - No rework of search into a full combobox, no deep links, no light theme, no new languages. These came up in the review and stay for later.
-- No new look. The dark palette stays. The layout changes.
+- No new palette. The dark colours stay. The layout changes, and all four tab panels are restyled to one shared pattern (section 10). The owner chose this over restyling only the Structures panel, so the GUI is settled for a long time.
 - No new runtime dependency.
 
 ## 4. Anti-goals
@@ -186,6 +188,38 @@ Two findings from the review are in scope because the new layout touches the sam
 - The colours of the 3D model and of the movement highlights stay where they are, in TypeScript. Moving them is out of scope.
 - The file stays one global stylesheet. Splitting it is out of scope.
 
+## 10a. How the panels look
+
+All four tab panels, the Layers section and the empty states share one pattern. The pattern is built from a few shared pieces, each a small component or class used by every panel:
+
+| Piece | Look | Used for |
+|---|---|---|
+| Panel title | large, semibold `h2`, an optional muted line under it | the name of the structure or movement, "Pick a movement", "Under this spot", "Notebook" |
+| Chips | small rounded labels on the raised surface | type and side of a structure, "Movement" and the joint, the feeling and side of a note |
+| Section heading | small, muted, capitals, `h3` | Attachments, Movements, Hip, Knee, Exercises, Main movers, Your notes and so on |
+| Card | a bordered box with rounded corners. The current or selected card uses the raised surface and a stronger border | one action row, one layer under a spot, one note, one structure to look into, a waiting-for-review line |
+| Button | the one `.btn` style. One primary variant with the accent border | every action |
+| Text link | accent colour | Sources, "Read about this structure", back links, Delete |
+| Key and value grid | muted key on the left, value on the right | attachments (From, To) |
+
+Per panel:
+
+- **Structures.** Title with the Latin name under it, chips for type and side, the action buttons, then Attachments as a From and To grid, then Movements as cards. The waiting-for-review line is a card.
+- **Movements, nothing picked.** Title, then one section per joint with the movements as a two-column grid of buttons, then Exercises.
+- **Movements, one picked.** A back link "All movements" above the title. The angle slider sits in a card with the angle's name and its value on one line. "Log this movement" is the primary button. Each role group is a section heading with its colour swatch, and each structure in it is a card: name, what it does, the uncertainty notes, then the Sources and "Read about this structure" links.
+- **Under a spot.** Title "Under this spot" with "From the surface inwards" under it. The list is numbered cards from the surface inwards, the number in a round badge. Each card has the name, type and depth, then the movements that load it. The two explanatory notes move below the list and the "Clear the spot" button.
+- **Notebook.** The privacy line sits in a card with a lock icon, directly under the title, with the disclaimer under it. Each note is a card: movement name and date on one line, chips for the feeling and the side, the logged angles, the note text, Delete. "Structures to look into" keeps its disclaimer directly under its heading. Print and the two backup buttons form a last section.
+- **Layers and empty states** use the same headings, buttons and muted text.
+
+Rules for the restyle:
+
+- **Texts stay as they are** unless this list names them. New or changed English texts, each with a German one: the back link "All movements" (replaces the button "Pick another movement"), the title "Under this spot" with the line "From the surface inwards" (replaces the one-line title), the section heading "Keep and share", the slider label split into the angle's name and "{value} degrees", the first-open heading "Tap a structure to learn about it" with its hint line, and the shorter phone button labels "Right side", "Hide" and "Over and under". The notebook wording test keeps passing.
+- **The feeling is never shown by colour alone.** "It hurts" and "It feels fine" chips each carry their words and an icon.
+- **Uncertainty sits next to every claim.** The review found that Under a spot and the Notebook's "structures to look into" show a load claim without the confidence, angle condition and "only in some hips" notes that the Phase 1 spec requires next to it. Since these rows are rebuilt as cards anyway, each card now shows those notes, the same way the Structures and Movements panels do. The printed summary shows them too.
+- **Dates** in the notebook are shown in the reader's language, for example "14 Nov 2026" and "14.11.2026". Stored dates do not change.
+- **The pinched colour.** The purple used for "pinched" is too dark to read against the dark surfaces. Its swatch and model colour become a lighter purple. The other three role colours stay. The builder picks the exact value so that it is at least 3 to 1 against the stage and clearly different in lightness from the other three.
+- The panels keep their test ids and their roles. Tests that look for a changed text are updated with it.
+
 ## 11. Testing
 
 - Unit tests, written first, for: the view name and marker function, the vertical tab keys, Layers closing on a tab change and on a model tap, the retry paths, the three notebook messages, and the name chip as a status region.
@@ -217,3 +251,7 @@ Two findings from the review are in scope because the new layout touches the sam
 - Language and credits behind a settings button on the phone.
 - The amendment to the "nothing covers the model" rule.
 - The review findings that stay out of scope (section 3).
+- The text changes listed in section 10a, and their German versions.
+- Uncertainty notes added to Under a spot, the Notebook and the printed summary.
+- The lighter purple for "pinched".
+- Notebook dates shown in the reader's language.
