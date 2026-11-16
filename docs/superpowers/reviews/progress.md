@@ -12,6 +12,7 @@ Session of 2026-11-16:
 
 - Sixth run: built plan 4b, the whole body as BodyParts3D meshes and names (Tasks 1 to 5). The saved Phase 4a patch was not touched and still applies to `build_region_blender.py`.
 - Seventh run: the fixes of the Phase 4b review. Fixes 2 to 4 are done (spinalis in the neck, the FMA id of infraspinatus, two generator tests). Fix 1 (a wrong side from BodyParts3D) stopped at its own stop rule and is not committed. See "Review fixes" in `phase-4b-build-report.md`.
+- Eighth run: the second review fixes (Fixes A to C) with the owner's decisions. Fix A is Fix 1 with option (b): only records a region's target list matches get the side they lie on, which corrects exactly FJ1469 and FJ1469M, and `arm.glb` is rebuilt. See "Second review fixes" in `phase-4b-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -24,7 +25,8 @@ Session of 2026-11-16:
 | Phase 3 publish v1, Tasks 1 to 8 | done (Task 3 stopped for the owner, open audit items below) | `phase-3-build-report.md` |
 | Phase 4a regions and German, Tasks 1 to 5 | partly done (Tasks 1 to 3 done, Task 4 blocked, Task 5 not started) | `phase-4a-build-report.md` |
 | Phase 4b whole body meshes, Tasks 1 to 5 | done (with deviations, points for the owner below) | `phase-4b-build-report.md` |
-| Phase 4b review fixes, Fixes 1 to 4 | partly done (Fixes 2 to 4 done, Fix 1 stopped for the owner) | `phase-4b-build-report.md`, section "Review fixes" |
+| Phase 4b review fixes, Fixes 1 to 4 | done (Fixes 2 to 4 in the seventh run, Fix 1 as Fix A of the second review fixes) | `phase-4b-build-report.md`, section "Review fixes" |
+| Phase 4b second review fixes, Fixes A to C | done (two App tests could not be written, see the report) | `phase-4b-build-report.md`, section "Second review fixes" |
 
 ## Waiting for the owner
 
@@ -43,14 +45,16 @@ Session of 2026-11-16:
 - Phase 4a: proofread the German texts and names (section "For the owner to proofread" of the report), especially the disclaimer and the educational line. Decide on "Physio-Fachkraft" in the summary and on the style of the German names (items 2 to 4).
 - Phase 4a: install `unzip` on the Linux machine. The builder used a copy unpacked from the Ubuntu package outside the repo (item 5).
 
-- Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,629. Decide whether that is fine or the build gets a second decimate pass (item 1 of `phase-4b-build-report.md`, "For the owner").
-- Phase 4b: eleven paired muscles are one structure each, so a tap selects both sides (item 2). The layer rule is now used on all five regions, with some pairs that may read wrong when peeling (item 3). Latin names are not checked one by one, four with typos were left out (item 4).
+- Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,296. The owner accepted this for now on 2026-11-16 (item 1 of `phase-4b-build-report.md`, "For the owner").
+- Phase 4b: eleven paired muscles are one structure each, so a tap selects both sides (item 2). The layer rule is now used on all five regions, with some pairs that may read wrong when peeling (item 3). Latin names are not checked one by one, four with typos were left out (item 4). The owner decided on 2026-11-16 that the Latin names stay as they are.
 - Phase 4b: run `docs/regions/phone-measurements.md` on the phone for the five new regions, the trunk and the shoulder first (item 5). Proofread the German region names and gap lines (section "For the owner to proofread").
-- Phase 4b review, Fix 1: the side check in `bp3d_inventory.py` corrects 72 files, not only FJ1469 and FJ1469M, so it stopped. Only those two are in a region, and the target lists stay the same with all 72 corrected. Decide which records the check corrects and reports (item 7 of `phase-4b-build-report.md`, section "Review fixes"). Until then `arm.glb` labels flexor pollicis brevis left on the right hand. The prepared work is `~/build/research/phase4b-fix1-wip.patch` in the Linux home, the 72 lines beside it in `phase4b-fix1-side-corrections.txt`. After the decision: apply it, add the check-models test, run the inventory, rebuild `arm.glb` with `--depths-out`, generate the structures and copy `arm.yaml` into the e2e data.
-- Phase 4b review: spinalis (no name in its header) is filed under the neck by where it lies. Whether it is spinalis cervicis is not checked (item 8).
+- Phase 4b review: spinalis (no name in its own header, named "Spinalis" in the header of its mirror FJ1543M) is filed under the neck by where it lies. Whether it is spinalis cervicis is not checked (items 8 and 12).
+- Phase 4b second review: `setNotice(null)` and `setPrintJob(null)` in `changeRegion` repeat what other code already does, so no test can fail on either line alone and none was added. Keep or remove them (item 10). One App test run failed once without a name and did not come back in nine runs (item 11). The doubled hyoid and the third left digastric file are documented in `docs/regions/known-gaps.md`, not fixed, as the owner decided.
+- Phase 4b second review: `~/build/research/phase4b-fix1-wip.patch` is applied, and the list of 72 beside it, `phase4b-fix1-side-corrections.txt`, is no longer needed. Both can be deleted (item 9).
 
 ## Notes for the next session
 
-- All runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. After the first five runs the Windows checkout was fast-forwarded to the same commit. The sixth run (Phase 4b) did not touch the Windows checkout, so fast-forward it before using it.
+- All runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. After the first five runs the Windows checkout was fast-forwarded to the same commit. The sixth to eighth runs (Phase 4b and its two review fixes) did not touch the Windows checkout, so fast-forward it before using it.
+- `sources/bp3d-inventory.jsonl` is not tracked in git. The one in the Linux clone has the corrected side of flexor pollicis brevis. Run `pipeline/assets/bp3d_inventory.py` before rebuilding a region anywhere else.
 - `npm ci` and the Python `.venv` in the Windows checkout were run from WSL in the first run. Its `node_modules` and `.venv` hold Linux builds. Run `npm ci` again before using that checkout from Windows.
 - If the owner changes the 2b stopping rule or the probe aim, the change sits in `apps/web/src/area/under.ts` and the probe effect in `apps/web/src/viewer/RegionModel.tsx`, each with a unit test.

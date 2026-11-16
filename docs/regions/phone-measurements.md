@@ -2,7 +2,7 @@
 
 Fill this in yourself. Follow step 5 of `docs/deploy-homelab.md` for the exact steps. Do everything on home Wi-Fi with Tailscale switched on. Use the review build. The Phase 2 sheet is `docs/phase2/phone-measurements.md`. This one measures only what the new regions add.
 
-Pass mark: after you choose a region, the model can be turned within 5000 ms, turning does not stutter, and peeling a layer reads as sensible. The trunk is the heaviest region at 140,629 triangles, so look at it closely.
+Pass mark: after you choose a region, the model can be turned within 5000 ms, turning does not stutter, and peeling a layer reads as sensible. The trunk is the heaviest region at 140,296 triangles, so look at it closely.
 
 ## Test setup
 
