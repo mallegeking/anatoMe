@@ -128,7 +128,20 @@ def test_build_targets_sides_and_hip():
     assert [t["sid"] for t in targets["lower-leg"] if t.get("context")] == ["femur", "fibula", "patella", "tibia"]
     assert next(t for t in targets["trunk"] if t["sid"] == "external-intercostal")["midline"] is True
     assert any("longus colli" in d for d in dropped)
+    assert not any("longus-colli" in t["sid"] for t in targets["neck"])
     assert all("femur" != t["sid"] or t.get("context") for ts in targets.values() for t in ts)
+
+
+def test_build_targets_drops_a_mixed_group():
+    # one sided and one unsided record under the same name
+    records, classes_of = fixture([
+        ("left serratus posterior inferior", {MUSCLE}),
+        ("serratus posterior inferior", {MUSCLE}),
+    ])
+    targets, dropped = build_targets(records, classes_of, hip_targets)
+    assert [d for d in dropped if d.startswith("serratus posterior inferior")] == [
+        "serratus posterior inferior: sided and unsided meshes mixed (FJ9000, FJ9001)"]
+    assert not any(t["sid"] == "serratus-posterior-inferior" for ts in targets.values() for t in ts)
 
 
 def test_build_targets_patterns_are_exact():
