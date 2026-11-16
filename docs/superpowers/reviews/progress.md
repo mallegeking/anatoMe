@@ -8,6 +8,10 @@ Sessions of 2026-11-14:
 - Fourth run: built plan 3, publish v1 (Tasks 1 to 8). The repo stays private. Nothing was made public, Pages is off, no tag was pushed.
 - Fifth run: built plan 4a, regions and German (Tasks 1 to 3). Task 4 is blocked on the surface gate, Task 5 was not started.
 
+Session of 2026-11-16:
+
+- Sixth run: built plan 4b, the whole body as BodyParts3D meshes and names (Tasks 1 to 5). The saved Phase 4a patch was not touched and still applies to `build_region_blender.py`.
+
 | Plan | State | Report |
 | --- | --- | --- |
 | Phase 2a movement explorer, Tasks 1 to 8 | done | `phase-2a-build-report.md` |
@@ -18,6 +22,7 @@ Sessions of 2026-11-14:
 | Phase 2d hip data, Tasks 3 to 6 (sourced data) | done (12 rows, 2 exercises, gaps listed) | `phase-2d-data-build-report.md` |
 | Phase 3 publish v1, Tasks 1 to 8 | done (Task 3 stopped for the owner, open audit items below) | `phase-3-build-report.md` |
 | Phase 4a regions and German, Tasks 1 to 5 | partly done (Tasks 1 to 3 done, Task 4 blocked, Task 5 not started) | `phase-4a-build-report.md` |
+| Phase 4b whole body meshes, Tasks 1 to 5 | done (with deviations, points for the owner below) | `phase-4b-build-report.md` |
 
 ## Waiting for the owner
 
@@ -36,8 +41,12 @@ Sessions of 2026-11-14:
 - Phase 4a: proofread the German texts and names (section "For the owner to proofread" of the report), especially the disclaimer and the educational line. Decide on "Physio-Fachkraft" in the summary and on the style of the German names (items 2 to 4).
 - Phase 4a: install `unzip` on the Linux machine. The builder used a copy unpacked from the Ubuntu package outside the repo (item 5).
 
+- Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,629. Decide whether that is fine or the build gets a second decimate pass (item 1 of `phase-4b-build-report.md`, "For the owner").
+- Phase 4b: eleven paired muscles are one structure each, so a tap selects both sides (item 2). The layer rule is now used on all five regions, with some pairs that may read wrong when peeling (item 3). Latin names are not checked one by one, four with typos were left out (item 4).
+- Phase 4b: run `docs/regions/phone-measurements.md` on the phone for the five new regions, the trunk and the shoulder first (item 5). Proofread the German region names and gap lines (section "For the owner to proofread").
+
 ## Notes for the next session
 
-- All five runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. The Windows checkout was fast-forwarded to the same commit at the end.
+- All runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. After the first five runs the Windows checkout was fast-forwarded to the same commit. The sixth run (Phase 4b) did not touch the Windows checkout, so fast-forward it before using it.
 - `npm ci` and the Python `.venv` in the Windows checkout were run from WSL in the first run. Its `node_modules` and `.venv` hold Linux builds. Run `npm ci` again before using that checkout from Windows.
 - If the owner changes the 2b stopping rule or the probe aim, the change sits in `apps/web/src/area/under.ts` and the probe effect in `apps/web/src/viewer/RegionModel.tsx`, each with a unit test.
