@@ -1,14 +1,35 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { createRef, type ReactNode } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import { LOAD_TIMEOUT_MS } from "./useLoadWatchdog";
+import type { ViewerHandle } from "./handle";
 import { Viewer } from "./Viewer";
 
 // jsdom cannot draw 3D, so these tests swap the 3D parts for stand-ins.
 // The real viewer, scene and model code still runs. Only the loading and the drawing are faked.
 // "load" is a model download the test finishes by hand. No frame is ever drawn, like a phone tab in the background.
+// The camera controls stand-in. The tests read and move it by hand.
+const controls = vi.hoisted(() => {
+  const listeners = new Map<string, Array<() => void>>();
+  const stub = {
+    fitToBox: vi.fn((..._args: unknown[]) => Promise.resolve()),
+    dollyTo: vi.fn((..._args: unknown[]) => Promise.resolve()),
+    distance: 2,
+    position: [0, 0, 2] as [number, number, number],
+    target: [0, 0, 0] as [number, number, number],
+    getTarget: (out: { set: (x: number, y: number, z: number) => void }) => (out.set(...stub.target), out),
+    getPosition: (out: { set: (x: number, y: number, z: number) => void }) => (out.set(...stub.position), out),
+    addEventListener: (type: string, fn: () => void) => listeners.set(type, [...(listeners.get(type) ?? []), fn]),
+    removeEventListener: (type: string, fn: () => void) =>
+      listeners.set(type, (listeners.get(type) ?? []).filter((f) => f !== fn)),
+    emit: (type: string) => (listeners.get(type) ?? []).forEach((fn) => fn()),
+    listenerCount: (type: string) => (listeners.get(type) ?? []).length,
+  };
+  return stub;
+});
+
 const load = vi.hoisted(() => ({
   done: false,
   finish: () => {},
@@ -34,7 +55,7 @@ vi.mock("@react-three/fiber", async () => {
   camera.position.z = 5;
   camera.updateMatrixWorld();
   const state = {
-    controls: { fitToBox: () => Promise.resolve() },
+    controls,
     invalidate: () => {},
     clock: { getDelta: () => 0 },
     gl: { domElement: document.createElement("canvas") },
@@ -76,6 +97,11 @@ function withWebGL(available: boolean) {
 
 beforeEach(() => {
   newLoad();
+  controls.fitToBox.mockClear();
+  controls.dollyTo.mockClear();
+  controls.distance = 2;
+  controls.position = [0, 0, 2];
+  controls.target = [0, 0, 0];
   // React warns about the 3D tags it does not know, like <group>. Keep the output quiet.
   vi.spyOn(console, "error").mockImplementation(() => {});
   // Only the watchdog timer is faked. The rest of React keeps running normally.
@@ -389,4 +415,68 @@ test("area mode: a probe whose rays miss still reports through the probe, not nu
   await settle();
   expect(onAreaTap).toHaveBeenCalledTimes(1);
   expect(onAreaTap).toHaveBeenCalledWith({ entries: [], point: [0, 0, expect.closeTo(0.05)], through: probe });
+});
+
+// Shows the viewer with a handle and a direction callback, and waits until the model has loaded.
+async function showWithHandle(loadFirst = true) {
+  withWebGL(true);
+  const handle = createRef<ViewerHandle>();
+  const onView = vi.fn();
+  render(
+    <Viewer files={files} t={t} selection={null} focus={null} isShown={() => true} highlights={null} onSelect={() => {}} handle={handle} onView={onView} />,
+  );
+  await settle();
+  if (loadFirst) {
+    await act(async () => {
+      load.finish();
+      await load.promise;
+    });
+    await settle();
+  }
+  return { handle, onView };
+}
+
+test("resetView frames the whole model again with a glide", async () => {
+  const { handle } = await showWithHandle();
+  controls.fitToBox.mockClear();
+  act(() => handle.current!.resetView());
+  expect(controls.fitToBox).toHaveBeenCalledTimes(1);
+  expect(controls.fitToBox.mock.calls[0][1]).toBe(true);
+});
+
+test("zoomBy multiplies the distance", async () => {
+  const { handle } = await showWithHandle();
+  act(() => handle.current!.zoomBy(0.8));
+  expect(controls.dollyTo).toHaveBeenCalledWith(1.6, true);
+});
+
+test("onView reports the direction after the first framing and when the camera rests", async () => {
+  const { onView } = await showWithHandle();
+  expect(onView).toHaveBeenLastCalledWith([0, 0, 1]);
+  controls.position = [2, 0, 0];
+  act(() => controls.emit("rest"));
+  expect(onView).toHaveBeenLastCalledWith([1, 0, 0]);
+});
+
+test("onView does not report again while the camera moves", async () => {
+  const { onView } = await showWithHandle();
+  onView.mockClear();
+  controls.position = [2, 0, 0];
+  act(() => controls.emit("update"));
+  act(() => controls.emit("controlend"));
+  expect(onView).not.toHaveBeenCalled();
+});
+
+test("the camera listener is removed when the viewer goes away", async () => {
+  await showWithHandle();
+  expect(controls.listenerCount("rest")).toBe(1);
+  cleanup();
+  expect(controls.listenerCount("rest")).toBe(0);
+});
+
+test("the handle does nothing before the model has loaded", async () => {
+  const { handle, onView } = await showWithHandle(false);
+  expect(handle.current).toBeNull();
+  expect(controls.fitToBox).not.toHaveBeenCalled();
+  expect(onView).not.toHaveBeenCalled();
 });

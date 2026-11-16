@@ -1,6 +1,6 @@
 import { useFrame, useLoader, useThree, type ThreeEvent } from "@react-three/fiber";
 import type CameraControlsImpl from "camera-controls";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
 import { Box3, Color, DoubleSide, Mesh, MeshStandardMaterial, Vector3, type Camera, type Object3D } from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -11,6 +11,7 @@ import { structuresUnder } from "../area/under";
 import { paintOf } from "./appearance";
 import { castFingerRays, pointAlong } from "./castRays";
 import { pickVisibleHit, shouldSelect, type Selection, type Side } from "./pick";
+import type { ViewerHandle, ViewDirection } from "./handle";
 import type { AreaTap } from "./Scene";
 
 // The decoder files live in public/draco/, so the app never asks another host for them.
@@ -85,7 +86,14 @@ type Props = {
   areaMarker: [number, number, number] | null;
   // A structure to look through. A new object each time makes it run again.
   areaProbe: Selection | null;
+  // Filled with resetView and zoomBy once the model is in.
+  handle?: Ref<ViewerHandle>;
+  // Told where the camera looks, after the first framing and each time it comes to rest.
+  onView?: (direction: ViewDirection) => void;
 };
+
+// The first framing, also used by resetView.
+const FRAME_PADDING = { paddingLeft: 0.05, paddingRight: 0.05, paddingTop: 0.05, paddingBottom: 0.05 };
 
 // The vertex of these meshes nearest to a world point, in world space.
 function nearestVertex(meshes: Mesh[], target: Vector3): Vector3 {
@@ -106,7 +114,7 @@ function nearestVertex(meshes: Mesh[], target: Vector3): Vector3 {
   return best;
 }
 
-export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick, areaMode, onAreaTap, areaMarker, areaProbe }: Props) {
+export function RegionModel({ urls, selection, focus, isShown, highlights, onSelect, onLoaded, onModelClick, areaMode, onAreaTap, areaMarker, areaProbe, handle, onView }: Props) {
   // useLoader with a list of urls loads all of them in parallel and waits (suspends) until all are done.
   // A failed load is thrown, so the error boundary around the viewer catches it.
   const gltfs = useLoader(GLTFLoader, urls, addDraco);
@@ -150,16 +158,54 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
     invalidate();
   }, [scenes, materials, selection, highlights, isShown, invalidate]);
 
+  // The callback may change between renders. The listeners below read the latest one from here.
+  const onViewRef = useRef(onView);
+  onViewRef.current = onView;
+  // The box of the whole model, kept from the first framing for resetView.
+  const wholeBox = useRef<Box3 | null>(null);
+
+  // Reports the unit vector from the camera's target to the camera.
+  function reportView(c: CameraControlsImpl) {
+    const direction = c.getPosition(new Vector3(), true).sub(c.getTarget(new Vector3(), true));
+    if (direction.lengthSq() === 0) return;
+    direction.normalize();
+    onViewRef.current?.([direction.x, direction.y, direction.z]);
+  }
+
   // Frame the camera on everything we loaded.
   useEffect(() => {
     if (!controls) return;
     const box = new Box3();
     for (const scene of scenes) box.expandByObject(scene);
-    void controls.fitToBox(box, false, { paddingLeft: 0.05, paddingRight: 0.05, paddingTop: 0.05, paddingBottom: 0.05 });
+    wholeBox.current = box;
+    void controls.fitToBox(box, false, FRAME_PADDING);
+    reportView(controls);
     // A jump without a glide does not wake the controls, so ask for the frame here.
     invalidate();
     setReady(true);
   }, [controls, scenes, invalidate]);
+
+  // The controls send "rest" when a move has settled, so this never runs per frame and never wakes the loop.
+  useEffect(() => {
+    if (!controls) return;
+    const onRest = () => reportView(controls);
+    controls.addEventListener("rest", onRest);
+    return () => controls.removeEventListener("rest", onRest);
+  }, [controls]);
+
+  // Nothing happens until the model is in and the controls exist.
+  useImperativeHandle(
+    handle,
+    () => ({
+      resetView() {
+        if (controls && wholeBox.current) void controls.fitToBox(wholeBox.current, true, FRAME_PADDING);
+      },
+      zoomBy(factor: number) {
+        if (controls) void controls.dollyTo(controls.distance * factor, true);
+      },
+    }),
+    [controls],
+  );
 
   // Glide the camera to the structure a search chose. Hidden meshes still count for the box.
   useEffect(() => {

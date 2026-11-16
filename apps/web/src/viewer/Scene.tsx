@@ -2,11 +2,12 @@
 // because it pulls in three.js, which is most of the app's size.
 import { CameraControls } from "@react-three/drei";
 import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, type MouseEvent } from "react";
+import { Suspense, useEffect, useRef, type MouseEvent, type Ref } from "react";
 import type { UnderEntry } from "../area/under";
 import { shouldClear, type Selection, type Side } from "./pick";
 import type { Highlight } from "../movement/roles";
 import { redrawWhenBack } from "./redraw";
+import type { ViewDirection, ViewerHandle } from "./handle";
 import { RegionModel } from "./RegionModel";
 
 export type SceneProps = {
@@ -29,6 +30,10 @@ export type SceneProps = {
   areaMarker?: [number, number, number] | null;
   // A structure to look through. A new object each time makes it run again, like focus.
   areaProbe?: Selection | null;
+  // Receives resetView and zoomBy once the model has loaded.
+  handle?: Ref<ViewerHandle>;
+  // Called after the first framing and each time the camera comes to rest.
+  onView?: (direction: ViewDirection) => void;
 };
 
 // point is where the marker goes, null when a probed structure has no mesh.
@@ -77,6 +82,8 @@ export default function Scene({
   onAreaTap = () => {},
   areaMarker = null,
   areaProbe = null,
+  handle,
+  onView,
 }: SceneProps) {
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
@@ -127,6 +134,8 @@ export default function Scene({
             areaMarker={areaMarker}
             areaProbe={areaProbe}
             onLoaded={onLoaded}
+            handle={handle}
+            onView={onView}
             onModelClick={(event) => {
               modelClick.current = event;
             }}
