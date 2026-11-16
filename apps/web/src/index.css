@@ -638,10 +638,6 @@ body,
   flex: 1 0 100%;
 }
 
-.app-name {
-  margin-right: auto;
-}
-
 /* A short phone has no room for a second row. The field folds into a button and opens across the whole bar. */
 @media (max-width: 899px) and (max-height: 700px) {
   .top-bar-row {
@@ -669,17 +665,20 @@ body,
     order: 0;
     flex: 1 1 auto;
   }
+}
 
+/* The name pushes the buttons to the right. On the wide layout the field does that instead. */
+.app-name {
+  flex: 0 0 auto;
+  margin: 0 auto 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
   .app-name {
     margin-right: 0;
   }
-}
-
-.app-name {
-  flex: 0 0 auto;
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
 }
 
 /* Only there when the manifest has more than one body region. Big enough for a thumb.
