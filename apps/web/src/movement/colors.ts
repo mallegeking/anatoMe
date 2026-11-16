@@ -4,6 +4,6 @@ import type { Highlight } from "./roles";
 export const HIGHLIGHT_COLORS: Record<Highlight, string> = {
   primary: "#d1495b",
   secondary: "#edae49",
-  pinched: "#7b2cbf",
+  pinched: "#b47be8",
   stretched: "#00798c",
 };

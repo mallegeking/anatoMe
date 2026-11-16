@@ -9,7 +9,10 @@ import type { Translate } from "../i18n/t";
 import type { EntrySide, Feeling } from "../notebook/types";
 import { DraftMark } from "../review/DraftMark";
 import { ActionNotes, Sources } from "../ui/InfoPanel";
+import { BackIcon } from "../ui/icons";
+import { Card, Chip, Chips, PanelTitle, SectionHeading } from "../ui/pieces";
 import type { Selection } from "../viewer/pick";
+import { HIGHLIGHT_COLORS } from "./colors";
 import { contextAngles, HIGHLIGHT_ORDER, involved, type Query } from "./roles";
 import { clearPick, pickExercise, pickMovement, pickPhase, queryOf, setAngle, setProgress, type MovementPick, type MovementState } from "./state";
 
@@ -43,11 +46,10 @@ export function MovementPanel(props: Props) {
   if (!state.pick || !query) return <Picker t={t} lang={lang} bundle={bundle} onChange={onChange} />;
 
   const back = (
-    <div className="panel-actions">
-      <button className="btn" type="button" onClick={() => onChange(clearPick())}>
-        {t("movement.back")}
-      </button>
-    </div>
+    <button className="link-button back-link" type="button" onClick={() => onChange(clearPick())}>
+      <BackIcon />
+      {t("movement.back")}
+    </button>
   );
   const result = <Result {...props} query={query} />;
   // A new pick starts with the form closed.
@@ -64,16 +66,37 @@ export function MovementPanel(props: Props) {
   const pickedId = state.pick.id;
   const movement = bundle.movements.find((m) => m.id === pickedId)!;
   return (
-    <section className="movement-panel" data-testid="movement-panel">
-      <h2>{nameOf(movement, lang)}</h2>
+    <section className="movement-panel panel-body" data-testid="movement-panel">
       {back}
+      <div className="panel-head">
+        <PanelTitle>{nameOf(movement, lang)}</PanelTitle>
+        <Chips>
+          <Chip>{t("movement.kind")}</Chip>
+          <Chip>{t(`movement.joint.${jointOf(movement)}`)}</Chip>
+        </Chips>
+      </div>
       {contextAngles(bundle, query).map(({ angle, min, max }) => {
         const value = state.pose[angle] ?? 0;
+        const shown = t("movement.degrees", { value: String(value) });
         return (
-          <label key={angle} className="movement-slider">
-            <span>{t("movement.slider", { angle: t(`angle.${angle}`), value: String(value) })}</span>
-            <input type="range" min={min} max={max} step={5} value={value} onChange={(e) => onChange(setAngle(state, angle, Number(e.target.value)))} />
-          </label>
+          <Card key={angle}>
+            <label className="movement-slider">
+              <span className="movement-slider-line">
+                <span>{t(`angle.${angle}`)}</span>
+                <span>{shown}</span>
+              </span>
+              <input
+                type="range"
+                min={min}
+                max={max}
+                step={5}
+                value={value}
+                aria-label={t(`angle.${angle}`)}
+                aria-valuetext={shown}
+                onChange={(e) => onChange(setAngle(state, angle, Number(e.target.value)))}
+              />
+            </label>
+          </Card>
         );
       })}
       {log}
@@ -99,7 +122,7 @@ function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => P
   if (!open) {
     return (
       <div className="panel-actions">
-        <button className="btn" ref={logButton} type="button" onClick={() => setOpen(true)}>
+        <button className="btn btn--primary" ref={logButton} type="button" onClick={() => setOpen(true)}>
           {t("notebook.log")}
         </button>
       </div>
@@ -130,12 +153,14 @@ function Picker({ t, lang, bundle, onChange }: Pick<Props, "t" | "lang" | "bundl
   // In the review build the waiting exercises are listed as drafts, so the waiting line would only repeat them.
   const exercisesPending = bundle.exercises.length === 0 && bundle.pendingExercises > 0 && bundle.mode !== "review";
   return (
-    <section className="movement-panel" data-testid="movement-panel">
-      <h2>{t("movement.pick")}</h2>
+    <section className="movement-panel panel-body" data-testid="movement-panel">
+      <div className="panel-head">
+        <PanelTitle sub={t("movement.pickHint")}>{t("movement.pick")}</PanelTitle>
+      </div>
       {joints.map((joint) => (
-        <div key={joint}>
-          <h3>{t(`movement.joint.${joint}`)}</h3>
-          <div className="movement-choices">
+        <div key={joint} className="panel-section">
+          <SectionHeading>{t(`movement.joint.${joint}`)}</SectionHeading>
+          <div className="movement-choices movement-choices--grid">
             {bundle.movements
               .filter((m) => jointOf(m) === joint)
               .map((m) => (
@@ -147,10 +172,10 @@ function Picker({ t, lang, bundle, onChange }: Pick<Props, "t" | "lang" | "bundl
         </div>
       ))}
       {(bundle.exercises.length > 0 || exercisesPending) && (
-        <div>
-          <h3>{t("movement.exercises")}</h3>
+        <div className="panel-section">
+          <SectionHeading>{t("movement.exercises")}</SectionHeading>
           {exercisesPending && <p className="muted">{t("movement.exercisesPending")}</p>}
-          <div className="movement-choices">
+          <div className="movement-choices movement-choices--grid">
             {bundle.exercises.map((e) => (
               <button className="btn" key={e.id} type="button" onClick={() => onChange(pickExercise(bundle, e.id))}>
                 {nameOf(e, lang)}
@@ -172,12 +197,17 @@ function ExerciseView({ t, lang, bundle, state, onChange, pick, back, log, child
   const percent = Math.round(state.progress * 100);
   const review = bundle.mode === "review";
   return (
-    <section className="movement-panel" data-testid="movement-panel">
-      <h2>{nameOf(exercise, lang)}</h2>
+    <section className="movement-panel panel-body" data-testid="movement-panel">
+      {back}
+      <div className="panel-head">
+        <PanelTitle>{nameOf(exercise, lang)}</PanelTitle>
+        <Chips>
+          <Chip>{t("movement.kindExercise")}</Chip>
+        </Chips>
+      </div>
       {review && exercise.draft && <DraftMark id={exercise.id} note={exercise.review_note} t={t} />}
       {review && !exercise.draft && exercise.review_note && <div className="review-note">{t("review.note", { note: exercise.review_note })}</div>}
       <Sources uses={exercise.citations} bundle={bundle} t={t} />
-      {back}
       <div className="movement-choices" role="group" aria-labelledby={phaseLabel}>
         <span id={phaseLabel} className="muted">
           {t("movement.phase")}
@@ -188,10 +218,12 @@ function ExerciseView({ t, lang, bundle, state, onChange, pick, back, log, child
           </button>
         ))}
       </div>
-      <label className="movement-slider">
-        <span>{t("movement.progress", { percent: String(percent) })}</span>
-        <input type="range" min={0} max={100} step={5} value={percent} onChange={(e) => onChange(setProgress(state, bundle, Number(e.target.value) / 100))} />
-      </label>
+      <Card>
+        <label className="movement-slider">
+          <span>{t("movement.progress", { percent: String(percent) })}</span>
+          <input type="range" min={0} max={100} step={5} value={percent} onChange={(e) => onChange(setProgress(state, bundle, Number(e.target.value) / 100))} />
+        </label>
+      </Card>
       <p className="muted">{t("movement.effortNote")}</p>
       {log}
       {children}
@@ -209,7 +241,7 @@ function Result({ t, lang, bundle, state, query, selection, onFocusStructure, on
   const review = bundle.mode === "review";
 
   const row = (action: BundleAction) => (
-    <li key={action.id}>
+    <Card key={action.id} as="li" current={selection?.sid === action.structure}>
       <button
         type="button"
         className="link-button movement-structure"
@@ -226,7 +258,7 @@ function Result({ t, lang, bundle, state, query, selection, onFocusStructure, on
       <button type="button" className="link-button" onClick={() => onOpenStructure(action.structure)}>
         {t("movement.openStructure")}
       </button>
-    </li>
+    </Card>
   );
 
   return (
@@ -236,19 +268,16 @@ function Result({ t, lang, bundle, state, query, selection, onFocusStructure, on
         const group = rows.filter((r) => r.highlight === highlight);
         if (group.length === 0) return null;
         return (
-          <div key={highlight} className="movement-group">
-            <h3>
-              <span className={`swatch swatch--${highlight}`} aria-hidden="true" />
-              {t(`movement.group.${highlight}`)}
-            </h3>
-            <ul>{group.map((r) => row(r.action))}</ul>
+          <div key={highlight} className="panel-section">
+            <SectionHeading swatch={HIGHLIGHT_COLORS[highlight]}>{t(`movement.group.${highlight}`)}</SectionHeading>
+            <ul className="action-rows">{group.map((r) => row(r.action))}</ul>
           </div>
         );
       })}
       {silent.length > 0 && (
-        <div className="movement-silent">
-          <h3>{t("movement.silent")}</h3>
-          <ul>
+        <div className="panel-section movement-silent">
+          <SectionHeading>{t("movement.silent")}</SectionHeading>
+          <ul className="movement-silent-list">
             {silent.map((sid) => (
               <li key={sid}>{structureName(sid)}</li>
             ))}

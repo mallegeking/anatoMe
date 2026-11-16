@@ -51,7 +51,7 @@ export function LogForm({ t, onSave, onCancel }: Props) {
         <textarea spellCheck={false} value={note} maxLength={NOTE_MAX} rows={2} onChange={(e) => setNote(e.target.value)} />
       </label>
       <div className="panel-actions">
-        <button className="btn" type="button" disabled={!feeling || !side} onClick={() => feeling && side && onSave({ feeling, side, note })}>
+        <button className="btn btn--primary" type="button" disabled={!feeling || !side} onClick={() => feeling && side && onSave({ feeling, side, note })}>
           {t("notebook.save")}
         </button>
         <button className="btn" type="button" onClick={onCancel}>

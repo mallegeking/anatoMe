@@ -979,34 +979,6 @@ body,
   }
 }
 
-.movement-panel {
-  font-size: 0.9375rem;
-  overflow-wrap: anywhere;
-}
-
-.movement-panel h2,
-.movement-panel h3 {
-  margin: 8px 0 4px;
-}
-
-.movement-panel h2 {
-  margin-top: 0;
-  font-size: 1.125rem;
-}
-
-.movement-panel h3 {
-  font-size: 0.9375rem;
-}
-
-.movement-panel p,
-.movement-panel ul {
-  margin: 4px 0;
-}
-
-.movement-panel ul {
-  padding-left: 18px;
-}
-
 .movement-choices {
   display: flex;
   flex-wrap: wrap;
@@ -1023,7 +995,30 @@ body,
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin: 8px 0;
+}
+
+.movement-slider-line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-3);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  min-height: var(--tap);
+}
+
+.movement-choices--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.movement-silent-list {
+  margin: 0;
+  padding-left: 18px;
 }
 
 .movement-slider input {
@@ -1037,39 +1032,6 @@ body,
   font-weight: 600;
 }
 
-.movement-structure[aria-current="true"] {
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: var(--accent-surface);
-  color: var(--text);
-  text-decoration: none;
-}
-
-/* The colour next to each group heading. The same colours paint the model. */
-.swatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 6px;
-  border-radius: 3px;
-  vertical-align: -1px;
-}
-
-.swatch--primary {
-  background: #d1495b;
-}
-
-.swatch--secondary {
-  background: #edae49;
-}
-
-.swatch--pinched {
-  background: #7b2cbf;
-}
-
-.swatch--stretched {
-  background: #00798c;
-}
 
 .area-panel {
   font-size: 0.9375rem;

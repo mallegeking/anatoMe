@@ -7,6 +7,7 @@ import { createT } from "../i18n/t";
 import type { Selection } from "../viewer/pick";
 import { makeMovementBundle } from "./fixture";
 import { MovementPanel } from "./MovementPanel";
+import { HIGHLIGHT_COLORS } from "./colors";
 import { initialMovementState } from "./state";
 
 const t = createT(en);
@@ -60,7 +61,8 @@ test("picking external rotation shows main movers and helpers in order", () => {
   const headings = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
   expect(headings).toEqual(["Main movers", "Helpers"]);
   expect(structureButtons().map((b) => b.textContent)).toEqual(["Obturator externus", "Piriformis", "Gluteus maximus"]);
-  expect(screen.getByLabelText("With the hip bent at 0 degrees")).toBeTruthy();
+  expect(screen.getByRole("slider", { name: en["angle.hip.flexion"] })).toBeTruthy();
+  expect(screen.getByText("0 degrees")).toBeTruthy();
   expect(screen.getByText(en["movement.hiddenNote"])).toBeTruthy();
   expect(screen.queryByText(en["movement.none"])).toBeNull();
 });
@@ -73,7 +75,7 @@ test("moving the slider to 65 puts both deep rotators under the silent heading",
   expect(slider.getAttribute("min")).toBe("0");
   expect(slider.getAttribute("max")).toBe("90");
   fireEvent.change(slider, { target: { value: "65" } });
-  expect(screen.getByLabelText("With the hip bent at 65 degrees")).toBeTruthy();
+  expect(screen.getByText("65 degrees")).toBeTruthy();
   const silent = screen.getByRole("heading", { name: en["movement.silent"] }).parentElement!;
   expect(within(silent).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Obturator externus", "Piriformis"]);
   expect(structureButtons().map((b) => b.textContent)).toEqual(["Gluteus maximus"]);
@@ -247,4 +249,89 @@ test("pressing save again while a save is under way saves only once", async () =
   expect(onLog).toHaveBeenCalledTimes(1);
   await act(async () => finish(true));
   expect(screen.getByRole("button", { name: en["notebook.log"] })).toBeTruthy();
+});
+
+test("the picker shows each joint's movements as buttons under a section heading", () => {
+  show();
+  const hip = screen.getByRole("heading", { name: en["movement.joint.hip"], level: 3 });
+  expect(hip.classList.contains("section-heading")).toBe(true);
+  expect(within(hip.parentElement!).getByRole("button", { name: "Hip external rotation" })).toBeTruthy();
+  expect(screen.getByText(en["movement.pickHint"])).toBeTruthy();
+});
+
+test("a picked movement has a back link above its title", () => {
+  show();
+  pick("Hip external rotation");
+  const back = screen.getByRole("button", { name: en["movement.back"] });
+  const title = screen.getByRole("heading", { name: "Hip external rotation", level: 2 });
+  expect(back.classList.contains("link-button")).toBe(true);
+  expect(back.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  fireEvent.click(back);
+  expect(screen.getByRole("heading", { name: en["movement.pick"] })).toBeTruthy();
+});
+
+test("chips name the kind and the joint", () => {
+  show();
+  pick("Hip external rotation");
+  const chips = document.querySelector(".chips")!;
+  expect([...chips.querySelectorAll(".chip")].map((c) => c.textContent)).toEqual([en["movement.kind"], en["movement.joint.hip"]]);
+  pick(en["movement.back"]);
+  pick("Bodyweight squat");
+  expect(document.querySelector(".chips")!.textContent).toBe(en["movement.kindExercise"]);
+});
+
+test("the slider is labelled by the angle's name and shows its value next to it", () => {
+  show();
+  pick("Hip external rotation");
+  const slider = screen.getByRole("slider", { name: en["angle.hip.flexion"] });
+  expect(slider.getAttribute("aria-valuetext")).toBe("0 degrees");
+  expect(slider.closest(".card")).toBeTruthy();
+  fireEvent.change(slider, { target: { value: "30" } });
+  expect(screen.getByText("30 degrees")).toBeTruthy();
+});
+
+test("Log this movement is the primary button", () => {
+  show();
+  pick("Hip external rotation");
+  expect(screen.getByRole("button", { name: en["notebook.log"] }).classList.contains("btn--primary")).toBe(true);
+});
+
+test("each involved structure is a card, and the selected one is the current card", () => {
+  show(makeMovementBundle(), { selection: { sid: "piriformis", side: "l" } });
+  pick("Hip external rotation");
+  const card = (name: string) => screen.getByRole("button", { name }).closest(".card")!;
+  expect(card("Piriformis").classList.contains("card--current")).toBe(true);
+  expect(card("Gluteus maximus").classList.contains("card--current")).toBe(false);
+});
+
+test("every card shows its uncertainty notes", () => {
+  const bundle = makeMovementBundle();
+  bundle.actions = bundle.actions.map((a) => (a.id === "m1" ? { ...a, applies_to: "some hips" } : a));
+  show(bundle);
+  pick("Hip external rotation");
+  const piriformis = screen.getByRole("button", { name: "Piriformis" }).closest(".card") as HTMLElement;
+  expect(within(piriformis).getByText(t("info.appliesTo", { text: "some hips" }))).toBeTruthy();
+  for (const name of ["Piriformis", "Gluteus maximus"]) {
+    const c = screen.getByRole("button", { name }).closest(".card") as HTMLElement;
+    expect(within(c).getByText(en["confidence.high"])).toBeTruthy();
+  }
+});
+
+test("the group heading's swatch has the colour the model uses", () => {
+  show();
+  pick("Hip external rotation");
+  const heading = screen.getByRole("heading", { name: en["movement.group.primary"] });
+  const swatch = heading.querySelector(".swatch") as HTMLElement;
+  const probe = document.createElement("div");
+  probe.style.background = HIGHLIGHT_COLORS.primary;
+  expect(swatch.style.background).toBe(probe.style.background);
+});
+
+test("pinched is the lighter purple", () => expect(HIGHLIGHT_COLORS.pinched).toBe("#b47be8"));
+
+test("the exercise view uses buttons and a card for the progress slider", () => {
+  show();
+  pick("Bodyweight squat");
+  expect(screen.getByRole("button", { name: "Lowering" }).classList.contains("btn")).toBe(true);
+  expect(screen.getByLabelText("Through the phase: 0 percent").closest(".card")).toBeTruthy();
 });
