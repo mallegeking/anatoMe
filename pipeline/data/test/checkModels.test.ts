@@ -11,8 +11,8 @@ type Extras = Record<string, unknown>;
 const BASE: Extras = { sid: "femur", label: "Femur", side: "l", kind: "bone", source: "bp3d" };
 
 // Writes a glb with one single-triangle mesh node per entry. An entry overrides the base
-// extras, and a key set to undefined is left out.
-async function writeGlb(file: string, meshes: Extras[]) {
+// extras, and a key set to undefined is left out. The triangle spans x from x to x + 1.
+async function writeGlb(file: string, meshes: Extras[], x = 0) {
   const doc = new Document();
   const buffer = doc.createBuffer();
   const scene = doc.createScene();
@@ -20,7 +20,7 @@ async function writeGlb(file: string, meshes: Extras[]) {
     const position = doc
       .createAccessor()
       .setType("VEC3")
-      .setArray(new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]))
+      .setArray(new Float32Array([x, 0, 0, x + 1, 0, 0, x, 1, 0]))
       .setBuffer(buffer);
     const mesh = doc.createMesh().addPrimitive(doc.createPrimitive().setAttribute("POSITION", position));
     const extras = Object.fromEntries(
@@ -180,4 +180,22 @@ test("a mesh in an also_in region passes", async () => {
   await writeGlb(join(d, "test.glb"), [{ sid: "femur" }]);
   const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip", "lower-leg"] }]]);
   expect((await checkModelMapping(d, structures)).ok).toBe(true);
+});
+
+// In BodyParts3D, and so in the model, left is x > 0.
+test("a mesh with side l whose centre lies at x < 0 fails", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "l" }], -2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.ok).toBe(false);
+  expect(result.errors).toEqual([
+    { file: "test.glb", path: "(unnamed node)", message: "femur has side l but lies on the right" },
+  ]);
+});
+test("a mesh with side l whose centre lies at x > 0 passes", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "l" }], 2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
 });

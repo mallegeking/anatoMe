@@ -6,18 +6,20 @@ Run from the repo root: .venv/bin/python pipeline/assets/bp3d_inventory.py [--re
 import argparse
 import csv
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from hipmatch import format_table, match_targets, side_of, summarize  # noqa: E402
+from hipmatch import format_table, match_targets, side_of, strip_side_suffix, summarize  # noqa: E402
 
 ROOT = HERE.parents[1]
 BP3D = ROOT / "sources" / "bp3d"
 OBJ_DIR = BP3D / "isa_BP3D_4.0_obj_99"
 OUT = ROOT / "sources" / "bp3d-inventory.jsonl"
+REGIONS = HERE / "regions"
 
 
 def read_tsv(path):
@@ -33,6 +35,50 @@ def count_faces(path):
             if line.startswith(b"f "):
                 n += 1
     return n
+
+
+# The header line with the mesh's box in millimetres: "# Bounds(mm): (x1,y1,z1)-(x2,y2,z2)".
+_BOUNDS = re.compile(r"^# Bounds\(mm\): \(([-\d.]+),[-\d.]+,[-\d.]+\)-\(([-\d.]+),[-\d.]+,[-\d.]+\)")
+
+
+def bounds_centre_x(path):
+    """The centre of the x range in the OBJ header's Bounds(mm) line, or None when it has none."""
+    with open(path, encoding="utf-8", errors="replace") as f:
+        for line in f:
+            if not line.startswith("#"):
+                return None
+            m = _BOUNDS.match(line)
+            if m:
+                return (float(m.group(1)) + float(m.group(2))) / 2
+    return None
+
+
+def target_patterns(regions_dir):
+    """Every pattern of every target in the target lists of regions_dir, compiled as match_targets does."""
+    patterns = []
+    for path in sorted(Path(regions_dir).glob("*.json")):
+        for t in json.loads(path.read_text(encoding="utf-8"))["targets"]:
+            patterns.extend(re.compile(p, re.IGNORECASE) for p in t["patterns"])
+    return patterns
+
+
+def side_by_position(record, centre_x, patterns):
+    """The record with the side its position gives, when the side in its name disagrees.
+
+    Only a record that one of the patterns matches is checked, so a region's mesh gets the side
+    it lies on. In BodyParts3D left is x > 0. The English name stays as the source has it.
+    A corrected record is printed.
+    """
+    if record["side"] == "" or centre_x is None or centre_x == 0:
+        return record
+    if not any(p.search(strip_side_suffix(record["english"])) for p in patterns):
+        return record
+    side = "l" if centre_x > 0 else "r"
+    if side == record["side"]:
+        return record
+    print(f"side corrected: {record['mesh_name']} {record['english']!r} is named {record['side']} "
+          f"but lies at x = {centre_x:.0f} mm, side set to {side}")
+    return {**record, "side": side}
 
 
 def pick_concept(concepts, elements_of, name_of):
@@ -56,12 +102,13 @@ def build_records():
     name_of = {}  # concept -> English name from the parts list
     for concept, _rep, en in read_tsv(BP3D / "isa_parts_list_e.txt"):
         name_of[concept] = en
+    patterns = target_patterns(REGIONS)
     records = []
     for obj in sorted(OBJ_DIR.glob("*.obj")):
         element = obj.stem
         concept = pick_concept(concepts_of[element], elements_of, name_of)
         english = name_of[concept]
-        records.append({
+        record = {
             "source": "bp3d",
             "mesh_name": element,
             "english": english,
@@ -69,7 +116,8 @@ def build_records():
             "faces": count_faces(obj),
             "bytes": obj.stat().st_size,
             "fma": concept,
-        })
+        }
+        records.append(side_by_position(record, bounds_centre_x(obj), patterns))
     return records
 
 

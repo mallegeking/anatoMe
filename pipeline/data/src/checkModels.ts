@@ -118,6 +118,17 @@ export async function checkModelMapping(
           errors.push({ file: f.path, path: name, message: `${sid} is not marked midline but mesh ${name} has no side` });
         }
       }
+      // In BodyParts3D, and so in the model, left is x > 0. A sided mesh must lie on its side.
+      if (typeof extras.side === "string" && (extras.side === "l" || extras.side === "r")) {
+        const { min, max } = getBounds(node);
+        const centre = (min[0] + max[0]) / 2;
+        if (extras.side === "l" && !(centre > 0)) {
+          errors.push({ file: f.path, path: name, message: `${String(sid)} has side l but lies on the right` });
+        }
+        if (extras.side === "r" && !(centre < 0)) {
+          errors.push({ file: f.path, path: name, message: `${String(sid)} has side r but lies on the left` });
+        }
+      }
       // A mesh from another source would carry the wrong license, so the sources must agree.
       if (extras.source !== undefined && extras.source !== f.source) {
         errors.push({ file: f.path, path: name, message: `source ${String(extras.source)} but the manifest says ${f.source}` });
