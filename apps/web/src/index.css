@@ -35,17 +35,61 @@ body,
   color: var(--text);
 }
 
-/* The model fills the space above the panel, so the panel never covers it. */
+/* The page is one grid. On a phone: the top bar, the model, the panel sheet and the tabs at the bottom.
+   From 900 px wide: the top bar across, then the tabs on the left, the model in the middle and the panel on the right.
+   The model never shares its space with the panel, so the panel never covers it. */
 .app {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   height: 100dvh;
+  grid-template: "top" auto "stage" minmax(220px, 1fr) "side" auto "nav" auto / minmax(0, 1fr);
+}
+
+/* The review banner and the top bar share the top row. */
+.top {
+  grid-area: top;
+  min-width: 0;
+}
+
+.nav {
+  grid-area: nav;
+  min-width: 0;
 }
 
 .stage {
+  grid-area: stage;
   position: relative;
-  flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
+}
+
+/* The right column on a wide screen, the sheet above the tabs on a phone. Layers, the panel and the foot stack inside it. */
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  max-height: 45dvh;
+  min-height: 0;
+  min-width: 0;
+  background: var(--panel);
+  border-top: 1px solid var(--divider);
+}
+
+@media (min-width: 900px) {
+  .app {
+    grid-template: "top top top" auto "nav stage side" minmax(0, 1fr) / 176px minmax(0, 1fr) 320px;
+  }
+
+  .side {
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid var(--divider);
+  }
+}
+
+@media (min-width: 1100px) {
+  .app {
+    grid-template-columns: 208px minmax(0, 1fr) 380px;
+  }
 }
 
 /* Lets our own tap and drag handling work instead of the browser scrolling or zooming the page. */
@@ -63,6 +107,15 @@ body,
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   background: var(--panel);
   border-top: 1px solid var(--divider);
+}
+
+/* Inside the side column the panel takes the room the column has. The tabs below it keep the safe area. */
+.side .panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  padding-bottom: 12px;
+  border-top: 0;
 }
 
 .panel-scroll {
@@ -330,7 +383,6 @@ body,
 .top-bar {
   position: relative;
   z-index: 2;
-  flex: 0 0 auto;
   padding: 8px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--divider);
@@ -338,7 +390,15 @@ body,
 
 .top-bar-row {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.app-name {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 
 .top-bar .layers-toggle {
@@ -410,7 +470,6 @@ body,
 
 /* Review build only. The banner takes its own row above the model, so it never covers it. */
 .review-banner {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -465,35 +524,76 @@ body,
   font-size: 0.8125rem;
 }
 
-/* The tabs under the top bar: one row of buttons that never wraps, even at 360 px. Each is as wide as its word plus a share of the rest. */
+/* The tabs. On a phone: a row of four equal tabs at the bottom, the icon above the name. */
 .mode-bar {
-  flex: 0 0 auto;
   display: flex;
   flex-wrap: nowrap;
+  padding-bottom: env(safe-area-inset-bottom);
   background: var(--panel);
-  border-bottom: 1px solid var(--divider);
+  border-top: 1px solid var(--divider);
 }
 
-/* Each tab is as wide as its word plus an equal share of the rest, so four tabs fit at 360 px. */
 .mode-bar button {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   min-width: 0;
   min-height: var(--tap);
-  padding: 0 6px;
+  padding: 4px 2px;
   border: 0;
-  border-bottom: 3px solid transparent;
   background: none;
   color: var(--muted);
   font: inherit;
+  font-size: 12px;
+}
+
+/* A long name is cut with an ellipsis, so the four tabs still fit at 360 px. */
+.mode-bar span {
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .mode-bar button[aria-selected="true"] {
-  border-bottom-color: var(--accent);
-  color: var(--text);
+  color: var(--accent);
   font-weight: 600;
+}
+
+/* From 900 px wide: a column in the rail on the left, each tab a row with the icon left of the name. */
+@media (min-width: 900px) {
+  .nav {
+    padding: var(--gap-3) var(--gap-2);
+    background: var(--panel);
+    border-right: 1px solid var(--divider);
+    overflow-y: auto;
+  }
+
+  .mode-bar {
+    flex-direction: column;
+    gap: var(--gap-1);
+    padding-bottom: 0;
+    border-top: 0;
+  }
+
+  .mode-bar button {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--gap-3);
+    padding: 0 var(--gap-3);
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .mode-bar button[aria-selected="true"] {
+    background: var(--accent-surface);
+    color: var(--text);
+  }
 }
 
 .movement-panel {

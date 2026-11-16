@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "./data/bundle";
@@ -7,7 +7,7 @@ import { clearRegionDataCache } from "./data/useRegionData";
 import de from "./i18n/de.json";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
-import { makeBundle } from "./ui/fixture";
+import { makeBundle, setViewport } from "./ui/fixture";
 import type { Selection } from "./viewer/pick";
 
 // What the app last handed the viewer, so a test can see the selection and where the camera should go.
@@ -18,6 +18,8 @@ const viewer = vi.hoisted(() => ({
   areaProbe: null as unknown,
   highlights: null as unknown,
   isShown: (() => true) as (sid: string, side: "l" | "r" | "") => boolean,
+  // How often a viewer was mounted, so a test can see that a layout change keeps the same one.
+  mounts: 0,
 }));
 
 // Lets one test make the lazy print summary fail. Otherwise it is the real one.
@@ -57,7 +59,9 @@ vi.mock("./notebook/LogForm", async (original) => {
 
 // jsdom cannot draw 3D, so the model is plain buttons here. "model" is a tap on empty space,
 // "tap piriformis" a tap on the left piriformis.
-vi.mock("./viewer/Viewer", () => ({
+vi.mock("./viewer/Viewer", async () => {
+  const { useEffect } = await import("react");
+  return {
   Viewer: ({
     onSelect,
     selection,
@@ -80,6 +84,9 @@ vi.mock("./viewer/Viewer", () => ({
     viewer.areaProbe = areaProbe;
     viewer.highlights = highlights;
     viewer.isShown = isShown;
+    useEffect(() => {
+      viewer.mounts++;
+    }, []);
     return (
       <>
         <button type="button" onClick={() => onSelect(null)}>
@@ -97,7 +104,8 @@ vi.mock("./viewer/Viewer", () => ({
       </>
     );
   },
-}));
+  };
+});
 
 // The model manifest the app reads first. One region, like the real one today.
 const oneRegion = { regions: { hip: { files: [{ path: "hip.glb", source: "bp3d", license: "CC-BY-4.0" }] } } };
@@ -734,4 +742,49 @@ test("switching region empties the search field", async () => {
   pickRegion("shoulder");
   await screen.findByText(en["info.tapHint"]);
   expect(field.value).toBe("");
+});
+
+test("the app name is the page heading", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.getByRole("heading", { level: 1, name: "anatoMe" })).toBeTruthy();
+});
+
+test("the panel is the tab panel of the selected tab", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  const panel = screen.getByRole("tabpanel");
+  expect(panel.getAttribute("aria-labelledby")).toBe("tab-atlas");
+  expect(panel.id).toBe("tabpanel");
+  expect(panel.contains(screen.getByText(en["info.tapHint"]))).toBe(true);
+  fireEvent.click(tab(en["mode.movement"]));
+  expect(screen.getByRole("tabpanel").getAttribute("aria-labelledby")).toBe("tab-movement");
+});
+
+test("the Area tab is called Under a spot", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(en["mode.area"]).toBe("Under a spot");
+  expect(tab(en["mode.area"])).toBeTruthy();
+});
+
+test("switching between phone and wide keeps the viewer mounted and the selection", async () => {
+  setViewport("phone");
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  // The viewer is keyed by region, so it mounted once more when the manifest named the region.
+  // The click above runs inside act, which has run that mount's effect, so the count starts here.
+  const before = viewer.mounts;
+  expect(screen.getByRole("tablist").getAttribute("aria-orientation")).toBe("horizontal");
+  act(() => setViewport("wide"));
+  expect(screen.getByRole("tablist").getAttribute("aria-orientation")).toBe("vertical");
+  act(() => setViewport("phone"));
+  expect(viewer.mounts).toBe(before);
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
+  expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
 });

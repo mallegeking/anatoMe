@@ -23,7 +23,7 @@ type Props = {
   onRegion: (id: string) => void;
 };
 
-// The bar above the model: the search field, the layers button and, when there is more than one, the region picker.
+// The bar above the model: the app name, the search field, the layers button and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
 export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
   const [query, setQuery] = useState("");
@@ -61,6 +61,7 @@ export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoo
   return (
     <header className="top-bar" onBlur={leave}>
       <div className="top-bar-row">
+        <h1 className="app-name">{t("app.name")}</h1>
         <input
           ref={field}
           type="search"

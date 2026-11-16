@@ -151,3 +151,9 @@ test("in English the German name is not shown", () => {
   expect(screen.getByRole("button", { name: /Piriformis/ })).toBeTruthy();
   expect(screen.queryByText("Birnenförmiger Muskel")).toBeNull();
 });
+
+test("the app name is a level-1 heading before the search field", () => {
+  const { field } = show();
+  const heading = screen.getByRole("heading", { level: 1, name: en["app.name"] });
+  expect(heading.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});

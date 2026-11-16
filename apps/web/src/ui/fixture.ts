@@ -1,4 +1,5 @@
 import type { RegionBundle } from "../data/bundle";
+import { SHORT_QUERY, WIDE_QUERY } from "./useMedia";
 
 // A small bundle for tests. Piriformis has one checked row and one waiting row. The review bundle adds the waiting rows as drafts.
 export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
@@ -56,4 +57,31 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
     pendingByMovement: {},
     pendingExercises: 0,
   };
+}
+
+// The screen the matchMedia stub answers for, and who listens to it.
+let viewport: "phone" | "wide" | "short" = "phone";
+const viewportListeners = new Set<() => void>();
+
+function stubMatchMedia(query: string): MediaQueryList {
+  return {
+    media: query,
+    get matches() {
+      return (query === WIDE_QUERY && viewport === "wide") || (query === SHORT_QUERY && viewport === "short");
+    },
+    onchange: null,
+    addEventListener: (_type: string, listener: () => void) => viewportListeners.add(listener),
+    removeEventListener: (_type: string, listener: () => void) => viewportListeners.delete(listener),
+    addListener: (listener: () => void) => viewportListeners.add(listener),
+    removeListener: (listener: () => void) => viewportListeners.delete(listener),
+    dispatchEvent: () => false,
+  } as unknown as MediaQueryList;
+}
+
+// For tests: makes window.matchMedia answer the layout queries as on a phone, a wide screen or a short phone,
+// and tells every listener, as a browser does when the window changes size.
+export function setViewport(kind: "phone" | "wide" | "short"): void {
+  viewport = kind;
+  window.matchMedia = stubMatchMedia;
+  for (const listener of [...viewportListeners]) listener();
 }

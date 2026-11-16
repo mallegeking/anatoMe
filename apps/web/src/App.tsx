@@ -22,6 +22,7 @@ import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
 import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
+import { useWide } from "./ui/useMedia";
 import { chooseRegion, regionIds } from "./region/regions";
 import { loadManifest, regionFiles, type Manifest, type ModelFiles } from "./viewer/manifest";
 import { Viewer } from "./viewer/Viewer";
@@ -78,6 +79,8 @@ export function App() {
   const [notebookError, setNotebookError] = useState(false);
   const notebookOpening = useRef<Promise<NotebookStore> | null>(null);
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
+  // The wide layout puts the tabs in a column on the left, so the arrow keys that move between them change too.
+  const wide = useWide();
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
   // A region without joints has no movements, so it has no Movements tab and no Notebook tab.
   const modes = useMemo<Mode[]>(
@@ -299,6 +302,8 @@ export function App() {
   // A failure to load the data gets its own message in the panel, because the model may be fine.
   // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
   // The educational line sits at the top of the panel, outside the part that scrolls, so it always shows.
+  // The grid in index.css places top, nav, stage and side. On a phone the nav sits at the bottom.
+  // Every layout renders the same elements, so a change of layout never mounts the viewer again.
   return (
     <ModelErrorBoundary
       t={t}
@@ -312,21 +317,25 @@ export function App() {
       }
     >
       <main className="app">
-        <ReviewBanner bundle={bundle} t={t} onOpenList={() => setReviewOpen(true)} />
-        <TopBar
-          t={t}
-          lang={lang}
-          structures={structures}
-          layersOpen={layersOpen}
-          onToggleLayers={() => setLayersOpen(!layersOpen)}
-          onChoose={chooseResult}
-          open={searchOpen}
-          onOpenChange={setSearchOpen}
-          regions={regions}
-          region={region ?? ""}
-          onRegion={changeRegion}
-        />
-        <ModeBar t={t} mode={shownMode} modes={modes} onChange={setMode} />
+        <div className="top">
+          <ReviewBanner bundle={bundle} t={t} onOpenList={() => setReviewOpen(true)} />
+          <TopBar
+            t={t}
+            lang={lang}
+            structures={structures}
+            layersOpen={layersOpen}
+            onToggleLayers={() => setLayersOpen(!layersOpen)}
+            onChoose={chooseResult}
+            open={searchOpen}
+            onOpenChange={setSearchOpen}
+            regions={regions}
+            region={region ?? ""}
+            onRegion={changeRegion}
+          />
+        </div>
+        <nav className="nav">
+          <ModeBar t={t} mode={shownMode} modes={modes} onChange={setMode} vertical={wide} />
+        </nav>
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
             <ReviewList bundle={bundle} t={t} lang={lang} onClose={() => setReviewOpen(false)} />
@@ -344,54 +353,67 @@ export function App() {
           />
           <PerfOverlay t={t} />
         </div>
-        <footer className="panel">
-          <EducationalLine t={t} />
-          <div className="panel-scroll" data-testid="panel-scroll">
-            {notice && (
-              <p className="muted search-notice" role="status">
-                {noticeText(notice, t, lang)}
-              </p>
-            )}
-            <ModelErrorBoundary key={region ?? ""} t={t} messageKey="error.dataLoad">
-              {/* Until the manifest says which region to show, the panel shows the same hint as while the data loads. */}
-              {region === null ? (
-                <Hint t={t} />
-              ) : (
-                <Suspense fallback={<Hint t={t} region={region} />}>
-                  <PanelArea
-                    region={region}
-                    t={t}
-                    lang={lang}
-                    mode={shownMode}
-                    selection={selection}
-                    label={label}
-                    layersOpen={layersOpen}
-                    layers={layers}
-                    setLayers={setLayers}
-                    movement={movement}
-                    onMovementChange={setMovement}
-                    onBundle={setBundle}
-                    onSwitchSide={switchSide}
-                    onHideSelected={hideSelected}
-                    onOpenMovement={openMovement}
-                    onFocusStructure={focusStructure}
-                    onOpenStructure={openStructure}
-                    area={area}
-                    onFocusAreaStructure={focusAreaStructure}
-                    onAreaClear={() => setArea(null)}
-                    onOverUnder={overUnder}
-                    onLog={logMovement}
-                    notebookStore={notebookStore}
-                    notebookError={notebookError}
-                    onFocusNotebookStructure={focusAreaStructure}
-                    onPrintNotebook={printNotebook}
-                  />
-                </Suspense>
+        <aside className="side">
+          {/* Filled when the layers move out of the panel. */}
+          <div className="layers-slot" />
+          <div className="panel">
+            <EducationalLine t={t} />
+            <div
+              className="panel-scroll"
+              data-testid="panel-scroll"
+              role="tabpanel"
+              id="tabpanel"
+              aria-labelledby={`tab-${shownMode}`}
+              tabIndex={0}
+            >
+              {notice && (
+                <p className="muted search-notice" role="status">
+                  {noticeText(notice, t, lang)}
+                </p>
               )}
-            </ModelErrorBoundary>
-            <Credits t={t} lang={lang} onLang={changeLang} />
+              <ModelErrorBoundary key={region ?? ""} t={t} messageKey="error.dataLoad">
+                {/* Until the manifest says which region to show, the panel shows the same hint as while the data loads. */}
+                {region === null ? (
+                  <Hint t={t} />
+                ) : (
+                  <Suspense fallback={<Hint t={t} region={region} />}>
+                    <PanelArea
+                      region={region}
+                      t={t}
+                      lang={lang}
+                      mode={shownMode}
+                      selection={selection}
+                      label={label}
+                      layersOpen={layersOpen}
+                      layers={layers}
+                      setLayers={setLayers}
+                      movement={movement}
+                      onMovementChange={setMovement}
+                      onBundle={setBundle}
+                      onSwitchSide={switchSide}
+                      onHideSelected={hideSelected}
+                      onOpenMovement={openMovement}
+                      onFocusStructure={focusStructure}
+                      onOpenStructure={openStructure}
+                      area={area}
+                      onFocusAreaStructure={focusAreaStructure}
+                      onAreaClear={() => setArea(null)}
+                      onOverUnder={overUnder}
+                      onLog={logMovement}
+                      notebookStore={notebookStore}
+                      notebookError={notebookError}
+                      onFocusNotebookStructure={focusAreaStructure}
+                      onPrintNotebook={printNotebook}
+                    />
+                  </Suspense>
+                )}
+              </ModelErrorBoundary>
+              <Credits t={t} lang={lang} onLang={changeLang} />
+            </div>
           </div>
-        </footer>
+          {/* Filled when the language and the credits move out of the panel. */}
+          <div className="side-foot" />
+        </aside>
       </main>
       {bundle && printJob && (
         <QuietBoundary>
