@@ -12,10 +12,15 @@ export default defineConfig({
   reporter: "list",
   use: {
     baseURL: "http://localhost:4175",
-    viewport: { width: 412, height: 915 },
     // Keep a trace of a failed run. Retries stay off, a flaky test should be fixed.
     trace: "retain-on-failure",
   },
+  // The five walk-throughs run on a phone only. The layout and stage checks also run on a small phone and a desktop.
+  projects: [
+    { name: "phone", use: { viewport: { width: 412, height: 915 }, hasTouch: true, isMobile: true } },
+    { name: "small-phone", use: { viewport: { width: 360, height: 640 }, hasTouch: true, isMobile: true }, testMatch: /(layout|stage)\.spec\.ts/ },
+    { name: "desktop", use: { viewport: { width: 1280, height: 800 } }, testMatch: /(layout|stage)\.spec\.ts/ },
+  ],
   webServer: {
     command: "node scripts/e2e-prepare.mjs && npx vite preview --outDir dist-e2e --port 4175 --strictPort",
     url: "http://localhost:4175/",

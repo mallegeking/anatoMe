@@ -305,10 +305,11 @@ body,
   font-size: 0.8125rem;
 }
 
+/* Only with ?perf=1. It sits under the name chip (44 px and its border), so both can show at once. */
 .perf-overlay {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: calc(var(--gap-3) + var(--tap) + 2px + var(--gap-2));
+  left: var(--gap-3);
   padding: 4px 8px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.6);
@@ -411,10 +412,6 @@ body,
   font-weight: 600;
 }
 
-.card .link-button {
-  min-height: 32px;
-}
-
 .action-rows {
   display: flex;
   flex-direction: column;
@@ -505,7 +502,9 @@ body,
   min-width: 0;
 }
 
+/* A small text link inside a panel. 32 px high at least, so a thumb still hits it. */
 .link-button {
+  min-height: 32px;
   padding: 4px 0;
   border: 0;
   background: none;
@@ -764,18 +763,48 @@ body,
   }
 }
 
+/* The wide layout centres the field in the bar, at most 620 px wide. The two outer columns share the rest equally.
+   They never get narrower than the name and the region picker, so on a narrow window, where one of them needs
+   more than its half, the field gives up width and sits a little off the middle instead of cutting the picker.
+   The bar itself is the grid and the row lets its children into it, so the result list can take the field's column. */
 @media (min-width: 900px) {
-  .top-bar-row {
-    flex-wrap: nowrap;
+  .top-bar {
+    display: grid;
+    grid-template-columns: minmax(max-content, 1fr) minmax(0, 620px) minmax(max-content, 1fr);
+    align-items: center;
+    column-gap: 16px;
   }
 
+  .top-bar-row {
+    display: contents;
+  }
+
+  .top-bar-row .app-name {
+    grid-area: 1 / 1;
+    justify-self: start;
+  }
+
+  /* One row: the phone's order would otherwise put the field on a second one. */
   .top-bar-row .search-field {
+    grid-area: 1 / 2;
     order: 0;
-    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .top-bar-row .region-picker {
+    grid-area: 1 / 3;
+    justify-self: end;
+    max-width: 100%;
+  }
+
+  /* The result list drops down from the field, as wide as the field, to the bar's bottom edge and below. */
+  .top-bar .search-drop {
+    grid-area: 1 / 2 / 2 / 3;
+    top: calc(100% + 8px);
   }
 }
 
-/* The name pushes the buttons to the right. On the wide layout the field does that instead. */
+/* The name pushes the buttons to the right. On the wide layout the bar's grid places it. */
 .app-name {
   flex: 0 0 auto;
   margin: 0 auto 0 0;
@@ -948,7 +977,11 @@ body,
 
 /* From 900 px wide: a column in the rail on the left, each tab a row with the icon left of the name. */
 @media (min-width: 900px) {
+  /* A column, so the educational line and the credits button sit at the bottom of the rail.
+     On a short screen the rail scrolls on its own. */
   .nav {
+    display: flex;
+    flex-direction: column;
     padding: var(--gap-3) var(--gap-2);
     background: var(--panel);
     border-right: 1px solid var(--divider);
