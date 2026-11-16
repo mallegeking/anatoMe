@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { IDBFactory } from "fake-indexeddb";
+import type { Ref } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "./data/bundle";
 import { App } from "./App";
@@ -8,6 +9,7 @@ import de from "./i18n/de.json";
 import en from "./i18n/en.json";
 import { createT } from "./i18n/t";
 import { makeBundle, setViewport } from "./ui/fixture";
+import type { ViewDirection, ViewerHandle } from "./viewer/handle";
 import type { Selection } from "./viewer/pick";
 
 // What the app last handed the viewer, so a test can see the selection and where the camera should go.
@@ -22,6 +24,8 @@ const viewer = vi.hoisted(() => ({
   mounts: 0,
   // Makes the next render of the stand-in viewer throw, to reach the outer error boundary.
   throws: false,
+  // What the app asked of the viewer's handle, in order: "reset" or a zoom factor.
+  calls: [] as unknown[],
 }));
 
 // Lets one test make the lazy print summary fail. Otherwise it is the real one.
@@ -62,9 +66,11 @@ vi.mock("./notebook/LogForm", async (original) => {
 // jsdom cannot draw 3D, so the model is plain buttons here. "model" is a tap on empty space,
 // "tap piriformis" a tap on the left piriformis.
 vi.mock("./viewer/Viewer", async () => {
-  const { useEffect } = await import("react");
+  const { useEffect, useImperativeHandle } = await import("react");
   return {
   Viewer: ({
+    handle,
+    onView,
     onSelect,
     selection,
     focus,
@@ -73,9 +79,11 @@ vi.mock("./viewer/Viewer", async () => {
     onAreaTap,
     areaProbe,
   }: {
+    handle?: Ref<ViewerHandle>;
+    onView?: (direction: ViewDirection) => void;
     onAreaTap: (tap: unknown) => void;
     areaProbe: unknown;
-    onSelect: (sel: Selection | null) => void;
+    onSelect: (sel: Selection | null, label?: string) => void;
     selection: Selection | null;
     focus: Selection | null;
     highlights: unknown;
@@ -90,6 +98,14 @@ vi.mock("./viewer/Viewer", async () => {
     useEffect(() => {
       viewer.mounts++;
     }, []);
+    useImperativeHandle(handle, () => ({
+      resetView: () => viewer.calls.push("reset"),
+      zoomBy: (factor: number) => viewer.calls.push(factor),
+    }));
+    // The camera starts in front of the model, as the real viewer reports after its first framing.
+    useEffect(() => {
+      onView?.([0, 0, 1]);
+    }, [onView]);
     return (
       <>
         <button type="button" onClick={() => onSelect(null)}>
@@ -97,6 +113,9 @@ vi.mock("./viewer/Viewer", async () => {
         </button>
         <button type="button" onClick={() => onSelect({ sid: "piriformis", side: "l" })}>
           tap piriformis
+        </button>
+        <button type="button" onClick={() => onSelect({ sid: "mystery", side: "r" }, "Mystery muscle")}>
+          tap unknown
         </button>
         <button type="button" onClick={() => onAreaTap({ point: [0, 0, 0], through: null, entries: [{ sid: "piriformis", side: "l", distance: 1, depth: 0 }, { sid: "femur", side: "l", distance: 1.05, depth: 0.05 }] })}>
           area tap
@@ -125,6 +144,7 @@ function serveFiles(bundle: RegionBundle | null, manifest: unknown = oneRegion) 
 
 beforeEach(() => {
   clearRegionDataCache();
+  viewer.calls = [];
   // Every test starts on a phone, unless it asks for another screen.
   setViewport("phone");
 });
@@ -323,9 +343,9 @@ test("the search notice shown in English reads in German after the language chan
   await screen.findByText(en["info.tapHint"]);
   fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "pirif" } });
   fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
-  expect(screen.getByRole("status").textContent).toBe(createT(en)("search.peeledOne", { name: "Piriformis" }));
+  expect(screen.getByTestId("search-notice").textContent).toBe(createT(en)("search.peeledOne", { name: "Piriformis" }));
   pickLanguage("de");
-  expect(screen.getByRole("status").textContent).toBe(createT(de)("search.peeledOne", { name: "Birnenförmiger Muskel" }));
+  expect(screen.getByTestId("search-notice").textContent).toBe(createT(de)("search.peeledOne", { name: "Birnenförmiger Muskel" }));
 });
 
 test("the Area tab shows the hint", async () => {
@@ -699,7 +719,7 @@ test("switching region closes the search, the layers panel and the print summary
   expect(document.querySelector("section.print-summary")).not.toBeNull();
   fireEvent.click(tab(en["mode.atlas"]));
   // Logging the movement left a notice. Now open the layers panel and the search list too.
-  expect(screen.getByRole("status")).toBeTruthy();
+  expect(screen.getByTestId("search-notice")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
   fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "pirif" } });
   expect(screen.getByTestId("search-results")).toBeTruthy();
@@ -710,7 +730,7 @@ test("switching region closes the search, the layers panel and the print summary
   await screen.findByText(en["info.tapHint"]);
   expect(screen.queryByTestId("search-results")).toBeNull();
   expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
-  expect(screen.queryByRole("status")).toBeNull();
+  expect(screen.queryByTestId("search-notice")).toBeNull();
   expect(document.querySelector("section.print-summary")).toBeNull();
 });
 
@@ -954,4 +974,71 @@ test("the last-resort error page still shows the educational line and the credit
   expect(screen.getByText(en["about.educational"])).toBeTruthy();
   expect(screen.getByText(en["credits.modified"])).toBeTruthy();
   expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+// The chip is the status region on the stage, next to the model.
+const chip = () => screen.getAllByRole("status").find((el) => el.classList.contains("stage-chip"))!;
+
+test("selecting a structure on the Movements tab still names it in the chip", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(chip().textContent).toBe("");
+  fireEvent.click(tab(en["mode.movement"]));
+  fireEvent.click(screen.getByText("tap piriformis"));
+  expect(chip().textContent).toContain("Piriformis");
+  expect(chip().textContent).toContain(en["stage.side.l"]);
+});
+
+test("the chip names the structure in the chosen language", async () => {
+  const bundle = makeBundle();
+  bundle.structures = bundle.structures.map((s) => (s.id === "piriformis" ? { ...s, german: "Birnenförmiger Muskel" } : s));
+  serve(bundle);
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  pickLanguage("de");
+  expect(chip().textContent).toContain("Birnenförmiger Muskel");
+  expect(chip().textContent).toContain(de["stage.side.l"]);
+});
+
+test("a structure the data does not know shows its file label in the chip", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap unknown"));
+  expect(chip().textContent).toContain("Mystery muscle");
+  expect(chip().textContent).toContain(en["stage.side.r"]);
+});
+
+test("the chip's clear button clears the selection", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
+  fireEvent.click(screen.getByRole("button", { name: en["stage.clear"] }));
+  expect(viewer.selection).toBeNull();
+  expect(chip().textContent).toBe("");
+  expect(screen.getByText(en["info.tapHint"])).toBeTruthy();
+});
+
+test("the view badge and the markers follow what the viewer reports", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.getByText(en["view.front"])).toBeTruthy();
+  expect(screen.getByText(en["stage.right"])).toBeTruthy();
+  expect(screen.getByText(en["stage.left"])).toBeTruthy();
+});
+
+test("wide: the zoom and reset buttons ask the viewer", async () => {
+  setViewport("wide");
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByRole("button", { name: en["stage.zoomIn"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["stage.zoomOut"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["stage.reset"] }));
+  expect(viewer.calls).toEqual([0.8, 1.25, "reset"]);
 });

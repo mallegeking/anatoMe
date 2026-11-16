@@ -23,12 +23,14 @@ import { CreditsBody, EducationalLine } from "./ui/Credits";
 import { LanguagePicker } from "./ui/LanguagePicker";
 import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
-import { LayersIcon } from "./ui/icons";
 import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { useWide } from "./ui/useMedia";
 import { chooseRegion, regionIds } from "./region/regions";
+import { StageControls } from "./stage/StageControls";
+import { viewOf, type ViewName } from "./stage/view";
 import { loadManifest, regionFiles, type Manifest, type ModelFiles } from "./viewer/manifest";
+import type { ViewDirection, ViewerHandle } from "./viewer/handle";
 import { Viewer } from "./viewer/Viewer";
 import { ModelErrorBoundary } from "./viewer/ModelErrorBoundary";
 import type { Selection } from "./viewer/pick";
@@ -87,6 +89,10 @@ export function App() {
   const [printJob, setPrintJob] = useState<{ entries: NotebookEntry[]; press: number } | null>(null);
   // The wide layout puts the tabs in a column on the left, so the arrow keys that move between them change too.
   const wide = useWide();
+  // The viewer's handle for the reset and zoom buttons, and the view the camera last came to rest in.
+  const viewerHandle = useRef<ViewerHandle>(null);
+  const [view, setView] = useState<ViewName | null>(null);
+  const hearView = useCallback((direction: ViewDirection) => setView(viewOf(direction)), []);
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
   // On the wide layout Layers always has its own section. On the phone it opens over the tab panel.
   // Going to the wide layout forgets the open state, so coming back to the phone starts with Layers closed.
@@ -148,6 +154,8 @@ export function App() {
   // Another region starts afresh: no selection, every layer back, no movement and no area spot.
   function changeRegion(id: string) {
     setRegion(id);
+    // The new viewer reports its own view once it has framed the model.
+    setView(null);
     setBundle(null);
     select(null);
     setFocus(null);
@@ -328,6 +336,14 @@ export function App() {
     setLabel(undefined);
   }, [selection]);
 
+  // The name chip on the stage: the structure's name in the current language, or the 3D file's label for a
+  // structure the data does not know. The side is a separate word, so the chip can style it.
+  const chipSelection = useMemo(() => {
+    if (!selection) return null;
+    const structure = structures.find((s) => s.id === selection.sid);
+    return { name: structure ? nameOf(structure, lang) : (label ?? selection.sid), side: selection.side };
+  }, [selection, structures, lang, label]);
+
   // The viewer and the panel each catch their own failures, so the rest of the screen and the credits stay.
   // A failure to load the data gets its own message in the panel, because the model may be fine.
   // The outer catch is a last resort. It still shows the credits, which the licences ask us to keep reachable.
@@ -382,6 +398,8 @@ export function App() {
         <div className="stage" hidden={reviewOpen && bundle?.mode === "review"}>
           {/* A new region gets a fresh viewer, with its own loading text and time limit. */}
           <Viewer key={region ?? ""} files={files} t={t} selection={selection} focus={focus} isShown={isShown}
+            handle={viewerHandle}
+            onView={hearView}
             highlights={highlights}
             onSelect={tapModel}
             areaMode={shownMode === "area"}
@@ -390,13 +408,17 @@ export function App() {
             areaProbe={areaProbe}
           />
           <PerfOverlay t={t} />
-          {/* Temporary: the stage controls take this button over. */}
-          {!wide && (
-            <button type="button" className="btn stage-btn" aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>
-              <LayersIcon size={18} />
-              {t("layers.open")}
-            </button>
-          )}
+          <StageControls
+            t={t}
+            wide={wide}
+            selected={chipSelection}
+            view={view}
+            onClearSelection={() => select(null)}
+            onReset={() => viewerHandle.current?.resetView()}
+            onZoom={(factor) => viewerHandle.current?.zoomBy(factor)}
+            layersOpen={layersOpen}
+            onToggleLayers={() => setLayersOpen(!layersOpen)}
+          />
         </div>
         <aside className="side">
           {(wide || layersOpen) && (
@@ -426,7 +448,7 @@ export function App() {
               tabIndex={0}
             >
               {notice && (
-                <p className="muted search-notice" role="status">
+                <p className="muted search-notice" role="status" data-testid="search-notice">
                   {noticeText(notice, t, lang)}
                 </p>
               )}

@@ -83,6 +83,8 @@ All changes land before new rows are written, with validator rules and tests for
 
 The current layout stays: the model fills the top, a panel sits below it and scrolls. Phase 1 adds a top bar with a search field and a layers button. The panel shows either the info for the selected structure or, with nothing selected, a short hint and the educational line. The educational line is visible by default, not only inside the collapsed credits. **(builder's call on the exact layout, within these rules:** nothing covers the model, one-handed use, no horizontal scroll at 360 px wide.**)**
 
+> Amended on 2026-11-16: nothing covers the centre of the stage. Small controls may sit at its edges and corners. See `2026-11-16-three-column-layout-design.md`, section 8.
+
 ### 5.2 Search
 
 - Searches English names and Latin names, case and accent insensitive, matching from the start of each word, so "max" finds gluteus maximus and adductor magnus does not match "minimus".

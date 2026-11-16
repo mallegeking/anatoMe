@@ -443,14 +443,137 @@ body,
   gap: 6px;
 }
 
-/* Temporary layers button in the stage's bottom right corner, phone only. */
-.stage-btn {
+/* The controls on the stage's edges. The wrapper covers the stage but lets taps and drags through to the model.
+   Only the buttons and the chip catch them. */
+.stage-controls {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  display: inline-flex;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The name chip, top left. With nothing selected it is empty and takes no room, but stays in the page as the status region. */
+.stage-chip {
+  position: absolute;
+  top: var(--gap-3);
+  left: var(--gap-3);
+  max-width: calc(100% - 2 * var(--gap-3));
+  display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gap-1);
+  padding-left: var(--gap-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  pointer-events: auto;
+}
+
+.stage-chip:empty {
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: none;
+}
+
+.stage-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-chip-side {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.stage-chip-clear {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+}
+
+/* The bottom edge. On the phone the markers, the badge and the buttons share one line. */
+.stage-bottom {
+  position: absolute;
+  right: var(--gap-3);
+  bottom: var(--gap-3);
+  left: var(--gap-3);
+  display: grid;
+  grid-template: "ml view mr buttons" auto / auto minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: var(--gap-2);
+}
+
+.stage-marker--left {
+  grid-area: ml;
+}
+
+.stage-marker--right {
+  grid-area: mr;
+}
+
+.stage-view {
+  grid-area: view;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-2);
+  min-width: 0;
+}
+
+.stage-marker,
+.stage-badge,
+.stage-hint {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.stage-marker {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.stage-badge {
+  padding: 2px var(--gap-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.stage-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.stage-buttons button {
+  pointer-events: auto;
+}
+
+/* 44 px squares with the icon in the middle. */
+.stage-icon-btn {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+}
+
+/* The wide layout puts the markers on a line above the badge and the hint, next to the taller button stack. */
+@media (min-width: 900px) {
+  .stage-bottom {
+    grid-template: ". . . buttons" 1fr "ml . mr buttons" auto "view view view buttons" auto / auto minmax(0, 1fr) auto auto;
+  }
 }
 
 .layers-title,
