@@ -16,7 +16,12 @@ const controls = vi.hoisted(() => {
   const stub = {
     fitToBox: vi.fn((..._args: unknown[]) => Promise.resolve()),
     dollyTo: vi.fn((..._args: unknown[]) => Promise.resolve()),
+    rotateTo: vi.fn((..._args: unknown[]) => Promise.resolve()),
+    normalizeRotations: vi.fn(() => stub),
     distance: 2,
+    // Straight from the front, as the first framing leaves it.
+    azimuthAngle: 0,
+    polarAngle: Math.PI / 2,
     position: [0, 0, 2] as [number, number, number],
     target: [0, 0, 0] as [number, number, number],
     getTarget: (out: { set: (x: number, y: number, z: number) => void }) => (out.set(...stub.target), out),
@@ -114,7 +119,11 @@ beforeEach(() => {
   loaderCache.clear.mockClear();
   controls.fitToBox.mockClear();
   controls.dollyTo.mockClear();
+  controls.rotateTo.mockClear();
+  controls.normalizeRotations.mockClear();
   controls.distance = 2;
+  controls.azimuthAngle = 0;
+  controls.polarAngle = Math.PI / 2;
   controls.position = [0, 0, 2];
   controls.target = [0, 0, 0];
   // React warns about the 3D tags it does not know, like <group>. Keep the output quiet.
@@ -503,6 +512,20 @@ test("resetView frames the whole model again with a glide", async () => {
   act(() => handle.current!.resetView());
   expect(controls.fitToBox).toHaveBeenCalledTimes(1);
   expect(controls.fitToBox.mock.calls[0][1]).toBe(true);
+});
+
+test("resetView turns the camera back to the first direction, the short way round", async () => {
+  const { handle } = await showWithHandle();
+  // The person turned the model to the back and tilted it a little.
+  controls.azimuthAngle = Math.PI;
+  controls.polarAngle = 1.2;
+  controls.position = [0, 0, -2];
+  act(() => handle.current!.resetView());
+  expect(controls.normalizeRotations).toHaveBeenCalledTimes(1);
+  expect(controls.rotateTo).toHaveBeenCalledWith(0, Math.PI / 2, true);
+  // The turn is asked for first, so the fit keeps the front direction instead of the nearest one to the back.
+  expect(controls.normalizeRotations.mock.invocationCallOrder[0]).toBeLessThan(controls.rotateTo.mock.invocationCallOrder[0]);
+  expect(controls.rotateTo.mock.invocationCallOrder[0]).toBeLessThan(controls.fitToBox.mock.invocationCallOrder.at(-1)!);
 });
 
 test("zoomBy multiplies the distance", async () => {

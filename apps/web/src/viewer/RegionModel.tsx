@@ -167,8 +167,9 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
   // The callback may change between renders. The listeners below read the latest one from here.
   const onViewRef = useRef(onView);
   onViewRef.current = onView;
-  // The box of the whole model, kept from the first framing for resetView.
+  // The box of the whole model and the direction the camera looked from, kept from the first framing for resetView.
   const wholeBox = useRef<Box3 | null>(null);
+  const firstAngles = useRef<{ azimuth: number; polar: number } | null>(null);
 
   // Reports the unit vector from the camera's target to the camera.
   function reportView(c: CameraControlsImpl) {
@@ -185,6 +186,7 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
     for (const scene of scenes) box.expandByObject(scene);
     wholeBox.current = box;
     void controls.fitToBox(box, false, FRAME_PADDING);
+    firstAngles.current = { azimuth: controls.azimuthAngle, polar: controls.polarAngle };
     reportView(controls);
     // A jump without a glide does not wake the controls, so ask for the frame here.
     invalidate();
@@ -204,7 +206,15 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
     handle,
     () => ({
       resetView() {
-        if (controls && wholeBox.current) void controls.fitToBox(wholeBox.current, true, FRAME_PADDING);
+        if (!controls || !wholeBox.current) return;
+        // fitToBox keeps the side the camera is nearest to, so turn back to the first direction before it.
+        // Full turns add up in the angle, so drop them first, or the camera would spin round several times.
+        const first = firstAngles.current;
+        if (first) {
+          controls.normalizeRotations();
+          void controls.rotateTo(first.azimuth, first.polar, true);
+        }
+        void controls.fitToBox(wholeBox.current, true, FRAME_PADDING);
       },
       zoomBy(factor: number) {
         if (controls) void controls.dollyTo(controls.distance * factor, true);

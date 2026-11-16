@@ -63,4 +63,9 @@ test("turning the model to the back swaps the markers", async ({ page }) => {
   }).toPass({ timeout: 20_000 });
   await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.left"]);
   await expect(page.locator(".stage-marker--right")).toHaveText(texts["stage.right"]);
+
+  // Reset brings back the first view, from the front, not only the first distance.
+  await page.getByRole("button", { name: texts["stage.reset"] }).click();
+  await expect(badge).toHaveText(texts["view.front"]);
+  await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.right"]);
 });
