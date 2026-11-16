@@ -13,12 +13,13 @@
 # gap.<value> from the language file. The quadriceps share a tendon that has no mesh, and the
 # vertebrae are not modelled, so psoas major has no origin.
 # German names from DocCheck Flexikon and German Wikipedia, one article per structure or the hip, knee and meniscus articles, read on 2026-11-14. german is left out where no opened source gave one.
-- {id: hip-bone, type: bone, english: Hip bone, german: Hüftbein, latin: Os coxae, fma: "FMA16585", region: hip, depth: 4}
-- {id: sacrum, type: bone, english: Sacrum, german: Kreuzbein, latin: Os sacrum, fma: "FMA16202", region: hip, depth: 4, midline: true}
-- {id: femur, type: bone, english: Femur, german: Oberschenkelknochen, latin: Os femoris, fma: "FMA9611", region: hip, depth: 4}
-- {id: patella, type: bone, english: Patella, german: Kniescheibe, latin: Patella, fma: "FMA24485", region: hip, depth: 4}
-- {id: tibia, type: bone, english: Tibia, german: Schienbein, latin: Tibia, fma: "FMA24476", region: hip, depth: 4}
-- {id: fibula, type: bone, english: Fibula, german: Wadenbein, latin: Fibula, fma: "FMA24479", region: hip, depth: 4}
+# also_in lists the other regions that draw this bone too.
+- {id: hip-bone, type: bone, english: Hip bone, german: Hüftbein, latin: Os coxae, fma: "FMA16585", region: hip, also_in: [trunk], depth: 4}
+- {id: sacrum, type: bone, english: Sacrum, german: Kreuzbein, latin: Os sacrum, fma: "FMA16202", region: hip, also_in: [trunk], depth: 4, midline: true}
+- {id: femur, type: bone, english: Femur, german: Oberschenkelknochen, latin: Os femoris, fma: "FMA9611", region: hip, also_in: [lower-leg], depth: 4}
+- {id: patella, type: bone, english: Patella, german: Kniescheibe, latin: Patella, fma: "FMA24485", region: hip, also_in: [lower-leg], depth: 4}
+- {id: tibia, type: bone, english: Tibia, german: Schienbein, latin: Tibia, fma: "FMA24476", region: hip, also_in: [lower-leg], depth: 4}
+- {id: fibula, type: bone, english: Fibula, german: Wadenbein, latin: Fibula, fma: "FMA24479", region: hip, also_in: [lower-leg], depth: 4}
 - {id: gluteus-maximus, type: muscle, english: Gluteus maximus, german: Großer Gesäßmuskel, latin: Musculus gluteus maximus, fma: "FMA22314", region: hip, depth: 1, depth_note: "OERI Human Anatomy 10.7: the largest gluteal muscle, with gluteus medius deep to it."}
 - {id: gluteus-medius, type: muscle, english: Gluteus medius, german: Mittlerer Gesäßmuskel, latin: Musculus gluteus medius, fma: "FMA22315", region: hip, depth: 2, depth_note: "OERI Human Anatomy 10.7: deep to gluteus maximus."}
 - {id: gluteus-minimus, type: muscle, english: Gluteus minimus, german: Kleiner Gesäßmuskel, latin: Musculus gluteus minimus, fma: "FMA22317", region: hip, depth: 3, depth_note: "OERI Human Anatomy 10.7: deep to gluteus medius."}

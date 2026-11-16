@@ -1,0 +1,721 @@
+{
+  "region": "neck",
+  "max_triangles_per_mesh": 2000,
+  "targets": [
+    {
+      "sid": "atlas",
+      "type": "bone",
+      "english": "Atlas",
+      "patterns": [
+        "^atlas$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "axis",
+      "type": "bone",
+      "english": "Axis",
+      "patterns": [
+        "^axis$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "cervical-rotator",
+      "type": "muscle",
+      "english": "Cervical rotator",
+      "patterns": [
+        "^left\\ cervical\\ rotator$",
+        "^right\\ cervical\\ rotator$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "digastric",
+      "type": "muscle",
+      "english": "Digastric",
+      "patterns": [
+        "^left\\ digastric$",
+        "^right\\ digastric$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "ethmoid",
+      "type": "bone",
+      "english": "Ethmoid",
+      "patterns": [
+        "^ethmoid$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "fifth-cervical-vertebra",
+      "type": "bone",
+      "english": "Fifth cervical vertebra",
+      "patterns": [
+        "^fifth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "fourth-cervical-vertebra",
+      "type": "bone",
+      "english": "Fourth cervical vertebra",
+      "patterns": [
+        "^fourth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "frontal-bone",
+      "type": "bone",
+      "english": "Frontal bone",
+      "patterns": [
+        "^frontal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "geniohyoid",
+      "type": "muscle",
+      "english": "Geniohyoid",
+      "patterns": [
+        "^left\\ geniohyoid$",
+        "^right\\ geniohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "hyoid-bone",
+      "type": "bone",
+      "english": "Hyoid bone",
+      "patterns": [
+        "^hyoid\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "iliocostalis-cervicis",
+      "type": "muscle",
+      "english": "Iliocostalis cervicis",
+      "patterns": [
+        "^left\\ iliocostalis\\ cervicis$",
+        "^right\\ iliocostalis\\ cervicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "inferior-nasal-concha",
+      "type": "bone",
+      "english": "Inferior nasal concha",
+      "patterns": [
+        "^left\\ inferior\\ nasal\\ concha$",
+        "^right\\ inferior\\ nasal\\ concha$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lacrimal-bone",
+      "type": "bone",
+      "english": "Lacrimal bone",
+      "patterns": [
+        "^left\\ lacrimal\\ bone$",
+        "^right\\ lacrimal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "longissimus-capitis",
+      "type": "muscle",
+      "english": "Longissimus capitis",
+      "patterns": [
+        "^left\\ longissimus\\ capitis$",
+        "^right\\ longissimus\\ capitis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "longissimus-cervicis",
+      "type": "muscle",
+      "english": "Longissimus cervicis",
+      "patterns": [
+        "^left\\ longissimus\\ cervicis$",
+        "^right\\ longissimus\\ cervicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "longus-capitis",
+      "type": "muscle",
+      "english": "Longus capitis",
+      "patterns": [
+        "^left\\ longus\\ capitis$",
+        "^right\\ longus\\ capitis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "mandible",
+      "type": "bone",
+      "english": "Mandible",
+      "patterns": [
+        "^mandible$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "maxilla",
+      "type": "bone",
+      "english": "Maxilla",
+      "patterns": [
+        "^left\\ maxilla$",
+        "^right\\ maxilla$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "mylohyoid",
+      "type": "muscle",
+      "english": "Mylohyoid",
+      "patterns": [
+        "^left\\ mylohyoid$",
+        "^right\\ mylohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "nasal-bone",
+      "type": "bone",
+      "english": "Nasal bone",
+      "patterns": [
+        "^left\\ nasal\\ bone$",
+        "^right\\ nasal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "obliquus-capitis-inferior",
+      "type": "muscle",
+      "english": "Obliquus capitis inferior",
+      "patterns": [
+        "^left\\ obliquus\\ capitis\\ inferior$",
+        "^right\\ obliquus\\ capitis\\ inferior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "obliquus-capitis-superior",
+      "type": "muscle",
+      "english": "Obliquus capitis superior",
+      "patterns": [
+        "^left\\ obliquus\\ capitis\\ superior$",
+        "^right\\ obliquus\\ capitis\\ superior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "occipital-bone",
+      "type": "bone",
+      "english": "Occipital bone",
+      "patterns": [
+        "^occipital\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "omohyoid",
+      "type": "muscle",
+      "english": "Omohyoid",
+      "patterns": [
+        "^left\\ omohyoid$",
+        "^right\\ omohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "palatine-bone",
+      "type": "bone",
+      "english": "Palatine bone",
+      "patterns": [
+        "^left\\ palatine\\ bone$",
+        "^right\\ palatine\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "parietal-bone",
+      "type": "bone",
+      "english": "Parietal bone",
+      "patterns": [
+        "^left\\ parietal\\ bone$",
+        "^right\\ parietal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "platysma",
+      "type": "muscle",
+      "english": "Platysma",
+      "patterns": [
+        "^left\\ platysma$",
+        "^right\\ platysma$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rectus-capitis-anterior",
+      "type": "muscle",
+      "english": "Rectus capitis anterior",
+      "patterns": [
+        "^left\\ rectus\\ capitis\\ anterior$",
+        "^right\\ rectus\\ capitis\\ anterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rectus-capitis-lateralis",
+      "type": "muscle",
+      "english": "Rectus capitis lateralis",
+      "patterns": [
+        "^left\\ rectus\\ capitis\\ lateralis$",
+        "^right\\ rectus\\ capitis\\ lateralis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rectus-capitis-posterior-major",
+      "type": "muscle",
+      "english": "Rectus capitis posterior major",
+      "patterns": [
+        "^left\\ rectus\\ capitis\\ posterior\\ major$",
+        "^right\\ rectus\\ capitis\\ posterior\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rectus-capitis-posterior-minor",
+      "type": "muscle",
+      "english": "Rectus capitis posterior minor",
+      "patterns": [
+        "^left\\ rectus\\ capitis\\ posterior\\ minor$",
+        "^right\\ rectus\\ capitis\\ posterior\\ minor$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "scalenus-anterior",
+      "type": "muscle",
+      "english": "Scalenus anterior",
+      "patterns": [
+        "^left\\ scalenus\\ anterior$",
+        "^right\\ scalenus\\ anterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "scalenus-medius",
+      "type": "muscle",
+      "english": "Scalenus medius",
+      "patterns": [
+        "^left\\ scalenus\\ medius$",
+        "^right\\ scalenus\\ medius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "scalenus-posterior",
+      "type": "muscle",
+      "english": "Scalenus posterior",
+      "patterns": [
+        "^left\\ scalenus\\ posterior$",
+        "^right\\ scalenus\\ posterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "semispinalis-capitis",
+      "type": "muscle",
+      "english": "Semispinalis capitis",
+      "patterns": [
+        "^left\\ semispinalis\\ capitis$",
+        "^right\\ semispinalis\\ capitis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "semispinalis-cervicis",
+      "type": "muscle",
+      "english": "Semispinalis cervicis",
+      "patterns": [
+        "^left\\ semispinalis\\ cervicis$",
+        "^right\\ semispinalis\\ cervicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "set-of-anterior-cervical-intertransversarii",
+      "type": "muscle",
+      "english": "Set of anterior cervical intertransversarii",
+      "patterns": [
+        "^set\\ of\\ anterior\\ cervical\\ intertransversarii$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "set-of-interspinales-cervicis",
+      "type": "muscle",
+      "english": "Set of interspinales cervicis",
+      "patterns": [
+        "^set\\ of\\ interspinales\\ cervicis$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "set-of-posterior-cervical-intertransversarii",
+      "type": "muscle",
+      "english": "Set of posterior cervical intertransversarii",
+      "patterns": [
+        "^set\\ of\\ posterior\\ cervical\\ intertransversarii$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "seventh-cervical-vertebra",
+      "type": "bone",
+      "english": "Seventh cervical vertebra",
+      "patterns": [
+        "^seventh\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "sixth-cervical-vertebra",
+      "type": "bone",
+      "english": "Sixth cervical vertebra",
+      "patterns": [
+        "^sixth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "sphenoid-bone",
+      "type": "bone",
+      "english": "Sphenoid bone",
+      "patterns": [
+        "^sphenoid\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "splenius-capitis",
+      "type": "muscle",
+      "english": "Splenius capitis",
+      "patterns": [
+        "^left\\ splenius\\ capitis$",
+        "^right\\ splenius\\ capitis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "splenius-cervicis",
+      "type": "muscle",
+      "english": "Splenius cervicis",
+      "patterns": [
+        "^left\\ splenius\\ cervicis$",
+        "^right\\ splenius\\ cervicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sternocleidomastoid",
+      "type": "muscle",
+      "english": "Sternocleidomastoid",
+      "patterns": [
+        "^left\\ sternocleidomastoid$",
+        "^right\\ sternocleidomastoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sternohyoid",
+      "type": "muscle",
+      "english": "Sternohyoid",
+      "patterns": [
+        "^left\\ sternohyoid$",
+        "^right\\ sternohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sternothyroid",
+      "type": "muscle",
+      "english": "Sternothyroid",
+      "patterns": [
+        "^left\\ sternothyroid$",
+        "^right\\ sternothyroid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "stylohyoid",
+      "type": "muscle",
+      "english": "Stylohyoid",
+      "patterns": [
+        "^left\\ stylohyoid$",
+        "^right\\ stylohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "temporal-bone",
+      "type": "bone",
+      "english": "Temporal bone",
+      "patterns": [
+        "^left\\ temporal\\ bone$",
+        "^right\\ temporal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "third-cervical-vertebra",
+      "type": "bone",
+      "english": "Third cervical vertebra",
+      "patterns": [
+        "^third\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "thyrohyoid",
+      "type": "muscle",
+      "english": "Thyrohyoid",
+      "patterns": [
+        "^left\\ thyrohyoid$",
+        "^right\\ thyrohyoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "vomer",
+      "type": "bone",
+      "english": "Vomer",
+      "patterns": [
+        "^vomer$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true
+    },
+    {
+      "sid": "zygomatic-bone",
+      "type": "bone",
+      "english": "Zygomatic bone",
+      "patterns": [
+        "^left\\ zygomatic\\ bone$",
+        "^right\\ zygomatic\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "clavicle",
+      "type": "bone",
+      "english": "Clavicle",
+      "patterns": [
+        "^left\\ clavicle$",
+        "^right\\ clavicle$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "fifth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Fifth thoracic vertebra",
+      "patterns": [
+        "^fifth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "first-rib",
+      "type": "bone",
+      "english": "First rib",
+      "patterns": [
+        "^left\\ first\\ rib$",
+        "^right\\ first\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "first-thoracic-vertebra",
+      "type": "bone",
+      "english": "First thoracic vertebra",
+      "patterns": [
+        "^first\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "fourth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Fourth thoracic vertebra",
+      "patterns": [
+        "^fourth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "manubrium",
+      "type": "bone",
+      "english": "Manubrium",
+      "patterns": [
+        "^manubrium$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "scapula",
+      "type": "bone",
+      "english": "Scapula",
+      "patterns": [
+        "^left\\ scapula$",
+        "^right\\ scapula$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "second-rib",
+      "type": "bone",
+      "english": "Second rib",
+      "patterns": [
+        "^left\\ second\\ rib$",
+        "^right\\ second\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "second-thoracic-vertebra",
+      "type": "bone",
+      "english": "Second thoracic vertebra",
+      "patterns": [
+        "^second\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "sixth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Sixth thoracic vertebra",
+      "patterns": [
+        "^sixth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "third-thoracic-vertebra",
+      "type": "bone",
+      "english": "Third thoracic vertebra",
+      "patterns": [
+        "^third\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    }
+  ]
+}
