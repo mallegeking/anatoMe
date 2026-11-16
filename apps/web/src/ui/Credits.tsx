@@ -70,7 +70,7 @@ export function Credits({ t, lang, onLang }: { t: Translate; lang: Lang; onLang:
         </p>
       </details>
       <p className="lang-switch">
-        <select className="lang-picker" aria-label={t("lang.label")} value={lang} onChange={(e) => onLang(e.target.value as Lang)}>
+        <select className="field lang-picker" aria-label={t("lang.label")} value={lang} onChange={(e) => onLang(e.target.value as Lang)}>
           {LANGS.map((id) => (
             <option key={id} value={id}>
               {t(`lang.${id}`)}

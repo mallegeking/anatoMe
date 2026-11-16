@@ -161,14 +161,14 @@ export function InfoPanel({ selection, bundle, t, lang, fallbackLabel, onSwitchS
 
       <div className="panel-actions">
         {selection.side !== "" && (
-          <button type="button" onClick={onSwitchSide}>
+          <button className="btn" type="button" onClick={onSwitchSide}>
             {t("info.switchSide")}
           </button>
         )}
-        <button type="button" onClick={onHide}>
+        <button className="btn" type="button" onClick={onHide}>
           {t("info.hide")}
         </button>
-        <button type="button" onClick={onOverUnder}>
+        <button className="btn" type="button" onClick={onOverUnder}>
           {t("info.overUnder")}
         </button>
       </div>

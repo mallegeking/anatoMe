@@ -44,7 +44,7 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
         <h2>{t("area.throughTitle", { name: structureName(through.sid) })}</h2>
         <p>{t("area.notOnLine", { name: structureName(through.sid) })}</p>
         <div className="panel-actions">
-          <button type="button" onClick={onClear}>
+          <button className="btn" type="button" onClick={onClear}>
             {t("area.clear")}
           </button>
         </div>
@@ -96,7 +96,7 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
         })}
       </ol>
       <div className="panel-actions">
-        <button type="button" onClick={onClear}>
+        <button className="btn" type="button" onClick={onClear}>
           {t("area.clear")}
         </button>
       </div>

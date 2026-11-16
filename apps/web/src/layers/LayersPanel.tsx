@@ -35,10 +35,10 @@ export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onT
       <h2 className="layers-title">{t("layers.title")}</h2>
 
       <div className="panel-actions">
-        <button type="button" onClick={onPeel} disabled={!canPeel}>
+        <button className="btn" type="button" onClick={onPeel} disabled={!canPeel}>
           {t("layers.peel")}
         </button>
-        <button type="button" onClick={onRestore} disabled={state.peeledDepths.length === 0}>
+        <button className="btn" type="button" onClick={onRestore} disabled={state.peeledDepths.length === 0}>
           {t("layers.restore")}
         </button>
       </div>
@@ -62,7 +62,7 @@ export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onT
             {hidden.map((h) => (
               <li key={h.key} className="layers-row">
                 <span>{h.name}</span>
-                <button type="button" onClick={() => onShow(h.key)}>
+                <button className="btn" type="button" onClick={() => onShow(h.key)}>
                   {t("layers.show")}
                 </button>
               </li>

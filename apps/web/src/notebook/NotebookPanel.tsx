@@ -137,7 +137,7 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
 
   const loadButton = (
     <>
-      <button type="button" onClick={() => fileInput.current?.click()}>
+      <button className="btn" type="button" onClick={() => fileInput.current?.click()}>
         {t("notebook.loadBackup")}
       </button>
       <input ref={fileInput} type="file" accept="application/json,.json" hidden aria-label={t("notebook.loadBackup")} onChange={loadBackup} />
@@ -173,10 +173,10 @@ export function NotebookPanel({ t, lang, bundle, store, storeError, showComparis
       </ul>
       {showComparison && <LookInto t={t} lang={lang} bundle={bundle} entries={list} onFocusStructure={onFocusStructure} />}
       <div className="panel-actions">
-        <button type="button" onClick={() => onPrint(list)}>
+        <button className="btn" type="button" onClick={() => onPrint(list)}>
           {t("notebook.print")}
         </button>
-        <button type="button" onClick={() => saveBackup(list)}>
+        <button className="btn" type="button" onClick={() => saveBackup(list)}>
           {t("notebook.saveBackup")}
         </button>
         {loadButton}

@@ -30,7 +30,7 @@ export function LogForm({ t, onSave, onCancel }: Props) {
           {t("notebook.feeling")}
         </span>
         {FEELINGS.map((f, i) => (
-          <button key={f} ref={i === 0 ? firstFeeling : undefined} type="button" aria-pressed={f === feeling} onClick={() => setFeeling(f)}>
+          <button className="btn" key={f} ref={i === 0 ? firstFeeling : undefined} type="button" aria-pressed={f === feeling} onClick={() => setFeeling(f)}>
             {t(`notebook.${f}`)}
           </button>
         ))}
@@ -40,7 +40,7 @@ export function LogForm({ t, onSave, onCancel }: Props) {
           {t("notebook.side")}
         </span>
         {SIDES.map((s) => (
-          <button key={s} type="button" aria-pressed={s === side} onClick={() => setSide(s)}>
+          <button className="btn" key={s} type="button" aria-pressed={s === side} onClick={() => setSide(s)}>
             {t(`notebook.side.${s}`)}
           </button>
         ))}
@@ -51,10 +51,10 @@ export function LogForm({ t, onSave, onCancel }: Props) {
         <textarea spellCheck={false} value={note} maxLength={NOTE_MAX} rows={2} onChange={(e) => setNote(e.target.value)} />
       </label>
       <div className="panel-actions">
-        <button type="button" disabled={!feeling || !side} onClick={() => feeling && side && onSave({ feeling, side, note })}>
+        <button className="btn" type="button" disabled={!feeling || !side} onClick={() => feeling && side && onSave({ feeling, side, note })}>
           {t("notebook.save")}
         </button>
-        <button type="button" onClick={onCancel}>
+        <button className="btn" type="button" onClick={onCancel}>
           {t("notebook.cancel")}
         </button>
       </div>

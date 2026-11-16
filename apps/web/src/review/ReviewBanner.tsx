@@ -9,7 +9,7 @@ export function ReviewBanner({ bundle, t, onOpenList }: Props) {
   return (
     <div className="review-banner" role="status">
       <span>{t("review.banner")}</span>
-      <button type="button" onClick={onOpenList}>
+      <button className="btn" type="button" onClick={onOpenList}>
         {t("review.list")}
       </button>
     </div>

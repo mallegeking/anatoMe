@@ -64,7 +64,7 @@ export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoo
         <input
           ref={field}
           type="search"
-          className="search-field"
+          className="field search-field"
           value={query}
           placeholder={t("search.placeholder")}
           aria-label={t("search.label")}
@@ -76,11 +76,11 @@ export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoo
             if (e.key === "Enter" && open && results[0]) choose(results[0]);
           }}
         />
-        <button type="button" className="layers-toggle" aria-expanded={layersOpen} onClick={onToggleLayers}>
+        <button type="button" className="btn layers-toggle" aria-expanded={layersOpen} onClick={onToggleLayers}>
           {t(layersOpen ? "layers.close" : "layers.open")}
         </button>
         {regions.length > 1 && (
-          <select className="region-picker" aria-label={t("region.label")} value={region} onChange={(e) => onRegion(e.target.value)}>
+          <select className="field region-picker" aria-label={t("region.label")} value={region} onChange={(e) => onRegion(e.target.value)}>
             {regions.map((id) => (
               <option key={id} value={id}>
                 {t(`region.${id}`)}

@@ -42,7 +42,7 @@ export function MovementPanel(props: Props) {
 
   const back = (
     <div className="panel-actions">
-      <button type="button" onClick={() => onChange(clearPick())}>
+      <button className="btn" type="button" onClick={() => onChange(clearPick())}>
         {t("movement.back")}
       </button>
     </div>
@@ -94,7 +94,7 @@ function LogMovement({ t, onLog }: { t: Translate; onLog: (input: LogInput) => v
   if (!open) {
     return (
       <div className="panel-actions">
-        <button ref={logButton} type="button" onClick={() => setOpen(true)}>
+        <button className="btn" ref={logButton} type="button" onClick={() => setOpen(true)}>
           {t("notebook.log")}
         </button>
       </div>
@@ -131,7 +131,7 @@ function Picker({ t, lang, bundle, onChange }: Pick<Props, "t" | "lang" | "bundl
             {bundle.movements
               .filter((m) => jointOf(m) === joint)
               .map((m) => (
-                <button key={m.id} type="button" onClick={() => onChange(pickMovement(bundle, m.id))}>
+                <button className="btn" key={m.id} type="button" onClick={() => onChange(pickMovement(bundle, m.id))}>
                   {nameOf(m, lang)}
                 </button>
               ))}
@@ -144,7 +144,7 @@ function Picker({ t, lang, bundle, onChange }: Pick<Props, "t" | "lang" | "bundl
           {exercisesPending && <p className="muted">{t("movement.exercisesPending")}</p>}
           <div className="movement-choices">
             {bundle.exercises.map((e) => (
-              <button key={e.id} type="button" onClick={() => onChange(pickExercise(bundle, e.id))}>
+              <button className="btn" key={e.id} type="button" onClick={() => onChange(pickExercise(bundle, e.id))}>
                 {nameOf(e, lang)}
               </button>
             ))}
@@ -175,7 +175,7 @@ function ExerciseView({ t, lang, bundle, state, onChange, pick, back, log, child
           {t("movement.phase")}
         </span>
         {exercise.phases.map((p) => (
-          <button key={p.id} type="button" aria-pressed={p.id === pick.phase} onClick={() => onChange(pickPhase(state, bundle, p.id))}>
+          <button className="btn" key={p.id} type="button" aria-pressed={p.id === pick.phase} onClick={() => onChange(pickPhase(state, bundle, p.id))}>
             {nameOf(p, lang)}
           </button>
         ))}
