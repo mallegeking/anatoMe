@@ -579,3 +579,93 @@ Perf median: 2381 ms on the hip (the first review fixes measured 2167 ms, the ru
 10. **The two resets in `changeRegion`.** `setNotice(null)` and `setPrintJob(null)` repeat what `select(null)` and the leave-the-Notebook effect already do, so no test can fail on either line alone and none was added. Keep them as a belt for later changes, or remove them. Either way the behaviour stays.
 11. **One unnamed App test failure** was seen once and not reproduced in nine runs after it. If it comes back, the run's full output names the test.
 12. **Spinalis** (item 8): BodyParts3D itself names it, in the header of FJ1543M. Whether it is the cervical part is still not checked.
+
+## Third review fixes
+
+Built on 2026-11-16 in the Linux clone, on the working branch, in the main session, from the owner's prompt with five fixes. These fixes add tests and docs only. The baseline of the build rules was green before any change (validate, check-models, 406 web and 139 pipeline tests, build, 7 e2e, no drafts). No app or pipeline code, no generated file (`pipeline/assets/regions/*.json`, `data/structures/*.yaml`), no model file and not `build_region_blender.py` was changed: `git diff f723a8c HEAD` touches only `App.test.tsx`, `checkModels.test.ts`, `validate.test.ts` and `docs/regions/known-gaps.md`, plus this report and the progress file.
+
+The code under test existed already, so each new test passed at once. To show that each can fail, the named line was broken in the working tree, the test file was run, and the line was put back with `git checkout` (the file was clean afterwards and the test passed again). Nothing broken was committed.
+
+| Fix | Commit | What the mutation showed |
+| --- | --- | --- |
+| 1 loadStructures passes the regions through | `39df281` | `regions: [String(r.region)]` without the `also_in` part: the new test failed with `expected [ 'hip' ] to deeply equal [ 'hip', 'lower-leg' ]`, 1 failed and 54 passed |
+| 2 The side check for the right side | `7458de0` | the side "r" branch of `checkModels.ts` removed: "a mesh with side r whose centre lies at x > 0 fails" failed with `expected true to be false`, 1 failed and 25 passed |
+| 3 The gap line after the region has loaded | `b975eb7` | `RegionInfo.tsx` rendering `<Hint t={t} />` without the region: the new test failed with `Unable to find an element with the text: Not in the model yet: latissimus dorsi.`, and the old gap line test still passed, as the review said |
+| 4 The rest of the address | `05d0140` | `changeRegion` building its params from `new URLSearchParams()`: the new test failed with `expected null to be '1'` |
+| 5 `docs/regions/known-gaps.md` | `ac3d263` | docs only, no mutation |
+| Report and progress file | the commit of this section | |
+
+### Fix 1: loadStructures
+
+"loadStructures gives each structure its home region first, then also_in" in `pipeline/data/test/validate.test.ts` reads `fx("multi-region")` and expects tibia `["hip", "lower-leg"]` and talus `["lower-leg"]`.
+
+### Fix 2: the side check
+
+In `pipeline/data/test/checkModels.test.ts`: "a mesh with side r whose centre lies at x > 0 fails" (the triangle spans x 2 to 3, exact error object `{ file: "test.glb", path: "(unnamed node)", message: "femur has side r but lies on the left" }`) and "a mesh with side r whose centre lies at x < 0 passes" (x -2 to -1, no errors).
+
+### Fix 3: the gap line after loading
+
+"the gap line of the region stays under the tap hint after the region's data has loaded" in `apps/web/src/App.test.tsx` picks the shoulder, waits until the tabs are exactly Structures and Area (only the shoulder's own data takes the Movements and Notebook tabs away), then expects the tap hint and "Not in the model yet: latissimus dorsi.". The earlier gap line test is kept as it is. It still covers the loading fallback and the region without a gap line.
+
+### Fix 4: the rest of the address
+
+"switching region keeps the rest of the address" in `apps/web/src/App.test.tsx` sets the address to `/?x=1#top` before the render, picks the shoulder, and expects `x=1` and `region=shoulder` in `location.search` and `#top` as `location.hash`. The `afterEach` already puts the address back to `/`. The whole file passed with it (41 tests).
+
+### Fix 5: known gaps
+
+What the searches printed:
+
+- `grep -i "palmaris brevis" sources/bp3d-inventory.jsonl`: nothing (exit 1). Also nothing in the 2234 OBJ headers, in `isa_parts_list_e.txt`, `partof_parts_list_e.txt`, `isa_element_parts.txt` or `partof_element_parts.txt`.
+- `grep -i "coccy" sources/bp3d-inventory.jsonl`: nine records, all pelvic floor muscles: FJ1449M, FJ2542 and FJ2547 (coccygeus), FJ1453M, FJ2544 and FJ2549 (iliococcygeus), FJ1457M, FJ2545 and FJ2550 (pubococcygeus). The OBJ headers give the same nine. `isa_parts_list_e.txt` has only coccygeus, iliococcygeus and pubococcygeus and their left and right concepts, no coccyx. The only sacrum mesh is FJ3393 "sacrum".
+- Flexor pollicis brevis: `isa_parts_list_e.txt` has "flexor pollicis brevis" (FMA37378, line 1356) and "superficial head of flexor pollicis brevis" (FMA46104, line 1664). The OBJ headers say "Left flexor pollicis brevis" (FJ1469, x -301 to -256 mm), "Right flexor pollicis brevis" (FJ1469M, x 256 to 301 mm), "Superficial head of right flexor pollicis brevis" (FJ1514, x -302 to -260 mm) and "Superficial head of left flexor pollicis brevis" (FJ1514M, x 260 to 302 mm). In `isa_element_parts.txt` FJ1469 is a "muscle organ" and FJ1514 a "head of muscle organ". `data/structures/arm.yaml` has both, as `flexor-pollicis-brevis` and `superficial-head-of-flexor-pollicis-brevis`.
+
+What changed in `docs/regions/known-gaps.md`:
+
+- "Arm and hand": "No gap is known" is gone. Palmaris brevis is listed as having no mesh, with the sources searched. A line says the arm has no gap line in the app, because there is no `regionGap.arm`. The two flexor pollicis brevis structures are listed with their file ids, FMA ids and header names.
+- "Trunk": the coccyx is listed as having no mesh, with what "coccy" finds instead.
+
+No `regionGap` text in the language files was changed.
+
+### Checks after the third review fixes
+
+Run on `ac3d263`, the full list of the build rules, exit 0:
+
+```
+data in data is valid                                   (validate)
+hip.glb: 65 meshes, 43378 triangles, 234348 bytes, size 0.325 x 1.124 x 0.173
+hip-z-anatomy.glb: 38 meshes, 5531 triangles, 54824 bytes, size 0.288 x 0.579 x 0.136
+lower-leg.glb: 128 meshes, 44294 triangles, 329168 bytes, size 0.339 x 0.907 x 0.230
+shoulder.glb: 91 meshes, 109449 triangles, 483232 bytes, size 0.482 x 0.499 x 0.244
+arm.glb: 144 meshes, 45227 triangles, 363016 bytes, size 0.648 x 0.697 x 0.201
+neck.glb: 105 meshes, 90682 triangles, 495160 bytes, size 0.333 x 0.452 x 0.209
+trunk.glb: 82 meshes, 140296 triangles, 724260 bytes, size 0.289 x 0.640 x 0.229
+region hip: 48909 triangles (budget 150000)
+region lower-leg: 44294 triangles (budget 150000)
+region shoulder: 109449 triangles (budget 150000)
+region arm: 45227 triangles (budget 150000)
+region neck: 90682 triangles (budget 150000)
+region trunk: 140296 triangles (budget 150000)
+every mesh maps to one of 312 structures                (check-models)
+ Test Files  39 passed (39)      Tests  408 passed (408)    (apps/web)
+ Test Files  8 passed (8)        Tests  142 passed (142)    (pipeline/data)
+✓ built in 2.01s                                        (build:review)
+✓ built in 1.52s                                        (build)
+  7 passed (23.5s)                                      (e2e)
+apps/web/dist/data: 6 bundle(s), no drafts              (check-no-drafts)
+median interactive ms: 2682                             (perf-check, the hip)
+ok   decoder download fails: message shown after 1317 ms
+ok   decoder never answers: message shown after 20783 ms
+ok   model file missing: message shown after 1012 ms     (error-check)
+31 passed in 3.32s                                      (test:py)
+```
+
+Perf median: 2682 ms on the hip (2381 ms in the second review fixes, the runs vary by a few hundred ms). No unnamed App test failure came back.
+
+### Deviations (third review fixes)
+
+- None. Every named test could fail on its named line alone.
+
+### For the owner (third review fixes)
+
+13. **A gap line for the arm.** The arm now has a known gap, palmaris brevis, but no `regionGap.arm` text, so the app shows nothing under the tap hint in the arm. Decide whether the arm should get a line such as "Not in the model yet: palmaris brevis." in English and German. The texts were not changed in this run.
+14. **The coccyx** has no mesh in BodyParts3D 4.0, so no region has it. Whether the sacrum mesh FJ3393 includes it was not checked. The trunk's gap line does not mention it. Decide whether it should.

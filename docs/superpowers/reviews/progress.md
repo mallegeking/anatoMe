@@ -13,6 +13,7 @@ Session of 2026-11-16:
 - Sixth run: built plan 4b, the whole body as BodyParts3D meshes and names (Tasks 1 to 5). The saved Phase 4a patch was not touched and still applies to `build_region_blender.py`.
 - Seventh run: the fixes of the Phase 4b review. Fixes 2 to 4 are done (spinalis in the neck, the FMA id of infraspinatus, two generator tests). Fix 1 (a wrong side from BodyParts3D) stopped at its own stop rule and is not committed. See "Review fixes" in `phase-4b-build-report.md`.
 - Eighth run: the second review fixes (Fixes A to C) with the owner's decisions. Fix A is Fix 1 with option (b): only records a region's target list matches get the side they lie on, which corrects exactly FJ1469 and FJ1469M, and `arm.glb` is rebuilt. See "Second review fixes" in `phase-4b-build-report.md`.
+- Ninth run: the third review fixes (Fixes 1 to 5), tests and docs only. Four new tests, each seen failing on its named line, and `docs/regions/known-gaps.md` lists palmaris brevis (arm) and the coccyx (trunk) as having no mesh. See "Third review fixes" in `phase-4b-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -27,6 +28,7 @@ Session of 2026-11-16:
 | Phase 4b whole body meshes, Tasks 1 to 5 | done (with deviations, points for the owner below) | `phase-4b-build-report.md` |
 | Phase 4b review fixes, Fixes 1 to 4 | done (Fixes 2 to 4 in the seventh run, Fix 1 as Fix A of the second review fixes) | `phase-4b-build-report.md`, section "Review fixes" |
 | Phase 4b second review fixes, Fixes A to C | done (two App tests could not be written, see the report) | `phase-4b-build-report.md`, section "Second review fixes" |
+| Phase 4b third review fixes, Fixes 1 to 5 | done (tests and docs only, every test seen failing on its named line) | `phase-4b-build-report.md`, section "Third review fixes" |
 
 ## Waiting for the owner
 
@@ -51,10 +53,11 @@ Session of 2026-11-16:
 - Phase 4b review: spinalis (no name in its own header, named "Spinalis" in the header of its mirror FJ1543M) is filed under the neck by where it lies. Whether it is spinalis cervicis is not checked (items 8 and 12).
 - Phase 4b second review: `setNotice(null)` and `setPrintJob(null)` in `changeRegion` repeat what other code already does, so no test can fail on either line alone and none was added. Keep or remove them (item 10). One App test run failed once without a name and did not come back in nine runs (item 11). The doubled hyoid and the third left digastric file are documented in `docs/regions/known-gaps.md`, not fixed, as the owner decided.
 - Phase 4b second review: `~/build/research/phase4b-fix1-wip.patch` is applied, and the list of 72 beside it, `phase4b-fix1-side-corrections.txt`, is no longer needed. Both can be deleted (item 9).
+- Phase 4b third review: the arm has a known gap now (palmaris brevis has no mesh) but no gap line in the app. Decide whether it gets `regionGap.arm` in English and German (item 13). The coccyx has no mesh either. Decide whether the trunk's gap line should name it (item 14).
 
 ## Notes for the next session
 
-- All runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. After the first five runs the Windows checkout was fast-forwarded to the same commit. The sixth to eighth runs (Phase 4b and its two review fixes) did not touch the Windows checkout, so fast-forward it before using it.
+- All runs built in a clone on the Linux file system, because the web tests time out on the Windows drive. After the first five runs the Windows checkout was fast-forwarded to the same commit. The sixth to ninth runs (Phase 4b and its three review fixes) did not touch the Windows checkout, so fast-forward it before using it.
 - `sources/bp3d-inventory.jsonl` is not tracked in git. The one in the Linux clone has the corrected side of flexor pollicis brevis. Run `pipeline/assets/bp3d_inventory.py` before rebuilding a region anywhere else.
 - `npm ci` and the Python `.venv` in the Windows checkout were run from WSL in the first run. Its `node_modules` and `.venv` hold Linux builds. Run `npm ci` again before using that checkout from Windows.
 - If the owner changes the 2b stopping rule or the probe aim, the change sits in `apps/web/src/area/under.ts` and the probe effect in `apps/web/src/viewer/RegionModel.tsx`, each with a unit test.
