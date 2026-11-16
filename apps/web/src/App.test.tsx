@@ -496,7 +496,10 @@ test("a logged movement is saved, says so and shows in the Notebook tab", async 
   fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
   expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
   fireEvent.click(tab(en["mode.notebook"]));
-  expect((await screen.findAllByText(/^Hip external rotation, \d{1,2} \w{3} \d{4}$/)).length).toBeGreaterThan(0);
+  const item = (await screen.findByText("on the stairs")).closest("li") as HTMLElement;
+  expect(within(item).getByText(/^Hip external rotation$/)).toBeTruthy();
+  expect([...item.querySelectorAll(".chip")].map((c) => c.textContent)).toEqual([en["notebook.painful"], en["notebook.side.l"]]);
+  expect(item.querySelector("[hidden]")!.textContent).toMatch(/^Hip external rotation, \d{1,2} \w{3} \d{4}$/);
   expect(screen.getByText("on the stairs")).toBeTruthy();
 });
 

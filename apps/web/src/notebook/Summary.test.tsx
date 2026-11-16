@@ -145,6 +145,14 @@ test("the printed list shows the uncertainty notes for each structure", () => {
   expect(within(item).getByText(t("info.appliesTo", { text: "pincer hips" }))).toBeTruthy();
 });
 
+test("nothing in the printed summary uses the pale muted class", () => {
+  const bundle = makeMovementBundle();
+  bundle.actions = bundle.actions.map((a) => (a.id === "m1" ? { ...a, confidence: "medium" as const, applies_to: "pincer hips" } : a));
+  const { container } = render(<Summary t={t} lang="en" bundle={bundle} model={summaryModel([entry()], bundle, now, true, "en")} />);
+  expect(screen.getByText(en["confidence.medium"])).toBeTruthy();
+  expect(container.querySelectorAll(".muted").length).toBe(0);
+});
+
 test("the printed dates are in the reader's language", () => {
   const de = createT(deTexts, en);
   const model = summaryModel([entry({ date: "2026-11-13" }), entry({ id: "o", date: "2026-10-01", feeling: "fine" })], b, now, false, "de");

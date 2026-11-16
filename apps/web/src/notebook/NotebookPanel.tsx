@@ -267,17 +267,17 @@ function EntryItem({ t, lang, bundle, entry, onDelete }: { t: Translate; lang: L
 }
 
 // The lines under a candidate: the limits on who it applies to, then how well supported the rows are.
-// The printed summary shows the same lines.
-export function CandidateNotes({ t, bundle, cand }: { t: Translate; bundle: RegionBundle; cand: Candidate }) {
+// The printed summary shows the same lines, without the pale muted class so they print black.
+export function CandidateNotes({ t, bundle, cand, className }: { t: Translate; bundle: RegionBundle; cand: Candidate; className?: string }) {
   const { confidence, appliesTo } = candidateNotes(bundle, cand);
   return (
     <>
       {appliesTo.map((text) => (
-        <div key={text} className="muted">
+        <div key={text} className={className}>
           {t("info.appliesTo", { text })}
         </div>
       ))}
-      <div className="muted">{t(`confidence.${confidence}`)}</div>
+      <div className={className}>{t(`confidence.${confidence}`)}</div>
     </>
   );
 }
@@ -304,7 +304,7 @@ function LookInto({ t, lang, bundle, entries, onFocusStructure }: { t: Translate
                   <button type="button" className="link-button" onClick={() => onFocusStructure({ sid: cand.sid, side: c.side })}>
                     {candidateText(t, bundle, cand, c.painfulCount, lang)}
                   </button>
-                  <CandidateNotes t={t} bundle={bundle} cand={cand} />
+                  <CandidateNotes t={t} bundle={bundle} cand={cand} className="muted" />
                 </Card>
               ))}
             </ul>

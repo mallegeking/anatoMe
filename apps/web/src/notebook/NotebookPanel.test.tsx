@@ -135,7 +135,8 @@ test("an exercise logged part way through shows its angles in whole degrees", as
 
 test("a note for a movement the bundle lacks is listed as unknown", async () => {
   await showWith([entry({ pick: { kind: "movement", id: "shoulder-shrug" } })]);
-  expect(screen.getAllByText((text) => text.includes(en["notebook.unknown"])).length).toBeGreaterThan(0);
+  // Once in the visible line and once in the hidden line that Delete points at.
+  expect(screen.getAllByText((text) => text.includes(en["notebook.unknown"])).length).toBe(2);
   // It is left out of the comparison, so there is nothing painful to compare.
   expect(screen.getByText(en["notebook.needPainful"])).toBeTruthy();
 });
