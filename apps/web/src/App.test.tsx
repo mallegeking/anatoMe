@@ -704,6 +704,19 @@ test("switching region writes ?region=<id> into the address without a new histor
   expect(location.search).toBe("?region=shoulder");
 });
 
+test("switching region keeps the rest of the address", async () => {
+  history.replaceState(null, "", "/?x=1#top");
+  serveTwo();
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  pickRegion("shoulder");
+  await screen.findByText(en["info.tapHint"]);
+  const params = new URLSearchParams(location.search);
+  expect(params.get("x")).toBe("1");
+  expect(params.get("region")).toBe("shoulder");
+  expect(location.hash).toBe("#top");
+});
+
 test("a data error in one region does not stay on screen after switching to another", async () => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   serveTwo(true, false);
