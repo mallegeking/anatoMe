@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { IDBFactory } from "fake-indexeddb";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "./data/bundle";
@@ -120,7 +120,11 @@ function serveFiles(bundle: RegionBundle | null, manifest: unknown = oneRegion) 
   return fetch;
 }
 
-beforeEach(clearRegionDataCache);
+beforeEach(() => {
+  clearRegionDataCache();
+  // Every test starts on a phone, unless it asks for another screen.
+  setViewport("phone");
+});
 afterEach(() => {
   cleanup();
   // A test that switches the language must not leave the next one in German.
@@ -787,4 +791,87 @@ test("switching between phone and wide keeps the viewer mounted and the selectio
   expect(viewer.mounts).toBe(before);
   expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
   expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
+});
+
+// Shown means in the page and not inside a hidden element.
+const shown = (el: HTMLElement) => el.closest("[hidden]") === null;
+
+test("wide: the layers section is always there, next to the tab panel", async () => {
+  setViewport("wide");
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(shown(screen.getByTestId("layers-panel"))).toBe(true);
+  expect(shown(screen.getByTestId("info-label"))).toBe(true);
+  expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
+  expect(screen.queryByRole("button", { name: en["layers.open"] })).toBeNull();
+});
+
+test("phone: the layers button opens Layers in the sheet, and a tab change closes it", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(screen.queryByTestId("layers-panel")).toBeNull();
+  const open = screen.getByRole("button", { name: en["layers.open"] });
+  fireEvent.click(open);
+  expect(open.getAttribute("aria-expanded")).toBe("true");
+  expect(shown(screen.getByTestId("layers-panel"))).toBe(true);
+  // The tab panel keeps its state but is out of sight.
+  expect(screen.getByTestId("panel-scroll").hidden).toBe(true);
+  fireEvent.click(tab(en["mode.movement"]));
+  expect(screen.queryByTestId("layers-panel")).toBeNull();
+  expect(screen.getByTestId("panel-scroll").hidden).toBe(false);
+  expect(screen.getByTestId("movement-panel")).toBeTruthy();
+});
+
+test("phone: a tap on a structure closes Layers and shows the structure", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  fireEvent.click(screen.getByText("tap piriformis"));
+  expect(screen.queryByTestId("layers-panel")).toBeNull();
+  expect(shown(screen.getByTestId("info-panel"))).toBe(true);
+});
+
+test("phone: a tap on empty space leaves Layers open", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  fireEvent.click(screen.getByText("model"));
+  expect(screen.getByTestId("layers-panel")).toBeTruthy();
+});
+
+test("phone: the close button closes Layers", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["layers.close"] }));
+  expect(screen.queryByTestId("layers-panel")).toBeNull();
+  expect(screen.getByTestId("panel-scroll").hidden).toBe(false);
+});
+
+test("the top bar has no layers button", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(within(screen.getByRole("banner")).queryByRole("button", { name: en["layers.open"] })).toBeNull();
+});
+
+test("going from phone to wide with Layers open keeps Layers, the selection and the tab", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  fireEvent.click(screen.getByText("tap piriformis"));
+  fireEvent.click(screen.getByRole("button", { name: en["layers.open"] }));
+  act(() => setViewport("wide"));
+  expect(shown(screen.getByTestId("layers-panel"))).toBe(true);
+  expect(shown(screen.getByTestId("info-panel"))).toBe(true);
+  expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
+  expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
+  act(() => setViewport("phone"));
+  expect(shown(screen.getByTestId("info-panel"))).toBe(true);
+  expect(screen.queryByTestId("layers-panel")).toBeNull();
 });

@@ -299,10 +299,6 @@ body,
   font: inherit;
 }
 
-.layers-toggle {
-  margin: 0 0 8px;
-}
-
 /* Only there when the manifest has more than one body region. The language switch in the credits looks the same. */
 .region-picker,
 .lang-picker {
@@ -338,6 +334,45 @@ body,
 
 .layers-panel {
   font-size: 0.9375rem;
+}
+
+/* The slot holds Layers. On a phone it takes the sheet while open. On a wide screen it stays above the tab panel. */
+.layers-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px;
+}
+
+@media (min-width: 900px) {
+  .layers-slot {
+    flex: 0 0 auto;
+    max-height: 45%;
+    border-bottom: 1px solid var(--divider);
+  }
+}
+
+.layers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.layers-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Temporary layers button in the stage's bottom right corner, phone only. */
+.stage-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .layers-title,
@@ -399,11 +434,6 @@ body,
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
-}
-
-.top-bar .layers-toggle {
-  margin: 0;
-  flex: 0 0 auto;
 }
 
 /* Only there when the manifest has more than one body region. Big enough for a thumb.

@@ -11,8 +11,6 @@ type Props = {
   // The search finds and shows names in this language, and in English and Latin too.
   lang: Lang;
   structures: BundleStructure[];
-  layersOpen: boolean;
-  onToggleLayers: () => void;
   onChoose: (structure: BundleStructure) => void;
   // Whether the result list shows. The app keeps this, so a tap on the model can close the list too.
   open: boolean;
@@ -23,9 +21,9 @@ type Props = {
   onRegion: (id: string) => void;
 };
 
-// The bar above the model: the app name, the search field, the layers button and, when there is more than one, the region picker.
+// The bar above the model: the app name, the search field and, when there is more than one, the region picker.
 // The result list closes when a result is chosen, the field is emptied or the field loses focus.
-export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
+export function TopBar({ t, lang, structures, onChoose, open, onOpenChange, regions, region, onRegion }: Props) {
   const [query, setQuery] = useState("");
   // Another region has other structures, so the typed text goes. State set while rendering is the React way to reset on a change.
   const [queryRegion, setQueryRegion] = useState(region);
@@ -77,9 +75,6 @@ export function TopBar({ t, lang, structures, layersOpen, onToggleLayers, onChoo
             if (e.key === "Enter" && open && results[0]) choose(results[0]);
           }}
         />
-        <button type="button" className="btn layers-toggle" aria-expanded={layersOpen} onClick={onToggleLayers}>
-          {t(layersOpen ? "layers.close" : "layers.open")}
-        </button>
         {regions.length > 1 && (
           <select className="field region-picker" aria-label={t("region.label")} value={region} onChange={(e) => onRegion(e.target.value)}>
             {regions.map((id) => (

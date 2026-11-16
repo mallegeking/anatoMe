@@ -2,6 +2,7 @@ import type { BundleStructure } from "../data/bundle";
 import type { Lang } from "../i18n/lang";
 import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
+import { CloseIcon } from "../ui/icons";
 import { hiddenKey, isVisibleOnAnySide, tissueOf, type LayerState, type TissueGroup } from "./layers";
 
 type Props = {
@@ -15,12 +16,14 @@ type Props = {
   onToggleTissue: (group: TissueGroup) => void;
   // key is what hiddenKey made for the entry.
   onShow: (key: string) => void;
+  // Given on the phone, where the panel opens over the tab panel. It adds a close button next to the title.
+  onClose?: () => void;
 };
 
 const GROUPS: TissueGroup[] = ["bone", "muscle", "soft"];
 
 // Peel buttons, tissue switches and the list of things hidden one by one.
-export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onToggleTissue, onShow }: Props) {
+export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onToggleTissue, onShow, onClose }: Props) {
   // One entry per hidden side, so hiding the left piriformis lists "Piriformis (left)".
   const hidden = structures.flatMap((s) =>
     (["l", "r", ""] as const)
@@ -32,7 +35,15 @@ export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onT
   const peeled = state.peeledDepths.length;
   return (
     <section className="layers-panel" data-testid="layers-panel">
-      <h2 className="layers-title">{t("layers.title")}</h2>
+      <div className="layers-head">
+        <h2 className="layers-title">{t("layers.title")}</h2>
+        {onClose && (
+          <button className="btn layers-close" type="button" onClick={onClose}>
+            <CloseIcon size={16} />
+            {t("layers.close")}
+          </button>
+        )}
+      </div>
 
       <div className="panel-actions">
         <button className="btn" type="button" onClick={onPeel} disabled={!canPeel}>

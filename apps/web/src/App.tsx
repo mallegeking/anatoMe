@@ -4,8 +4,9 @@ import de from "./i18n/de.json";
 import en from "./i18n/en.json";
 import { pickLanguage, readStoredLanguage, storeLanguage, type Lang } from "./i18n/lang";
 import { createT, type Translate } from "./i18n/t";
-import { hideStructure, initialLayers, revealFor, type LayerState } from "./layers/layers";
+import { hideStructure, initialLayers, peel, restore, revealFor, showStructure, toggleTissue, type LayerState } from "./layers/layers";
 import type { AreaState } from "./area/AreaPanel";
+import { LayersPanel } from "./layers/LayersPanel";
 import { makeIsShown } from "./layers/shown";
 import { involved } from "./movement/roles";
 import { initialMovementState, pickMovement, queryOf, type MovementState } from "./movement/state";
@@ -20,6 +21,7 @@ import { selectBySearch } from "./search/search";
 import { Credits, EducationalLine } from "./ui/Credits";
 import { ModeBar, type Mode } from "./ui/ModeBar";
 import { PanelArea } from "./ui/PanelArea";
+import { LayersIcon } from "./ui/icons";
 import { Hint } from "./ui/RegionInfo";
 import { TopBar } from "./ui/TopBar";
 import { useWide } from "./ui/useMedia";
@@ -82,6 +84,12 @@ export function App() {
   // The wide layout puts the tabs in a column on the left, so the arrow keys that move between them change too.
   const wide = useWide();
   const structures = useMemo(() => bundle?.structures ?? [], [bundle]);
+  // On the wide layout Layers always has its own section. On the phone it opens over the tab panel.
+  // Going to the wide layout forgets the open state, so coming back to the phone starts with Layers closed.
+  useEffect(() => {
+    if (wide) setLayersOpen(false);
+  }, [wide]);
+  const phoneLayers = !wide && layersOpen;
   // A region without joints has no movements, so it has no Movements tab and no Notebook tab.
   const modes = useMemo<Mode[]>(
     () => (!bundle || bundle.movements.length > 0 ? ["atlas", "movement", "area", "notebook"] : ["atlas", "area"]),
@@ -152,6 +160,12 @@ export function App() {
     history.replaceState(null, "", `?${params.toString()}${location.hash}`);
   }
 
+  // A change of tab closes Layers on the phone.
+  function changeMode(next: Mode) {
+    setMode(next);
+    setLayersOpen(false);
+  }
+
   function select(sel: Selection | null, fileLabel?: string) {
     setSelection(sel);
     setLabel(fileLabel);
@@ -159,8 +173,10 @@ export function App() {
   }
 
   // A tap on the model also closes the search list, so the list does not hang over the model.
+  // A tap on a structure closes Layers on the phone, so the structure shows.
   function tapModel(sel: Selection | null, fileLabel?: string) {
     setSearchOpen(false);
+    if (sel !== null) setLayersOpen(false);
     select(sel, fileLabel);
   }
 
@@ -252,6 +268,7 @@ export function App() {
   // "See what lies over and under it": switch to the Area tab and look through the selected structure.
   function overUnder() {
     if (!selection) return;
+    setLayersOpen(false);
     setMode("area");
     setAreaProbe({ ...selection });
   }
@@ -265,9 +282,16 @@ export function App() {
   // A movement named in the info panel: open the Movements tab with it picked.
   function openMovement(id: string) {
     if (!bundle) return;
+    setLayersOpen(false);
     setMode("movement");
     setMovement(pickMovement(bundle, id));
   }
+
+  // The layer buttons. They work on the structures of the region shown.
+  const peelLayer = () => setLayers((s) => peel(s, structures));
+  const restoreLayers = () => setLayers(restore);
+  const toggleLayerTissue = (group: Parameters<typeof toggleTissue>[1]) => setLayers((s) => toggleTissue(s, group));
+  const showLayerStructure = (key: string) => setLayers((s) => showStructure(s, key));
 
   // The colours of the involved structures. Only while the Movements tab has a pick with at least one
   // row that applies. Otherwise there is nothing to colour, so the model stays whole.
@@ -323,8 +347,6 @@ export function App() {
             t={t}
             lang={lang}
             structures={structures}
-            layersOpen={layersOpen}
-            onToggleLayers={() => setLayersOpen(!layersOpen)}
             onChoose={chooseResult}
             open={searchOpen}
             onOpenChange={setSearchOpen}
@@ -334,7 +356,7 @@ export function App() {
           />
         </div>
         <nav className="nav">
-          <ModeBar t={t} mode={shownMode} modes={modes} onChange={setMode} vertical={wide} />
+          <ModeBar t={t} mode={shownMode} modes={modes} onChange={changeMode} vertical={wide} />
         </nav>
         {reviewOpen && bundle?.mode === "review" ? (
           <div className="stage review-stage">
@@ -352,10 +374,30 @@ export function App() {
             areaProbe={areaProbe}
           />
           <PerfOverlay t={t} />
+          {/* Temporary: the stage controls take this button over. */}
+          {!wide && (
+            <button type="button" className="btn stage-btn" aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>
+              <LayersIcon size={18} />
+              {t("layers.open")}
+            </button>
+          )}
         </div>
         <aside className="side">
-          {/* Filled when the layers move out of the panel. */}
-          <div className="layers-slot" />
+          {(wide || layersOpen) && (
+            <div className="layers-slot">
+              <LayersPanel
+                t={t}
+                lang={lang}
+                state={layers}
+                structures={structures}
+                onPeel={peelLayer}
+                onRestore={restoreLayers}
+                onToggleTissue={toggleLayerTissue}
+                onShow={showLayerStructure}
+                onClose={wide ? undefined : () => setLayersOpen(false)}
+              />
+            </div>
+          )}
           <div className="panel">
             <EducationalLine t={t} />
             <div
@@ -363,6 +405,7 @@ export function App() {
               data-testid="panel-scroll"
               role="tabpanel"
               id="tabpanel"
+              hidden={phoneLayers}
               aria-labelledby={`tab-${shownMode}`}
               tabIndex={0}
             >
@@ -384,9 +427,6 @@ export function App() {
                       mode={shownMode}
                       selection={selection}
                       label={label}
-                      layersOpen={layersOpen}
-                      layers={layers}
-                      setLayers={setLayers}
                       movement={movement}
                       onMovementChange={setMovement}
                       onBundle={setBundle}

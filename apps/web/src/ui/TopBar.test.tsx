@@ -23,8 +23,6 @@ function Harness({ onChoose, lang = "en" }: { onChoose: (s: BundleStructure) => 
       t={t}
       lang={lang}
       structures={structures}
-      layersOpen={false}
-      onToggleLayers={() => {}}
       onChoose={onChoose}
       open={open}
       onOpenChange={setOpen}
@@ -112,8 +110,6 @@ function showRegions(regions: string[], onRegion = vi.fn()) {
       t={t}
       lang="en"
       structures={structures}
-      layersOpen={false}
-      onToggleLayers={() => {}}
       onChoose={() => {}}
       open={false}
       onOpenChange={() => {}}

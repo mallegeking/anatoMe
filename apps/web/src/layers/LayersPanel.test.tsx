@@ -79,3 +79,15 @@ test("a structure hidden on one side is listed with its side", () => {
   fireEvent.click(screen.getByRole("button", { name: /Show/ }));
   expect(onShow).toHaveBeenCalledWith("piriformis|l");
 });
+
+test("with onClose a close button shows and calls it", () => {
+  const onClose = vi.fn();
+  show(initialLayers(), { onClose });
+  fireEvent.click(screen.getByRole("button", { name: en["layers.close"] }));
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test("without onClose there is no close button", () => {
+  show();
+  expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
+});
