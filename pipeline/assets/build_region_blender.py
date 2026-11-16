@@ -379,9 +379,10 @@ def measure_depths(objs):
             continue
         sid = o["sid"]
         vertices = o.data.vertices
-        step = max(1, len(vertices) // DEPTH_SAMPLES)
+        n_verts = len(vertices)
+        k = min(n_verts, DEPTH_SAMPLES)  # spread evenly over the whole mesh
         c = counts.setdefault(sid, [0, 0])
-        for v in list(vertices)[::step][:DEPTH_SAMPLES]:
+        for v in (vertices[i * n_verts // k] for i in range(k)):
             n = v.normal.normalized()
             origin = v.co + n * DEPTH_START
             travelled, free = 0.0, True
@@ -500,8 +501,7 @@ def main():
                 sys.exit(1)
             print(f"ALIGNMENT OK: both hip joints within {1000 * MAX_HIP_JOINT_ERROR:.0f} mm")
         objs = build_objects(picked, "z-anatomy",
-                             lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices,
-                             load_cap(args.region))
+                             lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices)
 
     report(objs)
     export(objs, out, args.source)
