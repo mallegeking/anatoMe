@@ -3,6 +3,7 @@ import { useState } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { BundleStructure } from "../data/bundle";
 import en from "../i18n/en.json";
+import type { Lang } from "../i18n/lang";
 import { createT } from "../i18n/t";
 import { TopBar } from "./TopBar";
 
@@ -10,18 +11,32 @@ const t = createT(en);
 afterEach(cleanup);
 
 const structures: BundleStructure[] = [
-  { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2 },
-  { id: "femur", type: "bone", english: "Femur", depth: 4 },
+  { id: "piriformis", type: "muscle", english: "Piriformis", german: "Birnenförmiger Muskel", latin: "Musculus piriformis", depth: 2, paired: true },
+  { id: "femur", type: "bone", english: "Femur", depth: 4, paired: true },
 ];
 
 // The app keeps the open state of the list, so the tests do the same.
-function Harness({ onChoose }: { onChoose: (s: BundleStructure) => void }) {
+function Harness({ onChoose, lang = "en" }: { onChoose: (s: BundleStructure) => void; lang?: Lang }) {
   const [open, setOpen] = useState(false);
-  return <TopBar t={t} structures={structures} layersOpen={false} onToggleLayers={() => {}} onChoose={onChoose} open={open} onOpenChange={setOpen} />;
+  return (
+    <TopBar
+      t={t}
+      lang={lang}
+      structures={structures}
+      layersOpen={false}
+      onToggleLayers={() => {}}
+      onChoose={onChoose}
+      open={open}
+      onOpenChange={setOpen}
+      regions={["hip"]}
+      region="hip"
+      onRegion={() => {}}
+    />
+  );
 }
 
-function show(onChoose = vi.fn()) {
-  render(<Harness onChoose={onChoose} />);
+function show(onChoose = vi.fn(), lang: Lang = "en") {
+  render(<Harness onChoose={onChoose} lang={lang} />);
   return { onChoose, field: screen.getByPlaceholderText("Search, for example piriformis") };
 }
 
@@ -80,4 +95,59 @@ test("a result shows the English name, the type and the Latin name", () => {
   const result = screen.getByRole("button", { name: /Piriformis/ });
   expect(result.textContent).toContain(en["type.muscle"]);
   expect(result.textContent).toContain("Musculus piriformis");
+});
+
+test("after Escape closed the list, Enter chooses nothing", () => {
+  const { onChoose, field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.keyDown(field, { key: "Escape" });
+  fireEvent.keyDown(field, { key: "Enter" });
+  expect(onChoose).not.toHaveBeenCalled();
+});
+
+// The region picker. These render the bar directly, because the search state does not matter here.
+function showRegions(regions: string[], onRegion = vi.fn()) {
+  render(
+    <TopBar
+      t={t}
+      lang="en"
+      structures={structures}
+      layersOpen={false}
+      onToggleLayers={() => {}}
+      onChoose={() => {}}
+      open={false}
+      onOpenChange={() => {}}
+      regions={regions}
+      region="hip"
+      onRegion={onRegion}
+    />,
+  );
+  return onRegion;
+}
+
+test("one region shows no picker", () => {
+  showRegions(["hip"]);
+  expect(screen.queryByLabelText(en["region.label"])).toBeNull();
+});
+
+test("two regions show a picker that reports the choice", () => {
+  const onRegion = showRegions(["hip", "shoulder"]);
+  const picker = screen.getByLabelText(en["region.label"]) as HTMLSelectElement;
+  expect(picker.value).toBe("hip");
+  expect(screen.getByRole("option", { name: en["region.hip"] })).toBeTruthy();
+  fireEvent.change(picker, { target: { value: "shoulder" } });
+  expect(onRegion).toHaveBeenCalledWith("shoulder");
+});
+
+test("in German the list shows the German name and choosing one puts it in the field", () => {
+  const { field } = show(vi.fn(), "de");
+  fireEvent.change(field, { target: { value: "birnenformig" } });
+  fireEvent.click(screen.getByRole("button", { name: /Birnenförmiger Muskel/ }));
+  expect((field as HTMLInputElement).value).toBe("Birnenförmiger Muskel");
+});
+test("in English the German name is not shown", () => {
+  const { field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  expect(screen.getByRole("button", { name: /Piriformis/ })).toBeTruthy();
+  expect(screen.queryByText("Birnenförmiger Muskel")).toBeNull();
 });

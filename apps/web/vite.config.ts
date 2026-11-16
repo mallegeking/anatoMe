@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
@@ -24,9 +25,13 @@ function skipThreeDracoDefaults(): Plugin {
   };
 }
 
+// The root package.json holds the version. The app shows it in the credits.
+const rootPackage = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as { version: string };
+
 // base "./" makes the build work from any folder on any host.
 export default defineConfig({
   base: "./",
+  define: { __APP_VERSION__: JSON.stringify(rootPackage.version) },
   plugins: [react(), skipThreeDracoDefaults()],
   build: {
     // Writes the licence texts of every npm library inside the bundle to dist/third-party-licenses.txt.

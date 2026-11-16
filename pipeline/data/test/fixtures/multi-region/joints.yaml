@@ -1,0 +1,4 @@
+- id: hip
+  region: hip
+  dofs:
+    - {id: flexion, positive: flexion, negative: extension}

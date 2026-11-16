@@ -13,6 +13,8 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:4175",
     viewport: { width: 412, height: 915 },
+    // Keep a trace of a failed run. Retries stay off, a flaky test should be fixed.
+    trace: "retain-on-failure",
   },
   webServer: {
     command: "node scripts/e2e-prepare.mjs && npx vite preview --outDir dist-e2e --port 4175 --strictPort",

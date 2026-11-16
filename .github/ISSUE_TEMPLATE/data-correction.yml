@@ -1,0 +1,52 @@
+name: Data correction
+description: Report a claim in the app that looks wrong or missing.
+title: "Data correction: "
+labels: ["data-correction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping. anatoMe is an educational tool and cannot give medical advice. This form is for the content of the app only. See docs/data-corrections.md for what happens next.
+  - type: input
+    id: structure
+    attributes:
+      label: Structure
+      description: Which muscle, bone, ligament or other structure is it about?
+    validations:
+      required: true
+  - type: input
+    id: movement
+    attributes:
+      label: Movement
+      description: Which movement or exercise is it about, if any?
+  - type: input
+    id: row-code
+    attributes:
+      label: Row code
+      description: Only if you know it. Leave this empty if you do not, the structure and movement are enough.
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+  - type: textarea
+    id: right
+    attributes:
+      label: What you think is right
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source with a link
+      description: A paper, textbook or other source that supports it, with a link. Please say where in the source to look.
+    validations:
+      required: true
+  - type: checkboxes
+    id: not-advice
+    attributes:
+      label: Medical advice
+      options:
+        - label: I am not asking for medical advice
+          required: true

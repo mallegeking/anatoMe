@@ -9,9 +9,10 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 - Done 2026-11-03: the iliotibial tract is typed `fascia` (Phase 1 Task 2).
 - Done 2026-11-03: the piriformis 45 versus 30 degree question is attached to both piriformis rows as a `review_note` for the physio (Phase 1 Tasks 1 and 11). The answer itself comes from the physio review.
 - Done 2026-11-03: `posterior-cruciate-ligament` has its Terminologia Anatomica 2 name, Ligamentum cruciatum posterius (Phase 1 Task 10).
-- Done 2026-11-03: validator fixtures cover the load-type rule for capsule, bursa, bone, meniscus and fascia too (Phase 1 Task 1). Labrum and joint still have no fixture of their own.
-- Check structures in the reverse direction too (every meshed target has a structure entry).
-- Model check unit tests use glb files without Draco. Add one Draco fixture.
+- Done 2026-11-03: validator fixtures cover the load-type rule for capsule, bursa, bone, meniscus and fascia too (Phase 1 Task 1).
+- Done 2026-11-14: the labrum and the joint have their own validator fixtures (Phase 2d Task 2).
+- Done 2026-11-14: the model check also fails for a structure in the data that no mesh carries (Phase 2d Task 2).
+- Done 2026-11-14: one model check test reads a Draco-compressed glb that the test writes itself (Phase 2d Task 2).
 
 ## Mesh pipeline
 
@@ -37,19 +38,19 @@ Small issues found while reviewing Phase 0. None of them blocks the spike. Each 
 
 ## Tooling and docs
 
-- `perf-check.mjs` and `error-check.mjs`: handle a failed server start, a busy port 4173, and rename the `URL` constant.
-- Deploy guide: soften "Tailscale reads the files fresh on each request" and mention a hard refresh after updates.
-- README: describe the goal in future tense until the app does all of it.
-- Spike report: add a pointer to the tap pass criteria when the phone result is recorded.
+- Done 2026-11-14: `perf-check.mjs` and `error-check.mjs` now handle a failed server start and a busy port 4173, and the `URL` constant is renamed `PAGE_URL` (Phase 3 Task 4).
+- Done 2026-11-14: the deploy guide no longer promises that Tailscale reads the files fresh, and it tells you to do a hard refresh on the phone after an update (Phase 3 Task 4).
+- Done (done by Task 5 of the Phase 3 plan): README describes the goal in future tense until the app does all of it.
+- Done 2026-11-14: the spike report points to the tap checks in the phone measurements sheet (Phase 3 Task 4).
 
 ## Phase 2
 
 Found in the Phase 1 reviews and left for Phase 2.
 
-- Iliacus and psoas major are at depth 1, so the first peel hides them together with sartorius and rectus femoris. Decide how deep they should show.
-- "Hide this" hides both sides of a paired structure. Let it hide one side only.
-- Search opens paired structures on the left and keeps a hard-coded list of unpaired ones (only the sacrum). Give the bundle a `paired` flag instead, before the next region adds midline structures.
-- After Escape closed the search list, Enter still chooses the first result. Make Enter do nothing while the list is closed.
-- The brackets around the licence links in `Credits.tsx` are typed in the code. Move them into `en.json`.
-- Playwright: keep a trace of a failed run, and decide whether CI should retry a failed end-to-end test.
+- Done 2026-11-14 (Phase 2d Task 6): Iliacus and psoas major are at depth 1, so the first peel hides them together with sartorius and rectus femoris. Decide how deep they should show. Both are now at depth 2, because an ultrasound guide shows sartorius as the outermost muscle over the iliopsoas at the front of the hip.
+- Done 2026-11-13 (Phase 2a Task 1): "Hide this" hides both sides of a paired structure. Let it hide one side only.
+- Done 2026-11-13 (Phase 2a Task 1): Search opens paired structures on the left and keeps a hard-coded list of unpaired ones (only the sacrum). Give the bundle a `paired` flag instead, before the next region adds midline structures.
+- Done 2026-11-13 (Phase 2a Task 2): After Escape closed the search list, Enter still chooses the first result. Make Enter do nothing while the list is closed.
+- Done 2026-11-13 (Phase 2a Task 2): The brackets around the licence links in `Credits.tsx` are typed in the code. Move them into `en.json`.
+- Done 2026-11-13 (Phase 2a Task 2): Playwright: keep a trace of a failed run, and decide whether CI should retry a failed end-to-end test.
 - Angles between measured points: a row only claims what a source measured, so nothing is said between two measured angles (for example obturator externus between 60 and 75 degrees). Agree a rule with the physio.

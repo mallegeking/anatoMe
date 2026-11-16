@@ -1,13 +1,17 @@
 // Command line entry for the data checks.
 //   validate <dataDir>                  checks the YAML knowledge base
 //   build-data <dataDir> <outDir> [--review]  validates, then writes <outDir>/<region>.json per region
+//   mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...]  records a review
+//   data-report <dataDir> <region>      prints the coverage report as Markdown
 //   check-models <modelsDir> <dataDir>  checks mesh extras, licenses and the triangle budget
 // Prints one "file path: message" line per problem and exits 1 when there is any.
 
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { compileRegion, listRegions } from "./compile.ts";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
+import { markChecked } from "./markChecked.ts";
+import { coverage, formatReport } from "./report.ts";
 import { loadStructures, validateDataDir, type ValidationResult } from "./validate.ts";
 
 // The most triangles one region may have, so it stays smooth on a phone.
@@ -35,7 +39,7 @@ async function main(args: string[]): Promise<number> {
     const totals = new Map<string, number>();
     for (const f of manifestFiles(modelsDir)) {
       const s = await modelStats(join(modelsDir, f.path));
-      console.log(`${f.path}: ${s.meshes} meshes, ${s.triangles} triangles, ${s.bytes} bytes`);
+      console.log(`${f.path}: ${s.meshes} meshes, ${s.triangles} triangles, ${s.bytes} bytes, size ${s.size.map((n) => n.toFixed(3)).join(" x ")}`);
       totals.set(f.region, (totals.get(f.region) ?? 0) + s.triangles);
     }
     let code = 0;
@@ -46,6 +50,49 @@ async function main(args: string[]): Promise<number> {
     }
     if (code === 0) console.log(`every mesh maps to one of ${structures.size} structures`);
     return code;
+  }
+  if (command === "mark-checked") {
+    const dataDir = rest[0];
+    let by = "";
+    let on = "";
+    const ids: string[] = [];
+    for (let i = 1; i < rest.length; i++) {
+      if (rest[i] === "--by") by = rest[++i] ?? "";
+      else if (rest[i] === "--on") on = rest[++i] ?? "";
+      else if (rest[i] === "--from") {
+        let content: string;
+        try {
+          content = readFileSync(rest[++i] ?? "", "utf8");
+        } catch {
+          console.error(`cannot read the ids file ${rest[i]}`);
+          return 2;
+        }
+        const lines = content.split(/\r?\n/);
+        for (const l of lines) if (l.trim() !== "" && !l.trim().startsWith("#")) ids.push(l.trim());
+      } else ids.push(rest[i]);
+    }
+    if (!dataDir || ids.length === 0) {
+      console.error("usage: cli.ts mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...]");
+      return 2;
+    }
+    const run = markChecked(dataDir, [...new Set(ids)], by, on);
+    for (const id of new Set(ids)) {
+      const state = run.missing.includes(id) ? "not found" : run.already.includes(id) ? "already checked" : "marked";
+      console.log(`${id}: ${run.ok || state !== "marked" ? state : "not written"}`);
+    }
+    for (const e of run.errors) console.error(e);
+    if (!run.ok) console.error("nothing was written");
+    return run.ok ? 0 : 1;
+  }
+  if (command === "data-report" && rest.length === 2) {
+    const report = coverage(rest[0], rest[1]);
+    // A typo in the region name would otherwise look like an empty but healthy report.
+    if (report.structures.length === 0) {
+      console.error(`no structures found for region "${rest[1]}"`);
+      return 1;
+    }
+    console.log(formatReport(report));
+    return 0;
   }
   if (command === "build-data") {
     const review = rest.includes("--review");
@@ -61,12 +108,12 @@ async function main(args: string[]): Promise<number> {
         const bundle = compileRegion(dataDir, region, review ? "review" : "normal");
         const text = JSON.stringify(bundle);
         writeFileSync(join(outDir, `${region}.json`), text);
-        console.log(`${region}.json (${bundle.mode}): ${text.length} bytes, ${bundle.actions.length} actions, ${bundle.attachments.length} attachments`);
+        console.log(`${region}.json (${bundle.mode}): ${text.length} bytes, ${bundle.actions.length} actions, ${bundle.attachments.length} attachments, ${bundle.exercises.length} exercises`);
       }
       return 0;
     }
   }
-  console.error("usage: cli.ts validate <dataDir> | build-data <dataDir> <outDir> [--review] | check-models <modelsDir> <dataDir>");
+  console.error("usage: cli.ts validate <dataDir> | build-data <dataDir> <outDir> [--review] | mark-checked <dataDir> --by <label> --on <date> [--from <file>] [id ...] | data-report <dataDir> <region> | check-models <modelsDir> <dataDir>");
   return 2;
 }
 

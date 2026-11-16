@@ -1,0 +1,70 @@
+# Exercises for the Movements tab: which way the joints move in each phase and which muscles do the work.
+# Drafted on 2026-11-14 (plan 2d, Task 4) from sources opened in full that day. Every row waits for a physio.
+# path says how the joints move through a phase, from one angle to another, in degrees (see joints.yaml:
+# zero is standing upright, flexion and abduction are positive). Each from and to comes from the cited source,
+# except a start at 0, which is the standing or lying start of the exercise (the review_note asks about it).
+# effort lists the movements that the working muscles produce or hold back in that phase. It is not the way
+# the joint travels: lowering into a squat bends the hip, but the hip extensors do the work.
+# Exercises without a source for their joint angles are listed in docs/phase2/data-gaps.md.
+# German names from the German Wikipedia article Kniebeuge, read on 2026-11-14. german is left out where no opened source gave one.
+
+- id: bodyweight-squat
+  english: Bodyweight squat
+  german: Kniebeuge
+  regions: [hip]
+  phases:
+    - id: lowering
+      english: Lowering
+      german: Abwärtsbewegung
+      path:
+        - {angle: hip.flexion, from: 0, to: 90.3}
+        - {angle: knee.flexion, from: 0, to: 94.0}
+      effort: [hip-extension, knee-extension]
+    - id: rising
+      english: Rising
+      german: Aufwärtsbewegung
+      path:
+        - {angle: hip.flexion, from: 90.3, to: 0}
+        - {angle: knee.flexion, from: 94.0, to: 0}
+      effort: [hip-extension, knee-extension]
+  citations:
+    - ref: pottorf-2026
+      locator: Results, Table 1 (Peak joint angles), rows Squat, Right Hip Flexion and Right Knee Flexion, Vicon column. Squat depth set by a platform behind the participant (Methods, Testing protocol).
+      says: "In 18 healthy adults squatting down to a set platform, the marker-based system measured peak right hip flexion of 90.3 degrees (SD 6.9) and peak right knee flexion of 94.0 degrees (SD 22.6)."
+      says_kind: summary
+    - ref: park-2026
+      locator: Results, 3.2 Muscle Activity in the Eccentric Phase, Table 3
+      says: "During the lowering (eccentric) phase of the back squat, gluteus maximus, biceps femoris and semitendinosus worked at about 20 percent of their maximum voluntary contraction, and vastus medialis and vastus lateralis at about 35 to 60 percent."
+      says_kind: summary
+    - ref: park-2026
+      locator: Discussion, paragraphs beginning "Squat depth appeared to operate primarily as a demand-scaling variable" and "GM activation showed limited modulation"
+      says: "deeper squat positions required greater active control of knee flexion during descent and greater knee-extension output during ascent ... Although GM is a primary hip extensor"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: the angles are group means at the bottom of a squat to a set depth, and the start at 0 is standing upright. The muscle data come from a loaded barbell squat, used here for a bodyweight squat. Are the depth and the effort (hip and knee extensors in both phases) right?"
+
+- id: side-lying-hip-abduction
+  english: Side-lying hip abduction
+  regions: [hip]
+  phases:
+    - id: lifting
+      english: Lifting the leg
+      path:
+        - {angle: hip.abduction, from: 0, to: 30}
+      effort: [hip-abduction]
+    - id: lowering
+      english: Lowering the leg
+      path:
+        - {angle: hip.abduction, from: 30, to: 0}
+      effort: [hip-abduction]
+  citations:
+    - ref: uebayashi-2026
+      locator: Materials and Methods, Experimental task, first paragraph
+      says: "setting the hip joint at 0° ... Hip abduction (30°) was performed without knee bending for 3 s (concentric phase). Participants kept their legs elevated for 3 s (hold phase) and placed them down afterward for 3 s, without bending their knees (eccentric phase)"
+      says_kind: quote
+    - ref: uebayashi-2026
+      locator: Materials and Methods, Kinematics, and Abstract, Results
+      says: "Based on the displacement of the femoral angle, hip abduction was classified into concentric and eccentric phases ... The relative activation ratios (RARs) of the GMin-p and GMed to TFL were highest in hip position involving IR during the early concentric or late eccentric phases"
+      says_kind: quote
+  checked_by: null
+  review_note: "Physio: 30 degrees is the angle the study set for the task, with the hip otherwise straight and the knee straight. The study counts lowering as the eccentric phase of the abductors. Is 30 degrees a fair range to show, and is hip abduction right as the effort in both phases?"

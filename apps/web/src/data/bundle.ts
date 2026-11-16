@@ -1,9 +1,11 @@
 // The shape of the compiled data for one region (public/data/<region>.json).
 // Types only. The app reads it and pipeline/data/src/compile.ts writes it.
 
-export type BundleStructure = { id: string; type: string; english: string; latin?: string; depth: number };
+// german is the German name where a source gave one. The app shows names through nameOf, which falls back to english.
+// gap names a part the model does not show yet. The info panel shows the text gap.<gap> for it.
+export type BundleStructure = { id: string; type: string; english: string; german?: string; latin?: string; depth: number; paired: boolean; gap?: string };
 
-export type BundleMovement = { id: string; english: string; dof: string; direction: "positive" | "negative" };
+export type BundleMovement = { id: string; english: string; german?: string; dof: string; direction: "positive" | "negative" };
 
 // One source backing a claim. ref points to an entry in the bundle's citations.
 export type BundleCitationUse = { ref: string; locator: string; says: string; says_kind: "quote" | "summary" };
@@ -34,6 +36,19 @@ export type BundleAction = {
   review_note?: string;
 };
 
+export type BundlePhase = { id: string; english: string; german?: string; path: { angle: string; from: number; to: number }[]; effort: string[] };
+
+export type BundleExercise = {
+  id: string;
+  english: string;
+  german?: string;
+  phases: BundlePhase[];
+  citations: BundleCitationUse[];
+  draft: boolean;
+  // A question for the reviewer. Only the review build has it.
+  review_note?: string;
+};
+
 export type BundleCitation = { id: string; title: string; authors: string; year: number; url: string; license: string };
 
 export type RegionBundle = {
@@ -46,4 +61,9 @@ export type RegionBundle = {
   citations: BundleCitation[];
   // How many unchecked action rows each structure has. Normal mode counts the rows it dropped.
   pendingByStructure: Record<string, number>;
+  exercises: BundleExercise[];
+  // How many unchecked action rows each movement has.
+  pendingByMovement: Record<string, number>;
+  // How many unchecked exercise rows this region has.
+  pendingExercises: number;
 };

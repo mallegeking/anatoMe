@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useRef, useState } from "react";
 import type { Translate } from "../i18n/t";
+import type { ModelFiles } from "./manifest";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
 import type { SceneProps } from "./Scene";
 import { useLoadWatchdog } from "./useLoadWatchdog";
@@ -8,7 +9,7 @@ import { hasWebGL, WebGLUnavailableError } from "./webgl";
 // The 3D scene and three.js arrive as a separate download, so the rest of the first screen shows without waiting for them.
 const Scene = lazy(() => import("./Scene"));
 
-type Props = Omit<SceneProps, "onLoaded"> & { t: Translate };
+type Props = Omit<SceneProps, "onLoaded" | "urls"> & { t: Translate; files: ModelFiles };
 
 export function Viewer({ t, ...sceneProps }: Props) {
   return (
@@ -19,7 +20,7 @@ export function Viewer({ t, ...sceneProps }: Props) {
 }
 
 // Shows the loading text until the model files are in, and keeps an eye on the time.
-function WatchedScene({ t, ...sceneProps }: Props) {
+function WatchedScene({ t, files, ...sceneProps }: Props) {
   // Checked once. Without WebGL there is no point in downloading three.js.
   const [webgl] = useState(hasWebGL);
   const [loaded, setLoaded] = useState(false);
@@ -35,6 +36,8 @@ function WatchedScene({ t, ...sceneProps }: Props) {
   useLoadWatchdog(isReady);
 
   if (!webgl) throw new WebGLUnavailableError();
+  // A manifest that could not be read is a model load failure, so the boundary shows the same message.
+  if (files && "error" in files) throw files.error;
 
   return (
     <>
@@ -44,7 +47,7 @@ function WatchedScene({ t, ...sceneProps }: Props) {
         </p>
       )}
       <Suspense fallback={null}>
-        <Scene {...sceneProps} onLoaded={markLoaded} />
+        <Scene {...sceneProps} urls={files?.urls ?? null} onLoaded={markLoaded} />
       </Suspense>
     </>
   );

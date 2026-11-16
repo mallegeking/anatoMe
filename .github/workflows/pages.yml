@@ -1,0 +1,65 @@
+# Puts the checked build of the app on GitHub Pages.
+# It runs when something lands on main, or when someone starts it by hand.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time. A newer run waits for the running one instead of cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # Builds the normal app (never the review copy), makes sure no unchecked row got into it,
+  # and hands only that folder over as the Pages artifact.
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node packages
+        run: npm ci
+
+      - name: Validate data
+        run: npm run validate
+
+      - name: Check meshes against the data
+        run: npm run check-models
+
+      - name: Build the app
+        run: npm run build
+
+      - name: Make sure the build holds no draft rows
+        run: node scripts/check-no-drafts.mjs
+
+      - name: Upload the build for Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/web/dist
+
+  # Publishes the artifact. It only runs while the repository is public, because Pages
+  # is not meant to be on for a private repository. Until then the build job still runs as a check.
+  deploy:
+    needs: build
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

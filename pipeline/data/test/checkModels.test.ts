@@ -1,7 +1,9 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Document, NodeIO } from "@gltf-transform/core";
+import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
+import draco3d from "draco3dgltf";
 import { afterAll, expect, test } from "vitest";
 import { checkModelMapping, modelStats, type ValidationResult } from "../src/checkModels.ts";
 
@@ -9,8 +11,8 @@ type Extras = Record<string, unknown>;
 const BASE: Extras = { sid: "femur", label: "Femur", side: "l", kind: "bone", source: "bp3d" };
 
 // Writes a glb with one single-triangle mesh node per entry. An entry overrides the base
-// extras, and a key set to undefined is left out.
-async function writeGlb(file: string, meshes: Extras[]) {
+// extras, and a key set to undefined is left out. The triangle spans x from x to x + 1.
+async function writeGlb(file: string, meshes: Extras[], x = 0) {
   const doc = new Document();
   const buffer = doc.createBuffer();
   const scene = doc.createScene();
@@ -18,7 +20,7 @@ async function writeGlb(file: string, meshes: Extras[]) {
     const position = doc
       .createAccessor()
       .setType("VEC3")
-      .setArray(new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]))
+      .setArray(new Float32Array([x, 0, 0, x + 1, 0, 0, x, 1, 0]))
       .setBuffer(buffer);
     const mesh = doc.createMesh().addPrimitive(doc.createPrimitive().setAttribute("POSITION", position));
     const extras = Object.fromEntries(
@@ -34,10 +36,10 @@ const made: string[] = [];
 afterAll(() => made.forEach((d) => rmSync(d, { recursive: true, force: true })));
 
 // A models folder holding test.glb and a manifest that lists it.
-function makeDir(files: { path: string; source: string; license: string }[]) {
+function makeDir(files: { path: string; source: string; license: string }[], region = "test") {
   const d = mkdtempSync(join(tmpdir(), "anatome-models-"));
   made.push(d);
-  writeFileSync(join(d, "manifest.json"), JSON.stringify({ regions: { test: { files } } }));
+  writeFileSync(join(d, "manifest.json"), JSON.stringify({ regions: { [region]: { files } } }));
   return d;
 }
 const entry = (license = "CC-BY-4.0") => ({ path: "test.glb", source: "bp3d", license });
@@ -55,7 +57,7 @@ async function dirWithLicense(license: string) {
 }
 
 // The structures the checks know about, with the type and english name the meshes must match.
-const femur = new Map([["femur", { type: "bone", english: "Femur" }]]);
+const femur = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["test"] }]]);
 
 function expectError(result: ValidationResult, pattern: RegExp) {
   expect(result.ok).toBe(false);
@@ -86,8 +88,17 @@ test("modelStats counts mesh nodes, triangles and bytes", async () => {
   expect(stats.bytes).toBeGreaterThan(0);
 });
 
-test("a midline mesh has an empty side and passes", async () =>
-  expect((await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur)).ok).toBe(true));
+test("modelStats reports the size of the model", async () => {
+  const d = await dir([{}, { sid: "tibia" }]);
+  const { size } = await modelStats(join(d, "test.glb"));
+  expect(size).toHaveLength(3);
+  // The test file is flat, so a side may be zero.
+  for (const n of size) {
+    expect(Number.isFinite(n)).toBe(true);
+    expect(n).toBeGreaterThanOrEqual(0);
+  }
+});
+
 test("fails on a side that is not l, r or empty", async () =>
   expectError(await checkModelMapping(await dir([{ side: "left" }]), femur), /side must be/));
 
@@ -106,3 +117,85 @@ test("fails when a mesh kind differs from the structure type", async () =>
   expectError(await checkModelMapping(await dir([{ kind: "muscle" }]), femur), /kind muscle but femur is a bone/));
 test("fails when a mesh label differs from the structure name", async () =>
   expectError(await checkModelMapping(await dir([{ label: "Thigh bone" }]), femur), /label Thigh bone but femur is called Femur/));
+
+test("a midline structure with a sided mesh is an error", async () => {
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }]]);
+  expectError(await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "l" }]), sacrum), /sacrum is marked midline but mesh .* has side l/);
+});
+
+test("a paired structure with an unsided mesh is an error", async () =>
+  expectError(await checkModelMapping(await dir([{ sid: "femur", side: "" }]), femur), /femur is not marked midline but mesh .* has no side/));
+
+test("a midline structure with an unsided mesh passes", async () => {
+  const sacrum = new Map([["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }]]);
+  expect((await checkModelMapping(await dir([{ sid: "sacrum", label: "Sacrum", side: "" }]), sacrum)).ok).toBe(true);
+});
+
+// Structures in the data must have a mesh somewhere, the check works in both directions.
+test("a structure that no mesh carries is an error", async () => {
+  const two = new Map([
+    ["femur", { type: "bone", english: "Femur", midline: false, regions: ["test"] }],
+    ["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["test"] }],
+  ]);
+  expectError(await checkModelMapping(await dir([{ sid: "femur" }]), two), /structure sacrum has no mesh in any file/);
+});
+
+// Writes a Draco-compressed glb with one triangle mesh, the way the real model files are stored.
+async function writeDracoGlb(file: string, extras: Extras) {
+  const doc = new Document();
+  const buffer = doc.createBuffer();
+  const position = doc.createAccessor().setType("VEC3").setArray(new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0])).setBuffer(buffer);
+  const indices = doc.createAccessor().setType("SCALAR").setArray(new Uint16Array([0, 1, 2])).setBuffer(buffer);
+  const mesh = doc.createMesh().addPrimitive(doc.createPrimitive().setAttribute("POSITION", position).setIndices(indices));
+  doc.createScene().addChild(doc.createNode().setMesh(mesh).setExtras({ ...BASE, ...extras }));
+  doc.createExtension(KHRDracoMeshCompression).setRequired(true).setEncoderOptions({ method: KHRDracoMeshCompression.EncoderMethod.EDGEBREAKER });
+  const io = new NodeIO()
+    .registerExtensions([KHRDracoMeshCompression])
+    .registerDependencies({ "draco3d.encoder": await draco3d.createEncoderModule() });
+  await io.write(file, doc);
+}
+
+test("the model check reads a Draco-compressed file", async () => {
+  const d = makeDir([entry()]);
+  await writeDracoGlb(join(d, "test.glb"), { sid: "femur" });
+  // The file really is compressed, so a reader without the decoder cannot open it.
+  expect(readFileSync(join(d, "test.glb")).includes("KHR_draco_mesh_compression")).toBe(true);
+  const result = await checkModelMapping(d, femur);
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
+});
+
+test("a mesh must sit in a region its structure belongs to", async () => {
+  const d = makeDir([{ path: "test.glb", source: "bp3d", license: "CC-BY-4.0" }], "lower-leg");
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur" }]);
+  const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip"] }]]);
+  const result = await checkModelMapping(d, structures);
+  expect(result.ok).toBe(false);
+  expect(result.errors).toEqual([
+    { file: "test.glb", path: "(unnamed node)", message: "femur belongs to hip, not to lower-leg" },
+  ]);
+});
+test("a mesh in an also_in region passes", async () => {
+  const d = makeDir([{ path: "test.glb", source: "bp3d", license: "CC-BY-4.0" }], "lower-leg");
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur" }]);
+  const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip", "lower-leg"] }]]);
+  expect((await checkModelMapping(d, structures)).ok).toBe(true);
+});
+
+// In BodyParts3D, and so in the model, left is x > 0.
+test("a mesh with side l whose centre lies at x < 0 fails", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "l" }], -2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.ok).toBe(false);
+  expect(result.errors).toEqual([
+    { file: "test.glb", path: "(unnamed node)", message: "femur has side l but lies on the right" },
+  ]);
+});
+test("a mesh with side l whose centre lies at x > 0 passes", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "l" }], 2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
+});

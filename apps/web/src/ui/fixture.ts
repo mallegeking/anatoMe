@@ -7,11 +7,11 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
     region: "hip",
     mode,
     structures: [
-      { id: "hip-bone", type: "bone", english: "Hip bone", depth: 3 },
-      { id: "sacrum", type: "bone", english: "Sacrum", latin: "Os sacrum", depth: 4 },
-      { id: "femur", type: "bone", english: "Femur", latin: "Os femoris", depth: 3 },
-      { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2 },
-      { id: "rectus-femoris", type: "muscle", english: "Rectus femoris", depth: 1 },
+      { id: "hip-bone", type: "bone", english: "Hip bone", depth: 3, paired: true },
+      { id: "sacrum", type: "bone", english: "Sacrum", latin: "Os sacrum", depth: 4, paired: false },
+      { id: "femur", type: "bone", english: "Femur", latin: "Os femoris", depth: 3, paired: true },
+      { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2, paired: true },
+      { id: "rectus-femoris", type: "muscle", english: "Rectus femoris", depth: 1, paired: true, gap: "quadriceps-tendon" },
     ],
     movements: [{ id: "hip-ext-rot", english: "Hip external rotation", dof: "hip.rotation", direction: "positive" }],
     attachments: [
@@ -52,5 +52,8 @@ export function makeBundle(mode: "normal" | "review" = "normal"): RegionBundle {
     ],
     citations: [{ id: "c1", title: "Hip anatomy", authors: "Smith", year: 2020, url: "https://example.org", license: "CC-BY" }],
     pendingByStructure: { piriformis: 1 },
+    exercises: [],
+    pendingByMovement: {},
+    pendingExercises: 0,
   };
 }

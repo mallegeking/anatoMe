@@ -1,0 +1,710 @@
+{
+  "region": "lower-leg",
+  "max_triangles_per_mesh": 2000,
+  "targets": [
+    {
+      "sid": "abductor-digiti-minimi-of-foot",
+      "type": "muscle",
+      "english": "Abductor digiti minimi of foot",
+      "patterns": [
+        "^abductor\\ digiti\\ minimi\\ of\\ left\\ foot$",
+        "^abductor\\ digiti\\ minimi\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "abductor-hallucis",
+      "type": "muscle",
+      "english": "Abductor hallucis",
+      "patterns": [
+        "^left\\ abductor\\ hallucis$",
+        "^right\\ abductor\\ hallucis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "calcaneal-tendon",
+      "type": "tendon",
+      "english": "Calcaneal tendon",
+      "patterns": [
+        "^left\\ calcaneal\\ tendon$",
+        "^right\\ calcaneal\\ tendon$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "calcaneus",
+      "type": "bone",
+      "english": "Calcaneus",
+      "patterns": [
+        "^left\\ calcaneus$",
+        "^right\\ calcaneus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "cuboid-bone",
+      "type": "bone",
+      "english": "Cuboid bone",
+      "patterns": [
+        "^left\\ cuboid\\ bone$",
+        "^right\\ cuboid\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-big-toe",
+      "type": "bone",
+      "english": "Distal phalanx of big toe",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ big\\ toe$",
+        "^distal\\ phalanx\\ of\\ right\\ big\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-fourth-toe",
+      "type": "bone",
+      "english": "Distal phalanx of fourth toe",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ fourth\\ toe$",
+        "^distal\\ phalanx\\ of\\ right\\ fourth\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-little-toe",
+      "type": "bone",
+      "english": "Distal phalanx of little toe",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ little\\ toe$",
+        "^distal\\ phalanx\\ of\\ right\\ little\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-second-toe",
+      "type": "bone",
+      "english": "Distal phalanx of second toe",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ second\\ toe$",
+        "^distal\\ phalanx\\ of\\ right\\ second\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-third-toe",
+      "type": "bone",
+      "english": "Distal phalanx of third toe",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ third\\ toe$",
+        "^distal\\ phalanx\\ of\\ right\\ third\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-digitorum-longus",
+      "type": "muscle",
+      "english": "Extensor digitorum longus",
+      "patterns": [
+        "^left\\ extensor\\ digitorum\\ longus$",
+        "^right\\ extensor\\ digitorum\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-hallucis-brevis",
+      "type": "muscle",
+      "english": "Extensor hallucis brevis",
+      "patterns": [
+        "^left\\ extensor\\ hallucis\\ brevis$",
+        "^right\\ extensor\\ hallucis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-hallucis-longus",
+      "type": "muscle",
+      "english": "Extensor hallucis longus",
+      "patterns": [
+        "^left\\ extensor\\ hallucis\\ longus$",
+        "^right\\ extensor\\ hallucis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fibularis-brevis",
+      "type": "muscle",
+      "english": "Fibularis brevis",
+      "patterns": [
+        "^left\\ fibularis\\ brevis$",
+        "^right\\ fibularis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fibularis-longus",
+      "type": "muscle",
+      "english": "Fibularis longus",
+      "patterns": [
+        "^left\\ fibularis\\ longus$",
+        "^right\\ fibularis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fibularis-tertius",
+      "type": "muscle",
+      "english": "Fibularis tertius",
+      "patterns": [
+        "^left\\ fibularis\\ tertius$",
+        "^right\\ fibularis\\ tertius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fifth-metatarsal-bone",
+      "type": "bone",
+      "english": "Fifth metatarsal bone",
+      "patterns": [
+        "^left\\ fifth\\ metatarsal\\ bone$",
+        "^right\\ fifth\\ metatarsal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "first-lumbrical-of-foot",
+      "type": "muscle",
+      "english": "First lumbrical of foot",
+      "patterns": [
+        "^first\\ lumbrical\\ of\\ left\\ foot$",
+        "^first\\ lumbrical\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "first-metatarsal-bone",
+      "type": "bone",
+      "english": "First metatarsal bone",
+      "patterns": [
+        "^left\\ first\\ metatarsal\\ bone$",
+        "^right\\ first\\ metatarsal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "first-plantar-interosseous-of-foot",
+      "type": "muscle",
+      "english": "First plantar interosseous of foot",
+      "patterns": [
+        "^first\\ plantar\\ interosseous\\ of\\ left\\ foot$",
+        "^first\\ plantar\\ interosseous\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-accessorius",
+      "type": "muscle",
+      "english": "Flexor accessorius",
+      "patterns": [
+        "^left\\ flexor\\ accessorius$",
+        "^right\\ flexor\\ accessorius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digiti-minimi-brevis-of-foot",
+      "type": "muscle",
+      "english": "Flexor digiti minimi brevis of foot",
+      "patterns": [
+        "^flexor\\ digiti\\ minimi\\ brevis\\ of\\ left\\ foot$",
+        "^flexor\\ digiti\\ minimi\\ brevis\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digitorum-brevis",
+      "type": "muscle",
+      "english": "Flexor digitorum brevis",
+      "patterns": [
+        "^left\\ flexor\\ digitorum\\ brevis$",
+        "^right\\ flexor\\ digitorum\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digitorum-longus",
+      "type": "muscle",
+      "english": "Flexor digitorum longus",
+      "patterns": [
+        "^left\\ flexor\\ digitorum\\ longus$",
+        "^right\\ flexor\\ digitorum\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-hallucis-longus",
+      "type": "muscle",
+      "english": "Flexor hallucis longus",
+      "patterns": [
+        "^left\\ flexor\\ hallucis\\ longus$",
+        "^right\\ flexor\\ hallucis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fourth-lumbrical-of-foot",
+      "type": "muscle",
+      "english": "Fourth lumbrical of foot",
+      "patterns": [
+        "^fourth\\ lumbrical\\ of\\ left\\ foot$",
+        "^fourth\\ lumbrical\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fourth-metatarsal-bone",
+      "type": "bone",
+      "english": "Fourth metatarsal bone",
+      "patterns": [
+        "^left\\ fourth\\ metatarsal\\ bone$",
+        "^right\\ fourth\\ metatarsal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "intermediate-cuneiform-bone",
+      "type": "bone",
+      "english": "Intermediate cuneiform bone",
+      "patterns": [
+        "^left\\ intermediate\\ cuneiform\\ bone$",
+        "^right\\ intermediate\\ cuneiform\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lateral-cuneiform-bone",
+      "type": "bone",
+      "english": "Lateral cuneiform bone",
+      "patterns": [
+        "^left\\ lateral\\ cuneiform\\ bone$",
+        "^right\\ lateral\\ cuneiform\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lateral-head-of-flexor-hallucis-brevis",
+      "type": "muscle",
+      "english": "Lateral head of flexor hallucis brevis",
+      "patterns": [
+        "^lateral\\ head\\ of\\ left\\ flexor\\ hallucis\\ brevis$",
+        "^lateral\\ head\\ of\\ right\\ flexor\\ hallucis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lateral-head-of-gastrocnemius",
+      "type": "muscle",
+      "english": "Lateral head of gastrocnemius",
+      "patterns": [
+        "^lateral\\ head\\ of\\ left\\ gastrocnemius$",
+        "^lateral\\ head\\ of\\ right\\ gastrocnemius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "medial-cuneiform-bone",
+      "type": "bone",
+      "english": "Medial cuneiform bone",
+      "patterns": [
+        "^left\\ medial\\ cuneiform\\ bone$",
+        "^right\\ medial\\ cuneiform\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "medial-head-of-flexor-hallucis-brevis",
+      "type": "muscle",
+      "english": "Medial head of flexor hallucis brevis",
+      "patterns": [
+        "^medial\\ head\\ of\\ left\\ flexor\\ hallucis\\ brevis$",
+        "^medial\\ head\\ of\\ right\\ flexor\\ hallucis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "medial-head-of-gastrocnemius",
+      "type": "muscle",
+      "english": "Medial head of gastrocnemius",
+      "patterns": [
+        "^medial\\ head\\ of\\ left\\ gastrocnemius$",
+        "^medial\\ head\\ of\\ right\\ gastrocnemius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-fourth-toe",
+      "type": "bone",
+      "english": "Middle phalanx of fourth toe",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ fourth\\ toe$",
+        "^middle\\ phalanx\\ of\\ right\\ fourth\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-little-toe",
+      "type": "bone",
+      "english": "Middle phalanx of little toe",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ little\\ toe$",
+        "^middle\\ phalanx\\ of\\ right\\ little\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-second-toe",
+      "type": "bone",
+      "english": "Middle phalanx of second toe",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ second\\ toe$",
+        "^middle\\ phalanx\\ of\\ right\\ second\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-third-toe",
+      "type": "bone",
+      "english": "Middle phalanx of third toe",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ third\\ toe$",
+        "^middle\\ phalanx\\ of\\ right\\ third\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "navicular-bone-of-foot",
+      "type": "bone",
+      "english": "Navicular bone of foot",
+      "patterns": [
+        "^navicular\\ bone\\ of\\ left\\ foot$",
+        "^navicular\\ bone\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "oblique-head-of-adductor-hallucis",
+      "type": "muscle",
+      "english": "Oblique head of adductor hallucis",
+      "patterns": [
+        "^oblique\\ head\\ of\\ left\\ adductor\\ hallucis$",
+        "^oblique\\ head\\ of\\ right\\ adductor\\ hallucis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "opponens-digiti-minimi-of-foot",
+      "type": "muscle",
+      "english": "Opponens digiti minimi of foot",
+      "patterns": [
+        "^opponens\\ digiti\\ minimi\\ of\\ left\\ foot$",
+        "^opponens\\ digiti\\ minimi\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "plantaris",
+      "type": "muscle",
+      "english": "Plantaris",
+      "patterns": [
+        "^left\\ plantaris$",
+        "^right\\ plantaris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "popliteus",
+      "type": "muscle",
+      "english": "Popliteus",
+      "patterns": [
+        "^left\\ popliteus$",
+        "^right\\ popliteus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-big-toe",
+      "type": "bone",
+      "english": "Proximal phalanx of big toe",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ big\\ toe$",
+        "^proximal\\ phalanx\\ of\\ right\\ big\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-fourth-toe",
+      "type": "bone",
+      "english": "Proximal phalanx of fourth toe",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ fourth\\ toe$",
+        "^proximal\\ phalanx\\ of\\ right\\ fourth\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-little-toe",
+      "type": "bone",
+      "english": "Proximal phalanx of little toe",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ little\\ toe$",
+        "^proximal\\ phalanx\\ of\\ right\\ little\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-second-toe",
+      "type": "bone",
+      "english": "Proximal phalanx of second toe",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ second\\ toe$",
+        "^proximal\\ phalanx\\ of\\ right\\ second\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-third-toe",
+      "type": "bone",
+      "english": "Proximal phalanx of third toe",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ third\\ toe$",
+        "^proximal\\ phalanx\\ of\\ right\\ third\\ toe$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "second-lumbrical-of-foot",
+      "type": "muscle",
+      "english": "Second lumbrical of foot",
+      "patterns": [
+        "^second\\ lumbrical\\ of\\ left\\ foot$",
+        "^second\\ lumbrical\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "second-metatarsal-bone",
+      "type": "bone",
+      "english": "Second metatarsal bone",
+      "patterns": [
+        "^left\\ second\\ metatarsal\\ bone$",
+        "^right\\ second\\ metatarsal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "second-plantar-interosseous-of-foot",
+      "type": "muscle",
+      "english": "Second plantar interosseous of foot",
+      "patterns": [
+        "^second\\ plantar\\ interosseous\\ of\\ left\\ foot$",
+        "^second\\ plantar\\ interosseous\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sesamoid-bone-of-foot",
+      "type": "bone",
+      "english": "Sesamoid bone of foot",
+      "patterns": [
+        "^sesamoid\\ bone\\ of\\ left\\ foot$",
+        "^sesamoid\\ bone\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "soleus",
+      "type": "muscle",
+      "english": "Soleus",
+      "patterns": [
+        "^left\\ soleus$",
+        "^right\\ soleus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "talus",
+      "type": "bone",
+      "english": "Talus",
+      "patterns": [
+        "^left\\ talus$",
+        "^right\\ talus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "third-lumbrical-of-foot",
+      "type": "muscle",
+      "english": "Third lumbrical of foot",
+      "patterns": [
+        "^third\\ lumbrical\\ of\\ left\\ foot$",
+        "^third\\ lumbrical\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "third-metatarsal-bone",
+      "type": "bone",
+      "english": "Third metatarsal bone",
+      "patterns": [
+        "^left\\ third\\ metatarsal\\ bone$",
+        "^right\\ third\\ metatarsal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "third-plantar-interosseous-of-foot",
+      "type": "muscle",
+      "english": "Third plantar interosseous of foot",
+      "patterns": [
+        "^third\\ plantar\\ interosseous\\ of\\ left\\ foot$",
+        "^third\\ plantar\\ interosseous\\ of\\ right\\ foot$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "tibialis-anterior",
+      "type": "muscle",
+      "english": "Tibialis anterior",
+      "patterns": [
+        "^left\\ tibialis\\ anterior$",
+        "^right\\ tibialis\\ anterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "tibialis-posterior",
+      "type": "muscle",
+      "english": "Tibialis posterior",
+      "patterns": [
+        "^left\\ tibialis\\ posterior$",
+        "^right\\ tibialis\\ posterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "transverse-head-of-adductor-hallucis",
+      "type": "muscle",
+      "english": "Transverse head of adductor hallucis",
+      "patterns": [
+        "^transverse\\ head\\ of\\ left\\ adductor\\ hallucis$",
+        "^transverse\\ head\\ of\\ right\\ adductor\\ hallucis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "femur",
+      "type": "bone",
+      "english": "Femur",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:femur)$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "fibula",
+      "type": "bone",
+      "english": "Fibula",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:fibula)$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "patella",
+      "type": "bone",
+      "english": "Patella",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:patella)$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "tibia",
+      "type": "bone",
+      "english": "Tibia",
+      "patterns": [
+        "^(?:(?:left|right) )?(?:tibia)$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    }
+  ]
+}

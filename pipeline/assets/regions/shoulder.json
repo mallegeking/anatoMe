@@ -1,0 +1,655 @@
+{
+  "region": "shoulder",
+  "max_triangles_per_mesh": 2000,
+  "targets": [
+    {
+      "sid": "abdominal-part-of-pectoralis-major",
+      "type": "muscle",
+      "english": "Abdominal part of pectoralis major",
+      "patterns": [
+        "^abdominal\\ part\\ of\\ left\\ pectoralis\\ major$",
+        "^abdominal\\ part\\ of\\ right\\ pectoralis\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "acromial-part-of-deltoid",
+      "type": "muscle",
+      "english": "Acromial part of deltoid",
+      "patterns": [
+        "^acromial\\ part\\ of\\ left\\ deltoid$",
+        "^acromial\\ part\\ of\\ right\\ deltoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "ascending-part-of-trapezius",
+      "type": "muscle",
+      "english": "Ascending part of trapezius",
+      "patterns": [
+        "^ascending\\ part\\ of\\ left\\ trapezius$",
+        "^ascending\\ part\\ of\\ right\\ trapezius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "clavicle",
+      "type": "bone",
+      "english": "Clavicle",
+      "patterns": [
+        "^left\\ clavicle$",
+        "^right\\ clavicle$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "clavicular-part-of-deltoid",
+      "type": "muscle",
+      "english": "Clavicular part of deltoid",
+      "patterns": [
+        "^clavicular\\ part\\ of\\ left\\ deltoid$",
+        "^clavicular\\ part\\ of\\ right\\ deltoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "clavicular-part-of-pectoralis-major",
+      "type": "muscle",
+      "english": "Clavicular part of pectoralis major",
+      "patterns": [
+        "^clavicular\\ part\\ of\\ left\\ pectoralis\\ major$",
+        "^clavicular\\ part\\ of\\ right\\ pectoralis\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "descending-part-of-trapezius",
+      "type": "muscle",
+      "english": "Descending part of trapezius",
+      "patterns": [
+        "^descending\\ part\\ of\\ left\\ trapezius$",
+        "^descending\\ part\\ of\\ right\\ trapezius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "humerus",
+      "type": "bone",
+      "english": "Humerus",
+      "patterns": [
+        "^left\\ humerus$",
+        "^right\\ humerus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "infraspinatus",
+      "type": "muscle",
+      "english": "Infraspinatus muscle",
+      "patterns": [
+        "^left\\ infraspinatus\\ muscle$",
+        "^right\\ infraspinatus\\ muscle$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "levator-scapulae",
+      "type": "muscle",
+      "english": "Levator scapulae",
+      "patterns": [
+        "^left\\ levator\\ scapulae$",
+        "^right\\ levator\\ scapulae$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "pectoralis-minor",
+      "type": "muscle",
+      "english": "Pectoralis minor",
+      "patterns": [
+        "^left\\ pectoralis\\ minor$",
+        "^right\\ pectoralis\\ minor$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rhomboid-major",
+      "type": "muscle",
+      "english": "Rhomboid major",
+      "patterns": [
+        "^left\\ rhomboid\\ major$",
+        "^right\\ rhomboid\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "rhomboid-minor",
+      "type": "muscle",
+      "english": "Rhomboid minor",
+      "patterns": [
+        "^left\\ rhomboid\\ minor$",
+        "^right\\ rhomboid\\ minor$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "scapula",
+      "type": "bone",
+      "english": "Scapula",
+      "patterns": [
+        "^left\\ scapula$",
+        "^right\\ scapula$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "serratus-anterior",
+      "type": "muscle",
+      "english": "Serratus anterior",
+      "patterns": [
+        "^left\\ serratus\\ anterior$",
+        "^right\\ serratus\\ anterior$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "spinal-part-of-deltoid",
+      "type": "muscle",
+      "english": "Spinal part of deltoid",
+      "patterns": [
+        "^spinal\\ part\\ of\\ left\\ deltoid$",
+        "^spinal\\ part\\ of\\ right\\ deltoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "sternocostal-part-of-pectoralis-major",
+      "type": "muscle",
+      "english": "Sternocostal part of pectoralis major",
+      "patterns": [
+        "^sternocostal\\ part\\ of\\ left\\ pectoralis\\ major$",
+        "^sternocostal\\ part\\ of\\ right\\ pectoralis\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "subclavius",
+      "type": "muscle",
+      "english": "Subclavius",
+      "patterns": [
+        "^left\\ subclavius$",
+        "^right\\ subclavius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "subscapularis",
+      "type": "muscle",
+      "english": "Subscapularis",
+      "patterns": [
+        "^left\\ subscapularis$",
+        "^right\\ subscapularis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "supraspinatus",
+      "type": "muscle",
+      "english": "Supraspinatus",
+      "patterns": [
+        "^left\\ supraspinatus$",
+        "^right\\ supraspinatus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "teres-major",
+      "type": "muscle",
+      "english": "Teres major",
+      "patterns": [
+        "^left\\ teres\\ major$",
+        "^right\\ teres\\ major$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "teres-minor",
+      "type": "muscle",
+      "english": "Teres minor",
+      "patterns": [
+        "^left\\ teres\\ minor$",
+        "^right\\ teres\\ minor$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "transverse-part-of-trapezius",
+      "type": "muscle",
+      "english": "Transverse part of trapezius",
+      "patterns": [
+        "^transverse\\ part\\ of\\ left\\ trapezius$",
+        "^transverse\\ part\\ of\\ right\\ trapezius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "atlas",
+      "type": "bone",
+      "english": "Atlas",
+      "patterns": [
+        "^atlas$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "axis",
+      "type": "bone",
+      "english": "Axis",
+      "patterns": [
+        "^axis$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "body-of-sternum",
+      "type": "bone",
+      "english": "Body of sternum",
+      "patterns": [
+        "^body\\ of\\ sternum$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "eighth-rib",
+      "type": "bone",
+      "english": "Eighth rib",
+      "patterns": [
+        "^left\\ eighth\\ rib$",
+        "^right\\ eighth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "eighth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Eighth thoracic vertebra",
+      "patterns": [
+        "^eighth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "eleventh-rib",
+      "type": "bone",
+      "english": "Eleventh rib",
+      "patterns": [
+        "^left\\ eleventh\\ rib$",
+        "^right\\ eleventh\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "eleventh-thoracic-vertebra",
+      "type": "bone",
+      "english": "Eleventh thoracic vertebra",
+      "patterns": [
+        "^eleventh\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "fifth-cervical-vertebra",
+      "type": "bone",
+      "english": "Fifth cervical vertebra",
+      "patterns": [
+        "^fifth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "fifth-rib",
+      "type": "bone",
+      "english": "Fifth rib",
+      "patterns": [
+        "^left\\ fifth\\ rib$",
+        "^right\\ fifth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "fifth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Fifth thoracic vertebra",
+      "patterns": [
+        "^fifth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "first-rib",
+      "type": "bone",
+      "english": "First rib",
+      "patterns": [
+        "^left\\ first\\ rib$",
+        "^right\\ first\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "first-thoracic-vertebra",
+      "type": "bone",
+      "english": "First thoracic vertebra",
+      "patterns": [
+        "^first\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "fourth-cervical-vertebra",
+      "type": "bone",
+      "english": "Fourth cervical vertebra",
+      "patterns": [
+        "^fourth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "fourth-rib",
+      "type": "bone",
+      "english": "Fourth rib",
+      "patterns": [
+        "^left\\ fourth\\ rib$",
+        "^right\\ fourth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "fourth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Fourth thoracic vertebra",
+      "patterns": [
+        "^fourth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "manubrium",
+      "type": "bone",
+      "english": "Manubrium",
+      "patterns": [
+        "^manubrium$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "ninth-rib",
+      "type": "bone",
+      "english": "Ninth rib",
+      "patterns": [
+        "^left\\ ninth\\ rib$",
+        "^right\\ ninth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "ninth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Ninth thoracic vertebra",
+      "patterns": [
+        "^ninth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "second-rib",
+      "type": "bone",
+      "english": "Second rib",
+      "patterns": [
+        "^left\\ second\\ rib$",
+        "^right\\ second\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "second-thoracic-vertebra",
+      "type": "bone",
+      "english": "Second thoracic vertebra",
+      "patterns": [
+        "^second\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "seventh-cervical-vertebra",
+      "type": "bone",
+      "english": "Seventh cervical vertebra",
+      "patterns": [
+        "^seventh\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "seventh-rib",
+      "type": "bone",
+      "english": "Seventh rib",
+      "patterns": [
+        "^left\\ seventh\\ rib$",
+        "^right\\ seventh\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "seventh-thoracic-vertebra",
+      "type": "bone",
+      "english": "Seventh thoracic vertebra",
+      "patterns": [
+        "^seventh\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "sixth-cervical-vertebra",
+      "type": "bone",
+      "english": "Sixth cervical vertebra",
+      "patterns": [
+        "^sixth\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "sixth-rib",
+      "type": "bone",
+      "english": "Sixth rib",
+      "patterns": [
+        "^left\\ sixth\\ rib$",
+        "^right\\ sixth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "sixth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Sixth thoracic vertebra",
+      "patterns": [
+        "^sixth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "tenth-rib",
+      "type": "bone",
+      "english": "Tenth rib",
+      "patterns": [
+        "^left\\ tenth\\ rib$",
+        "^right\\ tenth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "tenth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Tenth thoracic vertebra",
+      "patterns": [
+        "^tenth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "third-cervical-vertebra",
+      "type": "bone",
+      "english": "Third cervical vertebra",
+      "patterns": [
+        "^third\\ cervical\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "third-rib",
+      "type": "bone",
+      "english": "Third rib",
+      "patterns": [
+        "^left\\ third\\ rib$",
+        "^right\\ third\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "third-thoracic-vertebra",
+      "type": "bone",
+      "english": "Third thoracic vertebra",
+      "patterns": [
+        "^third\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    },
+    {
+      "sid": "twelfth-rib",
+      "type": "bone",
+      "english": "Twelfth rib",
+      "patterns": [
+        "^left\\ twelfth\\ rib$",
+        "^right\\ twelfth\\ rib$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "twelfth-thoracic-vertebra",
+      "type": "bone",
+      "english": "Twelfth thoracic vertebra",
+      "patterns": [
+        "^twelfth\\ thoracic\\ vertebra$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "midline": true,
+      "context": true
+    }
+  ]
+}

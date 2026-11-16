@@ -1,0 +1,14 @@
+# Test-only exercise. It is checked, so the Movements tab always has one exercise to pick.
+- id: e2e-squat
+  english: Test squat
+  regions: [hip]
+  phases:
+    - id: lowering
+      english: Lowering
+      path:
+        - {angle: hip.flexion, from: 0, to: 100}
+      effort: [hip-extension]
+  citations:
+    - {ref: e2e-source, locator: test page 4, says: Test text for the end-to-end check., says_kind: summary}
+  checked_by: physio-1
+  checked_on: 2026-11-13

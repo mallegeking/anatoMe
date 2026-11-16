@@ -1,8 +1,12 @@
+import { cpSync, existsSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { validateDataDir, type ValidationResult } from "../src/validate.ts";
+import { QUOTABLE, validateDataDir, type ValidationResult } from "../src/validate.ts";
 
 // Each case is a small data folder under test/fixtures.
+const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 
 // Passes when the folder fails validation with at least one message matching the pattern.
@@ -49,3 +53,50 @@ test("attachment checked_by cannot be a name in role form", () => expectError(fx
 // Only a physio may check action rows. Attachment rows may be checked by the owner or a physio.
 test("action rows cannot be checked by the owner", () => expectError(fx("action-checked-by-owner"), /action rows can only be checked by a physio/));
 test("attachment rows can be checked by a physio", () => expect(validateDataDir(fx("attachment-checked-by-physio")).ok).toBe(true));
+
+// Exercises: cross references, the phase rules and the physio-only gate.
+test("exercise with an unknown angle", () => expectError(fx("exercise-bad-angle"), /unknown angle hip\.twist/));
+test("exercise with an unknown effort movement", () => expectError(fx("exercise-bad-movement"), /unknown movement hip-wiggle/));
+test("exercise with an unknown region", () => expectError(fx("exercise-bad-region"), /unknown region elbow/));
+test("exercise with a duplicate phase id", () => expectError(fx("exercise-duplicate-phase"), /duplicate phase id lowering/));
+test("exercise phase naming an angle twice", () => expectError(fx("exercise-angle-twice"), /angle hip\.flexion appears twice in one phase/));
+test("exercise path that goes nowhere", () => expectError(fx("exercise-no-movement"), /from and to must differ/));
+test("exercise checked by the owner", () => expectError(fx("exercise-checked-by-owner"), /exercise rows can only be checked by a physio, use a label like physio-1/));
+test("exercise id that an action row already uses", () => expectError(fx("exercise-duplicate-id"), /duplicate id/));
+test("the valid fixture with an exercise passes", () => {
+  expect(existsSync(join(fx("valid"), "exercises.yaml"))).toBe(true);
+  expect(validateDataDir(fx("valid")).ok).toBe(true);
+});
+test("a data folder without exercises.yaml passes", () => {
+  // Work on a copy of the valid fixture, so this does not depend on the real data folder.
+  const tmp = mkdtempSync(join(tmpdir(), "anatome-noex-"));
+  try {
+    cpSync(fx("valid"), tmp, { recursive: true });
+    rmSync(join(tmp, "exercises.yaml"));
+    expect(existsSync(join(tmp, "exercises.yaml"))).toBe(false);
+    expect(validateDataDir(tmp).ok).toBe(true);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("a labrum cannot work", () => expectError(fx("labrum-working"), /load must be stretched or pinched for type labrum/));
+test("a joint cannot appear in actions", () => expectError(fx("joint-in-actions"), /type joint cannot appear in actions/));
+
+// Licence ids: every citation names its licence, and a quote only comes from a source that fits CC BY 4.0.
+test("a quote from a non-commercial source is refused", () =>
+  expectError(fx("quote-from-nc-source"), /actions\/hip\.yaml \/0\/citations\/0\/says_kind: a quote needs a source whose licence fits CC BY 4\.0, test-book is CC-BY-NC-4\.0\. Write a summary in our own words instead/));
+test("a quote in an attachment from a non-commercial source is refused", () =>
+  expectError(fx("quote-from-nc-source"), /attachments\/hip\.yaml \/0\/citations\/0\/says_kind: a quote needs a source whose licence fits CC BY 4\.0/));
+test("a quote from a source with licence id other is refused", () =>
+  expectError(fx("quote-from-other-licence"), /a quote needs a source whose licence fits CC BY 4\.0, test-book is other/));
+test("a summary of a non-commercial source is fine", () => expect(validateDataDir(fx("summary-from-nc-source")).ok).toBe(true));
+test("a citation without license_id is refused", () => expectError(fx("no-license-id"), /citations\.yaml \/0: license_id is required/));
+test("the real data has no quote from an incompatible source", () => expect(validateDataDir(realDataDir).ok).toBe(true));
+test("the quotable licences are the six that fit CC BY 4.0", () =>
+  expect([...QUOTABLE].sort()).toEqual(["CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0", "CC-BY-unversioned", "CC0-1.0", "public-domain"]));
+
+test("the multi-region fixture passes", () => expect(validateDataDir(fx("multi-region")).ok).toBe(true));
+test("also_in must name a region some structure has as its home", () => expectError(fx("also-in-ghost"), /unknown region ghost/));
+test("also_in must not repeat the home region", () => expectError(fx("also-in-home"), /also_in repeats the home region hip/));
+test("a joint's region must be a known region", () => expectError(fx("joint-bad-region"), /unknown region ghost/));

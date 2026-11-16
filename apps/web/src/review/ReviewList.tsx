@@ -1,17 +1,20 @@
 import type { RegionBundle } from "../data/bundle";
+import type { Lang } from "../i18n/lang";
+import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { describeAction } from "../data/describe";
-import { ActionNotes, Sources } from "../ui/InfoPanel";
+import { ActionNotes, boneLabel, Sources } from "../ui/InfoPanel";
 import { DraftMark } from "./DraftMark";
 
-type Props = { bundle: RegionBundle; t: Translate; onClose: () => void };
+type Props = { bundle: RegionBundle; t: Translate; lang: Lang; onClose: () => void };
 
 // Every draft action and attachment, grouped by structure, so the reviewer can go through them one by one.
 // Each action shows the whole claim in the same words as the info panel, plus its row code, sources and question.
-export function ReviewList({ bundle, t, onClose }: Props) {
-  const name = (id: string) => bundle.structures.find((s) => s.id === id)?.english ?? id;
-  const lower = (id: string) => name(id).toLowerCase();
-  const movementName = (id: string) => bundle.movements.find((m) => m.id === id)?.english ?? id;
+export function ReviewList({ bundle, t, lang, onClose }: Props) {
+  const movementName = (id: string) => {
+    const movement = bundle.movements.find((m) => m.id === id);
+    return movement ? nameOf(movement, lang) : id;
+  };
 
   const groups = bundle.structures
     .map((structure) => ({
@@ -21,6 +24,8 @@ export function ReviewList({ bundle, t, onClose }: Props) {
     }))
     .filter((g) => g.attachments.length > 0 || g.actions.length > 0);
 
+  const exercises = bundle.exercises.filter((e) => e.draft);
+
   return (
     <section className="review-list" aria-label={t("review.list")}>
       <div className="review-list-bar">
@@ -29,16 +34,16 @@ export function ReviewList({ bundle, t, onClose }: Props) {
           {t("review.close")}
         </button>
       </div>
-      {groups.length === 0 && <p className="muted">{t("review.empty")}</p>}
+      {groups.length === 0 && exercises.length === 0 && <p className="muted">{t("review.empty")}</p>}
       {groups.map(({ structure, attachments, actions }) => (
         <div key={structure.id}>
-          <h3>{structure.english}</h3>
+          <h3>{nameOf(structure, lang)}</h3>
           <ul>
             {attachments.map((a) => (
               <li key={a.id}>
                 <div>
                   {t("review.attachment", {
-                    text: t(a.end === "origin" ? "info.origin" : "info.insertion", { landmark: a.landmark, bone: lower(a.bone) }),
+                    text: t(a.end === "origin" ? "info.origin" : "info.insertion", { landmark: a.landmark, bone: boneLabel(bundle, a.bone, lang) }),
                   })}
                 </div>
                 <DraftMark id={a.id} t={t} />
@@ -56,6 +61,29 @@ export function ReviewList({ bundle, t, onClose }: Props) {
           </ul>
         </div>
       ))}
+      {exercises.length > 0 && (
+        <div>
+          <h3>{t("review.exercises")}</h3>
+          <ul>
+            {exercises.map((e) => (
+              <li key={e.id}>
+                <div>{nameOf(e, lang)}</div>
+                {e.phases.map((p) => (
+                  <div key={p.id}>
+                    {t("review.phase", {
+                      phase: nameOf(p, lang),
+                      path: p.path.map((step) => t("review.pathStep", { angle: t(`angle.${step.angle}`), from: String(step.from), to: String(step.to) })).join(", "),
+                      effort: p.effort.map(movementName).join(", "),
+                    })}
+                  </div>
+                ))}
+                <DraftMark id={e.id} note={e.review_note} t={t} />
+                <Sources uses={e.citations} bundle={bundle} t={t} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }

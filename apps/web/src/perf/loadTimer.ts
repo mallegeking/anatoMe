@@ -1,4 +1,4 @@
-// Measures time to interactive: from the page starting to load until the hip is drawn and the controls work.
+// Measures time to interactive: from the page starting to load until the model is drawn and the controls work.
 declare global {
   interface Window {
     __anatomeInteractiveMs?: number;

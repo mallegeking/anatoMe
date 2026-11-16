@@ -5,7 +5,7 @@ import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import { makeBundle } from "../ui/fixture";
 import { ModelErrorBoundary } from "../viewer/ModelErrorBoundary";
-import { clearRegionDataCache, useRegionData } from "./useRegionData";
+import { clearRegionDataCache, normalizeBundle, useRegionData } from "./useRegionData";
 
 const t = createT(en);
 
@@ -49,4 +49,13 @@ test("a broken data file ends in the readable load error", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => new Response("not json")));
   setup();
   await waitFor(() => expect(screen.getByRole("alert").textContent).toBe(en["error.modelLoad"]));
+});
+
+test("normalizeBundle fills what an old bundle lacks", () => {
+  const old = { region: "hip", mode: "normal" as const, structures: [{ id: "femur", type: "bone", english: "Femur", depth: 4 }], movements: [], attachments: [], actions: [], citations: [], pendingByStructure: {} };
+  const b = normalizeBundle(old as never);
+  expect(b.exercises).toEqual([]);
+  expect(b.pendingByMovement).toEqual({});
+  expect(b.pendingExercises).toBe(0);
+  expect(b.structures[0].paired).toBe(true);
 });

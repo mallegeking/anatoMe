@@ -18,6 +18,11 @@ These are the 3D model files in `models/`, where each one comes from, and its li
 | --- | --- | --- | --- |
 | `models/hip.glb` | BodyParts3D | CC BY 4.0 | Hip region bones, muscles and the iliotibial tract (65 meshes) |
 | `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments and the two menisci (38 meshes) |
+| `models/lower-leg.glb` | BodyParts3D | CC BY 4.0 | Lower leg and foot bones, muscles and tendons, with the femur, tibia, fibula and patella (from the hip region) as context (128 meshes) |
+| `models/shoulder.glb` | BodyParts3D | CC BY 4.0 | Shoulder bones and muscles, with ribs, sternum and vertebrae as context (91 meshes) |
+| `models/arm.glb` | BodyParts3D | CC BY 4.0 | Arm and hand bones and muscles, with the humerus and scapula as context (144 meshes) |
+| `models/neck.glb` | BodyParts3D | CC BY 4.0 | Skull, hyoid, cervical vertebrae and neck muscles, with the clavicle, scapula, manubrium, first and second ribs and the first six thoracic vertebrae as context (105 meshes) |
+| `models/trunk.glb` | BodyParts3D | CC BY 4.0 | Ribs, sternum, vertebrae and the muscles of the back and chest wall, with the sacrum, hip bone and seventh cervical vertebra as context (82 meshes) |
 
 Changes we made to the source meshes: we reduced the number of triangles, removed materials, texture coordinates and colours, and converted them to glTF with Draco compression. The Z-Anatomy meshes were also scaled, turned and moved (a separate fit for each side) so they sit on the BodyParts3D bones. Built by `pipeline/assets/build_region_blender.py`.
 

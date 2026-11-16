@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { compileRegion } from "../src/compile.ts";
+import { compileRegion, listRegions } from "../src/compile.ts";
 
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
@@ -17,3 +17,69 @@ test("the real data compiles with no drafts in normal mode", () => expect(compil
 test("a dropped row's own citation is not in normal mode", () => expect(compileRegion(fx("valid"), "hip", "normal").citations.map(c => c.id)).not.toContain("draft-only-source"));
 test("review mode includes the draft row's citation", () => expect(compileRegion(fx("valid"), "hip", "review").citations.map(c => c.id)).toContain("draft-only-source"));
 test("normal mode keeps exactly the checked attachments", () => expect(compileRegion(fx("valid"), "hip", "normal").attachments.map(a => a.id)).toEqual(["gluteus-maximus-insertion-femur"]));
+
+test("paired is false for a midline structure and true otherwise", () => {
+  const byId = new Map(compileRegion(realDataDir, "hip", "normal").structures.map((s) => [s.id, s.paired]));
+  expect(byId.get("sacrum")).toBe(false);
+  expect(byId.get("femur")).toBe(true);
+});
+
+test("normal mode drops an unchecked exercise and counts it", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  expect(b.exercises.map((e) => e.id)).toEqual(["bodyweight-squat"]);
+  expect(b.exercises.some((e) => e.draft)).toBe(false);
+  expect(b.pendingExercises).toBe(1);
+});
+test("review mode keeps it as a draft with its review note", () => {
+  const e = compileRegion(fx("valid"), "hip", "review").exercises.find((x) => x.id === "goblet-squat");
+  expect(e?.draft).toBe(true);
+  expect(e?.review_note).toBe("A question about the goblet squat.");
+});
+test("an exercise for another region is left out", () => {
+  const b = compileRegion(fx("exercise-other-region"), "hip", "review");
+  expect(b.exercises.map((e) => e.id)).toEqual(["goblet-squat"]);
+  expect(b.pendingExercises).toBe(1);
+});
+test("pendingByMovement counts unchecked action rows per movement", () =>
+  expect(compileRegion(fx("valid"), "hip", "normal").pendingByMovement).toEqual({ "hip-internal-rotation": 1 }));
+test("a checked exercise keeps its citation in the bundle", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  expect(b.citations.map((c) => c.id)).toContain("used-source");
+  expect(b.exercises[0].citations[0].ref).toBe("used-source");
+  expect(JSON.stringify(b)).not.toContain("review_note");
+});
+
+test("gap is passed through to the bundle", () => {
+  const byId = new Map(compileRegion(fx("valid"), "hip", "normal").structures.map((s) => [s.id, s]));
+  expect(byId.get("gluteus-maximus")?.gap).toBe("test-gap");
+  // A structure without a gap gets no gap field at all.
+  expect(byId.get("piriformis")).not.toHaveProperty("gap");
+});
+
+test("german is passed through for structures, movements and exercises", () => {
+  const b = compileRegion(fx("valid"), "hip", "normal");
+  const structures = new Map(b.structures.map((s) => [s.id, s]));
+  expect(structures.get("gluteus-maximus")?.german).toBe("Großer Gesäßmuskel");
+  // A row without a German name gets no german field at all.
+  expect(structures.get("piriformis")).not.toHaveProperty("german");
+  const movements = new Map(b.movements.map((m) => [m.id, m]));
+  expect(movements.get("hip-flexion")?.german).toBe("Beugung im Hüftgelenk");
+  expect(movements.get("hip-extension")).not.toHaveProperty("german");
+  expect(b.exercises[0].german).toBe("Kniebeuge");
+  expect(b.exercises[0].phases[0].german).toBe("Abwärtsbewegung");
+  // An exercise without a German name gets no german field either.
+  expect(compileRegion(fx("valid"), "hip", "review").exercises.find((e) => e.id === "goblet-squat")).not.toHaveProperty("german");
+});
+
+test("a structure is in its home region and in every also_in region", () => {
+  const dir = fx("multi-region");
+  expect(compileRegion(dir, "hip", "normal").structures.map((s) => s.id)).toContain("tibia");
+  expect(compileRegion(dir, "lower-leg", "normal").structures.map((s) => s.id).sort()).toEqual(["talus", "tibia"]);
+});
+test("a region gets only the movements of its own joints", () => {
+  const dir = fx("multi-region");
+  expect(compileRegion(dir, "hip", "normal").movements.length).toBeGreaterThan(0);
+  expect(compileRegion(dir, "lower-leg", "normal").movements).toEqual([]);
+});
+test("listRegions lists home regions only", () => expect(listRegions(fx("multi-region"))).toEqual(["hip", "lower-leg"]));
+test("also_in does not go into the bundle", () => expect(JSON.stringify(compileRegion(fx("multi-region"), "lower-leg", "normal"))).not.toContain("also_in"));
