@@ -112,7 +112,7 @@ test("with no notes it shows the empty line", async () => {
 test("lists a note with date, movement, feeling, side and angle", async () => {
   await showWith([entry()]);
   expect(screen.getByText(en["notebook.backupHint"])).toBeTruthy();
-  expect(screen.getByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(screen.getByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
   expect(screen.getByText("Logged with the hip bent at 30 degrees")).toBeTruthy();
 });
 
@@ -121,9 +121,9 @@ test("lists the newest note first and an exercise with its phase", async () => {
     entry({ id: "old", createdAt: 1, feeling: "fine", side: "both" }),
     entry({ id: "new", createdAt: 2, date: "2026-11-14", pick: { kind: "exercise", id: "squat", phase: "lowering" }, pose: { "hip.flexion": 50, "knee.flexion": 55 } }),
   ]);
-  expect(listItems().map((li) => li.firstElementChild!.textContent)).toEqual([
-    "2026-11-14: Bodyweight squat, Lowering, It hurts, Left",
-    "2026-11-13: Hip external rotation, It feels fine, Both",
+  expect(listItems().map((li) => li.querySelector("[hidden]")!.textContent)).toEqual([
+    "Bodyweight squat, Lowering, 14 Nov 2026",
+    "Hip external rotation, 13 Nov 2026",
   ]);
   expect(screen.getByText("Logged with the hip bent at 50 degrees, the knee bent at 55 degrees")).toBeTruthy();
 });
@@ -135,7 +135,7 @@ test("an exercise logged part way through shows its angles in whole degrees", as
 
 test("a note for a movement the bundle lacks is listed as unknown", async () => {
   await showWith([entry({ pick: { kind: "movement", id: "shoulder-shrug" } })]);
-  expect(screen.getByText((text) => text.includes(en["notebook.unknown"]))).toBeTruthy();
+  expect(screen.getAllByText((text) => text.includes(en["notebook.unknown"])).length).toBeGreaterThan(0);
   // It is left out of the comparison, so there is nothing painful to compare.
   expect(screen.getByText(en["notebook.needPainful"])).toBeTruthy();
 });
@@ -234,7 +234,7 @@ test("a backup loaded into an empty notebook shows the notes", async () => {
   await screen.findByText(en["notebook.empty"]);
   upload(toBackup([entry()], new Date(2026, 10, 13)));
   expect(await screen.findByText(t("notebook.loaded", { added: "1", skipped: "0" }))).toBeTruthy();
-  expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(await screen.findByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
 });
 
 test("deleting asks first", async () => {
@@ -242,7 +242,7 @@ test("deleting asks first", async () => {
   const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
   fireEvent.click(screen.getByRole("button", { name: en["notebook.delete"] }));
   expect(confirm).toHaveBeenCalledWith(en["notebook.deleteConfirm"]);
-  expect(screen.getByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(screen.getByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
   expect(await store.list()).toHaveLength(1);
   confirm.mockReturnValue(true);
   fireEvent.click(screen.getByRole("button", { name: en["notebook.delete"] }));
@@ -258,7 +258,7 @@ test("a store that fails to delete says so and keeps the note", async () => {
   vi.spyOn(window, "confirm").mockReturnValue(true);
   fireEvent.click(screen.getByRole("button", { name: en["notebook.delete"] }));
   expect(await screen.findByText(en["notebook.unavailable"])).toBeTruthy();
-  expect(screen.getByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(screen.getByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
 });
 
 test("the print button hands over the notes", async () => {
@@ -307,7 +307,7 @@ test("each Delete button points at the line of its own note", async () => {
   for (const item of items) {
     const id = within(item).getByRole("button", { name: en["notebook.delete"] }).getAttribute("aria-describedby");
     expect(id).toBeTruthy();
-    expect(document.getElementById(id!)).toBe(item.querySelector("p"));
+    expect(document.getElementById(id!)).toBe(item.querySelector("[hidden]"));
   }
   expect(new Set(items.map((i) => i.querySelector("button")!.getAttribute("aria-describedby"))).size).toBe(2);
 });
@@ -318,14 +318,14 @@ test("a note logged in English reads in German after the switch", async () => {
   const bundle = makeMovementBundle();
   bundle.movements = bundle.movements.map((m) => (m.id === "hip-external-rotation" ? { ...m, german: "Außenrotation im Hüftgelenk" } : m));
   show({ store, bundle, lang: "en" });
-  expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(await screen.findByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
   cleanup();
   show({ store, bundle, lang: "de" });
-  expect(await screen.findByText(`2026-11-13: Außenrotation im Hüftgelenk, ${de["notebook.painful"]}, ${de["notebook.side.l"]}`)).toBeTruthy();
+  expect(await screen.findByText("Außenrotation im Hüftgelenk, 13.11.2026")).toBeTruthy();
   // And back to English, from the same note.
   cleanup();
   show({ store, bundle, lang: "en" });
-  expect(await screen.findByText("2026-11-13: Hip external rotation, It hurts, Left")).toBeTruthy();
+  expect(await screen.findByText("Hip external rotation, 13 Nov 2026")).toBeTruthy();
 });
 
 test("the status line shown in English reads in German after the language changes", async () => {
@@ -340,4 +340,54 @@ test("the status line shown in English reads in German after the language change
   expect(await screen.findByText(t("notebook.loaded", { added: "1", skipped: "1" }))).toBeTruthy();
   rerender(panel("de"));
   expect(screen.getByRole("status").textContent).toBe(createT(de)("notebook.loaded", { added: "1", skipped: "1" }));
+});
+
+test("the privacy line is in a card right under the title, with the disclaimer after it", () => {
+  show();
+  const title = screen.getByRole("heading", { name: en["notebook.title"], level: 2 });
+  const card = title.parentElement!.nextElementSibling as HTMLElement;
+  expect(card.classList.contains("card")).toBe(true);
+  expect(card.textContent).toBe(en["notebook.private"]);
+  expect(card.querySelector("svg")).toBeTruthy();
+  const disclaimer = screen.getByText(en["notebook.disclaimer"]);
+  expect(card.compareDocumentPosition(disclaimer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+test("a note is a card with its name, its date in the reader's language, and chips for feeling and side", async () => {
+  show({ store: await storeWith([entry({ date: "2026-11-14" })]), lang: "de" });
+  const item = (await screen.findByText("14.11.2026")).closest("li") as HTMLElement;
+  expect(item.classList.contains("card")).toBe(true);
+  const chips = [...item.querySelectorAll(".chip")].map((c) => c.textContent);
+  expect(chips).toEqual([de["notebook.painful"], de["notebook.side.l"]]);
+});
+
+test("the hurts chip has the warn tone and an icon, the fine chip an icon", async () => {
+  await showWith([entry(), entry({ id: "e2", createdAt: 2, feeling: "fine" })]);
+  const [fine, hurts] = listItems().map((li) => li.querySelector(".chip")!);
+  expect(hurts.classList.contains("chip--warn")).toBe(true);
+  expect(hurts.querySelector("svg")).toBeTruthy();
+  expect(fine.classList.contains("chip--warn")).toBe(false);
+  expect(fine.querySelector("svg")).toBeTruthy();
+});
+
+test("Delete is described by the note's name and date", async () => {
+  await showWith([entry()]);
+  const id = screen.getByRole("button", { name: en["notebook.delete"] }).getAttribute("aria-describedby")!;
+  expect(document.getElementById(id)!.textContent).toBe("Hip external rotation, 13 Nov 2026");
+});
+
+test("each structure to look into shows its uncertainty notes", async () => {
+  const bundle = makeMovementBundle();
+  bundle.actions = bundle.actions.map((a) => (a.id === "m1" ? { ...a, confidence: "medium" as const, applies_to: "hips with pincer-type impingement" } : a));
+  await showWith([entry()], { bundle });
+  const card = screen.getByRole("button", { name: /^Piriformis: loaded/ }).closest(".card") as HTMLElement;
+  expect(within(card).getByText(en["confidence.medium"])).toBeTruthy();
+  expect(within(card).getByText(t("info.appliesTo", { text: "hips with pincer-type impingement" }))).toBeTruthy();
+});
+
+test("print and the two backup buttons sit under Keep and share", async () => {
+  await showWith([entry()]);
+  const heading = screen.getByRole("heading", { name: en["notebook.keep"] });
+  const section = heading.parentElement!;
+  expect(within(section).getAllByRole("button").map((b) => b.textContent)).toEqual([en["notebook.print"], en["notebook.saveBackup"], en["notebook.loadBackup"]]);
 });

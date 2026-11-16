@@ -92,3 +92,17 @@ export function compare(entries: NotebookEntry[], bundle: RegionBundle, side: "l
   const ruledOut = [...painful.keys()].filter((sid) => fine.has(sid)).sort(byName);
   return { side, painfulCount, fineCount, unknownCount, candidates, ruledOut, incomplete };
 }
+
+const WEAKNESS = { high: 0, medium: 1, low: 2 } as const;
+
+// What the reader should weigh next to a candidate: the weakest confidence among the rows that made it count,
+// and every distinct "only in" limit among them, in row order. A row the bundle no longer has is passed over.
+// With no rows left there is nothing to stand on, so the confidence is low.
+export function candidateNotes(bundle: RegionBundle, cand: Candidate): { confidence: "high" | "medium" | "low"; appliesTo: string[] } {
+  const ids = new Set(cand.evidence);
+  const rows = bundle.actions.filter((a) => ids.has(a.id));
+  if (rows.length === 0) return { confidence: "low", appliesTo: [] };
+  const confidence = rows.reduce((weakest, a) => (WEAKNESS[a.confidence] > WEAKNESS[weakest] ? a.confidence : weakest), rows[0].confidence);
+  const appliesTo = [...new Set(rows.flatMap((a) => (a.applies_to ? [a.applies_to] : [])))];
+  return { confidence, appliesTo };
+}

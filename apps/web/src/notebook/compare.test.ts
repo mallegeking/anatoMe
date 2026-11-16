@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { makeMovementBundle } from "../movement/fixture";
-import { compare, isKnown, loadedBy } from "./compare";
+import { candidateNotes, compare, isKnown, loadedBy } from "./compare";
 import type { EntrySide, Feeling, NotebookEntry } from "./types";
 
 const b = makeMovementBundle();
@@ -88,5 +88,27 @@ describe("compare", () => {
     const entry: NotebookEntry = { ...e("1", "x", "painful", "l"), pick: { kind: "exercise", id: "squat", phase: "nope" } };
     expect(isKnown(entry, b)).toBe(false);
     expect(loadedBy(entry, b).size).toBe(0);
+  });
+});
+
+describe("candidateNotes", () => {
+  const withRows = (changes: Record<string, Partial<(typeof b.actions)[number]>>) => ({
+    ...b,
+    actions: b.actions.map((a) => ({ ...a, ...(changes[a.id] ?? {}) })),
+  });
+  const cand = { sid: "piriformis", painful: 2, evidence: ["m1", "m2"] };
+
+  test("takes the weakest confidence and collects the limits", () => {
+    const bundle = withRows({ m2: { confidence: "medium", applies_to: "hips with pincer-type impingement" } });
+    expect(candidateNotes(bundle, cand)).toEqual({ confidence: "medium", appliesTo: ["hips with pincer-type impingement"] });
+  });
+  test("each limit shows once, in row order", () => {
+    const bundle = withRows({ m1: { applies_to: "B" }, m2: { applies_to: "A", confidence: "low" } });
+    expect(candidateNotes(bundle, { ...cand, evidence: ["m2", "m1"] })).toEqual({ confidence: "low", appliesTo: ["B", "A"] });
+    expect(candidateNotes(withRows({ m1: { applies_to: "A" }, m2: { applies_to: "A" } }), cand).appliesTo).toEqual(["A"]);
+  });
+  test("an evidence id the bundle no longer has is passed over, and no rows at all means low", () => {
+    expect(candidateNotes(b, { ...cand, evidence: ["m1", "gone"] })).toEqual({ confidence: "high", appliesTo: [] });
+    expect(candidateNotes(b, { ...cand, evidence: ["gone"] })).toEqual({ confidence: "low", appliesTo: [] });
   });
 });

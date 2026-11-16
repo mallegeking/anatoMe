@@ -496,7 +496,7 @@ test("a logged movement is saved, says so and shows in the Notebook tab", async 
   fireEvent.click(screen.getByRole("button", { name: en["notebook.save"] }));
   expect(await screen.findByText(en["notebook.saved"])).toBeTruthy();
   fireEvent.click(tab(en["mode.notebook"]));
-  expect(await screen.findByText(/^\d{4}-\d{2}-\d{2}: Hip external rotation, It hurts, Left$/)).toBeTruthy();
+  expect((await screen.findAllByText(/^Hip external rotation, \d{1,2} \w{3} \d{4}$/)).length).toBeGreaterThan(0);
   expect(screen.getByText("on the stairs")).toBeTruthy();
 });
 

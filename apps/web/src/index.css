@@ -1085,42 +1085,35 @@ body,
   text-align: left;
 }
 
-/* The Notebook tab. Long notes and names wrap, so the panel never scrolls sideways. */
-.notebook-panel {
-  font-size: 0.9375rem;
-  overflow-wrap: anywhere;
+/* The Notebook tab. It takes the shared panel look, these rules only add what is its own. */
+.notebook-panel p {
+  margin: 0;
 }
 
-.notebook-panel h2 {
-  margin: 0 0 4px;
-  font-size: 1.125rem;
+.notebook-private {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-2);
 }
 
-.notebook-panel h3 {
-  margin: 12px 0 4px;
-  font-size: 0.9375rem;
+.notebook-private svg {
+  flex: none;
 }
 
-.notebook-panel h4 {
-  margin: 8px 0 2px;
+.entry-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-2);
+}
+
+.notebook-side {
+  margin: 0;
   font-size: 0.875rem;
 }
 
-.notebook-panel p {
-  margin: 4px 0;
-}
-
-.notebook-panel ul {
-  margin: 4px 0;
-  padding-left: 18px;
-}
-
-.notebook-panel li {
-  margin: 0 0 8px;
-}
-
 .notebook-panel li .link-button {
-  min-height: 32px;
   text-align: left;
 }
 

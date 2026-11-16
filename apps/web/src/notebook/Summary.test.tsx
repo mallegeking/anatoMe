@@ -1,5 +1,6 @@
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
+import deTexts from "../i18n/de.json";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
 import { makeMovementBundle } from "../movement/fixture";
@@ -71,7 +72,7 @@ test("the tables have a header row and plain cells", () => {
   const heads = within(first).getAllByRole("columnheader").map((h) => h.textContent);
   expect(heads).toEqual([en["summary.column.date"], en["summary.column.movement"], en["summary.column.side"], en["summary.column.angles"], en["summary.column.note"]]);
   const cells = within(first).getAllByRole("row")[1].querySelectorAll("td");
-  expect(cells[0].textContent).toBe("2026-11-13");
+  expect(cells[0].textContent).toBe("13 Nov 2026");
   expect(cells[1].textContent).toBe(b.movements.find((m) => m.id === "hip-external-rotation")!.english);
   expect(cells[2].textContent).toBe(en["notebook.side.l"]);
   expect(cells[3].textContent).toContain("32 degrees");
@@ -133,4 +134,22 @@ test("the review build prints the review banner instead of the basis line", () =
   render(<Summary t={t} lang="en" bundle={makeMovementBundle("review")} model={model} />);
   expect(screen.getByText(en["review.banner"])).toBeTruthy();
   expect(screen.queryByText(en["summary.basis"])).toBeNull();
+});
+
+test("the printed list shows the uncertainty notes for each structure", () => {
+  const bundle = makeMovementBundle();
+  bundle.actions = bundle.actions.map((a) => (a.id === "m1" ? { ...a, confidence: "medium" as const, applies_to: "pincer hips" } : a));
+  render(<Summary t={t} lang="en" bundle={bundle} model={summaryModel([entry()], bundle, now, true, "en")} />);
+  const item = screen.getByText(/^Piriformis: loaded/).closest("li") as HTMLElement;
+  expect(within(item).getByText(en["confidence.medium"])).toBeTruthy();
+  expect(within(item).getByText(t("info.appliesTo", { text: "pincer hips" }))).toBeTruthy();
+});
+
+test("the printed dates are in the reader's language", () => {
+  const de = createT(deTexts, en);
+  const model = summaryModel([entry({ date: "2026-11-13" }), entry({ id: "o", date: "2026-10-01", feeling: "fine" })], b, now, false, "de");
+  const { container } = render(<Summary t={de} lang="de" bundle={b} model={model} />);
+  expect(container.querySelector("td")!.textContent).toBe("13.11.2026");
+  expect(screen.getByText(de("summary.printed", { date: "14.11.2026" }))).toBeTruthy();
+  expect(screen.getByText(de("summary.range", { from: "01.10.2026", to: "13.11.2026" }))).toBeTruthy();
 });

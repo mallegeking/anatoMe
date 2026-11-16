@@ -2,7 +2,8 @@ import type { RegionBundle } from "../data/bundle";
 import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import { formatAngles } from "./angles";
-import { candidateText, entryName, ruledOutText } from "./NotebookPanel";
+import { formatDate } from "./dates";
+import { CandidateNotes, candidateText, entryName, ruledOutText } from "./NotebookPanel";
 import type { SummaryModel } from "./summary";
 import type { NotebookEntry } from "./types";
 
@@ -24,7 +25,7 @@ export function Summary({ t, lang, bundle, model }: { t: Translate; lang: Lang; 
         <tbody>
           {rows.map((entry) => (
             <tr key={entry.id}>
-              <td>{entry.date}</td>
+              <td>{formatDate(entry.date, lang)}</td>
               <td>{entryName(entry, bundle, t, lang)}</td>
               <td>{t(`notebook.side.${entry.side}`)}</td>
               <td>{formatAngles(entry.pose, bundle, t)}</td>
@@ -40,8 +41,8 @@ export function Summary({ t, lang, bundle, model }: { t: Translate; lang: Lang; 
   return (
     <section className="print-summary">
       <h1>{t("summary.title")}</h1>
-      <p>{t("summary.printed", { date: model.printedOn })}</p>
-      {model.from && model.to && <p>{t("summary.range", { from: model.from, to: model.to })}</p>}
+      <p>{t("summary.printed", { date: formatDate(model.printedOn, lang) })}</p>
+      {model.from && model.to && <p>{t("summary.range", { from: formatDate(model.from, lang), to: formatDate(model.to, lang) })}</p>}
       <p>{t("notebook.disclaimer")}</p>
       <h2>{t("summary.painful")}</h2>
       {table(model.painful, model.painfulMore)}
@@ -57,7 +58,10 @@ export function Summary({ t, lang, bundle, model }: { t: Translate; lang: Lang; 
               {c.candidates.length > 0 && (
                 <ul>
                   {c.candidates.map((cand) => (
-                    <li key={cand.sid}>{candidateText(t, bundle, cand, c.painfulCount, lang)}</li>
+                    <li key={cand.sid}>
+                      {candidateText(t, bundle, cand, c.painfulCount, lang)}
+                      <CandidateNotes t={t} bundle={bundle} cand={cand} />
+                    </li>
                   ))}
                 </ul>
               )}
