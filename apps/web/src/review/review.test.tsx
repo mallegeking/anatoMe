@@ -79,3 +79,8 @@ test("a draft exercise is listed with its phases, row code and question", () => 
   expect(screen.getByText("Row code: bridge")).toBeTruthy();
   expect(screen.getByText("Question for the reviewer: Is the range right?")).toBeTruthy();
 });
+
+test("review list keeps the attachment line wording", () => {
+  render(<ReviewList bundle={makeBundle("review")} t={t} lang="en" onClose={() => {}} />);
+  expect(screen.getByText(t("review.attachment", { text: "Ends at: greater trochanter of the femur" }))).toBeTruthy();
+});

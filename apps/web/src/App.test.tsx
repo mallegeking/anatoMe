@@ -202,10 +202,10 @@ test("show the other side selects that side and turns the camera to it", async (
   render(<App />);
   await screen.findByText(en["info.tapHint"]);
   fireEvent.click(screen.getByText("tap piriformis"));
-  fireEvent.click(screen.getByText(en["info.switchSide"]));
+  fireEvent.click(screen.getByText(en["info.otherSide.r"]));
   expect(viewer.selection).toEqual({ sid: "piriformis", side: "r" });
   expect(viewer.focus).toEqual({ sid: "piriformis", side: "r" });
-  expect(screen.getByRole("heading", { name: "Piriformis (right)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Piriformis", level: 2 })).toBeTruthy();
 });
 
 test("the educational line stays outside the part of the panel that scrolls", async () => {
@@ -311,13 +311,13 @@ test("a movement that hides the selected structure keeps the selection for the w
   await screen.findByText(en["info.tapHint"]);
   fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "rectus" } });
   fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
-  expect(screen.getByRole("heading", { name: "Rectus femoris (left)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Rectus femoris", level: 2 })).toBeTruthy();
   fireEvent.click(tab(en["mode.movement"]));
   fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
   // Rectus femoris is not involved, so the movement hides it.
   expect(viewer.isShown("rectus-femoris", "l")).toBe(false);
   fireEvent.click(tab(en["mode.atlas"]));
-  expect(screen.getByRole("heading", { name: "Rectus femoris (left)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Rectus femoris", level: 2 })).toBeTruthy();
 });
 
 test("a movement heading in the info panel opens that movement", async () => {
@@ -342,7 +342,7 @@ test("a structure in the movement panel can be focused or read about", async () 
   expect(tab(en["mode.movement"]).getAttribute("aria-selected")).toBe("true");
   fireEvent.click(screen.getByRole("button", { name: en["movement.openStructure"] }));
   expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true");
-  expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Piriformis", level: 2 })).toBeTruthy();
 });
 
 test("choosing a search result switches to the Structures tab", async () => {
@@ -353,7 +353,7 @@ test("choosing a search result switches to the Structures tab", async () => {
   fireEvent.change(screen.getByPlaceholderText(en["search.placeholder"]), { target: { value: "pirif" } });
   fireEvent.click(screen.getByTestId("search-results").querySelector("button")!);
   expect(tab(en["mode.atlas"]).getAttribute("aria-selected")).toBe("true");
-  expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Piriformis", level: 2 })).toBeTruthy();
 });
 
 // Picks a language: on the phone the picker is in the settings dialog, on the wide layout in the side foot.
@@ -402,7 +402,7 @@ test("choosing a list entry for a hidden structure makes it visible and selects 
   render(<App />);
   await screen.findByText(en["info.tapHint"]);
   fireEvent.click(screen.getByText("tap piriformis"));
-  fireEvent.click(screen.getByRole("button", { name: en["info.hide"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["info.hideShort"] }));
   expect(viewer.isShown("piriformis", "l")).toBe(false);
   expect(viewer.isShown("piriformis", "r")).toBe(true);
   fireEvent.click(tab(en["mode.area"]));
@@ -418,7 +418,7 @@ test("over and under in the info panel switches to the Area tab and probes that 
   render(<App />);
   await screen.findByText(en["info.tapHint"]);
   fireEvent.click(screen.getByText("tap piriformis"));
-  fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["info.overUnderShort"] }));
   expect(tab(en["mode.area"]).getAttribute("aria-selected")).toBe("true");
   expect(viewer.areaProbe).toEqual({ sid: "piriformis", side: "l" });
 });
@@ -438,7 +438,7 @@ test("picking another region loads its data and clears the selection, the layers
   expect(fetch.mock.calls.some(([url]) => url.endsWith("data/hip.json"))).toBe(true);
   // A selection, a look through it, an area list, a movement pick and a peeled layer.
   fireEvent.click(screen.getByText("tap piriformis"));
-  fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["info.overUnderShort"] }));
   fireEvent.click(screen.getByText("area tap"));
   fireEvent.click(tab(en["mode.movement"]));
   fireEvent.click(screen.getByRole("button", { name: "Hip external rotation" }));
@@ -848,7 +848,7 @@ test("switching between phone and wide keeps the viewer mounted and the selectio
   act(() => setViewport("phone"));
   expect(viewer.mounts).toBe(before);
   expect(viewer.selection).toEqual({ sid: "piriformis", side: "l" });
-  expect(screen.getByRole("heading", { name: "Piriformis (left)" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Piriformis", level: 2 })).toBeTruthy();
 });
 
 // Shown means in the page and not inside a hidden element.
@@ -858,7 +858,7 @@ test("wide: the layers section is always there, next to the tab panel", async ()
   setViewport("wide");
   serve(makeBundle());
   render(<App />);
-  await screen.findByText(en["info.tapHint"]);
+  await screen.findByText(en["info.clickHint"]);
   expect(shown(screen.getByTestId("layers-panel"))).toBe(true);
   expect(shown(screen.getByTestId("info-label"))).toBe(true);
   expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
@@ -938,7 +938,7 @@ test("wide: the educational line and the credits button sit in the rail, the lan
   setViewport("wide");
   serve(makeBundle());
   render(<App />);
-  await screen.findByText(en["info.tapHint"]);
+  await screen.findByText(en["info.clickHint"]);
   const rail = screen.getByRole("navigation");
   expect(shown(within(rail).getByText(en["about.educational"]))).toBe(true);
   expect(screen.getAllByText(en["about.educational"])).toHaveLength(1);
@@ -1065,7 +1065,7 @@ test("wide: the zoom and reset buttons ask the viewer", async () => {
   setViewport("wide");
   serve(makeBundle());
   render(<App />);
-  await screen.findByText(en["info.tapHint"]);
+  await screen.findByText(en["info.clickHint"]);
   fireEvent.click(screen.getByRole("button", { name: en["stage.zoomIn"] }));
   fireEvent.click(screen.getByRole("button", { name: en["stage.zoomOut"] }));
   fireEvent.click(screen.getByRole("button", { name: en["stage.reset"] }));

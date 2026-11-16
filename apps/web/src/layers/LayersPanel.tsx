@@ -3,6 +3,7 @@ import type { Lang } from "../i18n/lang";
 import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
 import { CloseIcon } from "../ui/icons";
+import { SectionHeading } from "../ui/pieces";
 import { hiddenKey, isVisibleOnAnySide, tissueOf, type LayerState, type TissueGroup } from "./layers";
 
 type Props = {
@@ -36,7 +37,7 @@ export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onT
   return (
     <section className="layers-panel" data-testid="layers-panel">
       <div className="layers-head">
-        <h2 className="layers-title">{t("layers.title")}</h2>
+        <SectionHeading>{t("layers.title")}</SectionHeading>
         {onClose && (
           <button className="btn layers-close" type="button" onClick={onClose}>
             <CloseIcon size={16} />
@@ -68,7 +69,7 @@ export function LayersPanel({ t, lang, state, structures, onPeel, onRestore, onT
 
       {hidden.length > 0 && (
         <div>
-          <h3 className="layers-hidden-title">{t("layers.hidden")}</h3>
+          <SectionHeading>{t("layers.hidden")}</SectionHeading>
           <ul className="layers-hidden">
             {hidden.map((h) => (
               <li key={h.key} className="layers-row">

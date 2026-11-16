@@ -4,7 +4,7 @@ import type { RegionBundle } from "../data/bundle";
 import de from "../i18n/de.json";
 import en from "../i18n/en.json";
 import { createT } from "../i18n/t";
-import { makeBundle } from "./fixture";
+import { makeBundle, setViewport } from "./fixture";
 import { InfoPanel } from "./InfoPanel";
 
 const t = createT(en);
@@ -30,9 +30,12 @@ test("groups checked rows by movement with load and role words", () => {
   expect(screen.getByText(/main/)).toBeTruthy();
 });
 
-test("attachment sentence uses the lower case bone name", () => {
+test("attachments are a list of label and value pairs, with the lower case bone name", () => {
   show("piriformis");
-  expect(screen.getByText("Starts at: anterior surface of the sacrum")).toBeTruthy();
+  expect(screen.getByText(en["info.originLabel"]).tagName).toBe("DT");
+  const value = screen.getByText("anterior surface of the sacrum");
+  expect(value.tagName).toBe("DD");
+  expect(value.previousElementSibling).toBe(screen.getByText(en["info.originLabel"]));
 });
 
 test("shows the waiting line when rows are pending", () => {
@@ -47,9 +50,47 @@ test("a bone with no rows shows no does-heading and no waiting line", () => {
   expect(screen.queryByText(en["info.pending"])).toBeNull();
 });
 
-test("shows the type of the structure", () => {
+test("the title is the name alone, and chips give the type and the side", () => {
+  show("piriformis", "l");
+  expect(screen.getByRole("heading", { level: 2, name: "Piriformis" })).toBeTruthy();
+  expect(screen.getByText(en["type.muscle"]).classList.contains("chip")).toBe(true);
+  expect(screen.getByText(en["info.sideChip.l"]).classList.contains("chip")).toBe(true);
+});
+
+test("a midline structure has no side chip", () => {
+  show("sacrum", "");
+  expect(screen.queryByText(en["info.sideChip.l"])).toBeNull();
+  expect(screen.queryByText(en["info.sideChip.r"])).toBeNull();
+  expect(screen.getByText(en["type.bone"]).classList.contains("chip")).toBe(true);
+});
+
+test("the waiting line is a card", () => {
   show("piriformis");
-  expect(screen.getByText(t("info.type", { type: en["type.muscle"] }))).toBeTruthy();
+  expect(screen.getByText(en["info.pending"]).closest(".card")).not.toBeNull();
+});
+
+test("phone: the buttons use the short labels", () => {
+  setViewport("phone");
+  show("piriformis", "l");
+  expect(screen.getByRole("button", { name: en["info.otherSide.r"] })).toBeTruthy();
+  expect(screen.getByRole("button", { name: en["info.hideShort"] })).toBeTruthy();
+  expect(screen.getByRole("button", { name: en["info.overUnderShort"] })).toBeTruthy();
+});
+
+test("wide: the buttons use the long labels", () => {
+  setViewport("wide");
+  show("piriformis", "l");
+  expect(screen.getByRole("button", { name: en["info.switchSide"] })).toBeTruthy();
+  expect(screen.getByRole("button", { name: en["info.hide"] })).toBeTruthy();
+  expect(screen.getByRole("button", { name: en["info.overUnder"] })).toBeTruthy();
+  setViewport("phone");
+});
+
+test("the action buttons come before the attachments", () => {
+  show("piriformis", "l");
+  const button = screen.getByRole("button", { name: en["info.otherSide.r"] });
+  const attachments = screen.getByRole("heading", { name: en["info.attachments"] });
+  expect(button.compareDocumentPosition(attachments) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 
 // A bundle where rectus femoris has a hip row and a knee row, and piriformis only hip rows.
@@ -85,13 +126,15 @@ test("a joint without rows gets no heading", () => {
 
 test("unpaired structure has no side switch", () => {
   show("sacrum");
+  expect(screen.queryByText(en["info.otherSide.r"])).toBeNull();
+  expect(screen.queryByText(en["info.otherSide.l"])).toBeNull();
   expect(screen.queryByText(en["info.switchSide"])).toBeNull();
 });
 
 test("paired structure switch calls onSwitchSide", () => {
   const onSwitchSide = vi.fn();
   show("piriformis", "l", "normal", onSwitchSide);
-  fireEvent.click(screen.getByText(en["info.switchSide"]));
+  fireEvent.click(screen.getByText(en["info.otherSide.r"]));
   expect(onSwitchSide).toHaveBeenCalledTimes(1);
 });
 
@@ -172,7 +215,7 @@ test("a movement heading opens that movement", () => {
 test("the over and under button reports the request", () => {
   const onOverUnder = vi.fn();
   show("piriformis", "l", "normal", () => {}, onOverUnder);
-  fireEvent.click(screen.getByRole("button", { name: en["info.overUnder"] }));
+  fireEvent.click(screen.getByRole("button", { name: en["info.overUnderShort"] }));
   expect(onOverUnder).toHaveBeenCalledTimes(1);
 });
 
@@ -183,8 +226,9 @@ test("in German the names are German, the bone keeps its capital, and a name wit
   const tDe = createT(de, en);
   render(<InfoPanel selection={{ sid: "piriformis", side: "l" }} bundle={bundle} t={tDe} lang="de" onSwitchSide={() => {}} onHide={() => {}} onOpenMovement={() => {}} onOverUnder={() => {}} />);
   // Piriformis has no German name in this bundle, so it shows the English one.
-  expect(screen.getByRole("heading", { name: tDe("side.left", { label: "Piriformis" }) })).toBeTruthy();
-  expect(screen.getByText(tDe("info.origin", { landmark: "anterior surface", bone: "Kreuzbein" }))).toBeTruthy();
+  expect(screen.getByRole("heading", { level: 2, name: "Piriformis" })).toBeTruthy();
+  expect(screen.getByText(tDe("info.originLabel"))).toBeTruthy();
+  expect(screen.getByText(tDe("info.originValue", { landmark: "anterior surface", bone: "Kreuzbein" }))).toBeTruthy();
   expect(screen.getByRole("button", { name: "Außenrotation im Hüftgelenk" })).toBeTruthy();
 });
 

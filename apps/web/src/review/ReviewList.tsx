@@ -43,7 +43,8 @@ export function ReviewList({ bundle, t, lang, onClose }: Props) {
               <li key={a.id}>
                 <div>
                   {t("review.attachment", {
-                    text: t(a.end === "origin" ? "info.origin" : "info.insertion", { landmark: a.landmark, bone: boneLabel(bundle, a.bone, lang) }),
+                    // The label and the value, joined as the single sentence the reviewer has always seen.
+                    text: `${t(a.end === "origin" ? "info.originLabel" : "info.insertionLabel")}: ${t(a.end === "origin" ? "info.originValue" : "info.insertionValue", { landmark: a.landmark, bone: boneLabel(bundle, a.bone, lang) })}`,
                   })}
                 </div>
                 <DraftMark id={a.id} t={t} />
