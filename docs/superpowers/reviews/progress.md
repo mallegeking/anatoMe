@@ -11,6 +11,7 @@ Sessions of 2026-11-14:
 Session of 2026-11-16:
 
 - Sixth run: built plan 4b, the whole body as BodyParts3D meshes and names (Tasks 1 to 5). The saved Phase 4a patch was not touched and still applies to `build_region_blender.py`.
+- Seventh run: the fixes of the Phase 4b review. Fixes 2 to 4 are done (spinalis in the neck, the FMA id of infraspinatus, two generator tests). Fix 1 (a wrong side from BodyParts3D) stopped at its own stop rule and is not committed. See "Review fixes" in `phase-4b-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -23,6 +24,7 @@ Session of 2026-11-16:
 | Phase 3 publish v1, Tasks 1 to 8 | done (Task 3 stopped for the owner, open audit items below) | `phase-3-build-report.md` |
 | Phase 4a regions and German, Tasks 1 to 5 | partly done (Tasks 1 to 3 done, Task 4 blocked, Task 5 not started) | `phase-4a-build-report.md` |
 | Phase 4b whole body meshes, Tasks 1 to 5 | done (with deviations, points for the owner below) | `phase-4b-build-report.md` |
+| Phase 4b review fixes, Fixes 1 to 4 | partly done (Fixes 2 to 4 done, Fix 1 stopped for the owner) | `phase-4b-build-report.md`, section "Review fixes" |
 
 ## Waiting for the owner
 
@@ -44,6 +46,8 @@ Session of 2026-11-16:
 - Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,629. Decide whether that is fine or the build gets a second decimate pass (item 1 of `phase-4b-build-report.md`, "For the owner").
 - Phase 4b: eleven paired muscles are one structure each, so a tap selects both sides (item 2). The layer rule is now used on all five regions, with some pairs that may read wrong when peeling (item 3). Latin names are not checked one by one, four with typos were left out (item 4).
 - Phase 4b: run `docs/regions/phone-measurements.md` on the phone for the five new regions, the trunk and the shoulder first (item 5). Proofread the German region names and gap lines (section "For the owner to proofread").
+- Phase 4b review, Fix 1: the side check in `bp3d_inventory.py` corrects 72 files, not only FJ1469 and FJ1469M, so it stopped. Only those two are in a region, and the target lists stay the same with all 72 corrected. Decide which records the check corrects and reports (item 7 of `phase-4b-build-report.md`, section "Review fixes"). Until then `arm.glb` labels flexor pollicis brevis left on the right hand. The prepared work is `~/build/research/phase4b-fix1-wip.patch` in the Linux home, the 72 lines beside it in `phase4b-fix1-side-corrections.txt`. After the decision: apply it, add the check-models test, run the inventory, rebuild `arm.glb` with `--depths-out`, generate the structures and copy `arm.yaml` into the e2e data.
+- Phase 4b review: spinalis (no name in its header) is filed under the neck by where it lies. Whether it is spinalis cervicis is not checked (item 8).
 
 ## Notes for the next session
 

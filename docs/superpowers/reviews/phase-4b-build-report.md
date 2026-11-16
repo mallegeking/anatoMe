@@ -49,7 +49,7 @@ From the build (Task 4) and `npm run check-models`. "Own" means the region is th
 | neck | 53 | 89 | 11 | 104 | 90,349 | 491,788 bytes | 31 of 53 |
 | trunk | 54 | 79 | 3 | 83 | 140,629 | 727,632 bytes | 24 of 54 |
 
-All own-structure and mesh counts are the planner's. FMA ids were found for 259 of 260 (infraspinatus has none in the part lists).
+All own-structure and mesh counts are the planner's. FMA ids were found for 259 of 260. Infraspinatus was the one without: the part lists have it as "infraspinatus" (FMA32546), and the lookup asked for "infraspinatus muscle". Fixed in the review fixes, now 260 of 260.
 
 `check-models` lines for all files:
 
@@ -247,7 +247,7 @@ Before Task 1 the baseline was green. A clean rebuild of the hip gave the commit
 - The external oblique looks faceted at 2000 faces. A higher cap for that one mesh is the lever, the trunk has about 9,400 triangles of room.
 - A few meshes end slightly under 120 faces (for example the right distal phalanx of the ring finger at 112, the right pisiform at 118). It is the same Blender rounding the hip already has (superior gemellus 119).
 - A vertex with a zero normal would count as a free ray in the layer measurement. No sign of it was seen.
-- Four English names keep the word "muscle" from BodyParts3D (infraspinatus and the three intercostals). Infraspinatus has no FMA id in the part lists.
+- Four English names keep the word "muscle" from BodyParts3D (infraspinatus and the three intercostals). Infraspinatus has an FMA id in the part lists (FMA32546, as "infraspinatus"), which the first lookup missed. The review fixes add it.
 - `t("regionGap.hip")` and `t("regionGap.arm")` log "Missing translation key" in development builds on every hint render, because the plan finds a missing gap text by the key coming back.
 - While a new region's data loads, four tabs show for a moment before two. Tapping Movements in that moment is harmless.
 - Search shows 8 results. In the trunk "thoracic" matches 13 structures, so some vertebrae are only found by typing more, with no hint that there are more.
@@ -279,3 +279,182 @@ The German texts of Task 2, in `apps/web/src/i18n/de.json`:
 | `regionGap.lower-leg` | Noch nicht im Modell: die Musculi interossei dorsales des Fußes und der Extensor digitorum brevis. |
 | `regionGap.neck` | Noch nicht im Modell: die Kaumuskeln, die Gesichtsmuskeln und der Longus colli. |
 | `regionGap.trunk` | Noch nicht im Modell: Latissimus dorsi, Quadratus lumborum, Multifidus, die Bauchmuskeln außer dem äußeren schrägen Bauchmuskel, die Rippenknorpel und die Bandscheiben. |
+
+## Review fixes
+
+Built on 2026-11-16 in the Linux clone, on the working branch, from the owner's prompt with four findings of the Phase 4b review. The baseline of the build rules was green before any change. Each fix was written test first. No name, id or side was typed into a generated file. `models/hip.glb`, `models/hip-z-anatomy.glb` and `pipeline/assets/regions/hip.json` are byte-identical (`git diff 40b1022 HEAD` on them is empty). The saved Phase 4a patch was not touched.
+
+| Fix | Commit | State |
+| --- | --- | --- |
+| 1 A wrong side from BodyParts3D | none | stopped, waiting for the owner |
+| 2 "spinalis" belongs to the neck | `a9684c3` | done with deviation |
+| 3 The FMA id of infraspinatus | `bc31c54` | done |
+| 4 Two more generator tests | `afb2acb` | done |
+
+### Fix 1: stopped
+
+The prompt expects the side check in `bp3d_inventory.py` to correct exactly FJ1469 and FJ1469M, and says to stop and report if any other file is reported. It reported 72 files.
+
+What was done: `bounds_centre_x(path)` reads the centre of the x range from the OBJ header's `Bounds(mm)` line, and `side_by_position(record, centre_x)` gives a sided record the side of its position, keeping the English name. Three tests in the new `pipeline/assets/tests/test_bp3d_inventory.py` (left at x < 0 gets "r", right at x > 0 gets "l", an agreeing and an unsided record unchanged, and the header parsing with and without a `Bounds(mm)` line) failed first and then passed. Every one of the 2,234 OBJ files has a `Bounds(mm)` line. Then the inventory ran and printed 72 `side corrected` lines.
+
+What the 72 are:
+
+- FJ1469 and FJ1469M, flexor pollicis brevis, as the review says. These two are the only ones that any pattern of any target list in `pipeline/assets/regions/` matches, the hip included.
+- 70 parts outside every region: the heart (cavity and papillary muscles of the right ventricle, cusps of the aortic and pulmonary valves, many branches of the right and left coronary arteries, the right marginal vein), the liver (branches of the left hepatic artery, the left hepatic duct, the left portal vein and its branches), the brachium of the superior colliculus in the brain, the stomach (right gastric and gastro-epiploic vessels), the left and right ascending lumbar veins, the right fibular vein (FJ2190, at x = +77 mm), the superficial dorsal vein of the penis (x = -0 mm), and three muscles of the pharynx and larynx (the left and right middle pharyngeal constrictor at about 10 mm, the left oblique arytenoid at -1 mm). In most of them "left" or "right" names a part of an organ (the right ventricle, the left hepatic artery), not a side of the body, or the part lies within a few millimetres of the midline.
+
+What it would change: run in memory, the generator gives the same five target lists and the same dropped list from a fully corrected inventory as from the present one. So accepting all 72 would change only `arm.glb` among the built files, as the review expects.
+
+The check-models part was tried on the existing files without committing it: a mesh with side "l" must have the centre of its bounds at x > 0, side "r" at x < 0. It fails on `arm.glb` only, with exactly `flexor-pollicis-brevis has side l but lies on the right` and `flexor-pollicis-brevis has side r but lies on the left`. That also confirms that left is x > 0 in the built files.
+
+Nothing of Fix 1 is committed. `sources/bp3d-inventory.jsonl` was put back byte for byte (`cmp` with a copy made before the run), so `arm.glb` still labels this muscle left on the right hand. The work is saved outside the repo, next to the Phase 4a patch, as `~/build/research/phase4b-fix1-wip.patch` (the inventory change, its test and the check-models check, without a check-models test yet). The 72 lines are saved as `~/build/research/phase4b-fix1-side-corrections.txt`. The patch still applies to the last commit of the review fixes (`git apply --check` passed).
+
+The decision is item 7 of "For the owner" below.
+
+### Fix 2: spinalis in the neck
+
+`region_of` makes the exact name "spinalis" a neck muscle (`test_region_of` asserts `region_of("spinalis", {MUSCLE}) == "neck"` and still `region_of("spinalis thoracis", {MUSCLE}) == "trunk"`, and it failed first). The OBJ headers confirm the review: FJ1543 and FJ1543M reach from 1329 to 1435 mm, spinalis thoracis (FJ1544) ends at 1335 mm, and the seventh cervical vertebra (FJ3172) spans 1365 to 1392 mm. The targets were generated again, `neck.glb` and `trunk.glb` were rebuilt with `--depths-out`, the structures were generated again, and both yaml files were copied into `apps/web/e2e/data/structures/`. `docs/regions/known-gaps.md` now lists spinalis under the neck among the joined pairs and says why it is there. `ATTRIBUTION.md` has the new mesh counts (neck 105, trunk 82).
+
+**Deviation, the mesh counts.** The prompt expects trunk 53 structures and 77 meshes and neck 54 and 91. The generator prints trunk 53 and 78 and neck 54 and 90. The diff of the two target files is the one spinalis target and nothing else. Spinalis is a midline group: its two files, FJ1543 and FJ1543M, have no side word and are joined into one mesh by the build, so the generator counts it as one mesh, as it did in the planner's 79 and 89. The expected values count the two files as two meshes. The structure counts, the other regions and the dropped list are as expected.
+
+### Fix 3: the FMA id of infraspinatus
+
+`fma_for(name, fma)` looks the name up as it is, then without a trailing " muscle", like `latin_for`. Test: `test_fma_lookup` (failed first). FMA ids are now found for 260 of 260. Only the infraspinatus row in `shoulder.yaml` changed (it gets `fma: "FMA32546"`). The e2e copy of `shoulder.yaml` was updated to match.
+
+### Fix 4: two more tests
+
+`test_build_targets_sides_and_hip` also asserts that no neck target has "longus-colli" in its sid. `test_build_targets_drops_a_mixed_group` checks that a group of "left serratus posterior inferior" and an unsided "serratus posterior inferior" is dropped with exactly `serratus posterior inferior: sided and unsided meshes mixed (FJ9000, FJ9001)` and is in no target list. Both pass on the existing code. To see that they can fail, the generator was broken twice on purpose and put back each time: with the reason text changed, the new mixed-group test failed, and with longus colli kept as a neck target while still in the dropped list, only the new neck assert failed.
+
+### Task 1 and cli.ts
+
+Task 1 lists `pipeline/data/src/cli.ts` among its files, but it needed no change and has none. `loadStructures` in `validate.ts` builds each structure's `regions` (home region first, then `also_in`), and `cli.ts` passes the whole map to `checkModelMapping` as it did before.
+
+### Per region after the review fixes
+
+| Region | Own structures | Own meshes in the target list | Borrowed bones | Meshes in the file | Triangles | File size | Latin names |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| lower-leg | 60 | 120 | 4 | 128 | 44,294 | 329,168 bytes | 33 of 60 |
+| shoulder | 23 | 46 | 33 | 91 | 109,449 | 483,232 bytes | 19 of 23 |
+| arm | 70 | 140 | 2 | 144 | 45,227 | 363,016 bytes | 38 of 70 |
+| neck | 54 | 90 | 11 | 105 | 90,682 | 495,160 bytes | 31 of 54 |
+| trunk | 53 | 78 | 3 | 82 | 140,296 | 724,260 bytes | 24 of 53 |
+
+FMA ids: 260 of 260. Latin: 145 of 260, as before. The dropped list is unchanged (the three parts of longus colli). Only `neck.glb` and `trunk.glb` changed among the model files.
+
+`check-models` lines for all files:
+
+```
+hip.glb: 65 meshes, 43378 triangles, 234348 bytes, size 0.325 x 1.124 x 0.173
+hip-z-anatomy.glb: 38 meshes, 5531 triangles, 54824 bytes, size 0.288 x 0.579 x 0.136
+lower-leg.glb: 128 meshes, 44294 triangles, 329168 bytes, size 0.339 x 0.907 x 0.230
+shoulder.glb: 91 meshes, 109449 triangles, 483232 bytes, size 0.482 x 0.499 x 0.244
+arm.glb: 144 meshes, 45227 triangles, 363016 bytes, size 0.648 x 0.697 x 0.201
+neck.glb: 105 meshes, 90682 triangles, 495160 bytes, size 0.333 x 0.452 x 0.209
+trunk.glb: 82 meshes, 140296 triangles, 724260 bytes, size 0.289 x 0.640 x 0.229
+region hip: 48909 triangles (budget 150000)
+region lower-leg: 44294 triangles (budget 150000)
+region shoulder: 109449 triangles (budget 150000)
+region arm: 45227 triangles (budget 150000)
+region neck: 90682 triangles (budget 150000)
+region trunk: 140296 triangles (budget 150000)
+every mesh maps to one of 312 structures
+```
+
+The trunk is 0.640 m high now, not 0.684 m, because spinalis was its highest part.
+
+### Layers of the neck and the trunk after the rebuild
+
+Spinalis moves from layer 1 in the trunk (57 percent free) to layer 3 in the neck (2 percent free), because in the neck file the semispinalis and splenius cover it. Three other values moved by one or two points with no change of depth, because the rebuilt files changed the shapes the rays meet: set of interspinales cervicis 0.03 to 0.02, splenius capitis 0.32 to 0.31, serratus posterior superior 0.53 to 0.55. So the line about spinalis under "Layers that may read wrong when peeling" no longer holds.
+
+Every soft part of the neck (32):
+
+| Structure | free | depth |
+| --- | --- | --- |
+| cervical-rotator | 0.00 | 3 |
+| digastric | 0.06 | 2 |
+| geniohyoid | 0.02 | 3 |
+| iliocostalis-cervicis | 0.30 | 1 |
+| longissimus-capitis | 0.03 | 3 |
+| longissimus-cervicis | 0.08 | 2 |
+| longus-capitis | 0.05 | 2 |
+| mylohyoid | 0.00 | 3 |
+| obliquus-capitis-inferior | 0.09 | 2 |
+| obliquus-capitis-superior | 0.07 | 2 |
+| omohyoid | 0.30 | 1 |
+| platysma | 0.57 | 1 |
+| rectus-capitis-anterior | 0.01 | 3 |
+| rectus-capitis-lateralis | 0.00 | 3 |
+| rectus-capitis-posterior-major | 0.20 | 1 |
+| rectus-capitis-posterior-minor | 0.10 | 2 |
+| scalenus-anterior | 0.05 | 2 |
+| scalenus-medius | 0.04 | 3 |
+| scalenus-posterior | 0.21 | 1 |
+| semispinalis-capitis | 0.02 | 3 |
+| semispinalis-cervicis | 0.01 | 3 |
+| set-of-anterior-cervical-intertransversarii | 0.00 | 3 |
+| set-of-interspinales-cervicis | 0.02 | 3 |
+| set-of-posterior-cervical-intertransversarii | 0.00 | 3 |
+| spinalis | 0.02 | 3 |
+| splenius-capitis | 0.31 | 1 |
+| splenius-cervicis | 0.22 | 1 |
+| sternocleidomastoid | 0.17 | 2 |
+| sternohyoid | 0.05 | 2 |
+| sternothyroid | 0.06 | 2 |
+| stylohyoid | 0.02 | 3 |
+| thyrohyoid | 0.01 | 3 |
+
+Every soft part of the trunk (21):
+
+| Structure | free | depth |
+| --- | --- | --- |
+| diaphragm | 0.24 | 1 |
+| external-intercostal | 0.28 | 1 |
+| external-oblique | 0.53 | 1 |
+| iliocostalis-lumborum | 0.30 | 1 |
+| iliocostalis-thoracis | 0.17 | 2 |
+| innermost-intercostal | 0.01 | 3 |
+| internal-intercostal | 0.10 | 2 |
+| interspinalis-thoracis | 0.08 | 2 |
+| lateral-lumbar-intertransversarius | 0.00 | 3 |
+| longissimus-thoracis | 0.16 | 2 |
+| lumbar-rotator | 0.01 | 3 |
+| medial-lumbar-intertransversarius | 0.02 | 3 |
+| semispinalis-thoracis | 0.19 | 2 |
+| serratus-posterior-inferior | 0.23 | 1 |
+| serratus-posterior-superior | 0.55 | 1 |
+| set-of-interspinales-lumborum | 0.00 | 3 |
+| set-of-levatores-costarum-breves | 0.02 | 3 |
+| set-of-levatores-costarum-longi | 0.03 | 3 |
+| spinalis-thoracis | 0.23 | 1 |
+| thoracic-rotator | 0.11 | 2 |
+| transversus-thoracis | 0.11 | 2 |
+
+### Checks after the review fixes
+
+Run on `afb2acb`, the full list of the build rules, exit 0:
+
+```
+data in data is valid                                   (validate)
+region trunk: 140296 triangles (budget 150000)          (check-models, all six regions under budget)
+every mesh maps to one of 312 structures
+ Test Files  39 passed (39)      Tests  405 passed (405)    (apps/web)
+ Test Files  8 passed (8)        Tests  137 passed (137)    (pipeline/data)
+✓ built in 1.09s                                        (build:review)
+✓ built in 1.12s                                        (build)
+  7 passed (16.6s)                                      (e2e)
+apps/web/dist/data: 6 bundle(s), no drafts              (check-no-drafts)
+median interactive ms: 2167                             (perf-check, the hip)
+ok   decoder download fails: message shown after 1005 ms
+ok   decoder never answers: message shown after 20552 ms
+ok   model file missing: message shown after 982 ms     (error-check)
+26 passed in 3.58s                                      (test:py)
+```
+
+**Render check (Task 4 Step 8, I looked)** for the arm, the neck and the trunk, front and back, into a temporary folder with a throwaway copy of `render_check_blender.py` that shows every kind and colours spinalis yellow. Nothing was committed.
+- Arm: not rebuilt, the same file as before. Both arms with the scapula as context, muscles from the shoulder to the fingers, symmetric, nothing floats.
+- Neck: from the back, spinalis sits on the cervical spine between the deep neck muscles, partly covered by semispinalis, which fits its new layer 3. Both sides match, nothing floats. The front is unchanged: the platysma from the jaw to the clavicles, the bones of the skull, the hyoid and the upper chest as context.
+- Trunk: no part stands above the highest bone any more. The back muscles end at the upper thoracic spine. Erector spinae, serratus posterior and the ribs as before, symmetric. The external oblique still looks faceted.
+
+### For the owner (review fixes)
+
+7. **Fix 1, the side check.** It finds 72 files whose side word disagrees with their position, not 2. Only FJ1469 and FJ1469M are in any region, and with all 72 corrected the target lists stay the same. Choose one: (a) accept the 72 as they are, so the inventory's side means the side of the body the mesh lies on, and only `arm.glb` changes, (b) correct only records that a region's target list matches and print only those, or (c) another rule. Until then `arm.glb` labels flexor pollicis brevis left on the right hand. The prepared work is `~/build/research/phase4b-fix1-wip.patch`. The check-models check and its test go in after the decision, with the rebuild of `arm.glb`.
+8. **Spinalis without a name.** Its header has no English name, and it is filed under the neck now because of where it lies. Whether it is the cervical part of spinalis (spinalis cervicis) is not checked.
