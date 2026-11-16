@@ -1,8 +1,9 @@
-"""List every BodyParts3D element mesh and match it against the hip targets.
+"""List every BodyParts3D element mesh and match it against a region's targets (the hip by default).
 
 Plain Python, no extra packages. Writes sources/bp3d-inventory.jsonl.
-Run from the repo root: .venv/bin/python pipeline/assets/bp3d_inventory.py
+Run from the repo root: .venv/bin/python pipeline/assets/bp3d_inventory.py [--region <id>]
 """
+import argparse
 import csv
 import json
 import sys
@@ -73,14 +74,17 @@ def build_records():
 
 
 def main():
+    ap = argparse.ArgumentParser(prog="bp3d_inventory.py")
+    ap.add_argument("--region", default="hip", help="the target file in regions/ to print the match table for")
+    args = ap.parse_args()
     records = build_records()
     with open(OUT, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r) + "\n")
     print(f"wrote {len(records)} records to {OUT}")
-    hip = json.loads((HERE / "regions" / "hip.json").read_text(encoding="utf-8"))
-    matches = match_targets(records, hip["targets"])
-    print(format_table(summarize(matches, hip["targets"])))
+    region = json.loads((HERE / "regions" / f"{args.region}.json").read_text(encoding="utf-8"))
+    matches = match_targets(records, region["targets"])
+    print(format_table(summarize(matches, region["targets"])))
 
 
 if __name__ == "__main__":

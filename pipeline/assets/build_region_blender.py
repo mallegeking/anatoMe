@@ -35,6 +35,7 @@ from mathutils.bvhtree import BVHTree
 HERE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd() / "pipeline" / "assets"
 sys.path.insert(0, str(HERE))
 from hipmatch import match_targets  # noqa: E402
+from meshrules import decimate_ratio, depth_from_free  # noqa: E402
 from meshfit import (  # noqa: E402
     apply_similarity,
     femoral_head_points,
@@ -76,9 +77,13 @@ def parse_args():
     ap.add_argument("--out", required=True)
     ap.add_argument("--whole-region", action="store_true",
                     help="Z-Anatomy only: export every target Z-Anatomy has, unaligned")
+    ap.add_argument("--depths-out",
+                    help="BodyParts3D only: measure the layer of each soft part and write it as JSON here")
     args = ap.parse_args(argv)
     if args.whole_region and args.source != "z-anatomy":
         ap.error("--whole-region only works with --source z-anatomy")
+    if args.depths_out and args.source != "bp3d":
+        ap.error("--depths-out only works with --source bp3d")
     return args
 
 
@@ -92,6 +97,11 @@ def load_records(source):
 
 def load_targets(region):
     return json.loads((HERE / "regions" / f"{region}.json").read_text(encoding="utf-8"))["targets"]
+
+
+def load_cap(region):
+    """The region file's max_triangles_per_mesh, or None when it has none (the hip)."""
+    return json.loads((HERE / "regions" / f"{region}.json").read_text(encoding="utf-8")).get("max_triangles_per_mesh")
 
 
 def pick_meshes(region, source, whole_region):
@@ -282,8 +292,8 @@ def triangles(mesh):
     return len(mesh.loop_triangles)
 
 
-def clean_and_decimate(obj, ratio):
-    """Drop materials, UVs and colours, then decimate (never below MIN_FACES)."""
+def clean_and_decimate(obj, ratio, cap=None):
+    """Drop materials, UVs and colours, then decimate (never below MIN_FACES, never above cap)."""
     me = obj.data
     me.materials.clear()
     for uv in list(me.uv_layers):
@@ -291,7 +301,7 @@ def clean_and_decimate(obj, ratio):
     for name in [a.name for a in me.color_attributes]:
         me.color_attributes.remove(me.color_attributes[name])
     tris = triangles(me)
-    r = max(ratio, min(1.0, MIN_FACES / tris))
+    r = decimate_ratio(tris, ratio, cap, MIN_FACES)
     if r < 1.0:
         mod = obj.modifiers.new("decimate", "DECIMATE")
         mod.ratio = r
@@ -307,8 +317,8 @@ def clean_and_decimate(obj, ratio):
     me.shade_smooth()
 
 
-def build_objects(picked, source, mesh_for_record, side_matrix):
-    """One object per target and side, with the glTF extras set."""
+def build_objects(picked, source, mesh_for_record, side_matrix, cap=None):
+    """One object per target and side, with the glTF extras set. cap is the region's max_triangles_per_mesh."""
     scene_coll = bpy.context.scene.collection
     built = []
     for target, records in picked:
@@ -325,7 +335,7 @@ def build_objects(picked, source, mesh_for_record, side_matrix):
                 mesh.transform(side_matrix[side])
             obj = bpy.data.objects.new(name, mesh)
             scene_coll.objects.link(obj)
-            clean_and_decimate(obj, BONE_RATIO if target["type"] == "bone" else OTHER_RATIO)
+            clean_and_decimate(obj, BONE_RATIO if target["type"] == "bone" else OTHER_RATIO, cap)
             # These become glTF extras, which three.js shows as userData.
             obj["sid"] = target["sid"]
             obj["label"] = target["english"]
@@ -334,6 +344,66 @@ def build_objects(picked, source, mesh_for_record, side_matrix):
             obj["source"] = source
             built.append(obj)
     return built
+
+
+# --- Measuring layers ----------------------------------------------------------
+
+DEPTH_SAMPLES = 300       # vertices per object
+DEPTH_START = 0.0005      # 0.5 mm off the surface along the normal
+DEPTH_STEP = 0.0001       # 0.1 mm past a hit on the object's own part
+DEPTH_MAX_HITS = 60
+DEPTH_MAX_DISTANCE = 2.0  # metres
+
+
+def measure_depths(objs):
+    """For each soft part, the share of rays from its surface that meet no other part.
+
+    One BVH tree holds the faces of every built object, bones and context bones included.
+    Rays start just off a vertex and go along its normal. Hits on the part's own sid are
+    passed through. Both sides of a structure are pooled.
+    Returns {sid: {"depth": d, "free": f, "samples": k}} sorted by sid.
+    The objects sit at the origin with their meshes in world space (see build_objects).
+    """
+    verts, polys, face_sid = [], [], []
+    for o in objs:
+        base = len(verts)
+        verts.extend(tuple(v.co) for v in o.data.vertices)
+        for p in o.data.polygons:
+            polys.append([base + i for i in p.vertices])
+            face_sid.append(o["sid"])
+    tree = BVHTree.FromPolygons(verts, polys)
+
+    counts = {}  # sid -> [free rays, all rays]
+    for o in objs:
+        if o["kind"] == "bone":
+            continue
+        sid = o["sid"]
+        vertices = o.data.vertices
+        step = max(1, len(vertices) // DEPTH_SAMPLES)
+        c = counts.setdefault(sid, [0, 0])
+        for v in list(vertices)[::step][:DEPTH_SAMPLES]:
+            n = v.normal.normalized()
+            origin = v.co + n * DEPTH_START
+            travelled, free = 0.0, True
+            for _ in range(DEPTH_MAX_HITS):
+                loc, _normal, index, dist = tree.ray_cast(origin, n, DEPTH_MAX_DISTANCE - travelled)
+                if loc is None:
+                    break
+                if face_sid[index] != sid:
+                    free = False
+                    break
+                travelled += dist + DEPTH_STEP
+                if travelled >= DEPTH_MAX_DISTANCE:
+                    break
+                origin = loc + n * DEPTH_STEP
+            c[0] += free
+            c[1] += 1
+    out = {}
+    for sid in sorted(counts):
+        free_rays, rays = counts[sid]
+        free = round(free_rays / rays, 2)
+        out[sid] = {"depth": depth_from_free(free), "free": free, "samples": rays}
+    return out
 
 
 def report(objs):
@@ -409,7 +479,14 @@ def main():
 
     if args.source == "bp3d":
         bpy.ops.wm.read_factory_settings(use_empty=True)
-        objs = build_objects(picked, "bp3d", import_bp3d, None)
+        objs = build_objects(picked, "bp3d", import_bp3d, None, load_cap(args.region))
+        if args.depths_out:
+            depths_out = Path(args.depths_out)
+            depths_out = depths_out if depths_out.is_absolute() else ROOT / depths_out
+            depths = measure_depths(objs)
+            depths_out.parent.mkdir(parents=True, exist_ok=True)
+            depths_out.write_text(json.dumps(depths, indent=2) + "\n", encoding="utf-8")
+            print(f"DEPTHS {len(depths)} soft parts written to {depths_out}")
     else:
         bpy.ops.wm.open_mainfile(filepath=str(ZA_BLEND))
         depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -423,7 +500,8 @@ def main():
                 sys.exit(1)
             print(f"ALIGNMENT OK: both hip joints within {1000 * MAX_HIP_JOINT_ERROR:.0f} mm")
         objs = build_objects(picked, "z-anatomy",
-                             lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices)
+                             lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices,
+                             load_cap(args.region))
 
     report(objs)
     export(objs, out, args.source)
