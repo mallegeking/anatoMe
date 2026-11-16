@@ -1033,43 +1033,56 @@ body,
 }
 
 
-.area-panel {
-  font-size: 0.9375rem;
-  overflow-wrap: anywhere;
+.area-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.area-panel h2 {
-  margin: 0 0 4px;
-  font-size: 1.125rem;
+.area-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
 }
 
-.area-panel h3 {
-  margin: 4px 0 0;
+.area-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-surface);
+  color: var(--accent);
   font-size: 0.8125rem;
   font-weight: 600;
 }
 
-.area-panel p {
-  margin: 4px 0;
-}
-
-.area-panel ol {
-  margin: 8px 0;
-  padding-left: 22px;
-}
-
-.area-panel li {
-  margin: 0 0 10px;
-}
-
-.area-panel li .link-button {
-  display: block;
+.area-card-head .link-button {
   min-height: 32px;
   text-align: left;
+  font-weight: 600;
 }
 
-.area-panel li .link-button[aria-current="true"] {
+.area-card-head .link-button[aria-current="true"] {
   font-weight: 700;
+}
+
+.area-load {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+  padding-top: var(--gap-2);
+  border-top: 1px solid var(--divider);
+}
+
+.area-load .link-button {
+  align-self: flex-start;
+  text-align: left;
 }
 
 /* The Notebook tab. Long notes and names wrap, so the panel never scrolls sideways. */

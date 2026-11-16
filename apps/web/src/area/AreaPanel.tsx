@@ -1,8 +1,10 @@
 import type { RegionBundle } from "../data/bundle";
-import { loadWord } from "../data/describe";
+import { describeAction } from "../data/describe";
 import type { Lang } from "../i18n/lang";
 import { nameOf } from "../i18n/names";
 import type { Translate } from "../i18n/t";
+import { ActionNotes } from "../ui/InfoPanel";
+import { Card, PanelTitle } from "../ui/pieces";
 import type { AreaTap } from "../viewer/Scene";
 import type { Selection } from "../viewer/pick";
 
@@ -40,9 +42,13 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
   // A probe that did not meet its own structure would list something else under its name, so say so instead.
   if (through && !area.entries.some((e) => same(through, e.sid, e.side))) {
     return (
-      <section className="area-panel" data-testid="area-panel">
-        <h2>{t("area.throughTitle", { name: structureName(through.sid) })}</h2>
-        <p>{t("area.notOnLine", { name: structureName(through.sid) })}</p>
+      <section className="area-panel panel-body" data-testid="area-panel">
+        <div className="panel-head">
+          <PanelTitle>{t("area.throughTitle", { name: structureName(through.sid) })}</PanelTitle>
+        </div>
+        <Card>
+          <p>{t("area.notOnLine", { name: structureName(through.sid) })}</p>
+        </Card>
         <div className="panel-actions">
           <button className="btn" type="button" onClick={onClear}>
             {t("area.clear")}
@@ -53,45 +59,52 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
   }
 
   return (
-    <section className="area-panel" data-testid="area-panel">
-      <h2>{through ? t("area.throughTitle", { name: structureName(through.sid) }) : t("area.title")}</h2>
-      <p className="muted">{t("area.note")}</p>
-      <p className="muted">{t("area.noSkin")}</p>
-      <ol>
-        {area.entries.map((entry) => {
+    <section className="area-panel panel-body" data-testid="area-panel">
+      <div className="panel-head">
+        <PanelTitle sub={t("area.subtitle")}>{through ? t("area.throughTitle", { name: structureName(through.sid) }) : t("area.title")}</PanelTitle>
+      </div>
+      <ol className="area-list">
+        {area.entries.map((entry, index) => {
           const structure = bundle.structures.find((s) => s.id === entry.sid);
           const name = structureName(entry.sid);
           const label = entry.side === "l" ? t("side.left", { label: name }) : entry.side === "r" ? t("side.right", { label: name }) : name;
           const current = same(selection, entry.sid, entry.side) || same(through, entry.sid, entry.side);
-          // One button for each distinct movement and load, in the order of the bundle's movement list.
+          // One line for each action row of the structure, in the order of the bundle's movement list.
           const rows = structure ? bundle.actions.filter((a) => a.structure === entry.sid) : [];
-          const loads = bundle.movements.flatMap((movement) =>
-            [...new Set(rows.filter((a) => a.movement === movement.id).map((a) => a.load))].map((load) => ({ movement, load })),
-          );
+          const loads = bundle.movements.flatMap((movement) => rows.filter((a) => a.movement === movement.id).map((action) => ({ movement, action })));
           const pending = structure && bundle.mode !== "review" ? (bundle.pendingByStructure[entry.sid] ?? 0) : 0;
           const cm = centimetres(entry.depth);
           return (
-            <li key={`${entry.sid}-${entry.side}`}>
-              <button type="button" className="link-button" aria-current={current ? "true" : undefined} onClick={() => onFocusStructure({ sid: entry.sid, side: entry.side })}>
-                {label}
-              </button>
+            <Card key={`${entry.sid}-${entry.side}`} as="li" current={current}>
+              <div className="area-card-head">
+                <span className="area-badge" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <button type="button" className="link-button" aria-current={current ? "true" : undefined} onClick={() => onFocusStructure({ sid: entry.sid, side: entry.side })}>
+                  {label}
+                </button>
+              </div>
               {structure && (
                 <div className="muted">
                   {t("area.typeDepth", { type: t(`type.${structure.type}`), depth: cm === "0" ? t("area.atSurface") : t("area.depth", { cm }) })}
                 </div>
               )}
               {loads.length > 0 && (
-                <div>
-                  <h3>{t("area.loadedBy")}</h3>
-                  {loads.map(({ movement, load }) => (
-                    <button key={`${movement.id}-${load}`} type="button" className="link-button" onClick={() => onOpenMovement(movement.id)}>
-                      {t("area.movement", { movement: nameOf(movement, lang), load: loadWord(load, t) })}
-                    </button>
+                <>
+                  <div className="muted">{t("area.loadedBy")}</div>
+                  {loads.map(({ movement, action }) => (
+                    <div key={action.id} className="area-load">
+                      <button type="button" className="link-button" onClick={() => onOpenMovement(movement.id)}>
+                        {nameOf(movement, lang)}
+                      </button>
+                      <div>{describeAction(action, t)}</div>
+                      <ActionNotes action={action} t={t} />
+                    </div>
                   ))}
-                </div>
+                </>
               )}
               {pending > 0 && <p className="muted">{t("info.pending")}</p>}
-            </li>
+            </Card>
           );
         })}
       </ol>
@@ -100,6 +113,8 @@ export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, 
           {t("area.clear")}
         </button>
       </div>
+      <p className="muted">{t("area.note")}</p>
+      <p className="muted">{t("area.noSkin")}</p>
     </section>
   );
 }

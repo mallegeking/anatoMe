@@ -3,6 +3,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import type { RegionBundle } from "../data/bundle";
 import de from "../i18n/de.json";
 import en from "../i18n/en.json";
+import { describeAction } from "../data/describe";
 import { createT } from "../i18n/t";
 import { makeMovementBundle } from "../movement/fixture";
 import { AreaPanel, type AreaState } from "./AreaPanel";
@@ -59,11 +60,11 @@ test("shows the two notes whenever there is a list", () => {
   expect(screen.getByText(en["area.noSkin"])).toBeTruthy();
 });
 
-test("lists each movement with its load word once", () => {
+test("lists each movement that loads the structure, in the order of the movement list", () => {
   show();
   const li = item("Piriformis (left)");
   const names = within(li).getAllByRole("button").slice(1).map((b) => b.textContent);
-  expect(names).toEqual(["Hip internal rotation (works)", "Hip external rotation (works)"]);
+  expect(names).toEqual(["Hip internal rotation", "Hip external rotation"]);
 });
 
 test("a bone has no movement heading", () => {
@@ -87,7 +88,7 @@ test("the name button reports the structure and side", () => {
 test("a movement button opens that movement", () => {
   const onOpenMovement = vi.fn();
   show({ onOpenMovement });
-  fireEvent.click(within(item("Piriformis (left)")).getByRole("button", { name: "Hip external rotation (works)" }));
+  fireEvent.click(within(item("Piriformis (left)")).getByRole("button", { name: "Hip external rotation" }));
   expect(onOpenMovement).toHaveBeenCalledWith("hip-external-rotation");
 });
 
@@ -102,7 +103,7 @@ test("an entry the bundle does not know shows its sid and nothing else", () => {
   show({ area: { ...area, entries: [{ sid: "mystery", side: "", distance: 1, depth: 0 }] } });
   const li = item("mystery");
   expect(within(li).getAllByRole("button")).toHaveLength(1);
-  expect(li.textContent).toBe("mystery");
+  expect(li.textContent).toBe("1mystery");
 });
 
 test("the clear button calls onClear", () => {
@@ -143,4 +144,65 @@ test("the area list works in a region without movements", () => {
   expect(screen.getAllByRole("listitem").length).toBeGreaterThan(0);
   expect(screen.getByRole("button", { name: "Piriformis (left)" })).toBeTruthy();
   expect(screen.queryByText(en["area.loadedBy"])).toBeNull();
+});
+
+test("the title and the line under it", () => {
+  show();
+  const h = screen.getByRole("heading", { level: 2 });
+  expect(h.textContent).toBe(en["area.title"]);
+  expect(h.nextElementSibling?.textContent).toBe(en["area.subtitle"]);
+});
+
+test("each layer is a numbered card, in order from the surface", () => {
+  show();
+  const cards = within(screen.getByRole("list")).getAllByRole("listitem");
+  expect(cards).toHaveLength(3);
+  expect(cards.every((c) => c.classList.contains("card"))).toBe(true);
+  expect(cards.map((c) => c.querySelector(".area-badge")?.textContent)).toEqual(["1", "2", "3"]);
+});
+
+test("the entry that is selected is the current card", () => {
+  show({ selection: { sid: "piriformis", side: "l" } });
+  expect(item("Piriformis (left)").classList.contains("card--current")).toBe(true);
+  expect(item("Femur (left)").classList.contains("card--current")).toBe(false);
+});
+
+test("each movement that loads a structure shows what it does and its uncertainty notes", () => {
+  const base = makeMovementBundle();
+  const bundle: RegionBundle = {
+    ...base,
+    actions: base.actions.map((a) => (a.id === "m1" ? { ...a, applies_to: "some hips", confidence: "medium" as const } : a)),
+  };
+  show({ bundle });
+  const li = item("Piriformis (left)");
+  const action = bundle.actions.find((a) => a.id === "m1")!;
+  expect(within(li).getByRole("button", { name: "Hip external rotation" })).toBeTruthy();
+  expect(within(li).getByText(describeAction(action, t))).toBeTruthy();
+  expect(within(li).getByText(t("info.appliesTo", { text: "some hips" }))).toBeTruthy();
+  expect(within(li).getByText(en["confidence.medium"])).toBeTruthy();
+});
+
+test("one line per action row, so two rows of the same movement both show", () => {
+  show({ area: { ...area, entries: [{ sid: "obturator-externus", side: "l", distance: 1, depth: 0.03 }] } });
+  const li = item("Obturator externus (left)");
+  expect(within(li).getAllByRole("button", { name: "Hip external rotation" })).toHaveLength(2);
+  expect(within(li).getAllByText(en["confidence.high"])).toHaveLength(2);
+});
+
+test("the two notes come after the list and the clear button", () => {
+  show();
+  const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+  const list = screen.getByRole("list");
+  const clear = screen.getByRole("button", { name: en["area.clear"] });
+  for (const key of ["area.note", "area.noSkin"] as const) {
+    const note = screen.getByText(en[key]);
+    expect(follows(list, note)).toBe(true);
+    expect(follows(clear, note)).toBe(true);
+  }
+});
+
+test("with no checked rows there is no Movements that load it heading, and the waiting line shows", () => {
+  show({ bundle: { ...makeMovementBundle(), actions: [], pendingByStructure: { piriformis: 2 } } });
+  expect(screen.queryByText(en["area.loadedBy"])).toBeNull();
+  expect(within(item("Piriformis (left)")).getByText(en["info.pending"])).toBeTruthy();
 });
