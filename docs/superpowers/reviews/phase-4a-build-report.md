@@ -130,7 +130,7 @@ What the report found for the other steps:
 2. **Proofread the German** (list below). Especially the disclaimer and the educational line, which must say exactly as much as the English.
 3. **German word rule:** the summary says "Physio-Fachkraft" because "Physiotherapeut" contains the banned stem "therap". Loosen the rule for that word if you prefer the full word.
 4. **German names:** decide whether the movement names should be one consistent set, and whether glosses of the Latin ("Birnenförmiger Muskel") are what you want, or the Latin name, or no German name.
-5. **Setup on this machine:** `unzip` is not installed and there is no root access here. The builder used a copy unpacked from the Ubuntu package in a folder outside the repo. Install `unzip` properly if you run the pipeline here again.
+5. **Setup on this machine: done.** `unzip` was not installed on the Linux machine (WSL2 Ubuntu) at the build, and the builder used a copy unpacked from the Ubuntu package in a folder outside the repo. The owner installed the package on 2026-11-16 (`unzip 6.0-29ubuntu1` in `/usr/bin`, from the dpkg log). The builder's copy is still in `~/build/bin/unzip` and comes first on the PATH. It can be deleted.
 6. **Review Fix 3 is stopped** (see "Review fixes"). The `?region=elbow` test cannot fail when App passes `""` to `chooseRegion`, because an empty address and an unknown region both give the first region. Decide whether to commit only the `?region=shoulder` test, which fails on that line, or both tests with the elbow test tied to another line. One candidate, not tried: the `ids.includes(asked)` check in `apps/web/src/region/regions.ts`. The two tests are in `~/build/research/phase4a-review-fix3-wip.patch` in the Linux home.
 
 ## For the owner to proofread

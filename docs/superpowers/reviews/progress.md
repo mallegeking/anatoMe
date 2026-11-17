@@ -54,7 +54,7 @@ Session of 2026-11-17:
 
 - Phase 4a: Task 4 is blocked. The new surface gate (95th percentile of the bone surface distances, limit 5 mm) measures 7.8 and 8.0 mm before decimation and 7.0 and 7.3 mm after, mostly on the iliac wing. Decide how the gate should work (four options in item 1 of `phase-4a-build-report.md`, "For the owner"). The uncommitted Steps 1 and 2 are saved as `~/build/research/phase4a-task4-wip.patch` in the Linux home, with the task report beside it. After the decision, Task 4 and then Task 5 (the region playbook) can be built.
 - Phase 4a: proofread the German texts and names (section "For the owner to proofread" of the report), especially the disclaimer and the educational line. Decide on "Physio-Fachkraft" in the summary and on the style of the German names (items 2 to 4).
-- Phase 4a: install `unzip` on the Linux machine. The builder used a copy unpacked from the Ubuntu package outside the repo (item 5).
+- Phase 4a: `unzip` is installed on the Linux machine since 2026-11-16 (item 5, done). The builder's copy in `~/build/bin/unzip` comes first on the PATH and can be deleted.
 - Phase 4a review: Fix 3 is stopped. The `?region=elbow` test cannot fail when App passes `""` instead of `location.search`, because both give the first region. Decide whether to commit only the `?region=shoulder` test or tie the elbow test to another line. Both tests are in `~/build/research/phase4a-review-fix3-wip.patch` in the Linux home (item 6 of `phase-4a-build-report.md`, "For the owner").
 
 - Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,296. The owner accepted this for now on 2026-11-16 (item 1 of `phase-4b-build-report.md`, "For the owner").
