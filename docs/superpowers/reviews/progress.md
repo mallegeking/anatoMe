@@ -18,6 +18,7 @@ Session of 2026-11-16:
 Session of 2026-11-17:
 
 - Tenth run: the Phase 3 review fixes (Fixes 1 to 5). The review guard now also compares reviewed rows at the base and the head, the validator refuses a quotable `license_id` under a non-commercial, no-derivatives or share-alike licence text, the history audit's home-path row is corrected after a re-run (new item D8), a new end-to-end test serves the build from `/anatoMe/`, and three small fixes. See "Review fixes" in `phase-3-build-report.md`.
+- Eleventh run: the Phase 4a review fixes (Fixes 1 to 5), tests and docs only. Fixes 1, 2, 4 and 5 are done: five new tests for the language choice, each seen failing on its line, and `docs/phase4/german-names.md` with the page and read date of every German name, each page opened again. Fix 3 (`?region=` at start) stopped at its own stop rule and is not committed, because the `?region=elbow` test cannot fail on its named line. See "Review fixes" in `phase-4a-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -34,6 +35,7 @@ Session of 2026-11-17:
 | Phase 4b second review fixes, Fixes A to C | done (two App tests could not be written, see the report) | `phase-4b-build-report.md`, section "Second review fixes" |
 | Phase 4b third review fixes, Fixes 1 to 5 | done (tests and docs only, every test seen failing on its named line) | `phase-4b-build-report.md`, section "Third review fixes" |
 | Phase 3 review fixes, Fixes 1 to 5 | done (every new test seen failing first, groh-2009 left not confirmed for the owner) | `phase-3-build-report.md`, section "Review fixes" |
+| Phase 4a review fixes, Fixes 1 to 5 | partly done (Fixes 1, 2, 4 and 5 done, Fix 3 stopped for the owner) | `phase-4a-build-report.md`, section "Review fixes" |
 
 ## Waiting for the owner
 
@@ -53,6 +55,7 @@ Session of 2026-11-17:
 - Phase 4a: Task 4 is blocked. The new surface gate (95th percentile of the bone surface distances, limit 5 mm) measures 7.8 and 8.0 mm before decimation and 7.0 and 7.3 mm after, mostly on the iliac wing. Decide how the gate should work (four options in item 1 of `phase-4a-build-report.md`, "For the owner"). The uncommitted Steps 1 and 2 are saved as `~/build/research/phase4a-task4-wip.patch` in the Linux home, with the task report beside it. After the decision, Task 4 and then Task 5 (the region playbook) can be built.
 - Phase 4a: proofread the German texts and names (section "For the owner to proofread" of the report), especially the disclaimer and the educational line. Decide on "Physio-Fachkraft" in the summary and on the style of the German names (items 2 to 4).
 - Phase 4a: install `unzip` on the Linux machine. The builder used a copy unpacked from the Ubuntu package outside the repo (item 5).
+- Phase 4a review: Fix 3 is stopped. The `?region=elbow` test cannot fail when App passes `""` instead of `location.search`, because both give the first region. Decide whether to commit only the `?region=shoulder` test or tie the elbow test to another line. Both tests are in `~/build/research/phase4a-review-fix3-wip.patch` in the Linux home (item 6 of `phase-4a-build-report.md`, "For the owner").
 
 - Phase 4b: four trunk meshes are above the 2000-face cap (the three intercostals and the right external oblique). The trunk is still under budget at 140,296. The owner accepted this for now on 2026-11-16 (item 1 of `phase-4b-build-report.md`, "For the owner").
 - Phase 4b: eleven paired muscles are one structure each, so a tap selects both sides (item 2). The layer rule is now used on all five regions, with some pairs that may read wrong when peeling (item 3). Latin names are not checked one by one, four with typos were left out (item 4). The owner decided on 2026-11-16 that the Latin names stay as they are.
