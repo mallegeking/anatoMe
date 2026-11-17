@@ -15,6 +15,10 @@ Session of 2026-11-16:
 - Eighth run: the second review fixes (Fixes A to C) with the owner's decisions. Fix A is Fix 1 with option (b): only records a region's target list matches get the side they lie on, which corrects exactly FJ1469 and FJ1469M, and `arm.glb` is rebuilt. See "Second review fixes" in `phase-4b-build-report.md`.
 - Ninth run: the third review fixes (Fixes 1 to 5), tests and docs only. Four new tests, each seen failing on its named line, and `docs/regions/known-gaps.md` lists palmaris brevis (arm) and the coccyx (trunk) as having no mesh. See "Third review fixes" in `phase-4b-build-report.md`.
 
+Session of 2026-11-17:
+
+- Tenth run: the Phase 3 review fixes (Fixes 1 to 5). The review guard now also compares reviewed rows at the base and the head, the validator refuses a quotable `license_id` under a non-commercial, no-derivatives or share-alike licence text, the history audit's home-path row is corrected after a re-run (new item D8), a new end-to-end test serves the build from `/anatoMe/`, and three small fixes. See "Review fixes" in `phase-3-build-report.md`.
+
 | Plan | State | Report |
 | --- | --- | --- |
 | Phase 2a movement explorer, Tasks 1 to 8 | done | `phase-2a-build-report.md` |
@@ -29,6 +33,7 @@ Session of 2026-11-16:
 | Phase 4b review fixes, Fixes 1 to 4 | done (Fixes 2 to 4 in the seventh run, Fix 1 as Fix A of the second review fixes) | `phase-4b-build-report.md`, section "Review fixes" |
 | Phase 4b second review fixes, Fixes A to C | done (two App tests could not be written, see the report) | `phase-4b-build-report.md`, section "Second review fixes" |
 | Phase 4b third review fixes, Fixes 1 to 5 | done (tests and docs only, every test seen failing on its named line) | `phase-4b-build-report.md`, section "Third review fixes" |
+| Phase 3 review fixes, Fixes 1 to 5 | done (every new test seen failing first, groh-2009 left not confirmed for the owner) | `phase-3-build-report.md`, section "Review fixes" |
 
 ## Waiting for the owner
 
@@ -40,6 +45,8 @@ Session of 2026-11-16:
 - Phase 2c: run section 7 "Notebook" of `docs/phase2/phone-measurements.md` on the phone in the review build, including a real print preview.
 - Phase 2d data: 12 new action rows and 2 exercises wait for the physio in the review build. Gaps in `docs/phase2/data-gaps.md`.
 - Phase 3: the history audit (`docs/phase3/history-audit.md`) has seven open items D1 to D7 (handle, symptoms and personal circumstances in the spec, the home server description, a personal e-mail address and a computer-like author name in commit metadata, and a local home-folder path in the history of commit `ed43141`). Decide between leaving them, rewriting history, or starting the public repo from a fresh commit, before checklist item 9. A squash-merge keeps D7 out of `main`. Item 1 of `phase-3-build-report.md`, "For the owner".
+- Phase 3 review fixes: the re-run of the home-path searches found D8, a local home folder path in commit 8b37ec6, file `docs/superpowers/reviews/three-column-layout-build-report.md`, only on the origin branch `claude/nifty-sagan-c57kd7`. Do not push that branch to the public repo, or fix it there. The audit now has eight open items, D1 to D8.
+- Phase 3 review fixes: groh-2009 is marked not confirmed in `docs/phase3/licence-recheck.md`. PMC showed a bot check again and the Europe PMC full text has no licence element. Its `license` and `license_id` were not changed. Both groh-2009 citations are summaries.
 - Phase 3: confirm the four extra licence mappings and the 21 licence rows read from Europe PMC (item 2 of the report), `REPO_URL` in `apps/web/src/config.ts` (item 3) and the README "What comes next" wording (item 4).
 - Phase 3: the remaining steps to publish v1 are in `docs/phase3/publish-checklist.md`. They start after the physio review.
 

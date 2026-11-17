@@ -97,3 +97,45 @@ Perf median: 2953 ms.
 4. **README "What comes next"** is the builder's wording (more regions, more checked rows). Change it if you prefer.
 5. **Pages action versions:** the documentation still shows upload-pages-artifact v4 and deploy-pages v4, while v5 releases exist. `pages.yml` follows the documentation. You may want to move to v5 when the documentation does.
 6. **Then work through `docs/phase3/publish-checklist.md`.** Phase 3 starts only after the physio review (item 1).
+
+## Review fixes
+
+Built on 2026-11-17 on the working branch, one commit per fix. The baseline was green before the first change. Every new test was seen failing before the code that makes it pass.
+
+- **Fix 1, the review guard compares rows.** Commit `bd389ed`. `scripts/check-review-guard.mjs` keeps `findReviewEdits` and gets a second export, `findReviewedRowChanges(baseRows, headRows)`. It returns a problem for every head row whose `checked_by` is not null and that is not deep-equal to the base row with the same id. The CLI now takes the base branch (`node scripts/check-review-guard.mjs main`), runs `git diff origin/<base>...HEAD -- data` itself for the line check, reads every yaml file under `data/` at `origin/<base>` and at `HEAD` with `git show`, and exits 1 with the file and row id of each problem. The `review-guard` job in `ci.yml` now runs `npm ci` (the script needs the yaml package) and calls the script that way, with the same failure message. Tests in `pipeline/data/test/reviewGuard.test.ts`: "a changed field on a row whose checked_by line is unchanged context is caught", "a new row head inserted above an existing review is caught", "checked_by with its value on the next added line is caught" (all three first failed with `expected [] to have a length of 1 but got +0` against an empty stub, so the line check alone let them through), and the passing cases "an unchanged checked row passes", "a checked row set back to null passes", "a new unchecked row passes". The owner's own pull requests stay exempt by the job's `if`. Check: `Tests  19 passed (19)` in that file. A throwaway repo with a changed field under `checked_by: physio-1` printed `data/actions/hip.yaml: row-a: checked_by is set on a row that is new or changed since the base` and exit 1, and a new unchecked row printed `No review recorded` and exit 0.
+- **Fix 2, licence text and id agree.** Commit `a912f2a`. `pipeline/data/src/validate.ts` adds an error at `/<n>/license_id` of `citations.yaml` when `license_id` is in `QUOTABLE` and the licence text names non-commercial, no-derivatives or share-alike (NC, ND, SA, Noncommercial, NoDerivs, ShareAlike, also with a hyphen, any case). Fixture `pipeline/data/test/fixtures/licence-text-nc-id-quotable`. Tests in `pipeline/data/test/validate.test.ts`: "a licence text that names non-commercial cannot have a quotable license_id" (failed first with `expected true to be false`, the fixture passed validation) and "the real data has no licence text that disagrees with a quotable license_id". Check: `Tests  150 passed (150)` in `pipeline/data`, `data in data is valid`.
+- **Fix 3, the audit record.** Commit `7e3aa5e`. The home-path searches were run again over `git log --all -p -U0` on 2026-11-17, 192 commits. The "Home paths" row in `docs/phase3/history-audit.md` no longer says 0. A new section "Re-run of the home-path searches" lists the hits by commit and file only: ed43141 (D7), its fix bceabaa, a new hit in 8b37ec6 and the pattern list in the audit itself. By commit time, the first run's 103 commits end at fd7fc22, and ed43141 came three minutes later, before the audit was committed, so it was outside the searched commits. The new hit is D8: commit 8b37ec6, file `docs/superpowers/reviews/three-column-layout-build-report.md`, only on the origin branch `claude/nifty-sagan-c57kd7`, which did not exist at the first run. The counts in "Result in short" and "Findings" now say eight. History was not rewritten. No test, this is a record.
+- **Fix 4, a sub-path test.** Commit `df11aae`. `apps/web/e2e/subpath.spec.ts`, test "the built app works from the anatoMe folder". It copies `apps/web/dist` into `<temp>/anatoMe/`, serves the temporary root with its own `node:http` server on a free port, opens `/anatoMe/`, waits for `window.__anatomeInteractiveMs`, searches for piriformis and opens its panel. It fails on any response of 400 or more and on any http request outside `/anatoMe/` or to another origin. `playwright.config.ts` and the other specs were not changed. Seen failing against a build made with `npx vite build --base=/`: `Failed: ["404 .../assets/index-....js","404 .../assets/index-....css"]`. Then `npm run build` again. Check: `8 passed` in `npm run e2e -w apps/web`.
+- **Fix 5, small things.** Commit `7ec7c40`. The credits separator is `about.separator` (" · ") in `en.json` and `de.json`. Test in `apps/web/src/ui/Credits.test.tsx`: "the separator between the two links comes from en.json" (failed first with `Received: "Source code · Report a mistake in the data"`). The README section "How the data is checked" has four sentences. The groh-2009 row of `docs/phase3/licence-recheck.md` was opened again on 2026-11-17: PMC showed a reCAPTCHA bot check, and the Europe PMC full-text record has no licence element (its permissions hold only a copyright line). The row now says so and is marked not confirmed, for the owner. `license` and `license_id` were not changed. Check: `Tests  409 passed (409)` in `apps/web`.
+
+Deviations in these fixes:
+
+- Fix 1: the CLI runs `git diff` itself and takes the base branch as its argument, instead of reading a diff on standard input. The row check needs `git show` anyway, and one command for both checks keeps the job simple. The line check still covers all of `data/`, as before, so it still flags a schema file in `data/schema/` that adds a `checked_by` key (it does that on this branch against `main`, as the old job would have).
+- Fix 1: the row check compares with `origin/<base>` as the prompt says, not with the merge base. On a pull request, `actions/checkout` checks out the merge commit, so the head already holds the base's newer rows and an owner review recorded on the base after the branch started does not show as a change.
+- Fix 1: a head file that is not a list of rows is reported as a problem, because the row check cannot read it. Every file under `data/` is a list today.
+- Fix 3: besides the row, D8 was added and the counts of doubtful items were changed from seven to eight, because the re-run found a hit the record did not have.
+- Fix 4: the test serves `dist/`, the build that ships, not `dist-e2e/` with the test data. The search for piriformis works with the real hip data.
+
+Checks after the last fix, all from one run of the full list:
+
+```
+data in data is valid
+lower-leg.glb: 128 meshes, 44294 triangles, 329168 bytes, size 0.339 x 0.907 x 0.230
+ Test Files  39 passed (39)
+      Tests  409 passed (409)
+ Test Files  8 passed (8)
+      Tests  150 passed (150)
+  8 passed (20.3s)
+apps/web/dist/data: 6 bundle(s), no drafts
+median interactive ms: 2303
+ok   decoder download fails: message shown after 1098 ms
+ok   decoder never answers: message shown after 20666 ms
+ok   model file missing: message shown after 997 ms
+31 passed in 3.91s
+```
+
+For the owner, from these fixes:
+
+- D8 in `docs/phase3/history-audit.md`: a local home folder path in commit 8b37ec6 on `claude/nifty-sagan-c57kd7`. Do not push that branch to the public repo, or fix it there.
+- groh-2009 is not confirmed in `docs/phase3/licence-recheck.md`. Its licence (CC BY-NC, version not stated) is not quotable either way, and every groh-2009 row is a summary.
+- The `review-guard` job still runs the pull request's own copy of the script and now also `npm ci` with the pull request's `package-lock.json`. Making it a required check and reading such pull requests closely still applies (publish checklist).
