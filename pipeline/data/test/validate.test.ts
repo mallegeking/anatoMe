@@ -93,6 +93,16 @@ test("a quote from a source with licence id other is refused", () =>
 test("a summary of a non-commercial source is fine", () => expect(validateDataDir(fx("summary-from-nc-source")).ok).toBe(true));
 test("a citation without license_id is refused", () => expectError(fx("no-license-id"), /citations\.yaml \/0: license_id is required/));
 test("the real data has no quote from an incompatible source", () => expect(validateDataDir(realDataDir).ok).toBe(true));
+test("a licence text that names non-commercial cannot have a quotable license_id", () =>
+  expectError(
+    fx("licence-text-nc-id-quotable"),
+    /^citations\.yaml \/1\/license_id: license says CC BY-NC 4\.0 but license_id CC-BY-4\.0 allows quotes\. Pick the id that matches the licence$/,
+  ));
+test("the real data has no licence text that disagrees with a quotable license_id", () => {
+  const result = validateDataDir(realDataDir);
+  expect(result.errors.filter((e) => e.path.endsWith("/license_id"))).toEqual([]);
+  expect(result.ok).toBe(true);
+});
 test("the quotable licences are the six that fit CC BY 4.0", () =>
   expect([...QUOTABLE].sort()).toEqual(["CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0", "CC-BY-unversioned", "CC0-1.0", "public-domain"]));
 

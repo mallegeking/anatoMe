@@ -19,7 +19,7 @@ type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | 
 type Joint = { id: string; region: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
 type Structure = { id: string; type: string; region?: string; also_in?: string[] };
-type Citation = { id: string; license_id: string };
+type Citation = { id: string; license: string; license_id: string };
 
 // Licences a quote may come from, because they fit CC BY 4.0. Share-alike, non-commercial,
 // no-derivatives and other licences may be cited, but only with a summary in our own words.
@@ -31,6 +31,8 @@ export const QUOTABLE: ReadonlySet<string> = new Set([
   "CC0-1.0",
   "public-domain",
 ]);
+// A licence text that names non-commercial, no-derivatives or share-alike, in short or long form, any case.
+const RESTRICTED_LICENCE = /\b(?:nc|nd|sa)\b|non-?commercial|no-?derivs|no-?derivatives|share-?alike/i;
 // The fields every row that makes a claim has, so the review gate can check them the same way.
 type Gated = { id: string; citations: { ref: string; says_kind?: string }[]; checked_by: string | null; checked_on?: string };
 type Action = Gated & {
@@ -105,6 +107,16 @@ export function validateDataDir(dir: string): ValidationResult {
   const structureById = new Map(structures.flatMap((s) => s.rows).map((s) => [s.id, s]));
   const movementIds = new Set(movements.rows.map((m) => m.id));
   const licenseById = new Map(citations.rows.map((c) => [c.id, c.license_id]));
+  // The id decides whether a source may be quoted, so it must not be looser than the licence text.
+  for (const [i, c] of citations.rows.entries()) {
+    if (QUOTABLE.has(c.license_id) && RESTRICTED_LICENCE.test(c.license)) {
+      errors.push({
+        file: citations.file,
+        path: `/${i}/license_id`,
+        message: `license says ${c.license} but license_id ${c.license_id} allows quotes. Pick the id that matches the licence`,
+      });
+    }
+  }
 
   for (const { file, rows } of actions) {
     for (const [i, a] of rows.entries()) {
