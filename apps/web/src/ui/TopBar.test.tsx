@@ -3,6 +3,7 @@ import { useState } from "react";
 import { afterEach, expect, test, vi } from "vitest";
 import type { BundleStructure } from "../data/bundle";
 import en from "../i18n/en.json";
+import type { Lang } from "../i18n/lang";
 import { createT } from "../i18n/t";
 import { TopBar } from "./TopBar";
 
@@ -10,18 +11,31 @@ const t = createT(en);
 afterEach(cleanup);
 
 const structures: BundleStructure[] = [
-  { id: "piriformis", type: "muscle", english: "Piriformis", latin: "Musculus piriformis", depth: 2 },
-  { id: "femur", type: "bone", english: "Femur", depth: 4 },
+  { id: "piriformis", type: "muscle", english: "Piriformis", german: "Birnenförmiger Muskel", latin: "Musculus piriformis", depth: 2, paired: true },
+  { id: "femur", type: "bone", english: "Femur", depth: 4, paired: true },
 ];
 
 // The app keeps the open state of the list, so the tests do the same.
-function Harness({ onChoose }: { onChoose: (s: BundleStructure) => void }) {
+function Harness({ onChoose, lang = "en", compact = false }: { onChoose: (s: BundleStructure) => void; lang?: Lang; compact?: boolean }) {
   const [open, setOpen] = useState(false);
-  return <TopBar t={t} structures={structures} layersOpen={false} onToggleLayers={() => {}} onChoose={onChoose} open={open} onOpenChange={setOpen} />;
+  return (
+    <TopBar
+      t={t}
+      lang={lang}
+      compact={compact}
+      structures={structures}
+      onChoose={onChoose}
+      open={open}
+      onOpenChange={setOpen}
+      regions={["hip"]}
+      region="hip"
+      onRegion={() => {}}
+    />
+  );
 }
 
-function show(onChoose = vi.fn()) {
-  render(<Harness onChoose={onChoose} />);
+function show(onChoose = vi.fn(), lang: Lang = "en") {
+  render(<Harness onChoose={onChoose} lang={lang} />);
   return { onChoose, field: screen.getByPlaceholderText("Search, for example piriformis") };
 }
 
@@ -80,4 +94,154 @@ test("a result shows the English name, the type and the Latin name", () => {
   const result = screen.getByRole("button", { name: /Piriformis/ });
   expect(result.textContent).toContain(en["type.muscle"]);
   expect(result.textContent).toContain("Musculus piriformis");
+});
+
+test("after Escape closed the list, Enter chooses nothing", () => {
+  const { onChoose, field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.keyDown(field, { key: "Escape" });
+  fireEvent.keyDown(field, { key: "Enter" });
+  expect(onChoose).not.toHaveBeenCalled();
+});
+
+// The region picker. These render the bar directly, because the search state does not matter here.
+function showRegions(regions: string[], onRegion = vi.fn()) {
+  render(
+    <TopBar
+      t={t}
+      lang="en"
+      compact={false}
+      structures={structures}
+      onChoose={() => {}}
+      open={false}
+      onOpenChange={() => {}}
+      regions={regions}
+      region="hip"
+      onRegion={onRegion}
+    />,
+  );
+  return onRegion;
+}
+
+test("one region shows no picker", () => {
+  showRegions(["hip"]);
+  expect(screen.queryByLabelText(en["region.label"])).toBeNull();
+});
+
+test("two regions show a picker that reports the choice", () => {
+  const onRegion = showRegions(["hip", "shoulder"]);
+  const picker = screen.getByLabelText(en["region.label"]) as HTMLSelectElement;
+  expect(picker.value).toBe("hip");
+  expect(screen.getByRole("option", { name: en["region.hip"] })).toBeTruthy();
+  fireEvent.change(picker, { target: { value: "shoulder" } });
+  expect(onRegion).toHaveBeenCalledWith("shoulder");
+});
+
+test("in German the list shows the German name and choosing one puts it in the field", () => {
+  const { field } = show(vi.fn(), "de");
+  fireEvent.change(field, { target: { value: "birnenformig" } });
+  fireEvent.click(screen.getByRole("button", { name: /Birnenförmiger Muskel/ }));
+  expect((field as HTMLInputElement).value).toBe("Birnenförmiger Muskel");
+});
+test("in English the German name is not shown", () => {
+  const { field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  expect(screen.getByRole("button", { name: /Piriformis/ })).toBeTruthy();
+  expect(screen.queryByText("Birnenförmiger Muskel")).toBeNull();
+});
+
+test("the app name is a level-1 heading before the search field", () => {
+  const { field } = show();
+  const heading = screen.getByRole("heading", { level: 1, name: en["app.name"] });
+  expect(heading.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+
+// On a short phone a button stands in for the field, so the model keeps its room.
+function showCompact() {
+  render(<Harness onChoose={vi.fn()} compact />);
+  return screen.getByRole("button", { name: en["search.open"] });
+}
+
+test("compact: a search button stands in for the field", () => {
+  const button = showCompact();
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(button.getAttribute("aria-expanded")).toBe("false");
+  fireEvent.click(button);
+  const field = screen.getByRole("searchbox");
+  expect(document.activeElement).toBe(field);
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("true");
+});
+
+test("compact: the field closes again when it is empty and loses focus", () => {
+  fireEvent.click(showCompact());
+  fireEvent.blur(screen.getByRole("searchbox"));
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
+});
+
+test("compact: the field stays open while it holds text", () => {
+  fireEvent.click(showCompact());
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.blur(field);
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+});
+
+test("compact: the field stays open while the focus moves into the results", () => {
+  fireEvent.click(showCompact());
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.blur(field, { relatedTarget: screen.getByRole("button", { name: /Piriformis/ }) });
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+});
+
+test("not compact: the field is always there and there is no search button", () => {
+  show();
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: en["search.open"] })).toBeNull();
+});
+
+test("compact: choosing a result empties and folds the field, so the bar shows again", () => {
+  const onChoose = vi.fn();
+  render(<Harness onChoose={onChoose} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "pirif" } });
+  fireEvent.click(screen.getByRole("button", { name: /Piriformis/ }));
+  expect(onChoose).toHaveBeenCalledWith(structures[0]);
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.queryByTestId("search-results")).toBeNull();
+  const button = screen.getByRole("button", { name: en["search.open"] });
+  expect(button.getAttribute("aria-expanded")).toBe("false");
+  // The focus does not get lost with the field. It lands on the button that opens it again.
+  expect(document.activeElement).toBe(button);
+  // Opened again, the field starts empty.
+  fireEvent.click(button);
+  expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("");
+});
+
+test("compact: Enter on the first result folds the field too", () => {
+  render(<Harness onChoose={vi.fn()} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  const field = screen.getByRole("searchbox");
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.keyDown(field, { key: "Enter" });
+  expect(screen.queryByRole("searchbox")).toBeNull();
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
+});
+
+test("not compact: choosing a result keeps its name in the field", () => {
+  const { field } = show();
+  fireEvent.change(field, { target: { value: "pirif" } });
+  fireEvent.click(screen.getByRole("button", { name: /Piriformis/ }));
+  expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("Piriformis");
+});
+
+test("the open field is forgotten when the bar stops being compact", () => {
+  const { rerender } = render(<Harness onChoose={vi.fn()} compact />);
+  fireEvent.click(screen.getByRole("button", { name: en["search.open"] }));
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "pirif" } });
+  rerender(<Harness onChoose={vi.fn()} compact={false} />);
+  expect(screen.getByRole("searchbox")).toBeTruthy();
+  rerender(<Harness onChoose={vi.fn()} compact />);
+  expect(screen.getByRole("button", { name: en["search.open"] }).getAttribute("aria-expanded")).toBe("false");
 });

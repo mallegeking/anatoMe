@@ -1,14 +1,17 @@
 import type { Object3D } from "three";
 
+// "l" and "r" for the two sides, "" for a structure on the midline.
+export type Side = "l" | "r" | "";
+
 export type PickedStructure = {
   sid: string;
   label: string;
-  side: "l" | "r" | "";
+  side: Side;
   kind: string;
 };
 
 // What is selected: a structure id and, for paired structures, the side.
-export type Selection = { sid: string; side: "l" | "r" | "" };
+export type Selection = { sid: string; side: Side };
 
 export type Hit = { object: Object3D; distance: number };
 export type PickedHit = { object: Object3D; structure: PickedStructure };
@@ -26,7 +29,7 @@ export function shouldClear(dragPx: number): boolean {
 }
 
 // Looks at the object and then its parents until one carries a structure id.
-function structureOf(object: Object3D): PickedStructure | null {
+export function structureOf(object: Object3D): PickedStructure | null {
   for (let node: Object3D | null = object; node; node = node.parent) {
     const data = node.userData as Partial<PickedStructure>;
     if (typeof data.sid === "string" && data.sid) {
@@ -51,13 +54,13 @@ export function pickHit(hits: Hit[]): PickedHit | null {
   return null;
 }
 
-// Like pickHit, but skips hits on structures that are hidden.
+// Like pickHit, but skips hits on a side of a structure that is hidden.
 // Three.js still reports hits on meshes that are switched off, so we filter them out here.
-export function pickVisibleHit(hits: Hit[], isVisibleSid: (sid: string) => boolean): PickedHit | null {
+export function pickVisibleHit(hits: Hit[], isShown: (sid: string, side: Side) => boolean): PickedHit | null {
   return pickHit(
     hits.filter((hit) => {
       const structure = structureOf(hit.object);
-      return structure !== null && isVisibleSid(structure.sid);
+      return structure !== null && isShown(structure.sid, structure.side);
     }),
   );
 }

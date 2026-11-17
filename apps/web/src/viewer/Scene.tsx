@@ -1,46 +1,51 @@
 // The 3D part of the viewer. Viewer.tsx loads this file on its own, after the first screen is up,
 // because it pulls in three.js, which is most of the app's size.
 import { CameraControls } from "@react-three/drei";
-import { addEffect, addTail, Canvas, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
-import { loadManifest, regionFiles, type Manifest } from "./manifest";
-import { shouldClear, type Selection } from "./pick";
+import { addEffect, addTail, Canvas, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useRef, type MouseEvent, type Ref } from "react";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import type { UnderEntry } from "../area/under";
+import { shouldClear, type Selection, type Side } from "./pick";
+import type { Highlight } from "../movement/roles";
 import { redrawWhenBack } from "./redraw";
-import { RegionModel } from "./RegionModel";
+import type { ViewDirection, ViewerHandle } from "./handle";
+import { RegionModel, renewDecoder } from "./RegionModel";
 
 export type SceneProps = {
-  region: string;
+  // The glb files to show, or null while the app is still reading the manifest.
+  urls: string[] | null;
   selection: Selection | null;
   // Where the camera should go. A new object each time makes it move again, even for the same structure.
   focus: Selection | null;
-  isVisibleSid: (sid: string) => boolean;
+  isShown: (sid: string, side: Side) => boolean;
+  // The role of each involved structure, or null when no movement is chosen.
+  highlights: ReadonlyMap<string, Highlight> | null;
   onSelect: (sel: Selection | null, label?: string) => void;
   // Called once, when the model files have finished loading.
   onLoaded: () => void;
+  // In area mode a tap lists what lies under the spot, and does not select. Off when left out.
+  areaMode?: boolean;
+  // Called after an area tap. null means the tap hit nothing.
+  onAreaTap?: (tap: AreaTap | null) => void;
+  // Where to draw the marker, or null for none.
+  areaMarker?: [number, number, number] | null;
+  // A structure to look through. A new object each time makes it run again, like focus.
+  areaProbe?: Selection | null;
+  // Receives resetView and zoomBy once the model has loaded.
+  handle?: Ref<ViewerHandle>;
+  // Called after the first framing and each time the camera comes to rest.
+  onView?: (direction: ViewDirection) => void;
 };
 
-// Reads the manifest and hands back the file URLs. A failure is thrown during render so the error boundary can show it.
-function useRegionUrls(region: string): string[] | null {
-  const [state, setState] = useState<{ urls: string[] } | { error: unknown } | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const base = import.meta.env.BASE_URL;
-    loadManifest(`${base}models/manifest.json`)
-      .then((manifest: Manifest) => {
-        if (!cancelled) setState({ urls: regionFiles(manifest, region).map((path) => base + path) });
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) setState({ error });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [region]);
-
-  if (state && "error" in state) throw state.error;
-  return state?.urls ?? null;
+// The loader keeps a failed download, so the same files would fail again at once.
+// "Try again" calls this first, so the files and the decoder are downloaded afresh.
+export function forgetModelFiles(urls: string[]) {
+  useLoader.clear(GLTFLoader, urls);
+  renewDecoder();
 }
+
+// point is where the marker goes, null when a probed structure has no mesh.
+export type AreaTap = { entries: UnderEntry[]; point: [number, number, number] | null; through: Selection | null };
 
 // The canvas clock keeps counting while nothing is drawn. Without this, the first frame after a rest
 // would see a long gap, and a camera glide would jump most of the way in one step.
@@ -73,18 +78,33 @@ function RedrawWhenBack() {
   return null;
 }
 
-export default function Scene({ region, selection, focus, isVisibleSid, onSelect, onLoaded }: SceneProps) {
-  const urls = useRegionUrls(region);
+export default function Scene({
+  urls,
+  selection,
+  focus,
+  isShown,
+  highlights,
+  onSelect,
+  onLoaded,
+  areaMode = false,
+  onAreaTap = () => {},
+  areaMarker = null,
+  areaProbe = null,
+  handle,
+  onView,
+}: SceneProps) {
   const downAt = useRef<[number, number]>([0, 0]);
   // The last click that landed on the model. The model handles those itself.
   const modelClick = useRef<Event | null>(null);
 
   // Every click on the canvas comes here, after the model has seen it.
-  // A tap on empty space clears the selection. A drag to rotate must not, so we measure how far the finger moved.
+  // A tap on empty space clears the selection, or in area mode the list. A drag to rotate must not, so we measure how far the finger moved.
   function handleClick(event: MouseEvent) {
     if (event.nativeEvent === modelClick.current) return;
     const moved = Math.hypot(event.clientX - downAt.current[0], event.clientY - downAt.current[1]);
-    if (shouldClear(moved)) onSelect(null);
+    if (!shouldClear(moved)) return;
+    if (areaMode) onAreaTap(null);
+    else onSelect(null);
   }
 
   // Do not give this Canvas a custom eventSource. The check in handleClick relies on R3F's own click listener
@@ -114,9 +134,16 @@ export default function Scene({ region, selection, focus, isVisibleSid, onSelect
             urls={urls}
             selection={selection}
             focus={focus}
-            isVisibleSid={isVisibleSid}
+            isShown={isShown}
+            highlights={highlights}
             onSelect={onSelect}
+            areaMode={areaMode}
+            onAreaTap={onAreaTap}
+            areaMarker={areaMarker}
+            areaProbe={areaProbe}
             onLoaded={onLoaded}
+            handle={handle}
+            onView={onView}
             onModelClick={(event) => {
               modelClick.current = event;
             }}

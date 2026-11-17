@@ -1,5 +1,6 @@
 {
   "name": "anatome",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "apps/web",
@@ -11,6 +12,8 @@
     "validate": "tsx pipeline/data/src/cli.ts validate data",
     "build-data": "tsx pipeline/data/src/cli.ts build-data data apps/web/public/data",
     "build-data:review": "tsx pipeline/data/src/cli.ts build-data data apps/web/dist-review/data --review",
+    "mark-checked": "tsx pipeline/data/src/cli.ts mark-checked data",
+    "data-report": "tsx pipeline/data/src/cli.ts data-report data hip",
     "check-models": "tsx pipeline/data/src/cli.ts check-models models data",
     "test": "npm test --workspaces --if-present",
     "test:py": ".venv/bin/pytest pipeline/assets/tests -q"

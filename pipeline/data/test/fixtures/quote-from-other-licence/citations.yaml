@@ -1,0 +1,8 @@
+- id: test-book
+  title: A test book
+  authors: Test Author
+  year: 2020
+  url: https://example.org/book
+  license: Custom permission letter
+  license_id: other
+  access: open

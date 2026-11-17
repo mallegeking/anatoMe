@@ -19,3 +19,13 @@
   citations:
     - {ref: e2e-source, locator: test page 2, says: Test text for the end-to-end check., says_kind: summary}
   checked_by: null
+- id: e2e-gluteus-maximus-checked
+  structure: gluteus-maximus
+  movement: hip-extension
+  load: working
+  role: primary
+  confidence: high
+  citations:
+    - {ref: e2e-source, locator: test page 3, says: Test text for the end-to-end check., says_kind: summary}
+  checked_by: physio-1
+  checked_on: 2026-11-13

@@ -54,3 +54,10 @@ test("tap skips hidden meshes", () =>
 
 test("tap on only hidden meshes picks nothing", () =>
   expect(pickVisibleHit([{ object: maxMesh, distance: 1 }], () => false)).toBeNull());
+
+test("tap skips the hidden side but not the other side of the same structure", () => {
+  const left = mesh({ sid: "piriformis", side: "l" });
+  const right = mesh({ sid: "piriformis", side: "r" });
+  const hits = [{ object: left, distance: 1 }, { object: right, distance: 2 }];
+  expect(pickVisibleHit(hits, (sid, side) => !(sid === "piriformis" && side === "l"))?.structure.side).toBe("r");
+});

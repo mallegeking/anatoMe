@@ -11,3 +11,4 @@ apps/web/dist-e2e/
 .superpowers/
 __pycache__/
 apps/web/test-results/
+graphify-out/

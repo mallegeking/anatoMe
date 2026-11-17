@@ -1,11 +1,13 @@
 # Sources that action and attachment rows point to. The first group was opened and read on 2026-11-02.
 # license is copied as the source states it. access open means anyone can read it for free.
+# license_id is the same licence as a fixed id the validator can check. A quote needs one that fits CC BY 4.0.
 - id: oeri-human-anatomy-10-7
   title: "Human Anatomy (OERI), 10.7: Appendicular Muscles of the Pelvic Girdle and Lower Limbs"
   authors: Whitney Menefee, Julie Jenks, Chiara Mazzasette, Kim-Leiloni Nguyen (ASCCC Open Educational Resources Initiative), adapted from OpenStax Anatomy and Physiology
   year: 2025
   url: https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_(OERI)/10%3A_Muscular_System/10.07%3A_Appendicular_Muscles_of_the_Pelvic_Girdle_and_Lower_Limbs
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: contreras-2015
   title: A comparison of two gluteus maximus EMG maximum voluntary isometric contraction positions
@@ -13,6 +15,7 @@
   year: 2015
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4582950/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: schenkel-2018
   title: No difference in flexion power despite iliopsoas fatty degeneration in healed hip fractures with large lesser trochanter displacement
@@ -20,6 +23,7 @@
   year: 2018
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6132924/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: osullivan-2010
   title: Electromyographic analysis of the three subdivisions of gluteus medius during weight-bearing exercises
@@ -27,6 +31,7 @@
   year: 2010
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2912252/
   license: CC BY 2.0
+  license_id: CC-BY-2.0
   access: open
 - id: ito-2025
   title: Comparison of External Rotation Torque of Short External Rotator Muscles in Hip Flexion Position
@@ -34,6 +39,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12329630/
   license: CC BY-NC 4.0
+  license_id: CC-BY-NC-4.0
   access: open
 - id: baba-2022
   title: "Impacts of external rotators and the ischiofemoral ligament on preventing excessive internal hip rotation: a cadaveric study"
@@ -41,6 +47,7 @@
   year: 2022
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8725321/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: ng-2019
   title: Hip Joint Capsular Anatomy, Mechanics, and Surgical Management
@@ -48,6 +55,7 @@
   year: 2019
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7406151/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: groh-2009
   title: A comprehensive review of hip labral tears
@@ -55,6 +63,7 @@
   year: 2009
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2697339/
   license: Creative Commons Attribution Noncommercial License (version not stated)
+  license_id: CC-BY-NC-unversioned
   access: open
 - id: van-arkel-2015
   title: The envelope of passive motion allowed by the capsular ligaments of the hip
@@ -62,6 +71,7 @@
   year: 2015
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4655836/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 # Sources added for the attachment rows in attachments/hip.yaml. Each one was opened and read on 2026-11-03.
 - id: akamatsu-2017
@@ -70,6 +80,7 @@
   year: 2017
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5733974/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: bedard-2025
   title: "The Musculoskeletal Advanced Transillumination Technique (MATT): A Descriptive Proof-of-Concept Study of a New Method for the Study of the Iliotibial Tract Tested on Fresh Cadaveric Specimens"
@@ -77,6 +88,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12452698/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: pinheiro-2026
   title: Anatomical Investigation of the Gluteus Medius Muscle Innervation and Its Topographical Correspondence With Myofascial Trigger Points
@@ -84,6 +96,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12812865/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: kenanidis-2025
   title: "Piriformis preservation in total hip arthroplasty: do we have a new concept? An update on anatomy, function and clinical outcomes"
@@ -91,6 +104,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12061017/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: palmieri-2026
   title: "Unilateral Conjoint Tendon Formation of the Piriformis, Superior Gemellus, and Tendonized Obturator Internus: A Rare Cadaveric Variation of the Deep Gluteal Region"
@@ -98,6 +112,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13423186/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: abouzaid-2026
   title: "Exploring the Significance of the Obturator Externus Groove as a Marker for Bipedalism: A Cadaveric Study"
@@ -105,6 +120,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13283457/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: sanchez-montoya-2025
   title: "Safety and Anatomical Accuracy of Dry Needling of the Quadratus Femoris Muscle: A Cadaveric Study"
@@ -112,6 +128,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12346365/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: kumazaki-2022
   title: Action and Contribution of the Iliopsoas and Rectus Femoris as Hip Flexor Agonists Examined with Anatomical Analysis
@@ -119,6 +136,7 @@
   year: 2022
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11250012/
   license: Creative Commons Attribution License (CC BY), version not stated
+  license_id: CC-BY-unversioned
   access: open
 - id: perez-lloveras-2026
   title: Anchor-Free Capsular Augmentation Using the Reflected Head of the Rectus Femoris in Hip Arthroscopy
@@ -126,6 +144,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13651428/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: obey-2016
   title: "Anatomy of the Adductor Magnus Origin: Implications for Proximal Hamstring Injuries"
@@ -133,6 +152,7 @@
   year: 2016
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4714133/
   license: CC BY-NC-ND 3.0
+  license_id: CC-BY-NC-ND-3.0
   access: open
 - id: landfald-2026
   title: "The Gracilis Muscle Reappraised: An Integrative Synthesis of Anatomy, Embryology, Imaging, and Surgical Applications"
@@ -140,6 +160,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13116401/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: zhong-2018
   title: The anatomical and imaging study of pes anserinus and its clinical application
@@ -147,6 +168,7 @@
   year: 2018
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC5908566/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: burnet-2004
   title: The Anatomy of Sartorius Muscle and its Implications for Sarcoma Radiotherapy
@@ -154,6 +176,7 @@
   year: 2004
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC2395605/
   license: Creative Commons Attribution License, version not stated
+  license_id: CC-BY-unversioned
   access: open
 - id: miguel-perez-2024
   title: "Anatomical Relationships of the Proximal Attachment of the Hamstring Muscles with Neighboring Structures: From Ultrasound, Anatomical and Histological Findings to Clinical Implications"
@@ -161,6 +184,7 @@
   year: 2024
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11353185/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: bogacka-wojcik-2025
   title: "Morphologic and morphometric study of the long head of the biceps femoris in male cadavers: tendon and MTJ insights for injury diagnosis"
@@ -168,6 +192,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13541974/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: asonganyi-eyong-2026
   title: Bilateral Fusion of the Semitendinosus and Long Head of the Biceps Femoris Muscles in a Male Cadaver
@@ -175,6 +200,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13332856/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: kikuchi-2025
   title: "Anatomical relationship between the anterior arm of the semimembranosus tendon and the medial collateral ligament: A cadaveric study"
@@ -182,6 +208,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12588184/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: oeri-human-anatomy-6-4
   title: "Human Anatomy (OERI), 6.4: The Vertebral Column"
@@ -189,6 +216,7 @@
   year: 2025
   url: https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_(OERI)/06%3A_Axial_Skeleton/6.04%3A_The_Vertebral_Column
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: posnik-2025
   title: Morphological Variability of the Thigh Muscle Traps in an Ultrasound That Awaits Clinicians
@@ -196,6 +224,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11765969/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: piagkou-2025
   title: "Systematic Review and Prevalence Meta-Analysis of Quadriceps Femoris Morphology: Significance of the Quadriceps Tendon in Anterior Cruciate Ligament Reconstruction"
@@ -203,6 +232,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12286201/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: hsu-2026
   title: "Ultrasonographic Diagnosis of an Ischiocondylar Adductor Magnus Partial Tear: An Uncommon Cause of Ischial Pain"
@@ -210,6 +240,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13512343/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 # Sources added for the action rows in actions/hip.yaml. Each one was opened and read on 2026-11-03.
 - id: szczerba-2026
@@ -218,6 +249,7 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13413262/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: godshaw-2019
   title: Acute Traumatic Tear of the Gluteus Medius and Gluteus Minimus in a Marathon Runner
@@ -225,6 +257,7 @@
   year: 2019
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6928675/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: bajuri-2022
   title: "Posttraumatic Isolated Right Gluteus Minimus Tear: A Case Report"
@@ -232,6 +265,7 @@
   year: 2022
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8994867/
   license: Creative Commons Attribution License, version not stated
+  license_id: CC-BY-unversioned
   access: open
 - id: hirano-2025
   title: "Toward a Better Understanding of Hip Adductor Function: Internal Rotation Capability Revealed by Anatomical and MRI Evaluation"
@@ -239,6 +273,7 @@
   year: 2025
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12452323/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: bai-2023
   title: "Painful and restricted hip due to myositis ossificans circumscripta of the pectineus muscle after pelvic fracture: A case report"
@@ -246,6 +281,7 @@
   year: 2023
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10145730/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
   access: open
 - id: arai-2026
   title: "Intermuscular and intramuscular distributions of sprint-induced thigh muscle activation in male sprinters: a T2-weighted MRI study"
@@ -253,4 +289,109 @@
   year: 2026
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13623594/
   license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: van-arkel-2015-restraint
+  title: "The capsular ligaments provide more hip rotational restraint than the acetabular labrum and the ligamentum teres: an experimental study"
+  authors: van Arkel RJ, Amis AA, Cobb JP, Jeffers JR
+  year: 2015
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4491667/
+  license: Creative Commons CC-BY license (version not stated)
+  license_id: CC-BY-unversioned
+  access: open
+- id: migliorini-2024
+  title: "The ligamentum teres and its role in hip arthroscopy for femoroacetabular impingement: a systematic review"
+  authors: Migliorini F, Cocconi F, Bardazzi T, Masoni V, Gardino V, Pipino G, Maffulli N
+  year: 2024
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11662112/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: borghi-2025
+  title: "A New Manual Alternative to the Ober Test: A Pilot Study of Precision and Accuracy in Healthy Young Adults"
+  authors: Borghi C, Colonna S, Roldan Garcia A
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12635949/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: zhao-2026
+  title: "Supine Ober's Test: A Physical Examination Maneuver for Evaluating External Snapping Hip"
+  authors: Zhao ZD, Jiang LX, Wang YT, Wang MX, Li CB, Li CB
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13693282/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: kellis-2022
+  title: "Hamstrings force-length relationships and their implications for angle-specific joint torques: a narrative review"
+  authors: Kellis E, Blazevich AJ
+  year: 2022
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9446565/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: danielsson-2020
+  title: "The mechanism of hamstring injuries: a systematic review"
+  authors: Danielsson A, Horvath A, Senorski C, Alentorn-Geli E, Garrett WE, Cugat R, Samuelsson K, Hamrin Senorski E
+  year: 2020
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7526261/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: chanel-2025
+  title: "Influence of the Knee and Hip Joint Angles on the Knee Extensor Muscles and Tendon Shear Wave Velocity in Men and Prepubertal Boys"
+  authors: Chanel B, Cometti C, Babault N
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12782349/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: zerbinati-2026
+  title: "Iliopsoas Tenotomy in Patients With Neurological Diseases. A Novel Closed Technique Using an Ultrasound-Guided Minimally Invasive Approach in Neuro-Orthopaedics"
+  authors: Zerbinati P, Tristano I, Glorioso D, Bemporad J
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13387791/
+  license: CC BY-NC-ND 4.0
+  license_id: CC-BY-NC-ND-4.0
+  access: open
+- id: aali-2025
+  title: "Altered lower extremity muscle activity patterns due to Iliopsoas tightness during single-leg landing"
+  authors: Aali S, Rezazadeh F, Ardigò LP, Badicu G
+  year: 2025
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC11923245/
+  license: CC BY-NC-ND 4.0
+  license_id: CC-BY-NC-ND-4.0
+  access: open
+- id: kato-2023
+  title: "Quantifying the shear modulus of the adductor longus muscle during hip joint motion using shear wave elastography"
+  authors: Kato T, Taniguchi K, Kodesho T, Nakao G, Yokoyama Y, Saito Y, Katayose M
+  year: 2023
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10261119/
+  license: CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: pottorf-2026
+  title: "Comparison of peak joint angles from non-concurrent squat and upper-limb assessment using a markerless Kinotek system and a marker-based Vicon system"
+  authors: Pottorf OA, Greenberg ET, Garcia MC, Dewan BM
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13179743/
+  license: Creative Commons Attribution License, linked to CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: park-2026
+  title: "Effects of Barbell Position and Squat Depth on Trunk and Lower-Extremity Muscle Activation During the Back Squat in Healthy Adult Men"
+  authors: Park JH, Lei S, Cho HY, Kim SH
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13413768/
+  license: Creative Commons Attribution (CC BY) license, linked to CC BY 4.0
+  license_id: CC-BY-4.0
+  access: open
+- id: uebayashi-2026
+  title: "Muscle activity of deep hip muscles across joint positions and elevation phases during side-lying hip abduction"
+  authors: Uebayashi K, Okubo Y, Akasaka K, Adachi G, Oshikawa T, Matsunaga N, Kaneoka K
+  year: 2026
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC13353230/
+  license: Creative Commons Attribution License, linked to CC BY 4.0
+  license_id: CC-BY-4.0
   access: open

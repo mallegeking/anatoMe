@@ -13,18 +13,32 @@
         "enum": ["bone", "muscle", "tendon", "ligament", "joint", "capsule", "labrum", "bursa", "nerve", "meniscus", "fascia"]
       },
       "english": { "type": "string", "minLength": 1 },
+      "german": { "description": "The German name, from a source opened when it was written. The app shows the English name where it is missing.", "type": "string", "minLength": 1 },
       "latin": { "type": "string", "minLength": 1 },
       "fma": { "type": "string", "pattern": "^FMA[0-9]+$" },
       "region": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "also_in": {
+        "description": "Other regions that also draw this structure, so a region does not show muscles without their bones.",
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+      },
       "depth": {
         "description": "Layer from the skin inwards, 1 is the outermost. Peeling a layer hides the lowest depth still shown.",
         "type": "integer",
         "minimum": 1
       },
+      "midline": { "description": "True for a structure on the midline that has no left and right copy.", "type": "boolean" },
       "depth_note": {
         "description": "Where the depth comes from. Written for every muscle.",
         "type": "string",
         "minLength": 1
+      },
+      "gap": {
+        "description": "A part of this structure that the model does not show yet. The app shows the text gap.<value> from the language file.",
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
       }
     }
   }

@@ -5,7 +5,7 @@
 
 import { existsSync, statSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { NodeIO, type Document } from "@gltf-transform/core";
+import { getBounds, NodeIO, type Document } from "@gltf-transform/core";
 import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
 import type { StructureInfo, ValidationError, ValidationResult } from "./validate.ts";
@@ -53,6 +53,8 @@ export async function checkModelMapping(
     return { ok: false, errors };
   }
 
+  // The ids that at least one mesh carries, to find structures without a mesh afterwards.
+  const meshed = new Set<string>();
   for (const f of files) {
     const at = `regions.${f.region}`;
     if (!ALLOWED_LICENSES.has(f.license)) {
@@ -91,9 +93,14 @@ export async function checkModelMapping(
       if (sid !== undefined && sid !== null && typeof sid !== "string") {
         errors.push({ file: f.path, path: name, message: `sid must be text, not ${JSON.stringify(sid)}` });
       }
+      if (typeof sid === "string") meshed.add(sid);
       const structure = typeof sid === "string" ? structures.get(sid) : undefined;
       if (typeof sid === "string" && sid !== "" && !structure) {
         errors.push({ file: f.path, path: name, message: `unknown structure id ${sid}` });
+      }
+      // A region may only draw structures that belong to it, at home or through also_in.
+      if (structure && !structure.regions.includes(f.region)) {
+        errors.push({ file: f.path, path: name, message: `${sid} belongs to ${structure.regions.join(" and ")}, not to ${f.region}` });
       }
       // The app shows the label and colours by kind, so both must agree with the knowledge base.
       if (structure && extras.kind !== undefined && extras.kind !== structure.type) {
@@ -102,16 +109,40 @@ export async function checkModelMapping(
       if (structure && extras.label !== undefined && extras.label !== structure.english) {
         errors.push({ file: f.path, path: name, message: `label ${String(extras.label)} but ${sid} is called ${structure.english}` });
       }
+      // Only a midline structure may have an empty side, and it must have one.
+      if (structure && typeof extras.side === "string") {
+        if (structure.midline && extras.side !== "") {
+          errors.push({ file: f.path, path: name, message: `${sid} is marked midline but mesh ${name} has side ${extras.side}` });
+        }
+        if (!structure.midline && extras.side === "") {
+          errors.push({ file: f.path, path: name, message: `${sid} is not marked midline but mesh ${name} has no side` });
+        }
+      }
+      // In BodyParts3D, and so in the model, left is x > 0. A sided mesh must lie on its side.
+      if (typeof extras.side === "string" && (extras.side === "l" || extras.side === "r")) {
+        const { min, max } = getBounds(node);
+        const centre = (min[0] + max[0]) / 2;
+        if (extras.side === "l" && !(centre > 0)) {
+          errors.push({ file: f.path, path: name, message: `${String(sid)} has side l but lies on the right` });
+        }
+        if (extras.side === "r" && !(centre < 0)) {
+          errors.push({ file: f.path, path: name, message: `${String(sid)} has side r but lies on the left` });
+        }
+      }
       // A mesh from another source would carry the wrong license, so the sources must agree.
       if (extras.source !== undefined && extras.source !== f.source) {
         errors.push({ file: f.path, path: name, message: `source ${String(extras.source)} but the manifest says ${f.source}` });
       }
     }
   }
+  // The other direction: every structure in the data needs a mesh somewhere.
+  for (const id of structures.keys()) {
+    if (!meshed.has(id)) errors.push({ file: "manifest.json", path: id, message: `structure ${id} has no mesh in any file` });
+  }
   return { ok: errors.length === 0, errors };
 }
 
-export async function modelStats(file: string): Promise<{ meshes: number; triangles: number; bytes: number }> {
+export async function modelStats(file: string): Promise<{ meshes: number; triangles: number; bytes: number; size: [number, number, number] }> {
   const doc = await (await io()).read(file);
   let meshes = 0;
   let triangles = 0;
@@ -125,7 +156,18 @@ export async function modelStats(file: string): Promise<{ meshes: number; triang
       triangles += count / 3;
     }
   }
-  return { meshes, triangles, bytes: statSync(file).size };
+  // Size of the whole file in model units: the box around all scenes, from getBounds (world space).
+  const lo = [Infinity, Infinity, Infinity];
+  const hi = [-Infinity, -Infinity, -Infinity];
+  for (const scene of doc.getRoot().listScenes()) {
+    const { min, max } = getBounds(scene);
+    for (let i = 0; i < 3; i++) {
+      lo[i] = Math.min(lo[i], min[i]);
+      hi[i] = Math.max(hi[i], max[i]);
+    }
+  }
+  const size = lo.map((v, i) => (Number.isFinite(v) ? hi[i] - v : 0)) as [number, number, number];
+  return { meshes, triangles, bytes: statSync(file).size, size };
 }
 
 function meshNodes(doc: Document) {

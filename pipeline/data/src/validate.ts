@@ -14,20 +14,38 @@ export type ValidationResult = { ok: boolean; errors: ValidationError[] };
 // The schemas live next to the real data, also when we check a test fixture.
 const SCHEMA_DIR = fileURLToPath(new URL("../../../data/schema/", import.meta.url));
 
-type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations";
+type Kind = "joints" | "movements" | "structures" | "actions" | "attachments" | "citations" | "exercises";
 
-type Joint = { id: string; dofs: { id: string }[] };
+type Joint = { id: string; region: string; dofs: { id: string }[] };
 type Movement = { id: string; dof: string };
-type Structure = { id: string; type: string };
-type Citation = { id: string };
+type Structure = { id: string; type: string; region?: string; also_in?: string[] };
+type Citation = { id: string; license: string; license_id: string };
+
+// Licences a quote may come from, because they fit CC BY 4.0. Share-alike, non-commercial,
+// no-derivatives and other licences may be cited, but only with a summary in our own words.
+export const QUOTABLE: ReadonlySet<string> = new Set([
+  "CC-BY-4.0",
+  "CC-BY-3.0",
+  "CC-BY-2.0",
+  "CC-BY-unversioned",
+  "CC0-1.0",
+  "public-domain",
+]);
+// A licence text that names non-commercial, no-derivatives or share-alike, in short or long form, any case.
+const RESTRICTED_LICENCE = /\b(?:nc|nd|sa)\b|non-?commercial|no-?derivs|no-?derivatives|share-?alike/i;
 // The fields every row that makes a claim has, so the review gate can check them the same way.
-type Gated = { id: string; citations: { ref: string }[]; checked_by: string | null; checked_on?: string };
+type Gated = { id: string; citations: { ref: string; says_kind?: string }[]; checked_by: string | null; checked_on?: string };
 type Action = Gated & {
   structure: string;
   movement: string;
   load: "working" | "stretched" | "pinched";
   role?: string;
   when?: { angle: string; min: number; max: number }[];
+};
+type Exercise = Gated & {
+  english: string;
+  regions: string[];
+  phases: { id: string; path: { angle: string; from: number; to: number }[]; effort: string[] }[];
 };
 type Attachment = Gated & { muscle: string; bone: string };
 
@@ -70,14 +88,16 @@ export function validateDataDir(dir: string): ValidationResult {
   const actions = listYaml(dir, "actions").map((f) => load<Action>("actions", f));
   // The attachments folder is optional, listYaml returns nothing when it is missing.
   const attachments = listYaml(dir, "attachments").map((f) => load<Attachment>("attachments", f));
+  // data/exercises.yaml is optional. A missing file means no exercises.
+  const exercises: Loaded<Exercise>[] = existsSync(join(dir, "exercises.yaml")) ? [load<Exercise>("exercises", "exercises.yaml")] : [];
 
   // Ids must be unique within each kind, across all files of that kind.
-  // Actions and attachments share one id space, because the review list shows them together.
+  // Actions, attachments and exercises share one id space, because the review list shows them together.
   checkUnique([joints], errors);
   checkUnique([movements], errors);
   checkUnique([citations], errors);
   checkUnique(structures, errors);
-  checkUnique([...actions, ...attachments], errors);
+  checkUnique([...actions, ...attachments, ...exercises], errors);
 
   const angles = new Set(joints.rows.flatMap((j) => j.dofs.map((d) => `${j.id}.${d.id}`)));
   for (const [i, m] of movements.rows.entries()) {
@@ -86,7 +106,17 @@ export function validateDataDir(dir: string): ValidationResult {
 
   const structureById = new Map(structures.flatMap((s) => s.rows).map((s) => [s.id, s]));
   const movementIds = new Set(movements.rows.map((m) => m.id));
-  const citationIds = new Set(citations.rows.map((c) => c.id));
+  const licenseById = new Map(citations.rows.map((c) => [c.id, c.license_id]));
+  // The id decides whether a source may be quoted, so it must not be looser than the licence text.
+  for (const [i, c] of citations.rows.entries()) {
+    if (QUOTABLE.has(c.license_id) && RESTRICTED_LICENCE.test(c.license)) {
+      errors.push({
+        file: citations.file,
+        path: `/${i}/license_id`,
+        message: `license says ${c.license} but license_id ${c.license_id} allows quotes. Pick the id that matches the licence`,
+      });
+    }
+  }
 
   for (const { file, rows } of actions) {
     for (const [i, a] of rows.entries()) {
@@ -119,7 +149,7 @@ export function validateDataDir(dir: string): ValidationResult {
       if (a.checked_by !== null && !a.checked_by.startsWith("physio-")) {
         errors.push({ file, path: at("/checked_by"), message: "action rows can only be checked by a physio, use a label like physio-1" });
       }
-      checkGated(file, i, a, citationIds, errors);
+      checkGated(file, i, a, licenseById, errors);
     }
   }
 
@@ -129,17 +159,69 @@ export function validateDataDir(dir: string): ValidationResult {
     for (const [i, a] of rows.entries()) {
       checkStructureType(file, `/${i}/muscle`, "muscle", a.muscle, structureById, errors);
       checkStructureType(file, `/${i}/bone`, "bone", a.bone, structureById, errors);
-      checkGated(file, i, a, citationIds, errors);
+      checkGated(file, i, a, licenseById, errors);
+    }
+  }
+
+  const regions = new Set(structures.flatMap((s) => s.rows).map((s) => s.region));
+  for (const { file, rows } of structures) {
+    for (const [i, s] of rows.entries()) {
+      for (const [j, r] of (s.also_in ?? []).entries()) {
+        if (r === s.region) errors.push({ file, path: `/${i}/also_in/${j}`, message: `also_in repeats the home region ${r}` });
+        else if (!regions.has(r)) errors.push({ file, path: `/${i}/also_in/${j}`, message: `unknown region ${r}` });
+      }
+    }
+  }
+  for (const { file, rows } of [joints]) {
+    for (const [i, j] of rows.entries()) {
+      if (!regions.has(j.region)) errors.push({ file, path: `/${i}/region`, message: `unknown region ${j.region}` });
+    }
+  }
+  for (const { file, rows } of exercises) {
+    for (const [i, x] of rows.entries()) {
+      for (const [j, r] of x.regions.entries()) {
+        if (!regions.has(r)) errors.push({ file, path: `/${i}/regions/${j}`, message: `unknown region ${r}` });
+      }
+      const phaseIds = new Set<string>();
+      for (const [p, phase] of x.phases.entries()) {
+        const pathAt = `/${i}/phases/${p}`;
+        if (phaseIds.has(phase.id)) errors.push({ file, path: `${pathAt}/id`, message: `duplicate phase id ${phase.id}` });
+        phaseIds.add(phase.id);
+        const seen = new Set<string>();
+        for (const [k, step] of phase.path.entries()) {
+          if (!angles.has(step.angle)) errors.push({ file, path: `${pathAt}/path/${k}/angle`, message: `unknown angle ${step.angle}` });
+          if (seen.has(step.angle)) errors.push({ file, path: `${pathAt}/path/${k}/angle`, message: `angle ${step.angle} appears twice in one phase` });
+          seen.add(step.angle);
+          if (step.from === step.to) errors.push({ file, path: `${pathAt}/path/${k}`, message: "from and to must differ" });
+        }
+        for (const [k, m] of phase.effort.entries()) {
+          if (!movementIds.has(m)) errors.push({ file, path: `${pathAt}/effort/${k}`, message: `unknown movement ${m}` });
+        }
+      }
+      // Like action rows, exercises are movement claims, so only a physio may check them.
+      if (x.checked_by !== null && !x.checked_by.startsWith("physio-")) {
+        errors.push({ file, path: `/${i}/checked_by`, message: "exercise rows can only be checked by a physio, use a label like physio-1" });
+      }
+      checkGated(file, i, x, licenseById, errors);
     }
   }
 
   return { ok: errors.length === 0, errors };
 }
 
-// The review gate rules shared by actions and attachments: known citations, and a date once checked.
-function checkGated(file: string, i: number, row: Gated, citationIds: Set<string>, errors: ValidationError[]) {
+// The rules shared by actions, attachments and exercises: known citations, quotes only from
+// sources whose licence fits, and the review gate dates.
+function checkGated(file: string, i: number, row: Gated, licenseById: Map<string, string>, errors: ValidationError[]) {
   for (const [j, c] of row.citations.entries()) {
-    if (!citationIds.has(c.ref)) errors.push({ file, path: `/${i}/citations/${j}/ref`, message: `unknown citation ${c.ref}` });
+    if (!licenseById.has(c.ref)) {
+      errors.push({ file, path: `/${i}/citations/${j}/ref`, message: `unknown citation ${c.ref}` });
+    } else if (c.says_kind === "quote" && !QUOTABLE.has(licenseById.get(c.ref) as string)) {
+      errors.push({
+        file,
+        path: `/${i}/citations/${j}/says_kind`,
+        message: `a quote needs a source whose licence fits CC BY 4.0, ${c.ref} is ${licenseById.get(c.ref)}. Write a summary in our own words instead`,
+      });
+    }
   }
   if (row.checked_by !== null && row.checked_on === undefined) {
     errors.push({ file, path: `/${i}`, message: "checked_on is required when checked_by is set" });
@@ -165,17 +247,17 @@ function checkStructureType(
 
 // The ids of every structure in dir/structures, for the model check.
 // Returns an empty set when a file cannot be read, validateDataDir reports why.
-// What the mesh check needs to know about each structure.
-export type StructureInfo = { type: string; english: string };
+// What the mesh check needs to know about each structure. midline means it has no left and right copy.
+export type StructureInfo = { type: string; english: string; midline: boolean; regions: string[] };
 
-// Reads data/structures into a map from structure id to its type and english name.
+// Reads data/structures into a map from structure id to its type, english name, midline flag and regions (home first).
 export function loadStructures(dir: string): Map<string, StructureInfo> {
   const structures = new Map<string, StructureInfo>();
   for (const file of listYaml(dir, "structures")) {
     const rows = readYaml(dir, file, []);
     if (!Array.isArray(rows)) continue;
     for (const r of rows) {
-      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english) });
+      if (r && typeof r.id === "string") structures.set(r.id, { type: String(r.type), english: String(r.english), midline: r.midline === true, regions: [String(r.region), ...(Array.isArray(r.also_in) ? r.also_in.map(String) : [])] });
     }
   }
   return structures;
@@ -184,7 +266,7 @@ export function loadStructures(dir: string): Map<string, StructureInfo> {
 function compileSchemas(): Record<Kind, ValidateFunction> {
   // allErrors so one run shows every problem, allowUnionTypes for checked_by (string or null).
   const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "attachments", "citations"];
+  const kinds: Kind[] = ["joints", "movements", "structures", "actions", "attachments", "citations", "exercises"];
   return Object.fromEntries(
     kinds.map((k) => [k, ajv.compile(JSON.parse(readFileSync(join(SCHEMA_DIR, `${k}.schema.json`), "utf8")))]),
   ) as Record<Kind, ValidateFunction>;

@@ -1,0 +1,800 @@
+{
+  "region": "arm",
+  "max_triangles_per_mesh": 2000,
+  "targets": [
+    {
+      "sid": "abductor-digiti-minimi-of-hand",
+      "type": "muscle",
+      "english": "Abductor digiti minimi of hand",
+      "patterns": [
+        "^abductor\\ digiti\\ minimi\\ of\\ left\\ hand$",
+        "^abductor\\ digiti\\ minimi\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "abductor-pollicis-brevis",
+      "type": "muscle",
+      "english": "Abductor pollicis brevis",
+      "patterns": [
+        "^left\\ abductor\\ pollicis\\ brevis$",
+        "^right\\ abductor\\ pollicis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "abductor-pollicis-longus",
+      "type": "muscle",
+      "english": "Abductor pollicis longus",
+      "patterns": [
+        "^left\\ abductor\\ pollicis\\ longus$",
+        "^right\\ abductor\\ pollicis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "anconeus",
+      "type": "muscle",
+      "english": "Anconeus",
+      "patterns": [
+        "^left\\ anconeus$",
+        "^right\\ anconeus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "brachialis",
+      "type": "muscle",
+      "english": "Brachialis",
+      "patterns": [
+        "^left\\ brachialis$",
+        "^right\\ brachialis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "brachioradialis",
+      "type": "muscle",
+      "english": "Brachioradialis",
+      "patterns": [
+        "^left\\ brachioradialis$",
+        "^right\\ brachioradialis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "capitate",
+      "type": "bone",
+      "english": "Capitate",
+      "patterns": [
+        "^left\\ capitate$",
+        "^right\\ capitate$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "coracobrachialis",
+      "type": "muscle",
+      "english": "Coracobrachialis",
+      "patterns": [
+        "^left\\ coracobrachialis$",
+        "^right\\ coracobrachialis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-index-finger",
+      "type": "bone",
+      "english": "Distal phalanx of index finger",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ index\\ finger$",
+        "^distal\\ phalanx\\ of\\ right\\ index\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-little-finger",
+      "type": "bone",
+      "english": "Distal phalanx of little finger",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ little\\ finger$",
+        "^distal\\ phalanx\\ of\\ right\\ little\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-middle-finger",
+      "type": "bone",
+      "english": "Distal phalanx of middle finger",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ middle\\ finger$",
+        "^distal\\ phalanx\\ of\\ right\\ middle\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-ring-finger",
+      "type": "bone",
+      "english": "Distal phalanx of ring finger",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ ring\\ finger$",
+        "^distal\\ phalanx\\ of\\ right\\ ring\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "distal-phalanx-of-thumb",
+      "type": "bone",
+      "english": "Distal phalanx of thumb",
+      "patterns": [
+        "^distal\\ phalanx\\ of\\ left\\ thumb$",
+        "^distal\\ phalanx\\ of\\ right\\ thumb$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-carpi-radialis-brevis",
+      "type": "muscle",
+      "english": "Extensor carpi radialis brevis",
+      "patterns": [
+        "^left\\ extensor\\ carpi\\ radialis\\ brevis$",
+        "^right\\ extensor\\ carpi\\ radialis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-carpi-radialis-longus",
+      "type": "muscle",
+      "english": "Extensor carpi radialis longus",
+      "patterns": [
+        "^left\\ extensor\\ carpi\\ radialis\\ longus$",
+        "^right\\ extensor\\ carpi\\ radialis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-carpi-ulnaris",
+      "type": "muscle",
+      "english": "Extensor carpi ulnaris",
+      "patterns": [
+        "^left\\ extensor\\ carpi\\ ulnaris$",
+        "^right\\ extensor\\ carpi\\ ulnaris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-digiti-minimi",
+      "type": "muscle",
+      "english": "Extensor digiti minimi",
+      "patterns": [
+        "^left\\ extensor\\ digiti\\ minimi$",
+        "^right\\ extensor\\ digiti\\ minimi$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-digitorum",
+      "type": "muscle",
+      "english": "Extensor digitorum",
+      "patterns": [
+        "^left\\ extensor\\ digitorum$",
+        "^right\\ extensor\\ digitorum$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-indicis",
+      "type": "muscle",
+      "english": "Extensor indicis",
+      "patterns": [
+        "^left\\ extensor\\ indicis$",
+        "^right\\ extensor\\ indicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-pollicis-brevis",
+      "type": "muscle",
+      "english": "Extensor pollicis brevis",
+      "patterns": [
+        "^left\\ extensor\\ pollicis\\ brevis$",
+        "^right\\ extensor\\ pollicis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "extensor-pollicis-longus",
+      "type": "muscle",
+      "english": "Extensor pollicis longus",
+      "patterns": [
+        "^left\\ extensor\\ pollicis\\ longus$",
+        "^right\\ extensor\\ pollicis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fifth-metacarpal-bone",
+      "type": "bone",
+      "english": "Fifth metacarpal bone",
+      "patterns": [
+        "^left\\ fifth\\ metacarpal\\ bone$",
+        "^right\\ fifth\\ metacarpal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "first-metacarpal-bone",
+      "type": "bone",
+      "english": "First metacarpal bone",
+      "patterns": [
+        "^left\\ first\\ metacarpal\\ bone$",
+        "^right\\ first\\ metacarpal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-carpi-radialis",
+      "type": "muscle",
+      "english": "Flexor carpi radialis",
+      "patterns": [
+        "^left\\ flexor\\ carpi\\ radialis$",
+        "^right\\ flexor\\ carpi\\ radialis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digiti-minimi-brevis-of-hand",
+      "type": "muscle",
+      "english": "Flexor digiti minimi brevis of hand",
+      "patterns": [
+        "^flexor\\ digiti\\ minimi\\ brevis\\ of\\ left\\ hand$",
+        "^flexor\\ digiti\\ minimi\\ brevis\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digitorum-profundus",
+      "type": "muscle",
+      "english": "Flexor digitorum profundus",
+      "patterns": [
+        "^left\\ flexor\\ digitorum\\ profundus$",
+        "^right\\ flexor\\ digitorum\\ profundus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-digitorum-superficialis",
+      "type": "muscle",
+      "english": "Flexor digitorum superficialis",
+      "patterns": [
+        "^left\\ flexor\\ digitorum\\ superficialis$",
+        "^right\\ flexor\\ digitorum\\ superficialis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-pollicis-brevis",
+      "type": "muscle",
+      "english": "Flexor pollicis brevis",
+      "patterns": [
+        "^left\\ flexor\\ pollicis\\ brevis$",
+        "^right\\ flexor\\ pollicis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "flexor-pollicis-longus",
+      "type": "muscle",
+      "english": "Flexor pollicis longus",
+      "patterns": [
+        "^left\\ flexor\\ pollicis\\ longus$",
+        "^right\\ flexor\\ pollicis\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "fourth-metacarpal-bone",
+      "type": "bone",
+      "english": "Fourth metacarpal bone",
+      "patterns": [
+        "^left\\ fourth\\ metacarpal\\ bone$",
+        "^right\\ fourth\\ metacarpal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "hamate",
+      "type": "bone",
+      "english": "Hamate",
+      "patterns": [
+        "^left\\ hamate$",
+        "^right\\ hamate$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "humeral-head-of-flexor-carpi-ulnaris",
+      "type": "muscle",
+      "english": "Humeral head of flexor carpi ulnaris",
+      "patterns": [
+        "^humeral\\ head\\ of\\ left\\ flexor\\ carpi\\ ulnaris$",
+        "^humeral\\ head\\ of\\ right\\ flexor\\ carpi\\ ulnaris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "humeral-head-of-pronator-teres",
+      "type": "muscle",
+      "english": "Humeral head of pronator teres",
+      "patterns": [
+        "^humeral\\ head\\ of\\ left\\ pronator\\ teres$",
+        "^humeral\\ head\\ of\\ right\\ pronator\\ teres$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lateral-head-of-triceps-brachii",
+      "type": "muscle",
+      "english": "Lateral head of triceps brachii",
+      "patterns": [
+        "^lateral\\ head\\ of\\ left\\ triceps\\ brachii$",
+        "^lateral\\ head\\ of\\ right\\ triceps\\ brachii$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "long-head-of-biceps-brachii",
+      "type": "muscle",
+      "english": "Long head of biceps brachii",
+      "patterns": [
+        "^long\\ head\\ of\\ left\\ biceps\\ brachii$",
+        "^long\\ head\\ of\\ right\\ biceps\\ brachii$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "long-head-of-triceps-brachii",
+      "type": "muscle",
+      "english": "Long head of triceps brachii",
+      "patterns": [
+        "^long\\ head\\ of\\ left\\ triceps\\ brachii$",
+        "^long\\ head\\ of\\ right\\ triceps\\ brachii$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "lunate",
+      "type": "bone",
+      "english": "Lunate",
+      "patterns": [
+        "^left\\ lunate$",
+        "^right\\ lunate$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "medial-head-of-triceps-brachii",
+      "type": "muscle",
+      "english": "Medial head of triceps brachii",
+      "patterns": [
+        "^medial\\ head\\ of\\ left\\ triceps\\ brachii$",
+        "^medial\\ head\\ of\\ right\\ triceps\\ brachii$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-index-finger",
+      "type": "bone",
+      "english": "Middle phalanx of index finger",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ index\\ finger$",
+        "^middle\\ phalanx\\ of\\ right\\ index\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-little-finger",
+      "type": "bone",
+      "english": "Middle phalanx of little finger",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ little\\ finger$",
+        "^middle\\ phalanx\\ of\\ right\\ little\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-middle-finger",
+      "type": "bone",
+      "english": "Middle phalanx of middle finger",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ middle\\ finger$",
+        "^middle\\ phalanx\\ of\\ right\\ middle\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "middle-phalanx-of-ring-finger",
+      "type": "bone",
+      "english": "Middle phalanx of ring finger",
+      "patterns": [
+        "^middle\\ phalanx\\ of\\ left\\ ring\\ finger$",
+        "^middle\\ phalanx\\ of\\ right\\ ring\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "oblique-head-of-adductor-pollicis",
+      "type": "muscle",
+      "english": "Oblique head of adductor pollicis",
+      "patterns": [
+        "^oblique\\ head\\ of\\ left\\ adductor\\ pollicis$",
+        "^oblique\\ head\\ of\\ right\\ adductor\\ pollicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "opponens-digiti-minimi-of-hand",
+      "type": "muscle",
+      "english": "Opponens digiti minimi of hand",
+      "patterns": [
+        "^opponens\\ digiti\\ minimi\\ of\\ left\\ hand$",
+        "^opponens\\ digiti\\ minimi\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "opponens-pollicis",
+      "type": "muscle",
+      "english": "Opponens pollicis",
+      "patterns": [
+        "^left\\ opponens\\ pollicis$",
+        "^right\\ opponens\\ pollicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "palmaris-longus",
+      "type": "muscle",
+      "english": "Palmaris longus",
+      "patterns": [
+        "^left\\ palmaris\\ longus$",
+        "^right\\ palmaris\\ longus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "pisiform",
+      "type": "bone",
+      "english": "Pisiform",
+      "patterns": [
+        "^left\\ pisiform$",
+        "^right\\ pisiform$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "pronator-quadratus",
+      "type": "muscle",
+      "english": "Pronator quadratus",
+      "patterns": [
+        "^left\\ pronator\\ quadratus$",
+        "^right\\ pronator\\ quadratus$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-index-finger",
+      "type": "bone",
+      "english": "Proximal phalanx of index finger",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ index\\ finger$",
+        "^proximal\\ phalanx\\ of\\ right\\ index\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-little-finger",
+      "type": "bone",
+      "english": "Proximal phalanx of little finger",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ little\\ finger$",
+        "^proximal\\ phalanx\\ of\\ right\\ little\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-middle-finger",
+      "type": "bone",
+      "english": "Proximal phalanx of middle finger",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ middle\\ finger$",
+        "^proximal\\ phalanx\\ of\\ right\\ middle\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-ring-finger",
+      "type": "bone",
+      "english": "Proximal phalanx of ring finger",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ ring\\ finger$",
+        "^proximal\\ phalanx\\ of\\ right\\ ring\\ finger$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "proximal-phalanx-of-thumb",
+      "type": "bone",
+      "english": "Proximal phalanx of thumb",
+      "patterns": [
+        "^proximal\\ phalanx\\ of\\ left\\ thumb$",
+        "^proximal\\ phalanx\\ of\\ right\\ thumb$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "radius",
+      "type": "bone",
+      "english": "Radius",
+      "patterns": [
+        "^left\\ radius$",
+        "^right\\ radius$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "scaphoid",
+      "type": "bone",
+      "english": "Scaphoid",
+      "patterns": [
+        "^left\\ scaphoid$",
+        "^right\\ scaphoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "second-metacarpal-bone",
+      "type": "bone",
+      "english": "Second metacarpal bone",
+      "patterns": [
+        "^left\\ second\\ metacarpal\\ bone$",
+        "^right\\ second\\ metacarpal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "set-of-dorsal-interossei-of-hand",
+      "type": "muscle",
+      "english": "Set of dorsal interossei of hand",
+      "patterns": [
+        "^set\\ of\\ dorsal\\ interossei\\ of\\ left\\ hand$",
+        "^set\\ of\\ dorsal\\ interossei\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "set-of-lumbricals-of-hand",
+      "type": "muscle",
+      "english": "Set of lumbricals of hand",
+      "patterns": [
+        "^set\\ of\\ lumbricals\\ of\\ left\\ hand$",
+        "^set\\ of\\ lumbricals\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "set-of-palmar-interossei-of-hand",
+      "type": "muscle",
+      "english": "Set of palmar interossei of hand",
+      "patterns": [
+        "^set\\ of\\ palmar\\ interossei\\ of\\ left\\ hand$",
+        "^set\\ of\\ palmar\\ interossei\\ of\\ right\\ hand$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "short-head-of-biceps-brachii",
+      "type": "muscle",
+      "english": "Short head of biceps brachii",
+      "patterns": [
+        "^short\\ head\\ of\\ left\\ biceps\\ brachii$",
+        "^short\\ head\\ of\\ right\\ biceps\\ brachii$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "superficial-head-of-flexor-pollicis-brevis",
+      "type": "muscle",
+      "english": "Superficial head of flexor pollicis brevis",
+      "patterns": [
+        "^superficial\\ head\\ of\\ left\\ flexor\\ pollicis\\ brevis$",
+        "^superficial\\ head\\ of\\ right\\ flexor\\ pollicis\\ brevis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "supinator",
+      "type": "muscle",
+      "english": "Supinator",
+      "patterns": [
+        "^left\\ supinator$",
+        "^right\\ supinator$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "third-metacarpal-bone",
+      "type": "bone",
+      "english": "Third metacarpal bone",
+      "patterns": [
+        "^left\\ third\\ metacarpal\\ bone$",
+        "^right\\ third\\ metacarpal\\ bone$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "transverse-head-of-adductor-pollicis",
+      "type": "muscle",
+      "english": "Transverse head of adductor pollicis",
+      "patterns": [
+        "^transverse\\ head\\ of\\ left\\ adductor\\ pollicis$",
+        "^transverse\\ head\\ of\\ right\\ adductor\\ pollicis$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "trapezium",
+      "type": "bone",
+      "english": "Trapezium",
+      "patterns": [
+        "^left\\ trapezium$",
+        "^right\\ trapezium$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "trapezoid",
+      "type": "bone",
+      "english": "Trapezoid",
+      "patterns": [
+        "^left\\ trapezoid$",
+        "^right\\ trapezoid$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "triquetral",
+      "type": "bone",
+      "english": "Triquetral",
+      "patterns": [
+        "^left\\ triquetral$",
+        "^right\\ triquetral$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "ulna",
+      "type": "bone",
+      "english": "Ulna",
+      "patterns": [
+        "^left\\ ulna$",
+        "^right\\ ulna$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "ulnar-head-of-flexor-carpi-ulnaris",
+      "type": "muscle",
+      "english": "Ulnar head of flexor carpi ulnaris",
+      "patterns": [
+        "^ulnar\\ head\\ of\\ left\\ flexor\\ carpi\\ ulnaris$",
+        "^ulnar\\ head\\ of\\ right\\ flexor\\ carpi\\ ulnaris$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "ulnar-head-of-pronator-teres",
+      "type": "muscle",
+      "english": "Ulnar head of pronator teres",
+      "patterns": [
+        "^ulnar\\ head\\ of\\ left\\ pronator\\ teres$",
+        "^ulnar\\ head\\ of\\ right\\ pronator\\ teres$"
+      ],
+      "required": true,
+      "source": "bp3d"
+    },
+    {
+      "sid": "humerus",
+      "type": "bone",
+      "english": "Humerus",
+      "patterns": [
+        "^left\\ humerus$",
+        "^right\\ humerus$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    },
+    {
+      "sid": "scapula",
+      "type": "bone",
+      "english": "Scapula",
+      "patterns": [
+        "^left\\ scapula$",
+        "^right\\ scapula$"
+      ],
+      "required": true,
+      "source": "bp3d",
+      "context": true
+    }
+  ]
+}

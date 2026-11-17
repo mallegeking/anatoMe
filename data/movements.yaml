@@ -1,9 +1,11 @@
 # One movement per direction of each degree of freedom in joints.yaml.
-- {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion}
-- {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension}
-- {id: hip-abduction, dof: hip.abduction, direction: positive, english: Hip abduction}
-- {id: hip-adduction, dof: hip.abduction, direction: negative, english: Hip adduction}
-- {id: hip-internal-rotation, dof: hip.rotation, direction: positive, english: Hip internal rotation}
-- {id: hip-external-rotation, dof: hip.rotation, direction: negative, english: Hip external rotation}
-- {id: knee-flexion, dof: knee.flexion, direction: positive, english: Knee flexion}
-- {id: knee-extension, dof: knee.flexion, direction: negative, english: Knee extension}
+# German names from the articles Hüftgelenk and Kniegelenk in German Wikipedia and DocCheck Flexikon and the DocCheck Flexikon articles Abduktion and Adduktion, read on 2026-11-14. german is left out where no opened source gave one.
+# Each German name with the page it is on and the date the page was read: docs/phase4/german-names.md.
+- {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion, german: Beugung im Hüftgelenk}
+- {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension, german: Streckung im Hüftgelenk}
+- {id: hip-abduction, dof: hip.abduction, direction: positive, english: Hip abduction, german: Abspreizen im Hüftgelenk}
+- {id: hip-adduction, dof: hip.abduction, direction: negative, english: Hip adduction, german: Heranführen im Hüftgelenk}
+- {id: hip-internal-rotation, dof: hip.rotation, direction: positive, english: Hip internal rotation, german: Innenrotation im Hüftgelenk}
+- {id: hip-external-rotation, dof: hip.rotation, direction: negative, english: Hip external rotation, german: Außenrotation im Hüftgelenk}
+- {id: knee-flexion, dof: knee.flexion, direction: positive, english: Knee flexion, german: Beugung des Kniegelenks}
+- {id: knee-extension, dof: knee.flexion, direction: negative, english: Knee extension, german: Streckung des Kniegelenks}

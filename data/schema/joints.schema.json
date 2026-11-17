@@ -6,9 +6,10 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "dofs"],
+    "required": ["id", "region", "dofs"],
     "properties": {
       "id": { "$ref": "#/definitions/slug" },
+      "region": { "$ref": "#/definitions/slug" },
       "dofs": {
         "type": "array",
         "minItems": 1,

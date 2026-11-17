@@ -1,0 +1,58 @@
+# Data gaps for the hip (Phase 2d)
+
+Started 2026-11-14 by the builder. One line per gap: the structure, what was looked for, the sources opened, and why they did not support a row. An honest gap beats a weak row. Sources were opened in full as open-access texts from Europe PMC. "PMC" numbers link as https://pmc.ncbi.nlm.nih.gov/articles/PMCxxxxxxx/.
+
+## Task 3: stretched and pinched rows
+
+### Capsular ligaments, capsule, labrum and the ligament of the head of the femur
+
+- **Iliofemoral ligament, angles.** Looked for: the hip angle at which it tightens in extension or external rotation. Opened: PMC4491667 (van Arkel 2015, rotational restraint), PMC4655836 (van Arkel 2015, envelope of passive motion), PMC7406151 (Ng 2019), PMC10485585 (iliofemoral band strains, CC BY-NC-ND), PMC8335960 (CC BY-NC). Why not: no opened source states an angle. The rows stay without an angle range.
+- **Pubofemoral ligament in external rotation.** Looked for: external rotation as its own row. Opened: PMC4491667, PMC7406151, PMC8479567 (CC BY-NC-ND). Why not: the sources tie it to extension or full abduction without a number, so a row without an angle range would claim it at every amount of flexion.
+- **Ischiofemoral ligament in extension.** Looked for: extension as a stretching movement. Opened: PMC8725321 (Baba 2022), PMC4491667. Why not: one sentence in Baba 2022 cites an earlier study, nothing measured in an opened source.
+- **Hip joint capsule in flexion, abduction and adduction.** Looked for: positions that tighten the whole capsule, with angles. Opened: PMC4655836, PMC7406151. Why not: the sources say "deep flexion" and "high levels of ab/adduction" without a starting angle. Only extension got a row.
+- **Ligament of the head of the femur in internal rotation with extension, and in adduction.** Looked for: tension positions with angles. Opened: PMC4491667, PMC11662112 (Migliorini 2024), PMC12461197 (finite element model). Why not: "in extension" has no number, the adduction statement in van Arkel 2015 reports other people's arthroscopic observations, and the finite element study is one model with stress, not tension, values.
+- **Acetabular labrum, more pinching positions.** Looked for: positions beyond the existing internal rotation row. Opened: PMC4491667. Why not: van Arkel 2015 found secondary restraint in extension with external rotation and in low flexion with full abduction, but "extension" and "full abduction" have no numbers, so a row would claim the pinch at every angle.
+
+### Iliotibial tract and the three hip bursae
+
+- **Iliotibial tract, angles and length.** Looked for: a measured lengthening of the tract, or a hip or knee angle at which it tightens. Opened: PMC12635949 (Borghi 2025), PMC13693282 (Zhao 2026), PMC13712515, PMC13380181 (CC BY-NC-ND), PMC12179863 (CC BY-NC). Why not: no source gives a number. The adduction row has no angle range.
+- **Iliotibial tract in hip extension.** Looked for: extension as a stretching movement. Opened: PMC13380181. Why not: one study after hip replacement found that a stiffer tract went with less extension and adduction range, a correlation only, under a licence that allows no quote.
+- **Iliotibial tract in knee flexion or extension, internal rotation or flexion.** Looked for: these as stretching movements. Opened: PMC12635949, PMC13693282. Why not: the knee is bent in the Ober test only to take other structures out of play, and internal rotation and flexion appear only as steps in one test sequence.
+- **Trochanteric bursa.** Looked for: positions that compress it. Opened: PMC13241414, PMC13256531 (Corvino 2026). Why not: one review advises avoiding adduction to reduce "compression across the painful area" without naming the bursa, and the other describes how bursitis develops without naming a movement.
+- **Iliopectineal bursa.** Looked for: positions that compress it, for example hip extension. Opened: PMC13256531, PMC10668929 (CC BY-NC-ND), PMC12494060 (CC BY-NC-ND), PMC3931342. Why not: the sources speak of friction from the iliopsoas tendon in both flexion and extension, not of compression in one movement.
+- **Ischial bursa.** Looked for: positions that compress it. Opened: PMC10027639, PMC11806822, PMC10020732 (CC BY-NC). Why not: the sources name prolonged sitting and direct pressure, which is not a joint movement, and give no angle. Filing it under hip flexion would be our guess.
+
+### Hamstrings, rectus femoris, iliacus and psoas major
+
+- **Iliacus in hip extension.** Looked for: a source on iliacus itself being stretched by hip extension. Opened: PMC12128184, PMC12179863 (CC BY-NC), PMC13256531, PMC12719109 (CC BY-NC), PMC13387791 (CC BY-NC-ND), PMC11923245 (CC BY-NC-ND). Why not: the sources speak of the psoas tendon or of the iliopsoas as a whole, never of iliacus alone. The physio is asked in the psoas row.
+- **Hamstrings, hip angles.** Looked for: measured length or stiffness of each hamstring at stated hip flexion angles. Opened: PMC9446565 (Kellis 2022), PMC7526261 (Danielsson 2020), PMC12714284, PMC8799393, PMC10955752 (CC BY-SA), PMC11023729, PMC13661361. Why not: no open study reports it per muscle by hip angle. Kellis 2022 gives about 45 degrees as the point where resistance starts to rise, with no upper end, so the rows carry only the knee position.
+- **Rectus femoris and psoas major, angles.** Looked for: stated hip extension angles. Opened: PMC12782349 (Chanel 2025), PMC13569825 (CC BY-NC-ND), PMC13387791, PMC11923245, PMC12510488, PMC12953823 (CC BY-NC-ND), PMC12283864. Why not: the only measured hip angles are 0 and 80 degrees of flexion, and the psoas sources name full extension without a number.
+
+### Deep rotators and adductors
+
+- **Adductor longus in hip extension and internal rotation.** Looked for: these as their own rows. Opened: PMC10261119 (Kato 2023). Why not: the extension effect was clear only with the hip also abducted, and the rotation effect only at 20 degrees of extension, with the authors unsure about the muscle's rotation lever. Both are mentioned in the abduction row instead.
+- **Adductor brevis, adductor magnus, gracilis and pectineus.** Looked for: length or stiffness in hip abduction. Opened: PMC12283864, PMC12611106, PMC13538968, PMC13537925 (CC BY-NC). Why not: no open study measured these muscles. The torque studies measure the whole group.
+- **Piriformis.** Looked for: stretch positions with angles. Opened: PMC8725321 (Baba 2022), PMC13302092, PMC12329630 (CC BY-NC). Why not: Baba 2022 found piriformis holding back internal rotation only at 0 degrees of flexion, and a range cannot hold a single angle. The deep flexion finding (most stiffness in external rotation at 110 degrees of flexion and 40 of adduction) is reported second hand from a study that is not open, and the switch to an internal rotator between 75 and 90 degrees is a lever arm finding, so a stretch in external rotation there would be our inference.
+- **Obturator externus.** Looked for: a stretch position. Opened: PMC8725321, PMC12329630. Why not: Baba 2022 names 0 and 60 degrees of flexion, and the ischiofemoral ligament did most of the holding at 30 degrees in between. A range from 0 to 60 would fill that gap. The existing obturator internus row uses that range and already asks the physio about it.
+- **Superior gemellus, inferior gemellus and quadratus femoris.** Looked for: stretch positions. Opened: PMC8725321, PMC12346365, PMC12523305. Why not: no opened source gives a stretch position for these muscles alone.
+
+## Task 4: exercises
+
+Two of the six exercises were added (bodyweight squat, side-lying hip abduction). The other four have no opened source for their joint angles.
+
+- **Forward lunge.** Looked for: hip and knee angles of the front leg through a forward lunge. Opened: PMC13747745 (badminton lunge), PMC13089218, PMC11843896, PMC13750531. Why not: the only hip angle is from a fast sport lunge in badminton players, and the slow lunge study gives an approximate knee range (about 90 to 100 degrees) without a hip angle. Mixing the two would describe a lunge nobody measured. No source covers the back leg.
+- **Romanian deadlift.** Looked for: hip and knee angles at the bottom of the lift. Opened: PMC8835508, PMC7046193, PMC12591051, PMC8248606, PMC13750531, PMC13511462, PMC11036218, PMC13727010 (CC BY-NC). Why not: the sources give muscle activity and technique ("knees slightly flexed") but no angles. The nearest numbers are from a conventional deadlift at the moment of peak force, a different lift.
+- **Glute bridge.** Looked for: hip angles at the start and at the top. Opened: PMC11981018, PMC8248606, PMC13619985. Why not: the review gives knee positions (60, 90 or 120 degrees) and says the hip can extend about 20 degrees past neutral, but no hip angles for the bridge itself. The hip thrust numbers are from a different exercise on a box.
+- **Clamshell.** Looked for: how far the knee opens (hip abduction and external rotation). Opened: PMC11195955, PMC10315199 (CC BY-NC-ND). Why not: the studies hold the hip at 30, 45 or 60 degrees of flexion and the knee at 90, but name the movement only as "maximum abduction with external rotation" without a number.
+
+## Task 5: knee rows for the thigh muscles
+
+No gap. On 2026-11-14 each of the ten muscles already had a working knee row from Phase 1, so no row was added: rectus femoris, vastus lateralis, vastus medialis and vastus intermedius (knee extension), sartorius, gracilis, biceps femoris long head, biceps femoris short head, semitendinosus and semimembranosus (knee flexion).
+
+## Not modelled
+
+Structures that the hip region does not have, and why.
+
+- **Quadriceps tendon and patellar ligament.** Neither mesh source has them, and drawing them by hand was ruled out in Phase 0. The info panel keeps its gap line for them.
+- **Psoas minor.** No mesh in either source.
+- **The origin of psoas major on the spine.** The lumbar vertebrae belong to a later region, so psoas major has no origin row (the data report lists it as "no origin").

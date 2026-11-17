@@ -4,6 +4,22 @@
   --panel: #1d2128;
   --text: #e8eaed;
   --muted: #9aa1ab;
+  --surface-2: #262b33; /* raised surface: buttons, chips, the current card */
+  --border: #3a414c;
+  --divider: #2c323b;
+  --accent: #8ab4f8;
+  --accent-surface: #2f3a4a;
+  --warn-bg: #5c4400;
+  --warn-fg: #fff3cd;
+  --warn-chip-bg: #4a3a14;
+  --warn-chip-fg: #ffe2a6;
+  --radius: 8px;
+  --tap: 44px;
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 12px;
+  --gap-4: 16px;
+  --gap-5: 20px;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -21,17 +37,61 @@ body,
   color: var(--text);
 }
 
-/* The model fills the space above the panel, so the panel never covers it. */
+/* The page is one grid. On a phone: the top bar, the model, the panel sheet and the tabs at the bottom.
+   From 900 px wide: the top bar across, then the tabs on the left, the model in the middle and the panel on the right.
+   The model never shares its space with the panel, so the panel never covers it. */
 .app {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   height: 100dvh;
+  grid-template: "top" auto "stage" minmax(220px, 1fr) "side" minmax(0, auto) "nav" auto / minmax(0, 1fr);
+}
+
+/* The review banner and the top bar share the top row. */
+.top {
+  grid-area: top;
+  min-width: 0;
+}
+
+.nav {
+  grid-area: nav;
+  min-width: 0;
 }
 
 .stage {
+  grid-area: stage;
   position: relative;
-  flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
+}
+
+/* The right column on a wide screen, the sheet above the tabs on a phone. Layers, the panel and the foot stack inside it. */
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  max-height: 45dvh;
+  min-height: 0;
+  min-width: 0;
+  background: var(--panel);
+  border-top: 1px solid var(--divider);
+}
+
+@media (min-width: 900px) {
+  .app {
+    grid-template: "top top top" auto "nav stage side" minmax(0, 1fr) / 176px minmax(0, 1fr) 320px;
+  }
+
+  .side {
+    max-height: none;
+    border-top: 0;
+    border-left: 1px solid var(--divider);
+  }
+}
+
+@media (min-width: 1100px) {
+  .app {
+    grid-template-columns: 208px minmax(0, 1fr) 380px;
+  }
 }
 
 /* Lets our own tap and drag handling work instead of the browser scrolling or zooming the page. */
@@ -48,7 +108,16 @@ body,
   overflow: hidden;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   background: var(--panel);
-  border-top: 1px solid #2c323b;
+  border-top: 1px solid var(--divider);
+}
+
+/* Inside the side column the panel takes the room the column has. The tabs below it keep the safe area. */
+.side .panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  padding-bottom: 12px;
+  border-top: 0;
 }
 
 .panel-scroll {
@@ -57,26 +126,9 @@ body,
   overflow-y: auto;
 }
 
-.info-label {
-  margin: 0 0 8px;
-  font-size: 1.125rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.info-label--hint {
-  font-weight: 400;
-  color: var(--muted);
-}
-
 .credits {
   font-size: 0.8125rem;
   color: var(--muted);
-}
-
-.credits summary {
-  cursor: pointer;
-  padding: 4px 0;
 }
 
 .credits ul {
@@ -86,6 +138,94 @@ body,
 
 .credits p {
   margin: 8px 0 0;
+}
+
+/* The language picker: the label, when shown, sits above the field. */
+.lang-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+/* The foot of the right column on the wide layout. */
+.side-foot {
+  flex: 0 0 auto;
+  padding: var(--gap-3) 16px;
+  border-top: 1px solid var(--divider);
+}
+
+.side-foot .lang-switch {
+  margin: 0;
+}
+
+/* The bottom of the rail: the educational line and the credits button. */
+.nav-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  margin-top: auto;
+  padding-top: var(--gap-3);
+}
+
+.nav-foot .educational {
+  margin: 0;
+}
+
+/* The settings button in the top bar, phone only. */
+.top-icon-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  padding: 0;
+}
+
+/* The native dialog. The box is the whole dialog, so a click on the dim backdrop has the dialog as its target. */
+.app-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(80dvh, 720px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.app-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.app-dialog-body {
+  max-height: min(80dvh, 720px);
+  padding: 16px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.app-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.app-dialog-head h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.app-dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  padding: 0;
 }
 
 .model-error {
@@ -102,6 +242,23 @@ body,
   height: auto;
   padding: 0 0 8px;
   text-align: left;
+}
+
+/* A message with its "Try again" button. On the stage both sit in the middle, in the panel they follow the text. */
+.retry-box {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  height: 100%;
+}
+
+.retry-box .model-error {
+  height: auto;
+}
+
+.panel .retry-box {
+  display: block;
+  height: auto;
 }
 
 /* The last-resort error: the message fills the screen and the credits stay below it. */
@@ -136,10 +293,11 @@ body,
   font-size: 0.8125rem;
 }
 
+/* Only with ?perf=1. It sits under the name chip (44 px and its border), so both can show at once. */
 .perf-overlay {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: calc(var(--gap-3) + var(--tap) + 2px + var(--gap-2));
+  left: var(--gap-3);
   padding: 4px 8px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.6);
@@ -147,38 +305,129 @@ body,
   pointer-events: none;
 }
 
-.info-panel h2,
-.info-panel h3,
-.info-panel h4 {
-  margin: 8px 0 4px;
-}
-
-.info-panel h2 {
-  margin-top: 0;
-  font-size: 1.125rem;
-  overflow-wrap: anywhere;
-}
-
-.info-panel h3 {
-  font-size: 0.9375rem;
-}
-
-.info-panel h4 {
-  font-size: 0.875rem;
-}
-
-.info-panel p,
-.info-panel ul {
-  margin: 4px 0;
-}
-
-.info-panel ul {
-  padding-left: 18px;
-}
-
-.info-panel {
+/* The one body rule every tab panel shares. */
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-5);
   font-size: 0.9375rem;
   overflow-wrap: anywhere;
+}
+
+.panel-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.panel-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 13px;
+}
+
+.chip--warn {
+  background: var(--warn-chip-bg);
+  color: var(--warn-chip-fg);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
+}
+
+.card--current {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.action-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  margin: 0;
+}
+
+.kv-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--gap-3);
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
 }
 
 .muted {
@@ -190,11 +439,66 @@ body,
   font-style: italic;
 }
 
+/* Shared control styles. */
+.btn {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+
+/* aria-disabled: a button that is off for a moment but keeps the keyboard focus, like Save during a save. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background: var(--accent-surface);
+  font-weight: 600;
+}
+
+.btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-surface);
+  font-weight: 600;
+}
+
+.field {
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+/* Only there when the manifest has more than one body region. The language picker looks the same. */
+.region-picker,
+.lang-picker {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 0 8px;
+  background: var(--surface-2);
+}
+
+.search-field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* A small text link inside a panel. 32 px high at least, so a thumb still hits it. */
 .link-button {
+  min-height: 32px;
   padding: 4px 0;
   border: 0;
   background: none;
-  color: #8ab4f8;
+  color: var(--accent);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
@@ -207,65 +511,201 @@ body,
   margin: 8px 0;
 }
 
-.panel-actions button {
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid #3a414c;
-  border-radius: 6px;
-  background: #262b33;
-  color: var(--text);
-  font: inherit;
+.panel-body .panel-actions {
+  margin: 0;
 }
 
-.layers-toggle {
-  min-height: 44px;
-  margin: 0 0 8px;
-  padding: 0 14px;
-  border: 1px solid #3a414c;
-  border-radius: 6px;
-  background: #262b33;
-  color: var(--text);
-  font: inherit;
-}
+
 
 .layers-panel {
   font-size: 0.9375rem;
 }
 
-.layers-title,
-.layers-hidden-title {
-  margin: 8px 0 4px;
-  font-size: 1.125rem;
+/* The slot holds Layers. On a phone it takes the sheet while open. On a wide screen it stays above the tab panel. */
+.layers-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px;
 }
 
-.layers-hidden-title {
-  font-size: 0.9375rem;
+/* With Layers open on a phone the panel below it holds only the educational line, which must show whole.
+   So the panel keeps its height and the Layers slot is the part that gives up room and scrolls. */
+.side .layers-slot + .panel {
+  flex-shrink: 0;
+}
+
+@media (min-width: 900px) {
+  .layers-slot {
+    flex: 0 0 auto;
+    max-height: 45%;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  /* On a wide screen the tab panel below Layers is the part that takes the rest of the column. */
+  .side .layers-slot + .panel {
+    flex-shrink: 1;
+  }
+}
+
+.layers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.layers-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The controls on the stage's edges. The wrapper covers the stage but lets taps and drags through to the model.
+   Only the buttons and the chip catch them. */
+.stage-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The name chip, top left. With nothing selected it is empty and takes no room, but stays in the page as the status region. */
+.stage-chip {
+  position: absolute;
+  top: var(--gap-3);
+  left: var(--gap-3);
+  max-width: calc(100% - 2 * var(--gap-3));
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+  padding-left: var(--gap-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  pointer-events: auto;
+}
+
+.stage-chip:empty {
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: none;
+}
+
+.stage-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-chip-side {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.stage-chip-clear {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+}
+
+/* The bottom edge. On the phone the markers, the badge and the buttons share one line. */
+.stage-bottom {
+  position: absolute;
+  right: var(--gap-3);
+  bottom: var(--gap-3);
+  left: var(--gap-3);
+  display: grid;
+  grid-template: "ml view mr buttons" auto / auto minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: var(--gap-2);
+}
+
+.stage-marker--left {
+  grid-area: ml;
+}
+
+.stage-marker--right {
+  grid-area: mr;
+}
+
+.stage-view {
+  grid-area: view;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-2);
+  min-width: 0;
+}
+
+.stage-marker,
+.stage-badge,
+.stage-hint {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.stage-marker {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.stage-badge {
+  padding: 2px var(--gap-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.stage-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.stage-buttons button {
+  pointer-events: auto;
+}
+
+/* 44 px squares with the icon in the middle. */
+.stage-icon-btn {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+}
+
+/* The wide layout puts the markers on a line above the badge and the hint, next to the taller button stack. */
+@media (min-width: 900px) {
+  .stage-bottom {
+    grid-template: ". . . buttons" 1fr "ml . mr buttons" auto "view view view buttons" auto / auto minmax(0, 1fr) auto auto;
+  }
 }
 
 .layers-panel p {
   margin: 4px 0;
 }
 
-.layers-panel button {
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid #3a414c;
-  border-radius: 6px;
-  background: #262b33;
-  color: var(--text);
-  font: inherit;
-}
 
-.layers-panel button:disabled {
-  opacity: 0.5;
-}
 
 .layers-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 44px;
+  min-height: var(--tap);
 }
 
 .layers-tissues .layers-row {
@@ -287,33 +727,101 @@ body,
 .top-bar {
   position: relative;
   z-index: 2;
-  flex: 0 0 auto;
   padding: 8px 16px;
   background: var(--panel);
-  border-bottom: 1px solid #2c323b;
+  border-bottom: 1px solid var(--divider);
 }
 
 .top-bar-row {
+  position: relative;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
-.top-bar .layers-toggle {
-  margin: 0;
-  flex: 0 0 auto;
+/* On the phone the field gets its own row, the full width. The name pushes the buttons to the right. */
+.top-bar-row .search-field {
+  order: 1;
+  flex: 1 0 100%;
 }
 
-.search-field {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid #3a414c;
-  border-radius: 6px;
-  background: #14171c;
-  color: var(--text);
-  font: inherit;
+/* A short phone has no room for a second row. The field folds into a button and opens across the whole bar. */
+@media (max-width: 899px) and (max-height: 700px) {
+  .top-bar-row {
+    flex-wrap: nowrap;
+  }
+
+  .top-bar-row .search-field {
+    order: 0;
+    flex: 1 1 auto;
+  }
+
+  .top-bar-row--searching .search-field {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
 }
+
+/* The wide layout centres the field in the bar, at most 620 px wide. The two outer columns share the rest equally.
+   They never get narrower than the name and the region picker, so on a narrow window, where one of them needs
+   more than its half, the field gives up width and sits a little off the middle instead of cutting the picker.
+   The bar itself is the grid and the row lets its children into it, so the result list can take the field's column. */
+@media (min-width: 900px) {
+  .top-bar {
+    display: grid;
+    grid-template-columns: minmax(max-content, 1fr) minmax(0, 620px) minmax(max-content, 1fr);
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  .top-bar-row {
+    display: contents;
+  }
+
+  .top-bar-row .app-name {
+    grid-area: 1 / 1;
+    justify-self: start;
+  }
+
+  /* One row: the phone's order would otherwise put the field on a second one. */
+  .top-bar-row .search-field {
+    grid-area: 1 / 2;
+    order: 0;
+    width: 100%;
+  }
+
+  .top-bar-row .region-picker {
+    grid-area: 1 / 3;
+    justify-self: end;
+    max-width: 100%;
+  }
+
+  /* The result list drops down from the field, as wide as the field, to the bar's bottom edge and below. */
+  .top-bar .search-drop {
+    grid-area: 1 / 2 / 2 / 3;
+    top: calc(100% + 8px);
+  }
+}
+
+/* The name pushes the buttons to the right. On the wide layout the bar's grid places it. */
+.app-name {
+  flex: 0 0 auto;
+  margin: 0 auto 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
+  .app-name {
+    margin-right: 0;
+  }
+}
+
+/* Only there when the manifest has more than one body region. Big enough for a thumb.
+   The language picker looks the same. */
+
 
 /* The list floats over the model only while it is open. */
 .search-drop {
@@ -324,7 +832,7 @@ body,
   max-height: 50dvh;
   overflow-y: auto;
   background: var(--panel);
-  border-bottom: 1px solid #2c323b;
+  border-bottom: 1px solid var(--divider);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -352,10 +860,10 @@ body,
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  min-height: 44px;
+  min-height: var(--tap);
   padding: 6px 16px;
   border: 0;
-  border-top: 1px solid #2c323b;
+  border-top: 1px solid var(--divider);
   background: none;
   color: var(--text);
   font: inherit;
@@ -375,13 +883,12 @@ body,
 
 /* Review build only. The banner takes its own row above the model, so it never covers it. */
 .review-banner {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: #5c4400;
-  color: #fff3cd;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
   font-size: 0.8125rem;
 }
 
@@ -393,7 +900,7 @@ body,
 .review-banner button,
 .review-list-bar button {
   flex: 0 0 auto;
-  min-height: 44px;
+  min-height: var(--tap);
 }
 
 .review-stage {
@@ -425,7 +932,321 @@ body,
   display: inline-block;
   padding: 1px 8px;
   border-radius: 4px;
-  background: #5c4400;
-  color: #fff3cd;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
   font-size: 0.8125rem;
+}
+
+/* The tabs. On a phone: a row of four equal tabs at the bottom, the icon above the name. */
+.mode-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--panel);
+  border-top: 1px solid var(--divider);
+}
+
+/* Each tab starts from the width of its own label and the spare room is shared out,
+   so a long label such as "Under a spot" is not cut off on a 360 px phone. */
+.mode-bar button {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+}
+
+/* A long name is cut with an ellipsis, so the four tabs still fit at 360 px. */
+.mode-bar span {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mode-bar button[aria-selected="true"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* From 900 px wide: a column in the rail on the left, each tab a row with the icon left of the name. */
+@media (min-width: 900px) {
+  /* A column, so the educational line and the credits button sit at the bottom of the rail.
+     On a short screen the rail scrolls on its own. */
+  .nav {
+    display: flex;
+    flex-direction: column;
+    padding: var(--gap-3) var(--gap-2);
+    background: var(--panel);
+    border-right: 1px solid var(--divider);
+    overflow-y: auto;
+  }
+
+  .mode-bar {
+    flex-direction: column;
+    gap: var(--gap-1);
+    padding-bottom: 0;
+    border-top: 0;
+  }
+
+  .mode-bar button {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--gap-3);
+    padding: 0 var(--gap-3);
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .mode-bar button[aria-selected="true"] {
+    background: var(--accent-surface);
+    color: var(--text);
+  }
+}
+
+.movement-choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+
+
+
+/* The angle and progress controls take the full width, so they are easy to drag with a thumb. */
+.movement-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.movement-slider-line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-3);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  min-height: var(--tap);
+}
+
+.movement-choices--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.movement-silent-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.movement-slider input {
+  width: 100%;
+  min-height: var(--tap);
+  margin: 0;
+}
+
+.movement-structure {
+  min-height: var(--tap);
+  font-weight: 600;
+}
+
+
+.area-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.area-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+}
+
+.area-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-surface);
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.area-card-head .link-button {
+  min-height: 32px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.area-card-head .link-button[aria-current="true"] {
+  font-weight: 700;
+}
+
+.area-load {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+  padding-top: var(--gap-2);
+  border-top: 1px solid var(--divider);
+}
+
+.area-load .link-button {
+  align-self: flex-start;
+  text-align: left;
+}
+
+/* The Notebook tab. It takes the shared panel look, these rules only add what is its own. */
+.notebook-panel p {
+  margin: 0;
+}
+
+.notebook-private {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-2);
+}
+
+.notebook-private svg {
+  flex: none;
+}
+
+.entry-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-2);
+}
+
+.notebook-side {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.notebook-panel li .link-button {
+  text-align: left;
+}
+
+.notebook-disclaimer {
+  font-style: italic;
+}
+
+/* A note keeps its own line breaks. */
+.notebook-note {
+  white-space: pre-wrap;
+}
+
+/* The log form under "Log this movement". */
+.log-form {
+  margin: 8px 0;
+}
+
+/* Why a save failed, right above the Save button. */
+.log-failure {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  overflow-wrap: anywhere;
+}
+
+.log-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.log-note textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  /* 16 px keeps phones from zooming in when the field gets focus. */
+  font-size: 1rem;
+  resize: vertical;
+}
+
+
+/* The printed notebook summary. It is hidden on screen and is the only thing that shows when printing. */
+.print-summary {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  html,
+  body,
+  #root {
+    height: auto;
+    overflow: visible;
+    background: #fff;
+    color: #000;
+  }
+
+  .app {
+    display: none;
+  }
+
+  .print-summary {
+    display: block;
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .print-summary table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .print-summary th,
+  .print-summary td {
+    border: 0.5pt solid #000;
+    padding: 2pt 4pt;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  /* Notes keep the line breaks the person typed. */
+  .print-summary td:last-child {
+    white-space: pre-wrap;
+  }
 }

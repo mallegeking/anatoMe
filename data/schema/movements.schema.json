@@ -11,7 +11,8 @@
       "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
       "dof": { "type": "string", "pattern": "^[a-z0-9-]+\\.[a-z0-9-]+$" },
       "direction": { "enum": ["positive", "negative"] },
-      "english": { "type": "string", "minLength": 1 }
+      "english": { "type": "string", "minLength": 1 },
+      "german": { "description": "The German name, from a source opened when it was written. The app shows the English name where it is missing.", "type": "string", "minLength": 1 }
     }
   }
 }

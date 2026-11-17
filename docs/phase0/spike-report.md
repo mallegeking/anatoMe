@@ -15,6 +15,7 @@ A browser app now loads the hip, lets you tap a structure to see its name, and r
 | Gate | Median of 3 runs interactive within 5000 ms on home Wi-Fi, and no stutter when rotating for 10 seconds |
 | Status | **Passed** (measured by the owner on 2026-11-03, results in `docs/phase0/phone-measurements.md`) |
 | Phone result | Firefox 159 on Android 14, 5 GHz Wi-Fi. Runs: 1489, 727 and 783 ms, median 783 ms. No stutter when rotating. 5 of 5 taps showed the right name. 5 of 5 empty-space taps cleared the name. Quick taps on a muscle kept it selected every time. |
+| Tap checks | The tap checks (sections 3 to 5 of the sheet) are in `docs/phase0/phone-measurements.md`. |
 | Provisional signal | Playwright pre-check, Chromium, 4x CPU throttle, 412 x 915 viewport, cache off, 5 runs |
 | Pre-check result | Median 1457 ms (an earlier run gave 1630 ms). All runs between 1375 and 1800 ms |
 | Desktop, no throttle | 0.5 to 1.4 s (the first run after a cold start was the slowest) |

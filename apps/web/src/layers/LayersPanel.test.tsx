@@ -10,9 +10,9 @@ const t = createT(en);
 afterEach(cleanup);
 
 const structures: BundleStructure[] = [
-  { id: "gluteus-maximus", type: "muscle", english: "Gluteus maximus", depth: 1 },
-  { id: "piriformis", type: "muscle", english: "Piriformis", depth: 2 },
-  { id: "femur", type: "bone", english: "Femur", depth: 4 },
+  { id: "gluteus-maximus", type: "muscle", english: "Gluteus maximus", depth: 1, paired: true },
+  { id: "piriformis", type: "muscle", english: "Piriformis", depth: 2, paired: true },
+  { id: "femur", type: "bone", english: "Femur", depth: 4, paired: true },
 ];
 
 const noop = () => {};
@@ -20,6 +20,7 @@ function show(state = initialLayers(), handlers: Partial<Parameters<typeof Layer
   render(
     <LayersPanel
       t={t}
+      lang="en"
       state={state}
       structures={structures}
       onPeel={noop}
@@ -33,12 +34,12 @@ function show(state = initialLayers(), handlers: Partial<Parameters<typeof Layer
 
 test("panel shows the peeled count and lists hidden structures with a show button", () => {
   const onShow = vi.fn();
-  show(hideStructure(peel(initialLayers(), structures), "piriformis"), { onShow });
+  show(hideStructure(peel(initialLayers(), structures), "piriformis", "l"), { onShow });
   expect(screen.getByText("1 layer peeled")).toBeTruthy();
   expect(screen.getByText("Hidden")).toBeTruthy();
-  expect(screen.getByText("Piriformis")).toBeTruthy();
+  expect(screen.getByText("Piriformis (left)")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: /Show/ }));
-  expect(onShow).toHaveBeenCalledWith("piriformis");
+  expect(onShow).toHaveBeenCalledWith("piriformis|l");
 });
 
 test("no hidden list when nothing is hidden by hand", () => {
@@ -65,7 +66,28 @@ test("tissue checkboxes reflect and toggle the state", () => {
 });
 
 test("peel is off when no visible muscle is left", () => {
-  const all = hideStructure(hideStructure(initialLayers(), "gluteus-maximus"), "piriformis");
+  let all = initialLayers();
+  for (const id of ["gluteus-maximus", "piriformis"]) for (const side of ["l", "r"] as const) all = hideStructure(all, id, side);
   show(all);
   expect((screen.getByRole("button", { name: "Peel a layer" }) as HTMLButtonElement).disabled).toBe(true);
+});
+
+test("a structure hidden on one side is listed with its side", () => {
+  const onShow = vi.fn();
+  show(hideStructure(initialLayers(), "piriformis", "l"), { onShow });
+  expect(screen.getByText("Piriformis (left)")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Show/ }));
+  expect(onShow).toHaveBeenCalledWith("piriformis|l");
+});
+
+test("with onClose a close button shows and calls it", () => {
+  const onClose = vi.fn();
+  show(initialLayers(), { onClose });
+  fireEvent.click(screen.getByRole("button", { name: en["layers.close"] }));
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test("without onClose there is no close button", () => {
+  show();
+  expect(screen.queryByRole("button", { name: en["layers.close"] })).toBeNull();
 });

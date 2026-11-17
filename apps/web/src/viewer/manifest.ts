@@ -1,6 +1,9 @@
 // Reads models/manifest.json, which lists the glb files for each body region.
 export type ManifestFile = { path: string; source: string; license: string };
 export type Manifest = { regions: Record<string, { files: ManifestFile[] }> };
+// What the app hands the viewer: the file URLs of the region, the error if the manifest could not be read,
+// or null while it is still loading.
+export type ModelFiles = { urls: string[] } | { error: unknown } | null;
 
 export async function loadManifest(url: string): Promise<Manifest> {
   const response = await fetch(url);
