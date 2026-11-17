@@ -16,6 +16,7 @@ These are the 3D model files in `models/`, where each one comes from, and its li
 
 | File | Source | License | What is in it |
 | --- | --- | --- | --- |
+| `models/body.glb` | BodyParts3D | CC BY 4.0 | The whole body: every BodyParts3D mesh of the six regions once, lighter (539 meshes). Used with hip-z-anatomy.glb. |
 | `models/hip.glb` | BodyParts3D | CC BY 4.0 | Hip region bones, muscles and the iliotibial tract (65 meshes) |
 | `models/hip-z-anatomy.glb` | Z-Anatomy | CC BY-SA 4.0 | Hip region ligaments, joint capsule, acetabular labrum and bursae, plus four knee ligaments and the two menisci (38 meshes) |
 | `models/lower-leg.glb` | BodyParts3D | CC BY 4.0 | Lower leg and foot bones, muscles and tendons, with the femur, tibia, fibula and patella (from the hip region) as context (128 meshes) |

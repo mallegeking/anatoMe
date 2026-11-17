@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { getBounds, NodeIO, type Document } from "@gltf-transform/core";
 import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
+import { WHOLE_BODY } from "./regions.ts";
 import type { StructureInfo, ValidationError, ValidationResult } from "./validate.ts";
 
 export type { ValidationResult };
@@ -19,6 +20,16 @@ export const ALLOWED_LICENSES = new Set(["CC-BY-4.0", "CC-BY-SA-4.0"]);
 
 // The license each mesh source publishes under. A file from one of these must carry exactly this one.
 export const SOURCE_LICENSES: Record<string, string> = { bp3d: "CC-BY-4.0", "z-anatomy": "CC-BY-SA-4.0" };
+
+// A region draws at most this many triangles. The whole body has its own, larger limit.
+export const REGION_TRIANGLE_BUDGET = 150_000;
+export const WHOLE_BODY_TRIANGLE_BUDGET = 240_000;
+// Largest distance between the bounding box centres of a whole body mesh and its region copy, in metres.
+export const MAX_BODY_SHIFT_M = 0.01;
+
+export function budgetFor(region: string): number {
+  return region === WHOLE_BODY ? WHOLE_BODY_TRIANGLE_BUDGET : REGION_TRIANGLE_BUDGET;
+}
 
 type ManifestFile = { path: string; source: string; license: string };
 type Manifest = { regions: Record<string, { files: ManifestFile[] }> };
@@ -55,6 +66,8 @@ export async function checkModelMapping(
 
   // The ids that at least one mesh carries, to find structures without a mesh afterwards.
   const meshed = new Set<string>();
+  // Every mesh by structure and side, in manifest order, for the whole body checks.
+  const drawn = new Map<string, { file: string; region: string; centre: number[] }[]>();
   for (const f of files) {
     const at = `regions.${f.region}`;
     if (!ALLOWED_LICENSES.has(f.license)) {
@@ -94,12 +107,20 @@ export async function checkModelMapping(
         errors.push({ file: f.path, path: name, message: `sid must be text, not ${JSON.stringify(sid)}` });
       }
       if (typeof sid === "string") meshed.add(sid);
+      if (typeof sid === "string" && typeof extras.side === "string") {
+        const { min, max } = getBounds(node);
+        const key = `${sid}|${extras.side}`;
+        const list = drawn.get(key) ?? [];
+        list.push({ file: f.path, region: f.region, centre: [0, 1, 2].map((i) => (min[i] + max[i]) / 2) });
+        drawn.set(key, list);
+      }
       const structure = typeof sid === "string" ? structures.get(sid) : undefined;
       if (typeof sid === "string" && sid !== "" && !structure) {
         errors.push({ file: f.path, path: name, message: `unknown structure id ${sid}` });
       }
       // A region may only draw structures that belong to it, at home or through also_in.
-      if (structure && !structure.regions.includes(f.region)) {
+      // The whole body draws structures of every region, so the rule does not apply to its files.
+      if (structure && f.region !== WHOLE_BODY && !structure.regions.includes(f.region)) {
         errors.push({ file: f.path, path: name, message: `${sid} belongs to ${structure.regions.join(" and ")}, not to ${f.region}` });
       }
       // The app shows the label and colours by kind, so both must agree with the knowledge base.
@@ -135,11 +156,46 @@ export async function checkModelMapping(
       }
     }
   }
+  if (files.some((f) => f.region === WHOLE_BODY)) checkWholeBody(drawn, errors);
   // The other direction: every structure in the data needs a mesh somewhere.
   for (const id of structures.keys()) {
     if (!meshed.has(id)) errors.push({ file: "manifest.json", path: id, message: `structure ${id} has no mesh in any file` });
   }
   return { ok: errors.length === 0, errors };
+}
+
+// The whole body draws each structure and side once, draws what the regions draw and nothing else,
+// and each of its meshes lies where the first region copy lies (the body is never its own copy).
+function checkWholeBody(
+  drawn: Map<string, { file: string; region: string; centre: number[] }[]>,
+  errors: ValidationError[],
+) {
+  for (const [key, list] of drawn) {
+    const [sid, side] = key.split("|");
+    const name = `${sid} side ${side === "" ? "midline" : side}`;
+    const inBody = list.filter((m) => m.region === WHOLE_BODY);
+    const copy = list.find((m) => m.region !== WHOLE_BODY);
+    if (inBody.length > 1) {
+      errors.push({ file: inBody[1].file, path: sid, message: `${name} is drawn twice in the whole body` });
+    }
+    if (inBody.length === 0 && copy) {
+      errors.push({ file: "manifest.json", path: sid, message: `${name} is in ${copy.region} but not in the whole body` });
+    }
+    if (inBody.length > 0 && !copy) {
+      errors.push({ file: inBody[0].file, path: sid, message: `${name} is in the whole body but in no region` });
+    }
+    if (inBody.length > 0 && copy) {
+      const c = inBody[0].centre;
+      const shift = Math.hypot(c[0] - copy.centre[0], c[1] - copy.centre[1], c[2] - copy.centre[2]);
+      if (shift > MAX_BODY_SHIFT_M) {
+        errors.push({
+          file: inBody[0].file,
+          path: sid,
+          message: `${name} lies ${(shift * 1000).toFixed(1)} mm from its copy in ${copy.file}, more than ${MAX_BODY_SHIFT_M * 1000} mm`,
+        });
+      }
+    }
+  }
 }
 
 export async function modelStats(file: string): Promise<{ meshes: number; triangles: number; bytes: number; size: [number, number, number] }> {

@@ -8,6 +8,8 @@ https://creativecommons.org/licenses/by-sa/4.0/
 
 For the hip: hip.glb is based on BodyParts3D (CC BY 4.0) and hip-z-anatomy.glb is based on Z-Anatomy (CC BY-SA 4.0).
 
+For the whole body: body.glb is based on BodyParts3D (CC BY 4.0) and is shown together with hip-z-anatomy.glb, which is based on Z-Anatomy (CC BY-SA 4.0).
+
 For the other regions: lower-leg.glb, shoulder.glb, arm.glb, neck.glb and trunk.glb are based on BodyParts3D (CC BY 4.0).
 
 The required credit text for each source is in ATTRIBUTION.md at the root of this repository.

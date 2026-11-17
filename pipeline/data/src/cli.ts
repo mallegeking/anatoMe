@@ -9,13 +9,10 @@
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { bundleRegions, compileRegion } from "./compile.ts";
-import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
+import { budgetFor, checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
 import { markChecked } from "./markChecked.ts";
 import { coverage, formatReport } from "./report.ts";
 import { loadStructures, validateDataDir, type ValidationResult } from "./validate.ts";
-
-// The most triangles one region may have, so it stays smooth on a phone.
-const TRIANGLE_BUDGET = 150_000;
 
 function report(result: ValidationResult): number {
   for (const e of result.errors) console.error(`${e.file} ${e.path}: ${e.message}`);
@@ -44,8 +41,8 @@ async function main(args: string[]): Promise<number> {
     }
     let code = 0;
     for (const [region, triangles] of totals) {
-      const over = triangles > TRIANGLE_BUDGET;
-      console.log(`region ${region}: ${triangles} triangles (budget ${TRIANGLE_BUDGET})${over ? " OVER BUDGET" : ""}`);
+      const over = triangles > budgetFor(region);
+      console.log(`region ${region}: ${triangles} triangles (budget ${budgetFor(region)})${over ? " OVER BUDGET" : ""}`);
       if (over) code = 1;
     }
     if (code === 0) console.log(`every mesh maps to one of ${structures.size} structures`);

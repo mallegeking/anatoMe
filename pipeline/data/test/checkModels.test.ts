@@ -5,7 +5,7 @@ import { Document, NodeIO } from "@gltf-transform/core";
 import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
 import { afterAll, expect, test } from "vitest";
-import { checkModelMapping, modelStats, type ValidationResult } from "../src/checkModels.ts";
+import { budgetFor, checkModelMapping, modelStats, type ValidationResult } from "../src/checkModels.ts";
 
 type Extras = Record<string, unknown>;
 const BASE: Extras = { sid: "femur", label: "Femur", side: "l", kind: "bone", source: "bp3d" };
@@ -214,4 +214,79 @@ test("a mesh with side r whose centre lies at x < 0 passes", async () => {
   const result = await checkModelMapping(d, femur);
   expect(result.errors).toEqual([]);
   expect(result.ok).toBe(true);
+});
+
+// A models folder whose manifest lists several regions. Each file is a glb with one mesh per
+// entry. A file entry is [path, meshes, x], x is where the triangle starts (default 2, so
+// every left mesh lies on the left).
+type FileSpec = [string, Extras[], number?];
+async function multiDir(regions: Record<string, FileSpec[]>) {
+  const d = mkdtempSync(join(tmpdir(), "anatome-models-"));
+  made.push(d);
+  const manifest: Record<string, { files: { path: string; source: string; license: string }[] }> = {};
+  for (const [region, files] of Object.entries(regions)) {
+    manifest[region] = { files: files.map(([path]) => ({ path, source: "bp3d", license: "CC-BY-4.0" })) };
+    for (const [path, meshes, x] of files) await writeGlb(join(d, path), meshes, x ?? 2);
+  }
+  writeFileSync(join(d, "manifest.json"), JSON.stringify({ regions: manifest }));
+  return d;
+}
+const bones = new Map([
+  ["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip"] }],
+  ["tibia", { type: "bone", english: "Tibia", midline: false, regions: ["hip"] }],
+  ["sacrum", { type: "bone", english: "Sacrum", midline: true, regions: ["hip"] }],
+]);
+const tibia = { sid: "tibia", label: "Tibia" };
+const sacrum = { sid: "sacrum", label: "Sacrum", side: "" };
+
+test("the whole body may draw a structure of any region", async () => {
+  const d = await multiDir({ hip: [["hip.glb", [{ sid: "femur" }]]], body: [["body.glb", [{ sid: "femur" }]]] });
+  const result = await checkModelMapping(d, new Map([bones.entries().next().value!]));
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
+});
+test("a structure drawn twice in the whole body fails", async () => {
+  const d = await multiDir({
+    hip: [["hip.glb", [{ sid: "femur" }]]],
+    body: [["a.glb", [{ sid: "femur" }]], ["b.glb", [{ sid: "femur" }]]],
+  });
+  expectError(await checkModelMapping(d, bones), /femur side l is drawn twice in the whole body/);
+});
+test("a structure a region draws but the whole body does not fails", async () => {
+  const d = await multiDir({ hip: [["hip.glb", [{ sid: "femur" }, tibia]]], body: [["body.glb", [{ sid: "femur" }]]] });
+  expectError(await checkModelMapping(d, bones), /tibia side l is in hip but not in the whole body/);
+});
+test("a structure the whole body draws but no region draws fails", async () => {
+  const d = await multiDir({ hip: [["hip.glb", [{ sid: "femur" }]]], body: [["body.glb", [{ sid: "femur" }, tibia]]] });
+  expectError(await checkModelMapping(d, bones), /tibia side l is in the whole body but in no region/);
+});
+test("a whole body mesh more than 10 mm from its region copy fails", async () => {
+  const d = await multiDir({ hip: [["hip.glb", [{ sid: "femur" }]]], body: [["body.glb", [{ sid: "femur" }], 2.02]] });
+  expectError(await checkModelMapping(d, bones), /femur side l lies 20\.0 mm from its copy in hip\.glb, more than 10 mm/);
+});
+test("a whole body mesh 5 mm from its region copy passes", async () => {
+  const d = await multiDir({ hip: [["hip.glb", [{ sid: "femur" }]]], body: [["body.glb", [{ sid: "femur" }], 2.005]] });
+  const result = await checkModelMapping(d, new Map([bones.entries().next().value!]));
+  expect(result.errors).toEqual([]);
+});
+test("a midline structure is named midline in these messages", async () => {
+  const d = await multiDir({
+    hip: [["hip.glb", [sacrum]]],
+    body: [["a.glb", [sacrum]], ["b.glb", [sacrum]]],
+  });
+  expectError(await checkModelMapping(d, bones), /sacrum side midline is drawn twice in the whole body/);
+});
+test("the body is compared with the first other region that has the structure, wherever body sits", async () => {
+  const d = await multiDir({
+    body: [["body.glb", [{ sid: "femur" }], 2.005]],
+    hip: [["hip.glb", [{ sid: "femur" }]]],
+    "lower-leg": [["lower-leg.glb", [{ sid: "femur" }], 2.5]],
+  });
+  const structures = new Map([["femur", { type: "bone", english: "Femur", midline: false, regions: ["hip", "lower-leg"] }]]);
+  const result = await checkModelMapping(d, structures);
+  expect(result.errors).toEqual([]);
+});
+test("budgetFor", () => {
+  expect(budgetFor("body")).toBe(240_000);
+  for (const r of ["hip", "lower-leg", "shoulder", "arm", "neck", "trunk"]) expect(budgetFor(r)).toBe(150_000);
 });
