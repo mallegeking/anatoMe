@@ -130,16 +130,33 @@ for (const { lang, texts } of LANGUAGES) {
         expect(nav.y).toBeGreaterThanOrEqual(tabpanel.y + tabpanel.height);
         await expect(page.getByTestId("layers-panel")).toHaveCount(0);
 
+        // Three structures hidden one by one fill the Layers list, so it needs more room than the sheet has.
+        for (const name of ["Piriformis", "Gluteus maximus", "Femur"]) {
+          await searchAndChoose(page, texts, name);
+          const info = page.getByTestId("info-panel");
+          await expect(info.getByRole("heading", { name, level: 2 })).toBeVisible();
+          await info.getByRole("button", { name: texts["info.hideShort"], exact: true }).click();
+        }
+
         // Layers opens in the sheet with its controls and the educational line, and the model keeps its room.
         await page.getByRole("button", { name: texts["layers.open"] }).click();
         const layers = page.getByTestId("layers-panel");
         await expect(layers).toBeVisible();
         await expect(layers.getByRole("button", { name: texts["layers.peel"] })).toBeVisible();
         await expect(layers.getByRole("button", { name: texts["layers.restore"] })).toBeVisible();
+        await expect(layers.getByRole("listitem")).toHaveCount(3);
         const educational = page.locator(".panel").getByText(texts["about.educational"]);
         await expect(educational).toBeVisible();
         const slot = (await page.locator(".layers-slot").boundingBox())!;
-        expect(overlaps(slot, (await educational.boundingBox())!)).toBe(false);
+        const line = (await educational.boundingBox())!;
+        expect(overlaps(slot, line)).toBe(false);
+        // The whole line shows: its box lies inside the panel, which cuts off what sticks out, and inside the screen.
+        const panel = (await page.locator(".panel").boundingBox())!;
+        const viewport = page.viewportSize()!;
+        expect(line.y, "line top in the panel").toBeGreaterThanOrEqual(panel.y - 0.5);
+        expect(line.y + line.height, "line bottom in the panel").toBeLessThanOrEqual(panel.y + panel.height + 0.5);
+        expect(line.y, "line top on the screen").toBeGreaterThanOrEqual(0);
+        expect(line.y + line.height, "line bottom on the screen").toBeLessThanOrEqual(viewport.height);
         expect(await stageHeight(page)).toBeGreaterThanOrEqual(STAGE_MIN);
         expect(await layoutProblems(page)).toEqual([]);
       }

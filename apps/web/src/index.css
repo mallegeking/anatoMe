@@ -539,11 +539,22 @@ body,
   padding: 8px 16px;
 }
 
+/* With Layers open on a phone the panel below it holds only the educational line, which must show whole.
+   So the panel keeps its height and the Layers slot is the part that gives up room and scrolls. */
+.side .layers-slot + .panel {
+  flex-shrink: 0;
+}
+
 @media (min-width: 900px) {
   .layers-slot {
     flex: 0 0 auto;
     max-height: 45%;
     border-bottom: 1px solid var(--divider);
+  }
+
+  /* On a wide screen the tab panel below Layers is the part that takes the rest of the column. */
+  .side .layers-slot + .panel {
+    flex-shrink: 1;
   }
 }
 
