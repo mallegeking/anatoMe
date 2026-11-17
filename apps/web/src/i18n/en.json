@@ -19,6 +19,7 @@
   "about.version": "Version {version}",
   "about.source": "Source code",
   "about.report": "Report a mistake in the data",
+  "about.separator": " · ",
   "lang.label": "Language",
   "lang.en": "English",
   "lang.de": "Deutsch",

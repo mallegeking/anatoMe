@@ -19,6 +19,7 @@
   "about.version": "Version {version}",
   "about.source": "Quellcode",
   "about.report": "Einen Fehler in den Daten melden",
+  "about.separator": " · ",
   "lang.label": "Sprache",
   "lang.en": "English",
   "lang.de": "Deutsch",

@@ -29,7 +29,7 @@ Notes you write in the Notebook stay in your browser on this device. The app nev
 
 ## How the data is checked
 
-Every claim in the app is a row that cites a published source. A row only shows after a person has checked it, a physiotherapist for movement rows and the owner for attachment rows. Unchecked rows never reach the normal build, and a test fails the build if one does. A separate review build shows them as drafts for the checkers, and it is never published. See [docs/deploy-homelab.md](docs/deploy-homelab.md).
+Every claim in the app is a row that cites a published source. A row only shows after a person has checked it, a physiotherapist for movement rows and the owner for attachment rows. Unchecked rows never reach the normal build, and a test fails the build if one does. The checkers see them as drafts in a separate review build that is never published, see [docs/deploy-homelab.md](docs/deploy-homelab.md).
 
 ## How to run it
 

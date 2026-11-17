@@ -46,6 +46,12 @@ test("the credits show the version and the two links", () => {
   expect(report.getAttribute("rel")).toBe("noopener noreferrer");
 });
 
+test("the separator between the two links comes from en.json", () => {
+  render(<Credits t={createT({ ...en, "about.separator": " | " })} lang="en" onLang={() => {}} />);
+  const links = screen.getByRole("link", { name: "Source code" }).parentElement!;
+  expect(links.textContent).toBe("Source code | Report a mistake in the data");
+});
+
 test("the language switch reports the choice", () => {
   const onLang = vi.fn();
   render(<Credits t={createT(en)} lang="en" onLang={onLang} />);

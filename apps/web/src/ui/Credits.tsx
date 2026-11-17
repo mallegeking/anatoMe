@@ -65,7 +65,7 @@ export function Credits({ t, lang, onLang }: { t: Translate; lang: Lang; onLang:
         <p>{t("about.version", { version: __APP_VERSION__ })}</p>
         <p>
           <a href={REPO_URL} target="_blank" rel="noopener noreferrer">{t("about.source")}</a>
-          {" · "}
+          {t("about.separator")}
           <a href={CORRECTION_URL} target="_blank" rel="noopener noreferrer">{t("about.report")}</a>
         </p>
       </details>
