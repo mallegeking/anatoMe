@@ -77,7 +77,14 @@ export function LogForm({ t, onSave, onCancel, saving = false, failure = null, o
         </p>
       )}
       <div className="panel-actions">
-        <button className="btn btn--primary" type="button" disabled={!feeling || !side || saving} onClick={() => feeling && side && onSave({ feeling, side, note })}>
+        {/* During a save the button only says it is off. A real disabled would drop the keyboard focus. */}
+        <button
+          className="btn btn--primary"
+          type="button"
+          disabled={!feeling || !side}
+          aria-disabled={saving}
+          onClick={() => !saving && feeling && side && onSave({ feeling, side, note })}
+        >
           {t("notebook.save")}
         </button>
         <button className="btn" type="button" disabled={saving} onClick={onCancel}>

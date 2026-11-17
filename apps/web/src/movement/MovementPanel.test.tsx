@@ -313,16 +313,21 @@ test("while a save is under way, Save and Cancel wait and the note stays", async
   let finish: (failure: LogFailure | null) => void = () => {};
   show(makeMovementBundle(), { onLog: vi.fn(() => new Promise<LogFailure | null>((resolve) => (finish = resolve))) });
   await fillForm("sharp pain");
-  pick(en["notebook.save"]);
   const save = screen.getByRole("button", { name: en["notebook.save"] }) as HTMLButtonElement;
   const cancel = screen.getByRole("button", { name: en["notebook.cancel"] }) as HTMLButtonElement;
-  expect(save.disabled).toBe(true);
+  save.focus();
+  fireEvent.click(save);
+  // Save says it is off but is not really disabled, so a keyboard user keeps the focus on it. Cancel is off.
+  expect(save.getAttribute("aria-disabled")).toBe("true");
+  expect(save.disabled).toBe(false);
+  expect(document.activeElement).toBe(save);
   expect(cancel.disabled).toBe(true);
   expect(logForm().getAttribute("aria-busy")).toBe("true");
   fireEvent.click(cancel);
   expect(note()).toBe("sharp pain");
   // The save fails, so both buttons work again and the note is still there to save.
   await act(async () => finish("notebook.saveFailed"));
+  expect(save.getAttribute("aria-disabled")).toBe("false");
   expect(save.disabled).toBe(false);
   expect(cancel.disabled).toBe(false);
   expect(logForm().getAttribute("aria-busy")).toBe("false");

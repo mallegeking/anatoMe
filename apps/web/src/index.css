@@ -450,7 +450,9 @@ body,
   font: inherit;
 }
 
-.btn:disabled {
+/* aria-disabled: a button that is off for a moment but keeps the keyboard focus, like Save during a save. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
   opacity: 0.5;
 }
 
