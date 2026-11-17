@@ -1,5 +1,6 @@
 # One movement per direction of each degree of freedom in joints.yaml.
 # German names from the articles Hüftgelenk and Kniegelenk in German Wikipedia and DocCheck Flexikon and the DocCheck Flexikon articles Abduktion and Adduktion, read on 2026-11-14. german is left out where no opened source gave one.
+# Each German name with the page it is on and the date the page was read: docs/phase4/german-names.md.
 - {id: hip-flexion, dof: hip.flexion, direction: positive, english: Hip flexion, german: Beugung im Hüftgelenk}
 - {id: hip-extension, dof: hip.flexion, direction: negative, english: Hip extension, german: Streckung im Hüftgelenk}
 - {id: hip-abduction, dof: hip.abduction, direction: positive, english: Hip abduction, german: Abspreizen im Hüftgelenk}

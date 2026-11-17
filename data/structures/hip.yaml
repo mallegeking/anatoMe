@@ -13,6 +13,7 @@
 # gap.<value> from the language file. The quadriceps share a tendon that has no mesh, and the
 # vertebrae are not modelled, so psoas major has no origin.
 # German names from DocCheck Flexikon and German Wikipedia, one article per structure or the hip, knee and meniscus articles, read on 2026-11-14. german is left out where no opened source gave one.
+# Each German name with the page it is on and the date the page was read: docs/phase4/german-names.md.
 # also_in lists the other regions that draw this bone too.
 - {id: hip-bone, type: bone, english: Hip bone, german: Hüftbein, latin: Os coxae, fma: "FMA16585", region: hip, also_in: [trunk], depth: 4}
 - {id: sacrum, type: bone, english: Sacrum, german: Kreuzbein, latin: Os sacrum, fma: "FMA16202", region: hip, also_in: [trunk], depth: 4, midline: true}
