@@ -1,4 +1,5 @@
 """Tests for region_gen.py. Run with: .venv/bin/pytest pipeline/assets/tests -q"""
+import json
 import re
 import sys
 from pathlib import Path
@@ -9,6 +10,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from region_gen import (  # noqa: E402
+    BODY_PARTS,
     BONE,
     CONTEXT,
     MUSCLE,
@@ -22,6 +24,8 @@ from region_gen import (  # noqa: E402
     strip_side,
     write_structures,
 )
+
+REGIONS = Path(__file__).resolve().parent.parent / "regions"
 
 HIP_BONES = ["femur", "tibia", "fibula", "patella", "sacrum", "hip-bone"]
 
@@ -228,3 +232,32 @@ def test_body_targets_stops_on_a_conflict():
     other = {**femur, "patterns": ["^left femur bone$"]}
     with pytest.raises(SystemExit, match="femur"):
         body_targets([("hip", [femur]), ("lower-leg", [other])])
+
+
+def rebuilt_body_targets():
+    """The body target list rebuilt in memory from the six current region files."""
+    parts = [(p, json.loads((REGIONS / f"{p}.json").read_text(encoding="utf-8"))["targets"]) for p in BODY_PARTS]
+    return body_targets(parts)
+
+
+def body_file_problems(body):
+    """What is wrong with a body.json, as a list of words. Empty when it matches the six region files."""
+    problems = []
+    if body["targets"] != rebuilt_body_targets():
+        problems.append("targets")
+    if (body["max_triangles_per_mesh"], body["max_triangles_per_bone_mesh"]) != (400, 1000):
+        problems.append("caps")
+    return problems
+
+
+def test_committed_body_json_matches_the_six_region_files():
+    body = json.loads((REGIONS / "body.json").read_text(encoding="utf-8"))
+    assert body_file_problems(body) == []
+
+
+def test_a_stale_body_json_is_caught(tmp_path):
+    body = json.loads((REGIONS / "body.json").read_text(encoding="utf-8"))
+    stale = {**body, "targets": body["targets"][:-1]}
+    (tmp_path / "body.json").write_text(json.dumps(stale), encoding="utf-8")
+    assert body_file_problems(json.loads((tmp_path / "body.json").read_text(encoding="utf-8"))) == ["targets"]
+    assert body_file_problems({**body, "max_triangles_per_mesh": 500}) == ["caps"]

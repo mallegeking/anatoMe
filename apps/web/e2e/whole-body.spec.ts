@@ -105,6 +105,9 @@ async function openArea(page: Page) {
   return (await page.locator(".stage").boundingBox())!;
 }
 
+// The names as the list wrote them, side words included, from the last call of listedRegions.
+let lastLabels: string[] = [];
+
 // The home region of each entry in the Under a spot list, in the list's order. A name without a home fails the test.
 async function listedRegions(page: Page): Promise<string[]> {
   const items = page.getByTestId("area-panel").getByRole("listitem");
@@ -113,7 +116,9 @@ async function listedRegions(page: Page): Promise<string[]> {
   // A paired structure shows as "<name> (left)" or "<name> (right)", so the side's words come off.
   const sideWords = [texts["side.left"], texts["side.right"]].map((text) => text.replace("{label}", ""));
   const nameOf = (label: string) => sideWords.reduce((name, words) => (name.endsWith(words) ? name.slice(0, -words.length) : name), label);
-  const names = (await items.locator(".area-card-head button").allTextContents()).map(nameOf);
+  const labels = await items.locator(".area-card-head button").allTextContents();
+  lastLabels = labels;
+  const names = labels.map(nameOf);
   return names.map((name) => {
     expect(homes.has(name), `${name} is in the test data`).toBe(true);
     return homes.get(name)!;
@@ -131,6 +136,9 @@ test("Under a spot: a tap on the trunk lists what lies under it", async ({ page 
   expect(regions.length).toBeGreaterThanOrEqual(1);
   expect(["trunk", "shoulder"]).toContain(regions[0]);
   expect(regions).not.toContain("arm");
+  // Front view: screen right is the body's left, so no entry may be a right-side structure.
+  const rightWords = texts["side.right"].replace("{label}", "");
+  expect(lastLabels.filter((label) => label.endsWith(rightWords))).toEqual([]);
 });
 
 test("Under a spot: a tap on an arm beside the trunk", async ({ page }) => {
@@ -151,6 +159,9 @@ test("Under a spot: a tap on an arm beside the trunk", async ({ page }) => {
 
   const regions = await listedRegions(page);
   expect(["arm", "shoulder"]).toContain(regions[0]);
+  // The right upper arm was tapped, so no entry may be a left-side structure.
+  const leftWords = texts["side.left"].replace("{label}", "");
+  expect(lastLabels.filter((label) => label.endsWith(leftWords))).toEqual([]);
 });
 
 test("peeling a layer in the whole body", async ({ page }) => {

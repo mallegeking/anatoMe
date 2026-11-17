@@ -6,7 +6,7 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 // The data comes from the test-only set in e2e/data (see scripts/e2e-prepare.mjs).
 
 // Opens the app and waits until the model is drawn and the camera has said where it looks from.
-async function openModel(page: Page, path = "/") {
+async function openModel(page: Page, path: string) {
   await page.goto(path);
   // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
   await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });

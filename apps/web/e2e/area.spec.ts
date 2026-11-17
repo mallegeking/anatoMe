@@ -21,9 +21,9 @@ test("tap a spot and read what lies under it", async ({ page, baseURL }) => {
 
   const canvas = page.locator("canvas");
   const box = (await canvas.boundingBox())!;
-  // The middle of the canvas is the gap between the two legs, because the model runs from the ankles
-  // to the top of psoas major. So tap the right thigh, placed from the middle in canvas heights
-  // (the model scales with the canvas height and stays centred).
+  // The app opens with the whole body, which stands in the middle of the canvas and scales with its height.
+  // A little left of the middle (screen left is the body's right) at half the canvas height lands on the right
+  // thigh, so the list starts with rectus femoris. The tap is placed from the middle in canvas heights.
   await canvas.click({ position: { x: box.width / 2 - 0.065 * box.height, y: box.height / 2 } });
 
   const panel = page.getByTestId("area-panel");

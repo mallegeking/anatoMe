@@ -2,7 +2,7 @@
 
 Phase 4b added five regions to the hip: lower leg and foot, shoulder, arm and hand, head and neck, and trunk. Their meshes come from BodyParts3D release 4.0 only, so every model file stays CC BY 4.0. This page lists what is missing, what was left out on purpose, and what it would take to fill each gap. The design is in `docs/superpowers/specs/2026-11-15-whole-body-meshes-design.md`.
 
-Each region shows one line about its gaps in the app while nothing is selected. The texts are `regionGap.<region>` in `apps/web/src/i18n/en.json`.
+Each region shows one line about its gaps in the app while nothing is selected. The whole body shows the regions' lines as a list (see its own section further down). The texts are `regionGap.<region>` in `apps/web/src/i18n/en.json`.
 
 ## What is true for every new region
 
