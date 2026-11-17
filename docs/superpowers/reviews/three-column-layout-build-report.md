@@ -130,6 +130,8 @@ A review of the whole branch (`9dec91e..8b37ec6`) found five defects a user woul
 
 After the fixes: `npm test -w apps/web` 47 files and 558 tests pass, `npm run build` passes, `npm run e2e -w apps/web -- --trace off` 41 passed and 8 skipped, `node scripts/check-no-drafts.mjs` and `node apps/web/scripts/error-check.mjs` pass.
 
+After the fixes, one more review read only the fix commits. It found all seven fixed and nothing important broken by them. It noted one small thing that is not fixed: a failed save is now reported only inside the log form. If the person leaves the Movements tab or picks another movement while a save is still running and that save then fails, no message is shown. Before the fix the notice at the top of the panel would still have said so.
+
 ## Not verified
 
 - A real phone. All phone checks ran in Chromium with a phone-sized window and touch emulation. Touch drag, pinch, the on-screen keyboard and the browser's address bar changing the height are untested.
@@ -163,7 +165,7 @@ Minor findings from the task reviews, left alone on purpose. One line each.
 **Task 4**
 - `AppDialog` unmounts on close and never calls `dialog.close()`, so focus may not return to the opener for keyboard users. Fixed in the final review (F4).
 - The test "not inside a details element" in `Credits.test.tsx` is now empty of meaning.
-- The `close()` stub in `test-setup.ts` is unused.
+- The `close()` stub in `test-setup.ts` was unused when this was noted. The F4 fix now calls `dialog.close()`, so the stub is used.
 - An orphaned "Big enough for a thumb" comment in `index.css`.
 - The `setDialog(null)` effect on `[wide]` also runs on mount.
 
