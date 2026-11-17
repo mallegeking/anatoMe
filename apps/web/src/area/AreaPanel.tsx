@@ -31,7 +31,13 @@ function centimetres(depth: number): string {
 
 // Lists what the model has under the tapped spot, from the surface inwards.
 export function AreaPanel({ t, lang, bundle, area, selection, onFocusStructure, onOpenMovement, onClear }: Props) {
-  if (!area) return <p className="info-label info-label--hint">{t("area.hint")}</p>;
+  // Nothing tapped yet: the same empty state as the Structures panel.
+  if (!area)
+    return (
+      <div className="panel-body">
+        <h2 className="panel-title">{t("area.hint")}</h2>
+      </div>
+    );
   const { through } = area;
   const structureName = (sid: string) => {
     const structure = bundle.structures.find((s) => s.id === sid);

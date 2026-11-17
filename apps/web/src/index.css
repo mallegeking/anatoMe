@@ -126,18 +126,6 @@ body,
   overflow-y: auto;
 }
 
-.info-label {
-  margin: 0 0 8px;
-  font-size: 1.125rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.info-label--hint {
-  font-weight: 400;
-  color: var(--muted);
-}
-
 .credits {
   font-size: 0.8125rem;
   color: var(--muted);

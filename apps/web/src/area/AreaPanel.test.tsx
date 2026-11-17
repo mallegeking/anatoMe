@@ -44,6 +44,13 @@ test("with no tap it shows only the hint", () => {
   expect(screen.queryByRole("list")).toBeNull();
 });
 
+test("the hint is a panel title in a panel body, like the other empty states", () => {
+  show({ area: null });
+  const heading = screen.getByRole("heading", { name: en["area.hint"], level: 2 });
+  expect(heading.classList.contains("panel-title")).toBe(true);
+  expect(heading.parentElement!.classList.contains("panel-body")).toBe(true);
+});
+
 test("lists the entries in order with side, type and depth", () => {
   show();
   const items = within(screen.getByRole("list")).getAllByRole("listitem", {}).filter((li) => li.parentElement?.tagName === "OL");
