@@ -4,7 +4,7 @@ import type { Translate } from "../i18n/t";
 import { formatAngles } from "./angles";
 import { formatDate } from "./dates";
 import { CandidateNotes, candidateText, entryName, ruledOutText } from "./NotebookPanel";
-import type { SummaryModel } from "./summary";
+import type { SummaryModel } from "./summaryModel";
 import type { NotebookEntry } from "./types";
 
 // The one-page summary. It is hidden on screen and is the only thing the print layout shows.
