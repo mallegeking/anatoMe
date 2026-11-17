@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { QUOTABLE, validateDataDir, type ValidationResult } from "../src/validate.ts";
+import { loadStructures, QUOTABLE, validateDataDir, type ValidationResult } from "../src/validate.ts";
 
 // Each case is a small data folder under test/fixtures.
 const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
@@ -93,10 +93,25 @@ test("a quote from a source with licence id other is refused", () =>
 test("a summary of a non-commercial source is fine", () => expect(validateDataDir(fx("summary-from-nc-source")).ok).toBe(true));
 test("a citation without license_id is refused", () => expectError(fx("no-license-id"), /citations\.yaml \/0: license_id is required/));
 test("the real data has no quote from an incompatible source", () => expect(validateDataDir(realDataDir).ok).toBe(true));
+test("a licence text that names non-commercial cannot have a quotable license_id", () =>
+  expectError(
+    fx("licence-text-nc-id-quotable"),
+    /^citations\.yaml \/1\/license_id: license says CC BY-NC 4\.0 but license_id CC-BY-4\.0 allows quotes\. Pick the id that matches the licence$/,
+  ));
+test("the real data has no licence text that disagrees with a quotable license_id", () => {
+  const result = validateDataDir(realDataDir);
+  expect(result.errors.filter((e) => e.path.endsWith("/license_id"))).toEqual([]);
+  expect(result.ok).toBe(true);
+});
 test("the quotable licences are the six that fit CC BY 4.0", () =>
   expect([...QUOTABLE].sort()).toEqual(["CC-BY-2.0", "CC-BY-3.0", "CC-BY-4.0", "CC-BY-unversioned", "CC0-1.0", "public-domain"]));
 
 test("the multi-region fixture passes", () => expect(validateDataDir(fx("multi-region")).ok).toBe(true));
+test("loadStructures gives each structure its home region first, then also_in", () => {
+  const structures = loadStructures(fx("multi-region"));
+  expect(structures.get("tibia")?.regions).toEqual(["hip", "lower-leg"]);
+  expect(structures.get("talus")?.regions).toEqual(["lower-leg"]);
+});
 test("also_in must name a region some structure has as its home", () => expectError(fx("also-in-ghost"), /unknown region ghost/));
 test("also_in must not repeat the home region", () => expectError(fx("also-in-home"), /also_in repeats the home region hip/));
 test("a joint's region must be a known region", () => expectError(fx("joint-bad-region"), /unknown region ghost/));

@@ -26,7 +26,7 @@ Content searches looked at added and removed lines of `git log --all -p -U0`, co
 ## Result in short
 
 - Real findings (a key, token, password, real hostname, real address, e-mail address in file content, or a file that should never have been committed): 0.
-- Doubtful items for the owner to judge: 7 (D1 to D7 below).
+- Doubtful items for the owner to judge: 8 (D1 to D8 below). D8 was added by the re-run of 2026-11-17.
 - Nothing needs to be rotated.
 
 ## Harmless hits
@@ -45,7 +45,7 @@ Content searches looked at added and removed lines of `git log --all -p -U0`, co
 | `secret` | 1 | Pattern list |
 | `token` | 11 | Pattern list (2) and package lock file entries (9) |
 | E-mail addresses in file content | 0 | Co-author lines exist only in commit messages, with the model vendor's no-reply address |
-| Home paths | 0 | |
+| Home paths | 2 real, in commit-files ed43141 and 8b37ec6, plus the pattern list in this file (commit 7d94a5c) | Not harmless. The first run of 2026-11-14 said 0 here, which was wrong. See D7, D8 and "Re-run of the home-path searches" below |
 | Health words, broad pass | 397 lines in 130 commit-files | Product vocabulary: the physio reviewer role, the symptom notebook, UI labels, test data, schema fields |
 | First-person health phrases | about 25 lines | A feature name and UI or test strings written for a generic user, not the owner's notes |
 | `checked_by` values | 134 values, 130 empty, 4 set | The 4 are generic role placeholders in end-to-end test data (commits 6bdae8b and a21ab01) |
@@ -54,7 +54,7 @@ Content searches looked at added and removed lines of `git log --all -p -U0`, co
 
 ## Findings
 
-No real finding. Seven doubtful items are open. None of them is a secret. Each one may matter only for the owner's privacy. All seven are open, and the owner decides what to do with each: leave it, rewrite history, or start the public repo from a fresh commit. Nothing was changed.
+No real finding. Eight doubtful items are open. None of them is a secret. Each one may matter only for the owner's privacy. All eight are open, and the owner decides what to do with each: leave it, rewrite history, or start the public repo from a fresh commit. Nothing was changed.
 
 - **D1.** Commit 769fb8d, file `docs/superpowers/specs/2026-11-02-anatome-design.md` (first written there, still in later edits such as 63dfd00, 3c46bf4 and ab155a0, and at the tip). Kind: the owner's online handle written as an at-mention in the header. It may matter because on GitHub an at-mention in a public file links to whoever owns that handle. Check that this is the account the owner wants linked.
 - **D2.** Same file, same commit and later versions, at the tip. Kind: statements about the owner's own pain. The motivation paragraph names pain in three body regions, which is the allowed general statement. The decision table, the roadmap and the success paragraph repeat which joints hurt and what the owner would choose to move. It may matter because it goes beyond the single general statement.
@@ -64,7 +64,24 @@ No real finding. Seven doubtful items are open. None of them is a secret. Each o
 - **D6.** Commits edb5979, 3eeeeed and 396d1c9. Kind: an author name that reads like a computer name, a device name leaking through the git config. It is in history only, not in the tip contents. It may matter because it exposes a name of the owner's home machine.
 - **D7.** Commit ed43141, file `docs/phase3/licence-recheck.md`. Kind: a local home folder path, with the local user name in it, in seven library rows. Commit bceabaa fixed it in the file, but it is still in the history of this branch. Found by the final review after the audit ran. It may matter because it exposes the owner's local user name.
 
-D1, D5, D6 and D7 can only be fixed by rewriting history (an author mapping, and replacing the spec text from commit 769fb8d onward). D2, D3 and D4 can also be fixed by editing the files for the future, but the old text would stay in history.
+- **D8.** Commit 8b37ec6, file `docs/superpowers/reviews/three-column-layout-build-report.md`, on the origin branch `claude/nifty-sagan-c57kd7` only. Kind: a local home folder path, with the local user name in it, in one line. It is still at the tip of that branch. Found by the re-run of 2026-11-17. That branch did not exist when the first audit ran. It may matter because it exposes the owner's local user name if that branch is pushed to the public repo.
+
+D8 can be fixed by not pushing that branch to the public repo, or by rewriting its history. D1, D5, D6 and D7 can only be fixed by rewriting history (an author mapping, and replacing the spec text from commit 769fb8d onward). D2, D3 and D4 can also be fixed by editing the files for the future, but the old text would stay in history.
+
+## Re-run of the home-path searches
+
+Date: 2026-11-17
+
+The home-path searches of search 2 (`/home/[a-z]`, `/Users/`, `C:\\Users`, `/mnt/c/`) were run again over the added and removed lines of `git log --all -p -U0`, counted per commit and file. The refs were the local branch and local main and list, and the origin branch, main, list and `claude/nifty-sagan-c57kd7`, 192 commits in all. History was not changed.
+
+| Commit | File | Lines | What it is |
+|---|---|---|---|
+| ed43141 | `docs/phase3/licence-recheck.md` | 7 added | A local home folder path with the user name (D7) |
+| bceabaa | `docs/phase3/licence-recheck.md` | 7 removed | The fix of D7. The path stays in the history of ed43141 |
+| 8b37ec6 | `docs/superpowers/reviews/three-column-layout-build-report.md` | 1 added | A local home folder path with the user name (D8), still at the tip of `claude/nifty-sagan-c57kd7` |
+| 7d94a5c | `docs/phase3/history-audit.md` | 3 added | The search patterns written as text in this file. Harmless |
+
+Why the first run missed D7: the first run counted 102 commits at its start and 103 at its end. By commit time, the 102 are exactly the commits before fd7fc22, and fd7fc22 is the 103rd. ed43141 (14:10) and bceabaa (14:11) came after it and before the audit was committed (14:13), so they were outside the commits the first run searched. This is read from the commit times, the first run left no log that would prove it.
 
 ## Authors
 

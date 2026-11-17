@@ -80,6 +80,6 @@ test("in German the current language's matches come first and each group sorts b
   ];
   // "a" matches by its German name, "c" and "b" only by their English one. Each group sorts by the German name.
   expect(ids(searchStructures("zett", list, "de"))).toEqual(["a", "c", "b"]);
-  // In English the English name is the current language's name, so all three match the same way.
+  // In English the German name is not searched, so "a" is not found. "c" and "b" match by their English name and sort by it.
   expect(ids(searchStructures("zett", list, "en"))).toEqual(["c", "b"]);
 });

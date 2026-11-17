@@ -31,7 +31,18 @@ Has no mesh in BodyParts3D 4.0:
 
 ## Arm and hand
 
-No gap is known beyond the shared ones above.
+Has no mesh in BodyParts3D 4.0:
+
+- Palmaris brevis. No record of `sources/bp3d-inventory.jsonl`, no OBJ header and no line of `isa_parts_list_e.txt` or `partof_parts_list_e.txt` names it.
+
+The arm has no gap line in the app yet, because there is no `regionGap.arm` text.
+
+Two structures at the base of the thumb, as BodyParts3D names them:
+
+- "Flexor pollicis brevis" (`flexor-pollicis-brevis`, FMA37378), from FJ1469 and FJ1469M. Their headers say "Left flexor pollicis brevis" and "Right flexor pollicis brevis". FJ1469 lies on the right and FJ1469M on the left, so the inventory gives each the side it lies on (see "Second review fixes" in `docs/superpowers/reviews/phase-4b-build-report.md`).
+- "Superficial head of flexor pollicis brevis" (`superficial-head-of-flexor-pollicis-brevis`, FMA46104), from FJ1514 and FJ1514M. Their headers say "Superficial head of right flexor pollicis brevis" and "Superficial head of left flexor pollicis brevis".
+
+Both concepts are lines of `isa_parts_list_e.txt`. In `isa_element_parts.txt` FJ1469 is a "muscle organ" and FJ1514 a "head of muscle organ". So the app shows the superficial head as a structure of its own next to the muscle it belongs to.
 
 ## Head and neck
 
@@ -65,6 +76,7 @@ Has no mesh in BodyParts3D 4.0:
 - Quadratus lumborum.
 - Multifidus.
 - Rectus abdominis, internal oblique and transversus abdominis. Only the external oblique is there.
+- The coccyx. No bone mesh is a coccyx. In `sources/bp3d-inventory.jsonl`, in the OBJ headers and in `isa_parts_list_e.txt`, "coccy" names only the pelvic floor muscles coccygeus, iliococcygeus and pubococcygeus.
 
 Left out on purpose: the pelvic floor and perineum muscles. BodyParts3D has them, but they do not move the skeleton the app teaches.
 

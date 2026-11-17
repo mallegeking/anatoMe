@@ -29,6 +29,7 @@ First: `6a50511`. Last: `1162e94`.
 - **Task 2, short tab labels.** The plain translations of three tab names and the search placeholder were cut off at 360 px. The tabs are "Strukturen", "Bewegung", "Stelle" and "Notizen" now, and the placeholder is "Suche: Piriformis".
 - **Task 2, extra test.** `lang.test.ts` has one test more than the plan ("a stored choice can be read back").
 - **Task 3, search order.** The plan says results sort by `nameOf`. The search keeps three groups (a match on the current language's name first, then English, then Latin) and sorts each group by `nameOf`. No English order changed.
+- **Task 3, search spellings.** Search also accepts ae, oe and ue for ä, ö and ü, and ss for ß, so "hueft" finds "Hüftbein" and "grosser gesass" finds "Großer Gesäßmuskel". The plan does not ask for this. It asks only that an umlaut can be typed without its dots ("huft").
 - **Task 3, bone names.** The info panel and the review list wrote bone names in lower case inside a sentence. That would break German nouns, so `boneLabel` lowers the case only in English.
 - **Task 3, `loadedBy`.** It calls `involved()` with "en", because the order does not matter there. `summaryModel` and `PrintSummary` gained a `lang` parameter, because `summaryModel` calls `compare`.
 - **Task 3, sources.** The research notes said the German Wikipedia hip page has "Abspreizen" and "Heranführen". It has only "Abspreizbewegung" and "Heranführungsbewegung". Both words are on the DocCheck Flexikon pages "Abduktion" and "Adduktion", which are now named in the header of `data/movements.yaml`.
@@ -129,7 +130,8 @@ What the report found for the other steps:
 2. **Proofread the German** (list below). Especially the disclaimer and the educational line, which must say exactly as much as the English.
 3. **German word rule:** the summary says "Physio-Fachkraft" because "Physiotherapeut" contains the banned stem "therap". Loosen the rule for that word if you prefer the full word.
 4. **German names:** decide whether the movement names should be one consistent set, and whether glosses of the Latin ("Birnenförmiger Muskel") are what you want, or the Latin name, or no German name.
-5. **Setup on this machine:** `unzip` is not installed and there is no root access here. The builder used a copy unpacked from the Ubuntu package in a folder outside the repo. Install `unzip` properly if you run the pipeline here again.
+5. **Setup on this machine: done.** `unzip` was not installed on the Linux machine (WSL2 Ubuntu) at the build, and the builder used a copy unpacked from the Ubuntu package in a folder outside the repo. The owner installed the package on 2026-11-16 (`unzip 6.0-29ubuntu1` in `/usr/bin`, from the dpkg log). The builder's copy is still in `~/build/bin/unzip` and comes first on the PATH. It can be deleted.
+6. **Review Fix 3 is stopped** (see "Review fixes"). The `?region=elbow` test cannot fail when App passes `""` to `chooseRegion`, because an empty address and an unknown region both give the first region. Decide whether to commit only the `?region=shoulder` test, which fails on that line, or both tests with the elbow test tied to another line. One candidate, not tried: the `ids.includes(asked)` check in `apps/web/src/region/regions.ts`. The two tests are in `~/build/research/phase4a-review-fix3-wip.patch` in the Linux home.
 
 ## For the owner to proofread
 
@@ -176,3 +178,46 @@ Every German text and name the builder was unsure about. Key or id: English / Ge
 - Tractus iliotibialis: no German everyday name was found, so the Latin term is the German label.
 - Kniebeuge for "Bodyweight squat" (the page is about squats in general), Abwärtsbewegung and Aufwärtsbewegung for its phases.
 - Left without a German name (no opened source gave one): sacrotuberous ligament, sacrospinous ligament, trochanteric bursa, iliopectineal bursa, ischial bursa, side-lying hip abduction and its two phases.
+
+## Review fixes
+
+Built on 2026-11-17 on the working branch, tests and docs only, one commit per fix. App behaviour did not change. The baseline was green before the first change. Each new test passed against the app as it is, then was run with its named line broken and seen failing, then the line was put back with `git checkout`. Task 4 and Task 5 of the plan, the saved patch and the German word rule were not touched.
+
+- **Fix 1, the language choice in App.** Commit `6a6430f`. Four new tests in `apps/web/src/App.test.tsx`:
+  - "picking Deutsch in the language switch stores de for the next visit". With `storeLanguage(next);` removed from `changeLang`, it failed and the other three passed.
+  - "a stored de starts the app in German" and "with nothing stored a German browser starts the app in German" (`navigator.languages` stubbed to `["de-AT"]`). With the initial state `pickLanguage(null, [])`, both failed.
+  - "the page's lang attribute is en with an English browser and de after the switch". With the effect that sets `document.documentElement.lang` removed, it failed.
+
+  The browser's languages are stubbed with `vi.spyOn(navigator, "languages", "get")`, which the existing `vi.restoreAllMocks()` in `afterEach` undoes. The existing `localStorage.clear()` empties the storage. `afterEach` now also removes the page's `lang` attribute, so a switch in one test does not carry into the next.
+- **Fix 2, an unknown stored value.** Commit `ff8125a`. `apps/web/src/i18n/lang.test.ts` "an unknown stored value falls back to the browser's language": `pickLanguage("xx", ["de-DE"])` is "de". The prompt names no line for this fix. The line broken was the return of `pickLanguage` in `lang.ts`, changed to give "en" for any stored value it does not know instead of going on to the browser's languages. The new test failed, and the plan's test "an unknown stored value is ignored" still passed, which is the gap the review found. The plan's test is unchanged.
+- **Fix 3, `?region=` at start. Stopped, nothing committed.** Both tests were written with the two-region manifest: "the address ?region=shoulder opens the shoulder" and "the address ?region=elbow, a region the manifest does not have, opens the first region". The existing `afterEach` resets the address. Both passed against the app. With `chooseRegion(regionIds(loaded), "")` in App, the shoulder test failed but the elbow test still passed. It cannot fail on that line: an empty address and an unknown region both give the first region, so App opens the hip either way. Following the prompt's rule, the fix was stopped and the change thrown away. The two tests are saved as `~/build/research/phase4a-review-fix3-wip.patch` in the Linux home (the patch also makes `serveTwo` return its fetch mock). See item 6 of "For the owner".
+- **Fix 4, the German name list.** Commit `2dc4ba3`. New file `docs/phase4/german-names.md` with one row per German name: 47 structures, 8 movements, the squat and its 2 phases, 58 rows. Each row has the id, the name, the page URL, the read date and the form the page has. Every page was fetched again on 2026-11-17 with curl, and the name was looked up in the page's text with the HTML tags removed. All 58 were found. 32 are on their page as written. 15 are on it with a lower-case first letter, as part of a sentence or as the meaning of the Latin. 11 are marked as combinations of page words: the two biceps heads, "Queres Pfannenband" (the page has "Das quere Pfannenband") and the 8 movement names. Of the movement words, "heranführen" is on the Adduktion page only in lower case, as the meaning of "adducere". A script compared every row with the data files and found no difference. The header comment of `data/structures/hip.yaml`, `data/movements.yaml` and `data/exercises.yaml` points to the list. No name was changed.
+- **Fix 5, this report.** The new deviation "Task 3, search spellings" above says that search also accepts ae, oe, ue and ss. In `apps/web/src/search/search.test.ts` the comment above the English expectation said "all three match the same way" over a result of two. It now says that in English the German name is not searched, so "a" is not found, and that "c" and "b" match by their English name and sort by it. The progress file is updated.
+
+Deviations in these fixes:
+
+- Fix 1: four tests instead of three, because case b) has two parts and each got its own test. `afterEach` also removes the page's `lang` attribute.
+- Fix 2: the builder chose the line to break, because the prompt names none.
+- Fix 4: "Read on" is 2026-11-17 for every row, the day each page was opened again for this list. The names were first chosen from the same pages on 2026-11-14. Abduction and adduction give two pages, because their words come from two pages. The knee movements give the DocCheck Flexikon Kniegelenk page, which has the whole phrase "Beugung und Streckung des Kniegelenks".
+
+Checks after the last fix, all from one run of the full list:
+
+```
+data in data is valid
+trunk.glb: 82 meshes, 140296 triangles, 724260 bytes, size 0.289 x 0.640 x 0.229
+ Test Files  39 passed (39)
+      Tests  414 passed (414)
+ Test Files  8 passed (8)
+      Tests  150 passed (150)
+✓ built in 2.87s          (build:review)
+✓ built in 2.31s          (build)
+  8 passed (18.8s)        (e2e)
+apps/web/dist/data: 6 bundle(s), no drafts
+median interactive ms: 2643
+ok   decoder download fails: message shown after 1018 ms
+ok   decoder never answers: message shown after 20682 ms
+ok   model file missing: message shown after 1277 ms
+31 passed in 3.51s        (test:py)
+```
+
+For the owner, from these fixes: item 6 of "For the owner" (Fix 3).

@@ -199,3 +199,19 @@ test("a mesh with side l whose centre lies at x > 0 passes", async () => {
   expect(result.errors).toEqual([]);
   expect(result.ok).toBe(true);
 });
+test("a mesh with side r whose centre lies at x > 0 fails", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "r" }], 2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.ok).toBe(false);
+  expect(result.errors).toEqual([
+    { file: "test.glb", path: "(unnamed node)", message: "femur has side r but lies on the left" },
+  ]);
+});
+test("a mesh with side r whose centre lies at x < 0 passes", async () => {
+  const d = makeDir([entry()]);
+  await writeGlb(join(d, "test.glb"), [{ sid: "femur", side: "r" }], -2);
+  const result = await checkModelMapping(d, femur);
+  expect(result.errors).toEqual([]);
+  expect(result.ok).toBe(true);
+});
