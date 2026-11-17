@@ -6,42 +6,42 @@ Built on 2026-11-16 on the working branch `claude/nifty-sagan-c57kd7`, in the cl
 
 ## Summary
 
-anatoMe now has one set of components for every width. From 900 px wide the page has three columns: a navigation rail (208 px, or 176 px below 1100 px) with the four tabs, the credits button and the language switch, the model stage in the middle, and a right column (380 px, or 320 px below 1100 px) with Layers and the tab panel. Below 900 px the tabs sit at the bottom and the panel is a sheet of at most 45 percent of the height. The phone stage is never shorter than 220 px.
+anatoMe now has one set of components for every width. From 900 px wide the page has three columns: a navigation rail (208 px, or 176 px below 1100 px) with the four tabs, the educational line and the credits button, the model stage in the middle, and a right column (380 px, or 320 px below 1100 px) with Layers, the tab panel and, at its bottom, the language switch. Below 900 px the tabs sit at the bottom and the panel is a sheet of at most 45 percent of the height. The phone stage is never shorter than 220 px.
 
-The stage has its own controls: a name chip for the selected structure, left and right side markers, a view badge (front, back, left, right, top, bottom), zoom in, zoom out, reset, and a Layers button on the phone. Layers has its own section and no longer replaces the tab panel. Credits and the language switch moved into a settings dialog on the phone and into the rail on wide screens. A failed load of the data, the 3D model, the manifest, the Draco decoder or a code chunk now shows a "Try again" button. The four tab panels (Structures, Movements, Under a spot, Notebook) share one look, with new German drafts and localised dates (`en-GB` and `de-DE`).
+The stage has its own controls: a name chip for the selected structure, left and right side markers, a view badge (front, back, left, right, top, bottom), zoom in, zoom out, reset, and a Layers button on the phone. Layers has its own section and no longer replaces the tab panel. Credits and the language switch moved into a settings dialog on the phone. On wide screens the credits button is at the bottom of the rail and the language switch at the bottom of the right column. A failed load of the data, the 3D model, the manifest, the Draco decoder or a code chunk now shows a "Try again" button. The four tab panels (Structures, Movements, Under a spot, Notebook) share one look, with new German drafts and localised dates (`en-GB` and `de-DE`).
 
 All checks are green except one known test that fails only because this container runs as root (see "Checks"). Nothing under `data/`, no `checked_by` and no data row was changed.
 
 ## Commits
 
-First: `9dec91e` (the plan). Last before this report: `bec564a`. The two commits before the plan (`622d78e` to `f0d91d5`) are the spec.
+First: `9dec91e` (the plan). Last before this report: `bec564a`. The three commits before the plan (`622d78e`, `a4c60a4` and `f0d91d5`) are the spec. The fixes from the final review come after this report (see "Final review").
 
 | Task | Commits | State |
 | --- | --- | --- |
 | 1 Shared colours and control styles | `6052111` | done |
 | 2 Grid shell and navigation rail | `e1275e6` | done with deviation |
-| 3 Layers in its own section | `caf303b` | done with deviation |
+| 3 Layers in its own section | `caf303b` | done, implementer notes only |
 | 4 Settings dialog, credits and language | `8531fa5`, `5966d78` (review fix) | done with deviation |
-| 5 Reset, zoom and camera view in the viewer | `0eb17e1` | done with deviation |
+| 5 Reset, zoom and camera view in the viewer | `0eb17e1` | done, implementer notes only |
 | 6 Stage controls | `128ff17` | done with deviation |
 | 7 Compact search on short phones | `f11d172`, `67c1906` (review fix) | done with deviation |
 | 8 Retry after failed loads | `5e0280c` | done with deviation |
 | 9 Shared panel pieces and the Structures panel | `ba89d64` | done with deviation |
-| 10 Movements panel | `8e5c036` | done with deviation |
+| 10 Movements panel | `8e5c036` | done, implementer notes only |
 | 11 Under a spot panel | `e57964f` | done with deviation |
 | 12 Notebook panel and dates | `17b074d`, `354c653` (review fix) | done with deviation |
 | 13 Layout and stage checks in a browser | `bec564a` | done with deviation |
-| 14 Full checks and this report | the commit that adds this file | done |
+| 14 Full checks and this report | `8b37ec6` | done |
 
 Task 12 was started by a first builder, and the container restarted before that builder reported. Its uncommitted edits survived in the working tree. A second builder verified every item of the brief against that tree and committed it (`17b074d`). The review fix `354c653` followed.
 
 ## Deviations
 
-From the plan, grouped by task. Each was accepted by the task reviewer.
+From the plan, grouped by task. For Tasks 1, 2, 4, 6, 7, 8, 9, 11, 12, 13 and 14 these are deviations from the plan, and the task reviewer accepted each one. For Tasks 3, 5 and 10 nothing departs from the plan. The lines there are the implementer's notes on how the work was done, for example extra tests. No reviewer had to accept them.
 
 **Task 1.** Small leftover rules stayed after the copies were deleted: `.layers-toggle` (a margin), `.region-picker` and `.lang-picker`, and `.search-field`, so layouts and select backgrounds stay as they were. The radius went from 6 px to 8 px as the brief says. The review banner button got the `.btn` look. The review-list close button has no `.btn`, because the brief did not name it.
 
-**Task 2.** The review banner and the top bar sit in a new `.top` wrapper that carries the grid area. `PanelArea.tsx` needed no change, and `role="tabpanel"` sits on the `.panel-scroll` element in `App.tsx`. The mount test counts from after the first act-wrapped click, because the viewer is keyed by region and mounts once more when the manifest names the region. `fireEvent` is used because `user-event` is not installed and no dependency may be added. `.panel` is a `div` now, not a `footer`. Extra tests: `useShort`, horizontal orientation and the heading order in the top bar.
+**Task 2.** The review banner and the top bar sit in a new `.top` wrapper that carries the grid area. `PanelArea.tsx` needed no change, and `role="tabpanel"` sits on the `.panel-scroll` element in `App.tsx`. The mount test counts from after the first act-wrapped click, because the viewer is keyed by region and mounts once more when the manifest names the region. `fireEvent` is used because `user-event` is not installed and no dependency may be added. In the app shell, `.panel` (the box that holds the educational line and the tab panel) is a `div` now, not a `footer`. This is not the `footer` of the last-resort error page, which is a different element and stayed as it was. Extra tests: `useShort`, horizontal orientation and the heading order in the top bar.
 
 **Task 3.** There is no jest-dom, so a `shown()` helper checks that nothing hidden is above an element. `App.test.tsx` got a `beforeEach` that resets the viewport to the phone. One extra test: a tap on empty space leaves Layers open.
 
@@ -114,6 +114,22 @@ Run from `/home/user/anatoMe` on 2026-11-16, one command at a time. The last lin
 
 The e2e run covers three browser sizes (412 x 915 phone, 360 x 640 small phone, 1280 x 800 desktop) in English and German, all in Chromium.
 
+## Final review
+
+A review of the whole branch (`9dec91e..8b37ec6`) found five defects a user would notice and two small items. All seven were fixed after this report, one commit each. Each fix started with a test that failed first.
+
+| | What was wrong | Fix | Test that now covers it |
+| --- | --- | --- | --- |
+| F1 | "Reset the view" kept the side the person had turned to (the back, a side, above or below) and only fitted the distance again. | `6066581`: Reset turns the camera back to the first direction, the short way round, then fits the model. | `Viewer.test.tsx`: "resetView turns the camera back to the first direction, the short way round". `stage.spec.ts`: "turning the model to the back swaps the markers" now ends with Reset and expects "Front view". |
+| F2 | A failed save of a note showed its message at the top of the panel, scrolled out of view, so nothing seemed to happen. | `36e3ac1`: the message shows inside the log form right above Save, as an alert. It goes when the form is changed or saved again. Save and Cancel wait while a save runs. | `MovementPanel.test.tsx`: "a failed save says why next to the Save button" (all three failures), "the failure goes away when the form is changed", "saving again clears the failure, and a save that works closes the form", "while a save is under way, Save and Cancel wait and the note stays". `App.test.tsx`: "notebook: a save that fails says so and keeps the typed note". |
+| F3 | On a short phone the search field stayed open over the app name, the region picker and the settings button after a result was chosen. | `567716d`: choosing a result empties and folds the field, and the focus goes to the search button. The open state is forgotten when the bar stops being compact. | `TopBar.test.tsx`: "compact: choosing a result empties and folds the field, so the bar shows again" and three more. `layout.spec.ts`: "small phone: the search field is behind a button". |
+| F4 | Closing a dialog lost the keyboard focus. | `b6040b8`: the focus goes back to the button that opened the dialog, and a close that did not come through Escape still tells the app. | `AppDialog.test.tsx`: "the focus goes back to the opener after" the close button, Escape and a backdrop click, and "a native close event tells the app, so it does not stay open". |
+| F5 | On a short phone in German, with Layers open and two or three structures hidden, the last line of the educational line was cut off. | `06c3770`: with Layers open on the phone, the panel keeps the height of the educational line and the Layers part scrolls. | `layout.spec.ts`: "the arrangement matches the width" hides three structures, opens Layers and checks that the whole line is inside the panel and the screen, in both languages. |
+| F6 | The "Under a spot" empty state did not use the shared panel pattern. | `08619fd`: a `panel-body` with an `h2` title, like the Structures empty state. The unused `.info-label` rules are gone. | `AreaPanel.test.tsx`: "the hint is a panel title in a panel body, like the other empty states". |
+| F7 | This report had a few wrong facts. | The commit that adds this section. | Read by hand. |
+
+After the fixes: `npm test -w apps/web` 47 files and 558 tests pass, `npm run build` passes, `npm run e2e -w apps/web -- --trace off` 41 passed and 8 skipped, `node scripts/check-no-drafts.mjs` and `node apps/web/scripts/error-check.mjs` pass.
+
 ## Not verified
 
 - A real phone. All phone checks ran in Chromium with a phone-sized window and touch emulation. Touch drag, pinch, the on-screen keyboard and the browser's address bar changing the height are untested.
@@ -138,14 +154,14 @@ Minor findings from the task reviews, left alone on purpose. One line each.
 - The "horizontal" test in `ModeBar.test.tsx` starts with an assertion that tests nothing.
 - No test for Home and End in vertical mode.
 - `useMedia` builds a new `MediaQueryList` on each snapshot.
-- The last-resort error page still renders the footer outside `.side`.
+- The last-resort error page still renders its own `footer` (with the educational line and the credits) outside `.side`. This is a different element from the shell's `.panel`, which is now a `div`.
 
 **Task 3**
 - The temporary stage Layers button always read `layers.open`. Task 6 replaced it.
 - The phone-to-wide test title says the tab is kept, but it does not check a tab other than the default.
 
 **Task 4**
-- `AppDialog` unmounts on close and never calls `dialog.close()`, so focus may not return to the opener for keyboard users.
+- `AppDialog` unmounts on close and never calls `dialog.close()`, so focus may not return to the opener for keyboard users. Fixed in the final review (F4).
 - The test "not inside a details element" in `Credits.test.tsx` is now empty of meaning.
 - The `close()` stub in `test-setup.ts` is unused.
 - An orphaned "Big enough for a thumb" comment in `index.css`.
@@ -164,11 +180,11 @@ Minor findings from the task reviews, left alone on purpose. One line each.
 
 **Task 7**
 - Prettier reformatted unrelated lines in `TopBar.tsx`.
-- On a short phone, choosing a search result leaves the field open (see "For the owner").
-- `fieldOpen` is not reset when `compact` turns false, and there is no test for choosing a result on a compact screen and then collapsing the field.
+- On a short phone, choosing a search result leaves the field open. Fixed in the final review (F3).
+- `fieldOpen` is not reset when `compact` turns false, and there is no test for choosing a result on a compact screen and then collapsing the field. Fixed in the final review (F3).
 
 **Task 8**
-- No busy or disabled state on Save during a save, and Cancel during a failing save loses the note.
+- No busy or disabled state on Save during a save, and Cancel during a failing save loses the note. Fixed in the final review (F2).
 - `lazyRetry` may start one extra download if the parent re-renders between the rejection and the boundary catching it.
 - No unit test for the Draco decoder renewal.
 - `NotebookPanel` still shows `notebook.unavailable` for a failed list, delete or backup load (see "For the owner").
@@ -187,7 +203,7 @@ Minor findings from the task reviews, left alone on purpose. One line each.
 
 **Task 11**
 - No test for review mode with the new row layout.
-- The old `.area-panel { overflow-wrap: anywhere }` was removed. Task 13 was to put it on `.panel-body`. The leftover grep did not cover this, so check that long German names do not overflow at narrow widths. The "nothing overflows" check in `layout.spec.ts` passed in all projects.
+- The old `.area-panel { overflow-wrap: anywhere }` was removed. Done: `.panel-body` in `index.css` now has `overflow-wrap: anywhere`, and the "nothing overflows" check in `layout.spec.ts` passed in all projects.
 
 **Task 12**
 - The date could be a `<time dateTime>` element.
@@ -204,6 +220,11 @@ Minor findings from the task reviews, left alone on purpose. One line each.
 **Task 14**
 - `README.md` screenshots under `docs/phase1/` show the old layout. They were not retaken.
 - The German tab name for "Under a spot" is still "Stelle" (key `mode.area`). It was not part of the plan's changes.
+
+**Final review**
+- The stage buttons (zoom, reset, Layers) stay shown and do nothing while the model's load error is showing.
+- On older Android browsers that make the page smaller when the keyboard opens, focusing search on a tall phone could make the page count as a short phone and fold the field.
+- A drag that starts inside a dialog and ends on the backdrop closes the dialog, because the click lands on the dialog itself.
 
 ## For the owner
 
@@ -278,10 +299,11 @@ Dates in the Notebook and the printed summary use `en-GB` ("14 Nov 2026") and `d
 2. **Search field off centre between 900 and about 1130 px.** It is up to 72 px off centre and narrower than 620 px, so the name and the picker keep their full width. At 1280 px it is centred. Choose: keep this, or let the name and picker shrink.
 3. **Right column cramped at 900 x 600.** The tab panel gets about 200 px of height and scrolls. Choose: accept it, or lower the rail's educational line and credits into the settings dialog on short screens.
 4. **Phone button "Right side" next to a chip "Left side".** On the phone the button is named after the side it switches to, so it reads "Right side" while the chip reads "Left side". On wide screens it reads "Show the other side". Choose a clearer phone label.
-5. **Short-phone search field stays open over the top bar** after a result is chosen. It closes only when its text is cleared, as the brief said. Choose: close it on choosing a result.
+5. **Short-phone search field stays open over the top bar** after a result is chosen. Settled in the final review (F3): it now empties and folds on choosing a result, and the name shows in the chip on the stage.
 6. **`notebook.unavailable` for failed list, delete and backup loads.** The text says the browser blocks storage, which is not true for these failures. Choose: a different text for these.
 7. **The "Under a spot" subtitle** ("From the surface inwards") also shows under the "over and under" title, where it is less fitting. Choose: hide it there.
 8. **Retry of a failed code chunk in Safari and Firefox** may not work without a page reload (see "Not verified").
+9. **The angle condition in "Structures to look into".** Structures to look into in the Notebook show the confidence and the "only in" limit, not the angle condition. The rows are already chosen by the angles you logged, so the condition was left out. Say if you want it shown.
 
 Changed behaviours a user will notice:
 
@@ -289,5 +311,5 @@ Changed behaviours a user will notice:
 - The movement buttons in "Under a spot" no longer carry the load word, and each action row is listed on its own line, even when two rows have the same load.
 - The tab "Area" is now "Under a spot" in English.
 - Layers no longer hides the tab panel. On the phone it opens in the sheet and closes on a tab change or a tap on a structure.
-- Credits and the language switch moved: the phone has them in a settings dialog, the wide layout in the rail.
+- Credits and the language switch moved: the phone has them in a settings dialog. The wide layout has the credits button at the bottom of the rail and the language switch at the bottom of the right column.
 - A failed load now shows "Try again" instead of asking for a page reload.
