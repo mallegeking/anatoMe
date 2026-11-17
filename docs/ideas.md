@@ -30,7 +30,7 @@ Add major peripheral nerves after the musculoskeletal regions.
 
 ## Whole body as one model
 
-Added 2026-11-17. Being picked up: see the build prompt in `docs/superpowers/plans/2026-11-17-opus-prompt-whole-body.md`.
+Added 2026-11-17. Built on 2026-11-17, see the design in `docs/superpowers/specs/2026-11-17-whole-body-view-design.md`.
 
 The region picker gets a "Whole body" entry next to the six regions, and the app opens with it instead of "Hip and thigh". The regions stay, because they are quicker to load and easier to read up close.
 

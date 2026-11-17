@@ -87,6 +87,19 @@ Left out because the data has no type for them yet:
 
 Because latissimus dorsi and the trapezius are not in the trunk file, the measured layer of the erector spinae reads more superficial than it would in a body.
 
+## Whole body
+
+The whole body holds every structure of the six regions once. It is built from one lighter file, `models/body.glb`, plus the hip's own `models/hip-z-anatomy.glb`. In `body.glb` a bone has at most 1000 triangles per mesh and every other part at most 400. The six region files keep their full detail.
+
+What detail is lost:
+
+- The skull's row of upper teeth turns into a jagged band and the lower jaw is slightly faceted.
+- Pectoralis major shows a few more sharp slivers.
+
+Nothing is dropped. All structures of the six regions are in it.
+
+Its gap list in the app is the regions' own lines. It shows a heading and then each region that has a gap line, with that line word for word. So it has no gaps of its own beyond those of the regions above.
+
 ## The hip has no adductor minimus
 
 BodyParts3D has adductor minimus as its own mesh, but the hip region does not include it. Adding it changes `models/hip.glb`, which this work did not touch. It is open for the owner.

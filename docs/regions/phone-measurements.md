@@ -18,6 +18,8 @@ Pass mark: after you choose a region, the model can be turned within 5000 ms, tu
 
 Open the site and choose the region in the "Body region" list. Start a timer when you tap the region. Stop it when you can first turn the model with one finger and it follows. Then turn the model with one finger for 10 seconds. Then open "Layers", tap "Peel a layer" one time after another until only bones are left.
 
+The app now opens with the whole body. For the whole body, note the time from opening the page, not from picking it in the list. It is the heaviest thing the app draws, about 239,000 triangles in 577 meshes. On the computer's speed check (perf-check, 4 times slower CPU) it took about 1.5 times as long as the hip in the same round.
+
 ### Pairs to look at when peeling
 
 These layers were measured from the model, and a few pairs may look wrong on the phone. Please say in the peeling column if one of them does.
@@ -31,6 +33,7 @@ These layers were measured from the model, and a few pairs may look wrong on the
 
 | Region | Time until the model can be turned (ms) | Does turning stutter? (yes or no) | Does peeling a layer read as sensible? (yes or no, and which muscle looks wrong) | One free line |
 | --- | --- | --- | --- | --- |
+| Whole body | | | | |
 | Lower leg and foot | | | | |
 | Shoulder | | | | |
 | Arm and hand | | | | |
