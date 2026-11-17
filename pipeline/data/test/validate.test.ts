@@ -115,3 +115,8 @@ test("loadStructures gives each structure its home region first, then also_in", 
 test("also_in must name a region some structure has as its home", () => expectError(fx("also-in-ghost"), /unknown region ghost/));
 test("also_in must not repeat the home region", () => expectError(fx("also-in-home"), /also_in repeats the home region hip/));
 test("a joint's region must be a known region", () => expectError(fx("joint-bad-region"), /unknown region ghost/));
+test("body is taken as a region name", () => {
+  const result = validateDataDir(fx("body-as-region"));
+  expect(result.ok).toBe(false);
+  expect(result.errors.map((e) => e.message)).toContain("body is the whole body, it cannot be a region of its own");
+});

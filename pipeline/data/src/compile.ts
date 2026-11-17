@@ -13,6 +13,7 @@ import type {
   BundleStructure,
   RegionBundle,
 } from "../../../apps/web/src/data/bundle.ts";
+import { WHOLE_BODY } from "./regions.ts";
 
 // Rows as they are written in the YAML files. validateDataDir has already checked them.
 type StructureRow = Omit<BundleStructure, "paired"> & { region: string; also_in?: string[]; midline?: boolean };
@@ -41,9 +42,16 @@ export function listRegions(dataDir: string): string[] {
   return [...new Set(readFolder<StructureRow>(dataDir, "structures").map((s) => s.region))].sort();
 }
 
+// The bundles build-data writes: the home regions, then the whole body.
+export function bundleRegions(dataDir: string): string[] {
+  return [...listRegions(dataDir), WHOLE_BODY];
+}
+
 export function compileRegion(dataDir: string, region: string, mode: "normal" | "review"): RegionBundle {
   const review = mode === "review";
-  const structures = readFolder<StructureRow>(dataDir, "structures").filter((s) => s.region === region || s.also_in?.includes(region));
+  // The whole body takes every structure, every joint and every exercise.
+  const whole = region === WHOLE_BODY;
+  const structures = readFolder<StructureRow>(dataDir, "structures").filter((s) => whole || s.region === region || s.also_in?.includes(region));
   const inRegion = new Set(structures.map((s) => s.id));
 
   const pendingByStructure: Record<string, number> = {};
@@ -77,7 +85,7 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
   let pendingExercises = 0;
   const exercises: BundleExercise[] = [];
   for (const row of readRows<ExerciseRow>(dataDir, "exercises.yaml")) {
-    if (!row.regions.includes(region)) continue;
+    if (!whole && !row.regions.includes(region)) continue;
     const draft = row.checked_by === null;
     if (draft) pendingExercises++;
     if (draft && !review) continue;
@@ -97,7 +105,7 @@ export function compileRegion(dataDir: string, region: string, mode: "normal" | 
 
   // german goes in only when the row has one, like gap below. The app falls back to english.
   // A region gets only the movements of its own joints, the joint is the part of dof before the dot.
-  const ownJoints = new Set(readRows<JointRow>(dataDir, "joints.yaml").filter((j) => j.region === region).map((j) => j.id));
+  const ownJoints = new Set(readRows<JointRow>(dataDir, "joints.yaml").filter((j) => whole || j.region === region).map((j) => j.id));
   const movements = readRows<BundleMovement>(dataDir, "movements.yaml").filter((m) => ownJoints.has(m.dof.split(".")[0])).map(({ id, english, german, dof, direction }) => ({
     id, english, ...(german !== undefined ? { german } : {}), dof, direction,
   }));

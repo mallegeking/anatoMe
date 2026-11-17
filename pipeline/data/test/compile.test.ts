@@ -1,6 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { compileRegion, listRegions } from "../src/compile.ts";
+import type { RegionBundle } from "../../../apps/web/src/data/bundle.ts";
+import { bundleRegions, compileRegion, listRegions } from "../src/compile.ts";
+import { WHOLE_BODY } from "../src/regions.ts";
 
 const fx = (name: string) => fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url));
 const realDataDir = fileURLToPath(new URL("../../../data", import.meta.url));
@@ -83,3 +85,34 @@ test("a region gets only the movements of its own joints", () => {
 });
 test("listRegions lists home regions only", () => expect(listRegions(fx("multi-region"))).toEqual(["hip", "lower-leg"]));
 test("also_in does not go into the bundle", () => expect(JSON.stringify(compileRegion(fx("multi-region"), "lower-leg", "normal"))).not.toContain("also_in"));
+
+const ids = (rows: { id: string }[]) => rows.map((r) => r.id).sort();
+const union = (dir: string, mode: "normal" | "review", pick: (b: RegionBundle) => { id: string }[]) =>
+  [...new Set(listRegions(dir).flatMap((r) => pick(compileRegion(dir, r, mode)).map((x) => x.id)))].sort();
+
+test("bundleRegions adds the whole body after the home regions", () =>
+  expect(bundleRegions(fx("multi-region"))).toEqual(["hip", "lower-leg", "body"]));
+for (const mode of ["normal", "review"] as const) {
+  test(`the whole body is the union of the regions (${mode}, real data)`, () => {
+    const body = compileRegion(realDataDir, WHOLE_BODY, mode);
+    expect(body.region).toBe("body");
+    expect(ids(body.structures)).toEqual(union(realDataDir, mode, (b) => b.structures));
+    expect(ids(body.actions)).toEqual(union(realDataDir, mode, (b) => b.actions));
+    expect(ids(body.attachments)).toEqual(union(realDataDir, mode, (b) => b.attachments));
+    expect(ids(body.movements)).toEqual(union(realDataDir, mode, (b) => b.movements));
+    expect(ids(body.exercises)).toEqual(union(realDataDir, mode, (b) => b.exercises));
+    expect(ids(body.citations)).toEqual(union(realDataDir, mode, (b) => b.citations));
+  }, 30_000); // it compiles the real data seven times, which can pass 5 s on a busy machine
+}
+test("the whole body lists each structure once", () => {
+  const s = compileRegion(fx("multi-region"), WHOLE_BODY, "normal").structures.map((x) => x.id);
+  expect(s.length).toBe(new Set(s).size);
+});
+test("the whole body has every movement of every joint", () =>
+  expect(ids(compileRegion(fx("multi-region"), WHOLE_BODY, "normal").movements)).toEqual(union(fx("multi-region"), "normal", (b) => b.movements)));
+test("the whole body's normal build has no drafts and counts them like the hip", () => {
+  const body = compileRegion(fx("valid"), WHOLE_BODY, "normal");
+  expect(body.actions.some((a) => a.draft)).toBe(false);
+  expect(body.pendingByStructure).toEqual(compileRegion(fx("valid"), "hip", "normal").pendingByStructure);
+  expect(body.pendingExercises).toBe(compileRegion(fx("valid"), "hip", "normal").pendingExercises);
+});

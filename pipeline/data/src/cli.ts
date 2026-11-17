@@ -8,7 +8,7 @@
 
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { compileRegion, listRegions } from "./compile.ts";
+import { bundleRegions, compileRegion } from "./compile.ts";
 import { checkModelMapping, manifestFiles, modelStats } from "./checkModels.ts";
 import { markChecked } from "./markChecked.ts";
 import { coverage, formatReport } from "./report.ts";
@@ -104,7 +104,7 @@ async function main(args: string[]): Promise<number> {
       mkdirSync(outDir, { recursive: true });
       // Clear old bundles first, so a stale file for another region (or an earlier review build) cannot ship.
       for (const f of readdirSync(outDir)) if (f.endsWith(".json")) rmSync(join(outDir, f));
-      for (const region of listRegions(dataDir)) {
+      for (const region of bundleRegions(dataDir)) {
         const bundle = compileRegion(dataDir, region, review ? "review" : "normal");
         const text = JSON.stringify(bundle);
         writeFileSync(join(outDir, `${region}.json`), text);

@@ -2,6 +2,7 @@
 // Ajv checks the shape of each file against data/schema. Plain code below checks
 // what a schema cannot: ids that point to other files, and the anatomy rules.
 
+import { WHOLE_BODY } from "./regions.ts";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -164,23 +165,28 @@ export function validateDataDir(dir: string): ValidationResult {
   }
 
   const regions = new Set(structures.flatMap((s) => s.rows).map((s) => s.region));
+  const bodyTaken = `${WHOLE_BODY} is the whole body, it cannot be a region of its own`;
   for (const { file, rows } of structures) {
     for (const [i, s] of rows.entries()) {
+      if (s.region === WHOLE_BODY) errors.push({ file, path: `/${i}/region`, message: bodyTaken });
       for (const [j, r] of (s.also_in ?? []).entries()) {
-        if (r === s.region) errors.push({ file, path: `/${i}/also_in/${j}`, message: `also_in repeats the home region ${r}` });
+        if (r === WHOLE_BODY) errors.push({ file, path: `/${i}/also_in/${j}`, message: bodyTaken });
+        else if (r === s.region) errors.push({ file, path: `/${i}/also_in/${j}`, message: `also_in repeats the home region ${r}` });
         else if (!regions.has(r)) errors.push({ file, path: `/${i}/also_in/${j}`, message: `unknown region ${r}` });
       }
     }
   }
   for (const { file, rows } of [joints]) {
     for (const [i, j] of rows.entries()) {
-      if (!regions.has(j.region)) errors.push({ file, path: `/${i}/region`, message: `unknown region ${j.region}` });
+      if (j.region === WHOLE_BODY) errors.push({ file, path: `/${i}/region`, message: bodyTaken });
+      else if (!regions.has(j.region)) errors.push({ file, path: `/${i}/region`, message: `unknown region ${j.region}` });
     }
   }
   for (const { file, rows } of exercises) {
     for (const [i, x] of rows.entries()) {
       for (const [j, r] of x.regions.entries()) {
-        if (!regions.has(r)) errors.push({ file, path: `/${i}/regions/${j}`, message: `unknown region ${r}` });
+        if (r === WHOLE_BODY) errors.push({ file, path: `/${i}/regions/${j}`, message: bodyTaken });
+        else if (!regions.has(r)) errors.push({ file, path: `/${i}/regions/${j}`, message: `unknown region ${r}` });
       }
       const phaseIds = new Set<string>();
       for (const [p, phase] of x.phases.entries()) {
