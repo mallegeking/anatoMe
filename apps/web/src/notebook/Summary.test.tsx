@@ -6,7 +6,7 @@ import { createT } from "../i18n/t";
 import { makeMovementBundle } from "../movement/fixture";
 import PrintSummary from "./PrintSummary";
 import { Summary } from "./Summary";
-import { summaryModel } from "./summary";
+import { summaryModel } from "./summaryModel";
 import type { NotebookEntry } from "./types";
 
 const t = createT(en);

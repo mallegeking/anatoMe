@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { makeMovementBundle } from "../movement/fixture";
-import { SUMMARY_ROWS, summaryModel } from "./summary";
+import { SUMMARY_ROWS, summaryModel } from "./summaryModel";
 import type { EntrySide, Feeling, NotebookEntry } from "./types";
 
 const b = makeMovementBundle();

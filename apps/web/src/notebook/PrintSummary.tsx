@@ -4,7 +4,7 @@ import type { Lang } from "../i18n/lang";
 import type { Translate } from "../i18n/t";
 import { SHOW_COMPARISON } from "./NotebookPanel";
 import { Summary } from "./Summary";
-import { summaryModel } from "./summary";
+import { summaryModel } from "./summaryModel";
 import type { NotebookEntry } from "./types";
 
 // React.lazy loads this default export. It builds the summary from the notes, puts it on the page,
