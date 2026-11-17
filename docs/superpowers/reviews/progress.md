@@ -20,6 +20,7 @@ Session of 2026-11-17:
 - Tenth run: the Phase 3 review fixes (Fixes 1 to 5). The review guard now also compares reviewed rows at the base and the head, the validator refuses a quotable `license_id` under a non-commercial, no-derivatives or share-alike licence text, the history audit's home-path row is corrected after a re-run (new item D8), a new end-to-end test serves the build from `/anatoMe/`, and three small fixes. See "Review fixes" in `phase-3-build-report.md`.
 - Eleventh run: the Phase 4a review fixes (Fixes 1 to 5), tests and docs only. Fixes 1, 2, 4 and 5 are done: five new tests for the language choice, each seen failing on its line, and `docs/phase4/german-names.md` with the page and read date of every German name, each page opened again. Fix 3 (`?region=` at start) stopped at its own stop rule and is not committed, because the `?region=elbow` test cannot fail on its named line. See "Review fixes" in `phase-4a-build-report.md`.
 - Twelfth run: built the three-column layout and stage controls (Tasks 1 to 14): a navigation rail, stage controls, Layers in its own section, retry after failed loads and four restyled panels. All checks are green except the known root-only `markChecked` pipeline test. German texts and eight open choices wait for the owner. See `three-column-layout-build-report.md`.
+- Thirteenth run: built the whole body view (design, plan and Tasks 1 to 6, plus the fixes of the whole-branch review). Approach A (the seven region files) failed the phone gate, so the whole body is one lighter file, `models/body.glb`, with bones at most 1000 and other parts at most 400 triangles per mesh. The app opens with it. All checks are green, perf median 3471 ms with the whole body as the opener. Five changed tests go further than the opener and wait for the owner. See `whole-body-view-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -38,6 +39,7 @@ Session of 2026-11-17:
 | Phase 3 review fixes, Fixes 1 to 5 | done (every new test seen failing first, groh-2009 left not confirmed for the owner) | `phase-3-build-report.md`, section "Review fixes" |
 | Phase 4a review fixes, Fixes 1 to 5 | partly done (Fixes 1, 2, 4 and 5 done, Fix 3 stopped for the owner) | `phase-4a-build-report.md`, section "Review fixes" |
 | Three-column layout and stage controls, Tasks 1 to 14 | done (with deviations, German drafts and open choices for the owner) | `three-column-layout-build-report.md` |
+| Whole body view, design, plan and Tasks 1 to 6 | done (option B, with deviations in changed tests for the owner) | `whole-body-view-build-report.md` |
 
 ## Waiting for the owner
 
@@ -66,6 +68,12 @@ Session of 2026-11-17:
 - Phase 4b second review: `setNotice(null)` and `setPrintJob(null)` in `changeRegion` repeat what other code already does, so no test can fail on either line alone and none was added. Keep or remove them (item 10). One App test run failed once without a name and did not come back in nine runs (item 11). The doubled hyoid and the third left digastric file are documented in `docs/regions/known-gaps.md`, not fixed, as the owner decided.
 - Phase 4b second review: `~/build/research/phase4b-fix1-wip.patch` is applied, and the list of 72 beside it, `phase4b-fix1-side-corrections.txt`, is no longer needed. Both can be deleted (item 9).
 - Phase 4b third review: the arm has a known gap now (palmaris brevis has no mesh) but no gap line in the app. Decide whether it gets `regionGap.arm` in English and German (item 13). The coccyx has no mesh either. Decide whether the trunk's gap line should name it (item 14).
+
+- Whole body view: confirm or reject the changed tests and test setup, rows 4 to 8 of "Deviations" in `whole-body-view-build-report.md` (both stage tests open the hip, 20 s load waits in three test helpers, `workers: 2`, a comment in area.spec). They go further than "opener only".
+- Whole body view: look at the before and after screenshots in `~/build/research/whole-body-screens/` (the skull's teeth row above all) and say whether bones at 1000 and other parts at 400 triangles are good enough. The body budget is 240,000 triangles with 708 left, so any new structure forces a decision.
+- Whole body view: run the "Whole body" row of `docs/regions/phone-measurements.md` on the Galaxy A23, timing from opening the page. perf-check here: 3471 ms for the whole body, 2371 ms for the hip.
+- Whole body view: proofread the German draft "Was dem Modell noch fehlt, nach Region:" (`regionGap.body`).
+- Whole body view: decide whether Under a spot should stop at the air between an arm and the trunk. A tap a few pixels beside the humerus lists the chest wall 5 to 11.5 cm deeper.
 
 ## Notes for the next session
 
