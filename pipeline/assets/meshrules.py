@@ -27,3 +27,10 @@ def decimate_ratio(tris: int, ratio: float, cap: int | None, min_faces: int = 12
     if cap is not None and r > cap / tris:
         r = cap / tris
     return r
+
+
+def cap_for(kind: str, cap: int | None, bone_cap: int | None) -> int | None:
+    """The triangle cap for one mesh: the bone cap for a bone when there is one, else the general cap."""
+    if kind == "bone" and bone_cap is not None:
+        return bone_cap
+    return cap

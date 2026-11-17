@@ -5,7 +5,7 @@ from pathlib import Path
 # Let the tests import meshrules from the folder above.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from meshrules import decimate_ratio, depth_from_free  # noqa: E402
+from meshrules import cap_for, decimate_ratio, depth_from_free  # noqa: E402
 
 
 def test_depth_from_free():
@@ -21,3 +21,11 @@ def test_decimate_ratio():
     assert decimate_ratio(223652, 0.14, 2000) == 2000 / 223652    # external oblique, capped
     assert decimate_ratio(5000, 0.14, 2000) == 0.14               # 700 faces, under the cap
     assert decimate_ratio(100, 0.14, 2000) == 1.0
+
+
+def test_cap_for():
+    assert cap_for("bone", 400, 1000) == 1000
+    assert cap_for("muscle", 400, 1000) == 400
+    assert cap_for("tendon", 400, 1000) == 400
+    assert cap_for("bone", 2000, None) == 2000    # a region file without a bone cap builds as before
+    assert cap_for("bone", None, None) is None    # the hip: no cap at all

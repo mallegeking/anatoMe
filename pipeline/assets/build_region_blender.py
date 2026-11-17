@@ -5,6 +5,8 @@ Runs inside Blender, headless, from the repo root:
       --region hip --source bp3d --out models/hip.glb
   tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blender.py -- \
       --region hip --source z-anatomy --out models/hip-z-anatomy.glb
+  tools/blender/blender -b --factory-startup -P pipeline/assets/build_region_blender.py -- \
+      --region body --source bp3d --out models/body.glb
 
 What it does:
   1. Reads regions/<region>.json and picks the targets whose "source" matches --source.
@@ -35,7 +37,7 @@ from mathutils.bvhtree import BVHTree
 HERE = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd() / "pipeline" / "assets"
 sys.path.insert(0, str(HERE))
 from hipmatch import match_targets  # noqa: E402
-from meshrules import decimate_ratio, depth_from_free  # noqa: E402
+from meshrules import cap_for, decimate_ratio, depth_from_free  # noqa: E402
 from meshfit import (  # noqa: E402
     apply_similarity,
     femoral_head_points,
@@ -62,6 +64,7 @@ ZA_COLLECTIONS = ["1: Skeletal system", "3: Joints", "4: Muscular system"]
 # The whole hip region still stays far under TRIANGLE_BUDGET.
 BONE_RATIO, OTHER_RATIO, MIN_FACES = 0.6, 0.14, 120
 TRIANGLE_BUDGET = 150_000  # for all files of the region together
+BODY_TRIANGLE_BUDGET = 240_000  # the whole body file
 
 # Rough Z-Anatomy to BodyParts3D move from docs/phase0/mesh-source-decision.md
 # (scale 1.0139, then shift). The per-side fit starts from here.
@@ -99,9 +102,10 @@ def load_targets(region):
     return json.loads((HERE / "regions" / f"{region}.json").read_text(encoding="utf-8"))["targets"]
 
 
-def load_cap(region):
-    """The region file's max_triangles_per_mesh, or None when it has none (the hip)."""
-    return json.loads((HERE / "regions" / f"{region}.json").read_text(encoding="utf-8")).get("max_triangles_per_mesh")
+def load_caps(region):
+    """(max_triangles_per_mesh, max_triangles_per_bone_mesh) of the region file, None for each it lacks."""
+    data = json.loads((HERE / "regions" / f"{region}.json").read_text(encoding="utf-8"))
+    return data.get("max_triangles_per_mesh"), data.get("max_triangles_per_bone_mesh")
 
 
 def pick_meshes(region, source, whole_region):
@@ -317,8 +321,8 @@ def clean_and_decimate(obj, ratio, cap=None):
     me.shade_smooth()
 
 
-def build_objects(picked, source, mesh_for_record, side_matrix, cap=None):
-    """One object per target and side, with the glTF extras set. cap is the region's max_triangles_per_mesh."""
+def build_objects(picked, source, mesh_for_record, side_matrix, caps=(None, None)):
+    """One object per target and side, with the glTF extras set. caps is (max_triangles_per_mesh, max_triangles_per_bone_mesh) of the region."""
     scene_coll = bpy.context.scene.collection
     built = []
     for target, records in picked:
@@ -335,7 +339,7 @@ def build_objects(picked, source, mesh_for_record, side_matrix, cap=None):
                 mesh.transform(side_matrix[side])
             obj = bpy.data.objects.new(name, mesh)
             scene_coll.objects.link(obj)
-            clean_and_decimate(obj, BONE_RATIO if target["type"] == "bone" else OTHER_RATIO, cap)
+            clean_and_decimate(obj, BONE_RATIO if target["type"] == "bone" else OTHER_RATIO, cap_for(target["type"], *caps))
             # These become glTF extras, which three.js shows as userData.
             obj["sid"] = target["sid"]
             obj["label"] = target["english"]
@@ -407,7 +411,7 @@ def measure_depths(objs):
     return out
 
 
-def report(objs):
+def report(objs, budget=TRIANGLE_BUDGET):
     stats = {}
     for o in objs:
         s = stats.setdefault(o["kind"], [0, 0])
@@ -417,8 +421,8 @@ def report(objs):
         print(f"{kind:10s} {n:4d} meshes {f:7d} faces")
     total = sum(f for _, f in stats.values())
     print(f"TOTAL {sum(n for n, _ in stats.values())} meshes {total} faces")
-    if total > TRIANGLE_BUDGET:
-        print(f"WARNING over the {TRIANGLE_BUDGET} triangle budget for the region")
+    if total > budget:
+        print(f"WARNING over the {budget} triangle budget for the region")
 
 
 def clear_scene_properties(scene):
@@ -480,7 +484,7 @@ def main():
 
     if args.source == "bp3d":
         bpy.ops.wm.read_factory_settings(use_empty=True)
-        objs = build_objects(picked, "bp3d", import_bp3d, None, load_cap(args.region))
+        objs = build_objects(picked, "bp3d", import_bp3d, None, load_caps(args.region))
         if args.depths_out:
             depths_out = Path(args.depths_out)
             depths_out = depths_out if depths_out.is_absolute() else ROOT / depths_out
@@ -503,7 +507,7 @@ def main():
         objs = build_objects(picked, "z-anatomy",
                              lambda r: za_world_mesh(r["mesh_name"], allowed, depsgraph), matrices)
 
-    report(objs)
+    report(objs, BODY_TRIANGLE_BUDGET if args.region == "body" else TRIANGLE_BUDGET)
     export(objs, out, args.source)
 
 

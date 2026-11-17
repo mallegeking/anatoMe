@@ -5,6 +5,8 @@ Plain Python, no extra packages. Run from the repo root:
       writes pipeline/assets/regions/<region>.json for every region in REGIONS
   .venv/bin/python pipeline/assets/region_gen.py structures
       writes data/structures/<region>.yaml from those files and sources/<region>-depths.json
+  .venv/bin/python pipeline/assets/region_gen.py body
+      writes pipeline/assets/regions/body.json, the BodyParts3D targets of all six region files, each once
 
 Needs sources/bp3d-inventory.jsonl (run bp3d_inventory.py first), the BodyParts3D part lists
 and Z-Anatomy's TA2.csv. The depths files come from build_region_blender.py --depths-out.
@@ -29,6 +31,11 @@ STRUCTURES_DIR = ROOT / "data" / "structures"
 BONE, MUSCLE = "FMA5018", "FMA5022"   # bone organ, muscle organ
 REGIONS = ["lower-leg", "shoulder", "arm", "neck", "trunk"]
 MAX_TRIANGLES_PER_MESH = 2000
+
+# The whole body: the six regions' BodyParts3D targets in one file, with lower caps.
+BODY_PARTS = ["hip", "lower-leg", "shoulder", "arm", "neck", "trunk"]
+BODY_MAX_TRIANGLES_PER_MESH = 400
+BODY_MAX_TRIANGLES_PER_BONE_MESH = 1000
 
 # Parts the two classes miss: muscles stored as heads or parts, the sternum, the Achilles tendon.
 EXTRA = re.compile(
@@ -185,6 +192,27 @@ def build_targets(records, classes_of, hip_targets):
     return result, dropped
 
 
+def body_targets(parts):
+    """The BodyParts3D targets of (region, targets) pairs, each sid once, in the order first seen.
+
+    A second target with the same sid but another type, english name or patterns stops the run.
+    """
+    out = []
+    first = {}  # sid -> (region, target)
+    for region, targets in parts:
+        for t in targets:
+            if t.get("source") != "bp3d":
+                continue
+            if t["sid"] not in first:
+                first[t["sid"]] = (region, t)
+                out.append(t)
+                continue
+            seen_region, seen = first[t["sid"]]
+            if any(t.get(k) != seen.get(k) for k in ("type", "english", "patterns")):
+                sys.exit(f"the sid {t['sid']} differs between {seen_region} and {region}")
+    return out
+
+
 # --- Latin and FMA --------------------------------------------------------------
 
 
@@ -339,6 +367,19 @@ def cmd_targets():
         print(f"  {d}")
 
 
+def cmd_body():
+    parts = [(p, json.loads((REGIONS_DIR / f"{p}.json").read_text(encoding="utf-8"))["targets"]) for p in BODY_PARTS]
+    targets = body_targets(parts)
+    data = {
+        "region": "body",
+        "max_triangles_per_mesh": BODY_MAX_TRIANGLES_PER_MESH,
+        "max_triangles_per_bone_mesh": BODY_MAX_TRIANGLES_PER_BONE_MESH,
+        "targets": targets,
+    }
+    (REGIONS_DIR / "body.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print(f"body {len(targets)} targets written to regions/body.json")
+
+
 def cmd_structures():
     latin = read_latin(TA2)
     fma_by_name = read_fma(BP3D / "isa_parts_list_e.txt")
@@ -360,9 +401,9 @@ def cmd_structures():
 
 
 def main():
-    commands = {"targets": cmd_targets, "structures": cmd_structures}
+    commands = {"targets": cmd_targets, "structures": cmd_structures, "body": cmd_body}
     if len(sys.argv) != 2 or sys.argv[1] not in commands:
-        sys.exit("usage: region_gen.py targets|structures")
+        sys.exit("usage: region_gen.py targets|structures|body")
     commands[sys.argv[1]]()
 
 

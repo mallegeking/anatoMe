@@ -3,6 +3,8 @@ import re
 import sys
 from pathlib import Path
 
+import pytest
+
 # Let the tests import region_gen from the folder above.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -10,6 +12,7 @@ from region_gen import (  # noqa: E402
     BONE,
     CONTEXT,
     MUSCLE,
+    body_targets,
     build_targets,
     fma_for,
     latin_for,
@@ -210,3 +213,18 @@ def test_fma_lookup():
     assert fma_for("Teres major muscle", fma) == "FMA1"          # the name itself comes first
     assert fma_for("Teres major", fma) == "FMA32549"
     assert fma_for("Talus", fma) is None
+
+
+def test_body_targets_union_once_in_order():
+    femur, tibia, soleus = hip_target("femur"), hip_target("tibia"), {**hip_target("soleus"), "type": "muscle"}
+    ligament = {**hip_target("pubofemoral-ligament"), "source": "z-anatomy"}
+    gap = {**hip_target("quadriceps-tendon"), "source": None}
+    out = body_targets([("hip", [femur, ligament, gap]), ("lower-leg", [soleus, femur, tibia])])
+    assert [t["sid"] for t in out] == ["femur", "soleus", "tibia"]   # BodyParts3D only, each once, first seen first
+
+
+def test_body_targets_stops_on_a_conflict():
+    femur = hip_target("femur")
+    other = {**femur, "patterns": ["^left femur bone$"]}
+    with pytest.raises(SystemExit, match="femur"):
+        body_targets([("hip", [femur]), ("lower-leg", [other])])
