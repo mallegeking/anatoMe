@@ -516,9 +516,10 @@ export function App() {
                 {region === null ? (
                   <Hint t={t} />
                 ) : (
-                  <Suspense fallback={<Hint t={t} region={region} />}>
+                  <Suspense fallback={<Hint t={t} region={region} parts={regions} />}>
                     <PanelArea
                       region={region}
+                      regions={regions}
                       t={t}
                       lang={lang}
                       mode={shownMode}

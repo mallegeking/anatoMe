@@ -7,7 +7,8 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 
 // Opens the app and waits until the model is drawn and the camera has said where it looks from.
 async function openModel(page: Page) {
-  await page.goto("/");
+  // The tap and the drag below are aimed at the hip's framing and timing, so these checks open the hip (plan decision 4).
+  await page.goto("/?region=hip");
   await expect(page.getByText(texts["loading.model"])).toHaveCount(0);
   await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
   // The panel's first text can change the height of the phone's sheet, and so the stage's, so wait for it too.

@@ -1,5 +1,8 @@
 import type { Manifest } from "../viewer/manifest";
 
+// The id of the whole body, the region made of all the others.
+export const WHOLE_BODY = "body";
+
 // The body regions the model manifest lists, in the manifest's order.
 export function regionIds(manifest: Manifest): string[] {
   return Object.keys(manifest.regions);

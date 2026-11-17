@@ -119,6 +119,7 @@
   "region.arm": "Arm and hand",
   "region.neck": "Head and neck",
   "region.trunk": "Trunk",
+  "regionGap.body": "What the model does not have yet, by region:",
   "regionGap.shoulder": "Not in the model yet: latissimus dorsi.",
   "regionGap.lower-leg": "Not in the model yet: the dorsal interossei of the foot and extensor digitorum brevis.",
   "regionGap.neck": "Not in the model yet: the jaw muscles, the muscles of the face and longus colli.",

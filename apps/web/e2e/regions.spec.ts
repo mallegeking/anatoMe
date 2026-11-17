@@ -29,8 +29,8 @@ test("?region=shoulder opens the shoulder", async ({ page }) => {
   await expect(page.getByText(texts["regionGap.shoulder"])).toBeVisible();
 });
 
-test("?region=elbow opens the hip", async ({ page }) => {
+test("?region=elbow opens the whole body", async ({ page }) => {
   await page.goto("/?region=elbow");
-  await expect(page.getByRole("combobox", { name: texts["region.label"] })).toHaveValue("hip");
+  await expect(page.getByRole("combobox", { name: texts["region.label"] })).toHaveValue("body");
   await expect(page.getByRole("tab", { name: texts["mode.movement"] })).toBeVisible();
 });

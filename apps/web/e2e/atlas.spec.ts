@@ -40,7 +40,7 @@ test("search piriformis and read about it", async ({ page, baseURL }) => {
   await page.waitForLoadState("networkidle");
   await expect.poll(() => paths.some((p) => p.endsWith(".glb"))).toBe(true);
   // These prove the listener saw the data, the meshes and the decoder.
-  expect(paths.some((p) => p.endsWith("data/hip.json"))).toBe(true);
+  expect(paths.some((p) => p.endsWith("data/body.json"))).toBe(true);
   expect(paths.some((p) => p.endsWith(".glb"))).toBe(true);
   expect(paths.some((p) => p.includes("/draco/"))).toBe(true);
 

@@ -439,6 +439,26 @@ body,
   font-style: italic;
 }
 
+/* The whole body's gap list: each region's name with its gap line under it.
+   Name and line stack, so the list wraps on a narrow phone instead of running off the side. */
+.region-gaps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.region-gaps dt {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.region-gaps dd {
+  margin: 0;
+}
+
 /* Shared control styles. */
 .btn {
   min-height: var(--tap);

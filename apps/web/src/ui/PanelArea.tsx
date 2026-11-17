@@ -22,6 +22,8 @@ const notebookPanel = lazyRetry(() => import("../notebook/NotebookPanel"));
 
 type Props = {
   region: string;
+  // The manifest's region ids, for the whole body's gap list.
+  regions: string[];
   t: Translate;
   // The language the names show in.
   lang: Lang;
@@ -51,7 +53,7 @@ type Props = {
 // Loads the data, tells the app which structures exist, and shows one of the panels:
 // the movement panel in the Movements tab, else the area panel in the Area tab,
 // else the notebook in the Notebook tab, else the info panel.
-export function PanelArea({ region, t, lang, mode, selection, label, movement, onBundle, ...on }: Props) {
+export function PanelArea({ region, regions, t, lang, mode, selection, label, movement, onBundle, ...on }: Props) {
   const bundle = useRegionData(region);
   useEffect(() => onBundle(bundle), [bundle, onBundle]);
   if (mode === "movement") {
@@ -104,6 +106,7 @@ export function PanelArea({ region, t, lang, mode, selection, label, movement, o
   return (
     <RegionInfo
       region={region}
+      parts={regions}
       selection={selection}
       fallbackLabel={label}
       t={t}

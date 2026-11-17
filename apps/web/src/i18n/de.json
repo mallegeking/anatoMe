@@ -119,6 +119,7 @@
   "region.arm": "Arm und Hand",
   "region.neck": "Kopf und Hals",
   "region.trunk": "Rumpf",
+  "regionGap.body": "Was dem Modell noch fehlt, nach Region:",
   "regionGap.shoulder": "Noch nicht im Modell: Latissimus dorsi.",
   "regionGap.lower-leg": "Noch nicht im Modell: die Musculi interossei dorsales des Fußes und der Extensor digitorum brevis.",
   "regionGap.neck": "Noch nicht im Modell: die Kaumuskeln, die Gesichtsmuskeln und der Longus colli.",

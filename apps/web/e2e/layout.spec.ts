@@ -233,7 +233,7 @@ for (const { lang, texts } of LANGUAGES) {
       // Wait until the heavy files have really been asked for, so a late outside request cannot slip past.
       await page.waitForLoadState("networkidle");
       await expect.poll(() => paths.some((p) => p.endsWith(".glb"))).toBe(true);
-      expect(paths.some((p) => p.endsWith("data/hip.json"))).toBe(true);
+      expect(paths.some((p) => p.endsWith("data/body.json"))).toBe(true);
       expect(paths.some((p) => p.includes("/draco/"))).toBe(true);
       expect([...hosts]).toEqual([new URL(baseURL!).host]);
     });
