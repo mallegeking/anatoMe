@@ -6,6 +6,7 @@ import { App } from "./App";
 import { clearRegionDataCache } from "./data/useRegionData";
 import de from "./i18n/de.json";
 import en from "./i18n/en.json";
+import { LANG_KEY } from "./i18n/lang";
 import { createT } from "./i18n/t";
 import { makeBundle } from "./ui/fixture";
 import type { Selection } from "./viewer/pick";
@@ -117,6 +118,7 @@ afterEach(() => {
   cleanup();
   // A test that switches the language must not leave the next one in German.
   localStorage.clear();
+  document.documentElement.removeAttribute("lang");
   // A test that switches region leaves ?region=... in the address.
   history.replaceState(null, "", "/");
   vi.unstubAllGlobals();
@@ -305,6 +307,46 @@ test("the search notice shown in English reads in German after the language chan
   expect(screen.getByRole("status").textContent).toBe(createT(en)("search.peeledOne", { name: "Piriformis" }));
   pickLanguage("de");
   expect(screen.getByRole("status").textContent).toBe(createT(de)("search.peeledOne", { name: "Birnenförmiger Muskel" }));
+});
+
+// The browser's languages for one test. The afterEach puts the real ones back.
+const browserLanguages = (languages: string[]) => vi.spyOn(navigator, "languages", "get").mockReturnValue(languages);
+
+test("picking Deutsch in the language switch stores de for the next visit", async () => {
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(localStorage.getItem(LANG_KEY)).toBeNull();
+  const deutsch = screen.getByRole("option", { name: en["lang.de"] }) as HTMLOptionElement;
+  fireEvent.change(screen.getByRole("combobox", { name: en["lang.label"] }), { target: { value: deutsch.value } });
+  expect(localStorage.getItem(LANG_KEY)).toBe("de");
+});
+
+test("a stored de starts the app in German", async () => {
+  browserLanguages(["en-US"]);
+  localStorage.setItem(LANG_KEY, "de");
+  serve(makeBundle());
+  render(<App />);
+  expect(await screen.findByRole("tab", { name: de["mode.atlas"] })).toBeTruthy();
+  expect(screen.queryByRole("tab", { name: en["mode.atlas"] })).toBeNull();
+});
+
+test("with nothing stored a German browser starts the app in German", async () => {
+  browserLanguages(["de-AT"]);
+  serve(makeBundle());
+  render(<App />);
+  expect(await screen.findByRole("tab", { name: de["mode.atlas"] })).toBeTruthy();
+  expect(screen.queryByRole("tab", { name: en["mode.atlas"] })).toBeNull();
+});
+
+test("the page's lang attribute is en with an English browser and de after the switch", async () => {
+  browserLanguages(["en-US"]);
+  serve(makeBundle());
+  render(<App />);
+  await screen.findByText(en["info.tapHint"]);
+  expect(document.documentElement.lang).toBe("en");
+  pickLanguage("de");
+  expect(document.documentElement.lang).toBe("de");
 });
 
 test("the Area tab shows the hint", async () => {
