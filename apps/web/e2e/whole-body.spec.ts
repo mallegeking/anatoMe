@@ -11,10 +11,11 @@ function picker(page: Page) {
   return page.getByRole("combobox", { name: texts["region.label"] });
 }
 
-// Opens the address and waits until the model is drawn. The whole body has many meshes, so this takes longer than a region.
+// Opens the address and waits until the model is drawn.
 async function openModel(page: Page, path: string) {
   await page.goto(path);
-  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 30_000 });
+  // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
+  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
 }
 
 test("the app opens with the whole body", async ({ page }) => {
@@ -49,4 +50,32 @@ test("a search in the whole body selects a structure outside the hip", async ({ 
   await page.getByTestId("search-results").getByRole("button", { name: /^Scapula\b/ }).first().click();
   await expect(page.getByTestId("info-panel").getByRole("heading", { name: "Scapula", exact: true, level: 2 })).toBeVisible();
   await expect(page.locator(".stage-chip")).toContainText("Scapula");
+});
+
+test("turning the whole body to the back swaps the markers and reset brings the front back", async ({ page }) => {
+  // Each step below waits for a full software frame of the whole body, which takes seconds when several browsers share the machine.
+  test.setTimeout(120_000);
+  await openModel(page, "/");
+  const badge = page.locator(".stage-badge");
+  await expect(badge).toHaveText(texts["view.front"]);
+  // The panel's first text can change the height of the phone's sheet, and so the stage's, so wait for it too.
+  await expect(page.getByTestId("info-label")).toBeVisible();
+
+  // A sideways drag of half the stage's height turns the model half way round, as in stage.spec.ts.
+  // The turn depends only on the drag distance, and each pointer move costs a full software frame of the whole body, so two steps are enough.
+  const stage = (await page.locator(".stage").boundingBox())!;
+  const y = stage.y + 0.5 * stage.height;
+  const from = stage.x + stage.width / 2 - 0.25 * stage.height;
+  await page.mouse.move(from, y);
+  await page.mouse.down();
+  await page.mouse.move(from + 0.5 * stage.height, y, { steps: 2 });
+  await page.mouse.up();
+  // The badge follows once the camera has come to rest.
+  await expect(badge).toHaveText(texts["view.back"], { timeout: 30_000 });
+  await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.left"]);
+  await expect(page.locator(".stage-marker--right")).toHaveText(texts["stage.right"]);
+
+  await page.getByRole("button", { name: texts["stage.reset"] }).click();
+  await expect(badge).toHaveText(texts["view.front"], { timeout: 30_000 });
+  await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.right"]);
 });

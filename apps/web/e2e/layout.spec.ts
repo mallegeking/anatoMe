@@ -18,7 +18,8 @@ const STAGE_MIN = 220;
 
 async function open(page: Page, texts: Texts) {
   await page.goto("/");
-  await expect(page.getByText(texts["loading.model"])).toHaveCount(0);
+  // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
+  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
 }
 
 async function stageHeight(page: Page): Promise<number> {

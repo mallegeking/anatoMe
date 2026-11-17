@@ -9,6 +9,9 @@ export default defineConfig({
   timeout: 60_000,
   // A test.only left in by mistake would skip every other test, so CI refuses it.
   forbidOnly: !!process.env.CI,
+  // Most tests now open the whole body, which each test browser draws in software WebGL. More than two browsers
+  // at once on a 4-core machine (the GitHub runners have 4 too) make loads and drags time out.
+  workers: 2,
   reporter: "list",
   use: {
     baseURL: "http://localhost:4175",

@@ -16,7 +16,8 @@ test("tap a spot and read what lies under it", async ({ page, baseURL }) => {
 
   await page.goto("/");
   await page.getByRole("tab", { name: texts["mode.area"] }).click();
-  await expect(page.getByText(texts["loading.model"])).toHaveCount(0);
+  // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
+  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
 
   const canvas = page.locator("canvas");
   const box = (await canvas.boundingBox())!;

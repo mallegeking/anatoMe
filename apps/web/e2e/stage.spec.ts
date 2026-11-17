@@ -6,10 +6,10 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 // The data comes from the test-only set in e2e/data (see scripts/e2e-prepare.mjs).
 
 // Opens the app and waits until the model is drawn and the camera has said where it looks from.
-async function openModel(page: Page) {
-  // The tap and the drag below are aimed at the hip's framing and timing, so these checks open the hip (plan decision 4).
-  await page.goto("/?region=hip");
-  await expect(page.getByText(texts["loading.model"])).toHaveCount(0);
+async function openModel(page: Page, path = "/") {
+  await page.goto(path);
+  // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
+  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
   await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
   // The panel's first text can change the height of the phone's sheet, and so the stage's, so wait for it too.
   await expect(page.getByTestId("info-label")).toBeVisible();
@@ -21,7 +21,8 @@ test("tap a structure, see the chip, clear it, reset the view", async ({ page },
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
-  await openModel(page);
+  // The tap below is aimed at the hip's framing, so this check opens the hip (plan decision 4).
+  await openModel(page, "/?region=hip");
 
   // The model stands in the middle of the stage and scales with its height, so the spot is placed from the middle
   // in stage heights, as in area.spec.ts. This is the thigh on the screen's right at every size.
@@ -48,7 +49,8 @@ test("tap a structure, see the chip, clear it, reset the view", async ({ page },
 });
 
 test("turning the model to the back swaps the markers", async ({ page }) => {
-  await openModel(page);
+  // The whole body has its own turning test in whole-body.spec.ts, because a 10-step drag of the whole body takes about 50 s in software WebGL.
+  await openModel(page, "/?region=hip");
   const stage = (await page.locator(".stage").boundingBox())!;
   const badge = page.locator(".stage-badge");
   // A sideways drag of half the stage's height turns the model about half way round. Drag again if one is not enough.
