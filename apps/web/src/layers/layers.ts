@@ -1,5 +1,5 @@
-import type { BundleStructure } from "../data/bundle";
-import type { Side } from "../viewer/pick";
+import type { BundleStructure } from "../data/bundle.ts";
+import type { Side } from "../viewer/pick.ts";
 
 // Bone and muscle get their own switch. Everything else is "soft".
 export type TissueGroup = "bone" | "muscle" | "soft";

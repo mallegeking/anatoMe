@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
 import type { RegionBundle } from "../../../apps/web/src/data/bundle.ts";
+import { initialLayers, isVisible, peel } from "../../../apps/web/src/layers/layers.ts";
 import { bundleRegions, compileRegion, listRegions } from "../src/compile.ts";
 import { WHOLE_BODY } from "../src/regions.ts";
 
@@ -116,3 +117,12 @@ test("the whole body's normal build has no drafts and counts them like the hip",
   expect(body.pendingByStructure).toEqual(compileRegion(fx("valid"), "hip", "normal").pendingByStructure);
   expect(body.pendingExercises).toBe(compileRegion(fx("valid"), "hip", "normal").pendingExercises);
 });
+test("peeling once in the whole body takes the outer muscles of every region", () => {
+  const body = compileRegion(realDataDir, WHOLE_BODY, "normal");
+  const after = peel(initialLayers(), body.structures);
+  const hidden = body.structures.filter((s) => s.type === "muscle" && !isVisible(after, s, "l"));
+  expect(new Set(hidden.map((s) => s.depth))).toEqual(new Set([1]));
+  const homes = new Set(listRegions(realDataDir).filter((r) => compileRegion(realDataDir, r, "normal").structures.some((s) => hidden.some((h) => h.id === s.id))));
+  expect(homes).toEqual(new Set(listRegions(realDataDir)));
+  expect(body.structures.filter((s) => s.type === "muscle" && s.depth > 1).every((s) => isVisible(after, s, "l"))).toBe(true);
+}, 30_000); // it compiles the real data seven times, as the union test above does
