@@ -16,7 +16,7 @@ All on this machine. perf-check is Chromium with a 4 times slower CPU, median of
 
 1. **Do the regions fit together?** Yes. All six are BodyParts3D in metres with no shift or turn. The 62 bones drawn in more than one region have identical bounding boxes (0.0 mm apart), except the sacrum (0.2 mm, the hip draws it with more triangles). Screenshots of the seven region files loaded together, from the front, the right side and the back, show one continuous body: thighs into knees and lower legs, trunk into neck, shoulders into arms, gluteals, hamstrings, calves and back muscles joined up, and the hip's blue iliotibial tract running along the outer thigh. No gap, overlap or wrong scale. The screenshots are in `~/build/research/whole-body-screens/` (not in the repo, they are renders of the CC BY and CC BY-SA meshes). Stop rule 1 did not apply.
 2. **Drawn twice:** 62 structure and side pairs, all bones, 120,415 triangles in all. The full list is in section 2.2 of the design.
-3. **Weight:** 478,857 triangles over seven files, 2.7 MB, 639 meshes. Without the copies, 577 meshes and about 358,000 triangles.
+3. **Weight:** 478,857 triangles over seven files, 2.7 MB, 653 meshes. Without the copies, 577 meshes and about 358,000 triangles.
 4. **Speed of the simplest whole body (approach A, the seven files, copies skipped):** medians 6803, 9795 and 5334 ms. The hip as opener in the same rounds: 4213, 3851 and 2875 ms.
 
 ## Choice: B, one lighter file

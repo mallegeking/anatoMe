@@ -865,6 +865,37 @@ test("the gap line of the region stays under the tap hint after the region's dat
   expect(screen.getByText("Not in the model yet: latissimus dorsi.")).toBeTruthy();
 });
 
+test("the whole body's gap list names the manifest's regions while its data loads and after", async () => {
+  const twoFile = { path: "x.glb", source: "bp3d", license: "CC-BY-4.0" };
+  const manifest = { regions: { body: { files: [twoFile] }, shoulder: { files: [twoFile] } } };
+  // Without movements the tabs drop to two once the body's data is in, which tells the loaded panel from the loading one.
+  const body: RegionBundle = { ...makeBundle(), region: "body", movements: [], actions: [] };
+  let release: () => void = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (url.endsWith("models/manifest.json")) return new Response(JSON.stringify(manifest));
+      if (url.endsWith("data/body.json")) {
+        await held;
+        return new Response(JSON.stringify(body));
+      }
+      return new Response("", { status: 404 });
+    }),
+  );
+  render(<App />);
+  // While the data loads, the panel's fallback hint shows the list.
+  expect(await screen.findByText(en["regionGap.body"])).toBeTruthy();
+  expect(screen.getByText(en["regionGap.shoulder"])).toBeTruthy();
+  expect(screen.getAllByRole("tab")).toHaveLength(4);
+  release();
+  // Once the data is in, the region panel's hint shows it.
+  await waitFor(() => expect(screen.getAllByRole("tab").map((x) => x.textContent)).toEqual([en["mode.atlas"], en["mode.area"]]));
+  expect(screen.getByText(en["regionGap.body"])).toBeTruthy();
+  expect(screen.getByText(en["region.shoulder"], { selector: "dt" })).toBeTruthy();
+  expect(screen.getByText(en["regionGap.shoulder"])).toBeTruthy();
+});
+
 test("switching region empties the search field", async () => {
   serveTwo();
   render(<App />);

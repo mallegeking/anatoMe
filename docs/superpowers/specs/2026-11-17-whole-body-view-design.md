@@ -51,7 +51,7 @@ Together they are 120,415 triangles that would be drawn a second or third time. 
 
 ### 2.3 How heavy is it?
 
-`npm run check-models` before this work: 478,857 triangles over the seven files (hip 48,909, lower leg 44,294, shoulder 109,449, arm 45,227, neck 90,682, trunk 140,296), 2.7 MB, 639 meshes. Without the copies it is 577 meshes and about 358,000 triangles. A region may have 150,000.
+`npm run check-models` before this work: 478,857 triangles over the seven files (hip 48,909, lower leg 44,294, shoulder 109,449, arm 45,227, neck 90,682, trunk 140,296), 2.7 MB, 653 meshes. Without the copies it is 577 meshes and about 358,000 triangles. A region may have 150,000.
 
 ### 2.4 How fast is it?
 
