@@ -20,7 +20,11 @@ Session of 2026-11-17:
 - Tenth run: the Phase 3 review fixes (Fixes 1 to 5). The review guard now also compares reviewed rows at the base and the head, the validator refuses a quotable `license_id` under a non-commercial, no-derivatives or share-alike licence text, the history audit's home-path row is corrected after a re-run (new item D8), a new end-to-end test serves the build from `/anatoMe/`, and three small fixes. See "Review fixes" in `phase-3-build-report.md`.
 - Eleventh run: the Phase 4a review fixes (Fixes 1 to 5), tests and docs only. Fixes 1, 2, 4 and 5 are done: five new tests for the language choice, each seen failing on its line, and `docs/phase4/german-names.md` with the page and read date of every German name, each page opened again. Fix 3 (`?region=` at start) stopped at its own stop rule and is not committed, because the `?region=elbow` test cannot fail on its named line. See "Review fixes" in `phase-4a-build-report.md`.
 - Twelfth run: built the three-column layout and stage controls (Tasks 1 to 14): a navigation rail, stage controls, Layers in its own section, retry after failed loads and four restyled panels. All checks are green except the known root-only `markChecked` pipeline test. German texts and eight open choices wait for the owner. See `three-column-layout-build-report.md`.
-- Thirteenth run: built the whole body view (design, plan and Tasks 1 to 6, plus the fixes of the whole-branch review). Approach A (the seven region files) failed the phone gate, so the whole body is one lighter file, `models/body.glb`, with bones at most 1000 and other parts at most 400 triangles per mesh. The app opens with it. All checks are green, perf median 3471 ms with the whole body as the opener. Five changed tests go further than the opener and wait for the owner. See `whole-body-view-build-report.md`.
+- Thirteenth run: built the whole body view (design, plan and Tasks 1 to 6, plus the fixes of the whole-branch review). Approach A (the seven region files) failed the phone gate, so the whole body is one lighter file, `models/body.glb`, with bones decimated to 1000 and other parts to 400 triangles per mesh (17 meshes stay above 400, see the fourteenth run). The app opens with it. All checks are green, perf median 3471 ms with the whole body as the opener. Five changed tests go further than the opener and wait for the owner. See `whole-body-view-build-report.md`.
+
+Session of 2026-11-18:
+
+- Fourteenth run: the whole body view review fixes (Fixes 1 to 5). Every load wait now checks that the model really loaded, the whole body's stage controls are tested at three sizes, the flaky turning test was traced to the view badge missing camera-controls' `rest` on long frames and fixed in the app, and the gap list has an App test. Fix 4 (the triangle caps) stopped at its own stop rule: the docs now call the caps targets and list the 17 meshes above 400. See "Review fixes" in `whole-body-view-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -40,6 +44,7 @@ Session of 2026-11-17:
 | Phase 4a review fixes, Fixes 1 to 5 | partly done (Fixes 1, 2, 4 and 5 done, Fix 3 stopped for the owner) | `phase-4a-build-report.md`, section "Review fixes" |
 | Three-column layout and stage controls, Tasks 1 to 14 | done (with deviations, German drafts and open choices for the owner) | `three-column-layout-build-report.md` |
 | Whole body view, design, plan and Tasks 1 to 6 | done (option B, with deviations in changed tests for the owner) | `whole-body-view-build-report.md` |
+| Whole body view review fixes, Fixes 1 to 5 | partly done (Fixes 1, 2, 3 and 5 done, Fix 3 fixed in the app, Fix 4 stopped for the owner) | `whole-body-view-build-report.md`, section "Review fixes" |
 
 ## Waiting for the owner
 
@@ -74,6 +79,10 @@ Session of 2026-11-17:
 - Whole body view: run the "Whole body" row of `docs/regions/phone-measurements.md` on the Galaxy A23, timing from opening the page. perf-check here: 3471 ms for the whole body, 2371 ms for the hip.
 - Whole body view: proofread the German draft "Was dem Modell noch fehlt, nach Region:" (`regionGap.body`).
 - Whole body view: decide whether Under a spot should stop at the air between an arm and the trunk. A tap a few pixels beside the humerus lists the chest wall 5 to 11.5 cm deeper.
+
+- Whole body view review: Fix 4 is stopped. 17 non-bone meshes in `body.glb` stay above 400 triangles (the three intercostals 5615 to 7105, the external oblique about 2000 each side, serratus anterior about 840 and ten more). Merging loose vertices before decimating brings 13 of them to 400 in a trial, the three intercostals and the thoracic rotator stop at about 2500, 1600, 1100 and 770. Decide whether the pipeline merges first and what cap these sheets get (item 3 of "Review fixes", "For the owner"). The docs now say "decimated to" and list them.
+- Whole body view review: confirm the four 20 s load waits that stay, now each followed by a check that the model loaded (item 1), and that Fix 3 was fixed in the app (the view is reported on `sleep` too) instead of in the test scheduling, with `workers` still 2 (item 2).
+- Whole body view review: the new zoom test's reset step failed once in the first five full e2e runs and could not be made to fail again. See "Five full e2e runs" in the report (item 4).
 
 ## Notes for the next session
 

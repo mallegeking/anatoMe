@@ -161,3 +161,169 @@ Perf median: **3471 ms with the whole body as the opener** (limit 5000). Right a
 7. **Under a spot between arm and trunk:** a tap that misses the humerus by a few pixels lists the chest wall 5 to 11.5 cm deeper. Decide whether the list should stop at a gap of air.
 8. **Phone:** run the new "Whole body" row of `docs/regions/phone-measurements.md`, timing from opening the page.
 9. **Screenshots** of Step 1 and of the before and after comparison are in `~/build/research/whole-body-screens/` in the Linux home. They can be deleted after you have looked.
+
+## Review fixes
+
+Date: 2026-11-18. Five fixes from the review of the whole body view, on the working branch. Every new test was seen failing for the right reason before it counted, by breaking the app on purpose where the feature already worked. Those breaks were never committed.
+
+### Commits
+
+| Commit | Fix | State |
+| --- | --- | --- |
+| 3a8b143 | Fix 1: the load waits | done |
+| 7fc8a01 | Fix 3: the flaky turning test | done with deviation (fixed in the app, not in the scheduling) |
+| 524e6be | Fix 2: stage controls on the whole body | done |
+| 79849b4 | Fix 5: the gap list test and the mesh count | done |
+| 1c3ca32 | Fix 4: caps and budget | stopped at its own stop rule, words corrected, waits for the owner |
+| c3acfc8 | Fix 2, follow-up: the zoom test keeps its pictures on a failure | done |
+
+Fix 3 is committed before Fix 2 because the new whole body turning tests at three sizes need it to be reliable.
+
+### Fix 1: the load waits
+
+After every wait for the loading text, the open helpers now also check that the stage badge reads "Front view" and that the model's load error ("The 3D model could not be loaded...") is not on the page.
+
+Proof: with `models/body.glb` replaced by a few bytes in `dist-e2e` only (a temporary line in `scripts/e2e-prepare.mjs`, not committed), `layout.spec.ts` before the fix gave 25 passed and 3 failed. Every phone and desktop test passed without a model. After the fix all 28 layout tests that run failed, 8 at the phone size, 10 at the small phone size and 10 at the desktop size, each at line 25, the new badge check. Then the temporary line was removed and all four specs were green.
+
+Waits that stay at 20 s, for the owner to confirm. Each opens the whole body, which takes 10 to 12 s to load in a test browser when two share the machine, and each is now followed by the positive check, so a failed load can no longer pass it:
+
+- `layout.spec.ts`, helper `open` (opens `/`).
+- `area.spec.ts`, "tap a spot and read what lies under it" (opens `/`).
+- `whole-body.spec.ts`, helper `openModel`.
+- `whole-body-stage.spec.ts`, helper `openModel` (new file, Fix 2).
+
+`stage.spec.ts` opens the hip only and is back to the default wait.
+
+### Fix 2: stage controls on the whole body
+
+A new file, `apps/web/e2e/whole-body-stage.spec.ts`, runs in all three projects (`playwright.config.ts` names it in the small phone and desktop `testMatch`):
+
+- "tap a structure of the whole body, see its name in the chip, clear it": the tap is aimed at 0.068 stage heights right of the middle and 0.53 stage heights down. Found by tapping the built app at all three sizes and pinned: this is the left rectus femoris at every size, with sartorius just above and inside and tensor fasciae latae above and outside (the spots 0.065 and 0.075 across, 0.50 to 0.55 down all gave rectus femoris). The chip must read "Rectus femoris left", clear must empty it, and no console error may appear.
+- "zooming in and out changes the whole body's view and reset brings the first view back": compares pictures of the stage once the camera has come to rest. The desktop uses the zoom buttons. The phones have no zoom buttons, so the test pinches with two fingers through Chrome's touch input, as a person would. Zoom in must change the picture, zoom out must change it again, and reset must give back the first picture pixel for pixel.
+- "turning the whole body to the back swaps the markers and reset brings the front back": moved from `whole-body.spec.ts` unchanged, now at three sizes. Its badge and panel checks at the start are now in the helper.
+
+Seen failing first: with clear, `zoomBy` and `resetView` broken in the app, the chip test failed at "chip is empty" at all sizes, the zoom test at "zooming in changes the view" on the desktop and at "reset shows the first view" on both phones, and the turning test at the front view after reset.
+
+The follow-up commit c3acfc8 is described under "Five full e2e runs" below.
+
+### Fix 3: the flaky turning test
+
+Cause, found before anything was changed (superpowers:systematic-debugging):
+
+1. The same kind of failure was reproduced with the whole body. When two test browsers draw the whole body, a turn leaves the badge on "Front view" for 30 s. The trace's last frame shows the model turned to the back. The turn worked and the badge did not follow.
+2. The badge changes only on camera-controls' `rest` event (`RegionModel.tsx`). camera-controls sends `rest` only from a frame that still moved the camera and started less than 0.01 from the end (`node_modules/camera-controls/dist/camera-controls.module.js`, `update`). When one long frame takes the glide from more than 0.01 to under 0.00001, the next frame does not move, and camera-controls sends only `sleep`.
+3. Measured with camera-controls' own steps logged in the test browser: a frame of the whole body takes a median 0.41 s and up to 1.97 s with one test browser, and a median 0.83 s and up to 1.75 s with two. Some `rest` events came only because a frame happened to start at 0.00968 or 0.00004 left. The hip at the desktop size under the same load: median 0.29 s, up to 0.63 s. The hip failure itself did not come back, in 9 runs of the test next to the whole body tests on purpose and in every full run since, so it is tied to this cause by the mechanism, not by a captured failure.
+4. With `rest` switched off in the served bundle (a scratch test, `restThreshold` 0), the old build left the badge on "Front view" after a turn to the back, and the fixed build showed "Back view".
+
+So test browsers sharing the CPU make the frames longer, but the weakness is in the app: a long frame anywhere, a slow phone as well, leaves the badge and the markers on the old view. Running the tests one at a time would only make it rarer, since a lone browser also draws 2 s frames. **Deviation:** the fix is in the app, not in the scheduling. `RegionModel.tsx` now reports the view on `sleep` as well as on `rest`, a few lines, and `workers` stays at 2. The stage test's timeouts and steps are unchanged.
+
+Tests: `Viewer.test.tsx`, new "onView reports the direction when the camera stops without a rest" (failed first: no call with the new direction), and "the camera listener is removed when the viewer goes away" now also checks the `sleep` listener (failed first: 0 listeners).
+
+### Fix 4: caps and budget
+
+Stopped at the fix's own stop rule. Nothing in the pipeline or in `models/` changed. `body.glb` and the six region files are byte for byte as before, and the budget stays at 240,000.
+
+17 non-bone meshes in `body.glb` are above 400 triangles: the innermost, external and internal intercostals (7105, 6736, 5615, one mesh each for both sides), the external oblique (right 2019, left 1991), serratus anterior (843, 838), the thoracic rotator (590), iliocostalis lumborum (548, 522), longissimus thoracis (535, 531), serratus posterior inferior (466, 461), the right platysma (449) and the ascending part of trapezius (443, 432). Every bone is at or under 1000.
+
+Why, from trials in Blender on the real sources (scratch scripts, not committed):
+
+- The BodyParts3D meshes come with their seams unmerged. One muscle arrives as hundreds or thousands of loose pieces (external intercostal 12,674, external oblique about 1,045, serratus anterior about 497), and Blender's collapse decimation keeps every piece. A second or third pass gains almost nothing (external intercostal 6736, then 6467, then 6458).
+- Merging vertices closer than 1 µm first brings 11 of the 17 to exactly 400 and longissimus thoracis to 406 and 414 (400 and 406 after a second pass).
+- The three intercostals and the thoracic rotator are many separate thin sheets even after merging (346, 114, 62 and 28 pieces). With merge distances up to 0.1 mm and five passes they stop at about 2500, 1600, 1100 and 770 triangles. 400 triangles would leave only slivers for each space between the ribs.
+
+So they cannot all reach the cap without visible damage, and a partial fix would still leave "at most" wrong and a cap test would need a list of exceptions. Corrected instead: section 3.1 of the design now says the bones are decimated to 1000 and other parts to 400 as a target, with the table of the 17 meshes and the reason, and `docs/regions/known-gaps.md` says the same with the list. Item 1 of "For the owner" above was corrected the same way. No test was added.
+
+### Fix 5: the gap list test and the mesh count
+
+`App.test.tsx`, new "the whole body's gap list names the manifest's regions while its data loads and after": a manifest with the whole body and the shoulder, the body's data held back, then let through. The shoulder's name and gap line must show in the loading hint and in the loaded panel. Seen failing on each break: App giving the loading hint no regions (line 889), App giving PanelArea no regions (line 895), and PanelArea giving RegionInfo none (line 895).
+
+"639 meshes" is now 653 in section 2.3 of the design: hip 65, hip Z-Anatomy 38, lower leg 128, shoulder 91, arm 144, neck 105, trunk 82, counted from the files. Step 1 of this report had the same figure and was corrected too. The 478,857 triangles add up from the same counts.
+
+### Changed tests
+
+| File and test | Change | Why |
+| --- | --- | --- |
+| `layout.spec.ts`, helper `open` | badge and load error checks after the 20 s wait | Fix 1 |
+| `area.spec.ts`, "tap a spot and read what lies under it" | the same checks after its 20 s wait | Fix 1 |
+| `whole-body.spec.ts`, helper `openModel` | the same checks | Fix 1 |
+| `stage.spec.ts`, helper `openModel` | default wait instead of 20 s, load error check added (the badge check was there) | Fix 1, it opens the hip |
+| `whole-body.spec.ts`, "turning the whole body to the back..." | moved to `whole-body-stage.spec.ts`, steps, timeouts and assertions unchanged | Fix 2, so it runs at three sizes |
+| `whole-body-stage.spec.ts` | new file with three tests | Fix 2 |
+| `playwright.config.ts` | `whole-body-stage` added to the small phone and desktop `testMatch` | Fix 2 |
+| `Viewer.test.tsx` | one new test, one test also checks the `sleep` listener | Fix 3 |
+| `App.test.tsx` | one new test | Fix 5 |
+
+### Five full e2e runs
+
+Two series of five full runs of `npm run e2e -w apps/web`, all with `workers: 2`, after all five fixes.
+
+First series, at 1c3ca32 (the e2e run of the check list counts as run 1):
+
+| Run | Result |
+| --- | --- |
+| 1 | 57 passed, 8 skipped (4.6m) |
+| 2 | **1 failed**, 56 passed, 8 skipped (4.6m) |
+| 3 | 57 passed, 8 skipped (4.6m) |
+| 4 | 57 passed, 8 skipped (4.5m) |
+| 5 | 57 passed, 8 skipped (4.6m) |
+
+The failure in run 2 was the new zoom test on the phone, at its reset step: after reset the stage picture never matched the first picture within 30 s ("reset shows the first view"). The hip turning test of the review passed in all runs. Its trace was overwritten by the next run. The cause was not found. Tried, each refuted:
+
+- A stale "resting" picture, two equal screenshots during one slow frame: in 6 runs of the test under load, no animation frame was pending at any of the 24 pictures the helper took.
+- The phone's sheet resizing the stage when the whole body's data comes late: with `body.json` held back 6 s, the stage's size and its picture stayed the same at all three sizes.
+- The reset step itself under load: 36 tries of an instrumented copy of the test, next to the layout and the whole body tests, all matched.
+
+The assertion was not changed. Commit c3acfc8 makes a failure keep the first picture, the picture after reset, a picture of the page and the chip's text in the test's trace, so a next failure can be read. (Its commit message says 24 tries, the count at the time.)
+
+Second series, at c3acfc8, each run's `test-results` kept:
+
+| Run | Result |
+| --- | --- |
+| 1 | 57 passed, 8 skipped (4.6m) |
+| 2 | 57 passed, 8 skipped (4.5m) |
+| 3 | 57 passed, 8 skipped (4.5m) |
+| 4 | 57 passed, 8 skipped (4.5m) |
+| 5 | 57 passed, 8 skipped (4.4m) |
+
+Five runs in a row green. The zoom test's reset step failed once in 30 full-run tries (15 per series) plus 36 probe tries, so it may come back. If it does, its trace holds the pictures.
+
+### Checks
+
+The full list of the build rules at 1c3ca32 (before the zoom test follow-up, which changes only that test), every command exit 0:
+
+```
+npm run validate                    data in data is valid
+npm run check-models                region body: 239292 triangles (budget 240000)
+                                    region hip: 48909, lower-leg: 44294, shoulder: 109449,
+                                    arm: 45227, neck: 90682, trunk: 140296 (budget 150000 each)
+                                    every mesh maps to one of 312 structures
+npm test                            web: Test Files 48 passed (48), Tests 576 passed (576)
+                                    pipeline: Test Files 8 passed (8), Tests 167 passed (167)
+npm run build:review -w apps/web    exit 0
+npm run build                       exit 0
+npm run e2e -w apps/web             57 passed, 8 skipped (4.6m)
+node scripts/check-no-drafts.mjs    apps/web/dist/data: 7 bundle(s), no drafts
+node apps/web/scripts/perf-check.mjs   runs 3865, 3746, 4484, 3372, 3231 ms, median interactive ms: 3746
+node apps/web/scripts/error-check.mjs  ok decoder download fails (1044 ms), ok decoder never answers (20572 ms), ok model file missing (954 ms)
+npm run test:py                     36 passed in 3.31s
+```
+
+`perf-check.mjs` was not changed. The 8 skipped e2e tests are the same size-specific skips as before.
+
+### Not verified
+
+- A real phone. The pinch in the zoom test is Chrome's touch input on a desktop machine, and the missed `rest` on a slow phone is argued from camera-controls' code and the test browser's frame times, not seen on the Galaxy A23.
+- The hip's own turning failure from the review did not come back, so its cause is the mechanism above by argument.
+- Merged-then-decimated meshes were only counted, not looked at. Their look is not judged.
+
+### Noticed, not done
+
+- The same loose-pieces cause probably explains the four trunk meshes above the 2000 cap in `trunk.glb` (Phase 4b, "For the owner" item 1) and the "faceted" external oblique noted there. Merging before decimating would change the region files, which this fix was not allowed to do.
+- A frame of the whole body in the test browser takes 0.4 to 2 s even alone, so every whole body e2e test is slow by nature. Each stage drag costs a frame per pointer move.
+
+### For the owner
+
+1. **The 20 s waits** in `layout.spec.ts`, `area.spec.ts`, `whole-body.spec.ts` and the new `whole-body-stage.spec.ts` stay, each now followed by the model check. Confirm.
+2. **Fix 3 was fixed in the app, not in the test scheduling.** The badge and the markers now also follow the camera on camera-controls' `sleep`, because a long frame skips `rest`. `workers` stays at 2. Confirm.
+3. **The caps (Fix 4).** 17 meshes stay above 400 triangles. Decide whether the pipeline should merge loose vertices before decimating (13 of the 17 then reach 400, the body file and probably the trunk file would change), and what cap the intercostals and the thoracic rotator should have. Until then the docs say "decimated to" and list them.
+4. **The zoom test's reset step** failed once in the first five full runs, cause not found, and was green in the next five in a row. If it fails again, its trace holds the pictures. See "Five full e2e runs".
