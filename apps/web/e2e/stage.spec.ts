@@ -51,7 +51,7 @@ test("tap a structure, see the chip, clear it, reset the view", async ({ page },
 });
 
 test("turning the model to the back swaps the markers", async ({ page }) => {
-  // The whole body has its own turning test in whole-body.spec.ts, because a 10-step drag of the whole body takes about 50 s in software WebGL.
+  // The whole body has its own turning test in whole-body-stage.spec.ts, because a 10-step drag of the whole body takes about 50 s in software WebGL.
   await openModel(page, "/?region=hip");
   const stage = (await page.locator(".stage").boundingBox())!;
   const badge = page.locator(".stage-badge");
