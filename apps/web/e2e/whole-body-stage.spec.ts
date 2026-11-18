@@ -92,9 +92,20 @@ test("zooming in and out changes the whole body's view and reset brings the firs
   expect(zoomedOut.equals(zoomedIn), "zooming out changes the view").toBe(false);
 
   await page.getByRole("button", { name: texts["stage.reset"] }).click();
+  let afterReset = zoomedOut;
   await expect(async () => {
-    expect((await restingPicture(page)).equals(first), "reset shows the first view").toBe(true);
-  }).toPass({ timeout: 30_000 });
+    afterReset = await restingPicture(page);
+    expect(afterReset.equals(first), "reset shows the first view").toBe(true);
+  })
+    .toPass({ timeout: 30_000 })
+    .catch(async (error: unknown) => {
+      // This failed once in fifteen runs and could not be made to fail again, so a failure keeps its pictures.
+      await info.attach("first view", { body: first, contentType: "image/png" });
+      await info.attach("view after reset", { body: afterReset, contentType: "image/png" });
+      await info.attach("page after reset", { body: await page.screenshot(), contentType: "image/png" });
+      await info.attach("chip after reset", { body: (await page.locator(".stage-chip").textContent()) ?? "", contentType: "text/plain" });
+      throw error;
+    });
   await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
 });
 
