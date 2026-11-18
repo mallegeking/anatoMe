@@ -194,11 +194,17 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
   }, [controls, scenes, invalidate]);
 
   // The controls send "rest" when a move has settled, so this never runs per frame and never wakes the loop.
+  // They send "rest" only from a frame that still moved the camera. When one long frame ends the glide (a slow phone,
+  // a busy machine), they skip it and send only "sleep" when the camera stops, so that reports the view too.
   useEffect(() => {
     if (!controls) return;
     const onRest = () => reportView(controls);
     controls.addEventListener("rest", onRest);
-    return () => controls.removeEventListener("rest", onRest);
+    controls.addEventListener("sleep", onRest);
+    return () => {
+      controls.removeEventListener("rest", onRest);
+      controls.removeEventListener("sleep", onRest);
+    };
   }, [controls]);
 
   // Nothing happens until the model is in and the controls exist.

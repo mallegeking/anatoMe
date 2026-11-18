@@ -542,6 +542,15 @@ test("onView reports the direction after the first framing and when the camera r
   expect(onView).toHaveBeenLastCalledWith([1, 0, 0]);
 });
 
+// The controls send "rest" only from a frame that still moved the camera. When one long frame ends the glide,
+// as on a slow phone or a busy test machine, they go straight to "sleep", so that has to report too.
+test("onView reports the direction when the camera stops without a rest", async () => {
+  const { onView } = await showWithHandle();
+  controls.position = [0, 0, -2];
+  act(() => controls.emit("sleep"));
+  expect(onView).toHaveBeenLastCalledWith([0, 0, -1]);
+});
+
 test("onView does not report again while the camera moves", async () => {
   const { onView } = await showWithHandle();
   onView.mockClear();
@@ -554,8 +563,10 @@ test("onView does not report again while the camera moves", async () => {
 test("the camera listener is removed when the viewer goes away", async () => {
   await showWithHandle();
   expect(controls.listenerCount("rest")).toBe(1);
+  expect(controls.listenerCount("sleep")).toBe(1);
   cleanup();
   expect(controls.listenerCount("rest")).toBe(0);
+  expect(controls.listenerCount("sleep")).toBe(0);
 });
 
 test("the handle does nothing before the model has loaded", async () => {
