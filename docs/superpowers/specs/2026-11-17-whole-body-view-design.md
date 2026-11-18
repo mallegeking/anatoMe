@@ -91,7 +91,25 @@ What this shows:
 - The time does not follow the triangles closely. Going from 249,000 to 182,000 triangles saves only a few hundred ms, and even 112,000 triangles stays near 3500 ms while the hip is at 2255 ms. A CPU profile of one load shows the files are all in after about 1.5 s, and most of the rest is the browser's own work on the 577 separate meshes. Merging meshes would make it faster, but the owner's rule says every structure stays its own mesh, so it is not done.
 - A single cap of 400 makes the skull visibly blocky at the top. Bones are few but some are large single meshes (skull, hip bone, scapula, ribs), so they need more triangles than muscles. Bones at 1000 and every other part at 400 cost no measurable time over a single cap of 400 and keep the skull whole.
 
-**Chosen (builder's call): bones at most 1000 triangles per mesh, every other part at most 400.** It passes the gate in every round (medians 3944 and 4485 ms). It sits around 4000 ms on this noisy machine, about 1.5 times the hip in the same round. The owner measures the real phone, where the hip took 783 ms.
+**Chosen (builder's call): bones decimated to 1000 triangles per mesh, every other part to 400.** It passes the gate in every round (medians 3944 and 4485 ms). It sits around 4000 ms on this noisy machine, about 1.5 times the hip in the same round. The owner measures the real phone, where the hip took 783 ms.
+
+The caps, here and in the table above, are the targets Blender's decimation is asked for, not limits it always reaches. Every bone is at or under 1000. These 17 other meshes in `body.glb` stay above 400 (triangles in the built file):
+
+| Mesh | Triangles |
+| --- | --- |
+| innermost intercostal (one mesh for both sides) | 7105 |
+| external intercostal (one mesh for both sides) | 6736 |
+| internal intercostal (one mesh for both sides) | 5615 |
+| external oblique, right and left | 2019, 1991 |
+| serratus anterior, right and left | 843, 838 |
+| thoracic rotator (one mesh for both sides) | 590 |
+| iliocostalis lumborum, left and right | 548, 522 |
+| longissimus thoracis, right and left | 535, 531 |
+| serratus posterior inferior, right and left | 466, 461 |
+| platysma, right | 449 |
+| ascending part of trapezius, right and left | 443, 432 |
+
+Why: the BodyParts3D files come with their seams unmerged, so one muscle arrives as hundreds or thousands of loose pieces (the external intercostal as 12,674), and Blender's collapse decimation keeps every piece. A second pass gains almost nothing. Merging vertices that lie on top of each other first brings 13 of them to 400 or a few triangles over in a trial. The three intercostals and the thoracic rotator are many separate thin sheets even then (up to 346 pieces), and decimation stops at about 2500, 1600, 1100 and 770 triangles. 400 triangles would leave only slivers for each space between the ribs. Whether to merge first, and what the cap for these sheets should be, waits for the owner. The 240,000 budget holds either way (239,292 now).
 
 ### 3.2 What detail is lost
 

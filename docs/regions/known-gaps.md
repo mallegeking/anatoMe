@@ -89,7 +89,7 @@ Because latissimus dorsi and the trapezius are not in the trunk file, the measur
 
 ## Whole body
 
-The whole body holds every structure of the six regions once. It is built from one lighter file, `models/body.glb`, plus the hip's own `models/hip-z-anatomy.glb`. In `body.glb` a bone has at most 1000 triangles per mesh and every other part at most 400. The six region files keep their full detail.
+The whole body holds every structure of the six regions once. It is built from one lighter file, `models/body.glb`, plus the hip's own `models/hip-z-anatomy.glb`. In `body.glb` each bone is decimated to 1000 triangles per mesh and every other part to 400. That is the target, not a limit: every bone is at or under 1000, but 17 other meshes stay above 400 because the source meshes arrive in many loose pieces. They are the innermost, external and internal intercostals (7105, 6736 and 5615 triangles, one mesh each for both sides), the external oblique (2019 and 1991), serratus anterior (843 and 838), the thoracic rotator (590), iliocostalis lumborum (548 and 522), longissimus thoracis (535 and 531), serratus posterior inferior (466 and 461), the right platysma (449) and the ascending part of trapezius (443 and 432). Section 3.1 of `docs/superpowers/specs/2026-11-17-whole-body-view-design.md` says why. The six region files keep their full detail.
 
 What detail is lost:
 
