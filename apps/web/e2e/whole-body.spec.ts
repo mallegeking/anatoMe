@@ -5,6 +5,7 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 
 // Walks the whole body in the built app: it is what the app opens with, the picker leads to a region and back,
 // a search finds a structure that is not in the hip, Under a spot lists what lies under a tap, and peeling works.
+// The stage controls on the whole body are in whole-body-stage.spec.ts, which runs at all three sizes.
 // The data comes from the test-only set in e2e/data (see scripts/e2e-prepare.mjs), which makes body.json too.
 
 const REGION_ORDER = ["body", "hip", "lower-leg", "shoulder", "arm", "neck", "trunk"];
@@ -56,34 +57,6 @@ test("a search in the whole body selects a structure outside the hip", async ({ 
   await page.getByTestId("search-results").getByRole("button", { name: /^Scapula\b/ }).first().click();
   await expect(page.getByTestId("info-panel").getByRole("heading", { name: "Scapula", exact: true, level: 2 })).toBeVisible();
   await expect(page.locator(".stage-chip")).toContainText("Scapula");
-});
-
-test("turning the whole body to the back swaps the markers and reset brings the front back", async ({ page }) => {
-  // Each step below waits for a full software frame of the whole body, which takes seconds when several browsers share the machine.
-  test.setTimeout(120_000);
-  await openModel(page, "/");
-  const badge = page.locator(".stage-badge");
-  await expect(badge).toHaveText(texts["view.front"]);
-  // The panel's first text can change the height of the phone's sheet, and so the stage's, so wait for it too.
-  await expect(page.getByTestId("info-label")).toBeVisible();
-
-  // A sideways drag of half the stage's height turns the model half way round, as in stage.spec.ts.
-  // The turn depends only on the drag distance, and each pointer move costs a full software frame of the whole body, so two steps are enough.
-  const stage = (await page.locator(".stage").boundingBox())!;
-  const y = stage.y + 0.5 * stage.height;
-  const from = stage.x + stage.width / 2 - 0.25 * stage.height;
-  await page.mouse.move(from, y);
-  await page.mouse.down();
-  await page.mouse.move(from + 0.5 * stage.height, y, { steps: 2 });
-  await page.mouse.up();
-  // The badge follows once the camera has come to rest.
-  await expect(badge).toHaveText(texts["view.back"], { timeout: 30_000 });
-  await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.left"]);
-  await expect(page.locator(".stage-marker--right")).toHaveText(texts["stage.right"]);
-
-  await page.getByRole("button", { name: texts["stage.reset"] }).click();
-  await expect(badge).toHaveText(texts["view.front"], { timeout: 30_000 });
-  await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.right"]);
 });
 
 // The home region of each structure in the test data, by its English name, read from e2e/data/structures/<region>.yaml.
@@ -146,7 +119,7 @@ test("Under a spot: a tap on the trunk lists what lies under it", async ({ page 
 });
 
 test("Under a spot: a tap on an arm beside the trunk", async ({ page }) => {
-  // The turn below waits for full software frames of the whole body, as in the turning test above.
+  // The turn below waits for full software frames of the whole body, as in the turning test of whole-body-stage.spec.ts.
   test.setTimeout(120_000);
   const stage = await openArea(page);
   // A sideways drag of a quarter of the stage's height turns the model a quarter of the way round, to its right side.
