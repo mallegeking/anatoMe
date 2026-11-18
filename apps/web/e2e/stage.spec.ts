@@ -8,9 +8,11 @@ import texts from "../src/i18n/en.json" with { type: "json" };
 // Opens the app and waits until the model is drawn and the camera has said where it looks from.
 async function openModel(page: Page, path: string) {
   await page.goto(path);
-  // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
-  await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.getByText(texts["loading.model"])).toHaveCount(0);
+  // The load error also removes the loading text, so check that the model really came: the camera has said where it
+  // looks from, and the model's load error is not on the page.
   await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
+  await expect(page.getByRole("alert").filter({ hasText: texts["error.modelLoad"] })).toHaveCount(0);
   // The panel's first text can change the height of the phone's sheet, and so the stage's, so wait for it too.
   await expect(page.getByTestId("info-label")).toBeVisible();
 }

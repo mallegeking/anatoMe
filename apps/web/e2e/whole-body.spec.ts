@@ -18,6 +18,10 @@ async function openModel(page: Page, path: string) {
   await page.goto(path);
   // As long as the app's own load watchdog (LOAD_TIMEOUT_MS in src/viewer/useLoadWatchdog.ts). Load time is gated by perf-check, not here.
   await expect(page.getByText(texts["loading.model"])).toHaveCount(0, { timeout: 20_000 });
+  // The load error also removes the loading text, so check that the model really came: the camera has said where it
+  // looks from, and the model's load error is not on the page.
+  await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
+  await expect(page.getByRole("alert").filter({ hasText: texts["error.modelLoad"] })).toHaveCount(0);
 }
 
 test("the app opens with the whole body", async ({ page }) => {
