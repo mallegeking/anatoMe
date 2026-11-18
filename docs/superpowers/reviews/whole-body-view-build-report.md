@@ -327,3 +327,78 @@ npm run test:py                     36 passed in 3.31s
 2. **Fix 3 was fixed in the app, not in the test scheduling.** The badge and the markers now also follow the camera on camera-controls' `sleep`, because a long frame skips `rest`. `workers` stays at 2. Confirm.
 3. **The caps (Fix 4).** 17 meshes stay above 400 triangles. Decide whether the pipeline should merge loose vertices before decimating (13 of the 17 then reach 400, the body file and probably the trunk file would change), and what cap the intercostals and the thoracic rotator should have. Until then the docs say "decimated to" and list them.
 4. **The zoom test's reset step** failed once in the first five full runs, cause not found, and was green in the next five in a row. If it fails again, its trace holds the pictures. See "Five full e2e runs".
+
+## Reset from very close to the first view
+
+Date: 2026-11-18. One bug fix, on the working branch. The reset button did nothing when the camera rested less than 0.01 away from the first view. camera-controls 3.1.2 sends `transitionstart` only for a move larger than its `restThreshold` (0.01), in `rotateTo`, `moveTo`, `dollyTo` and `setFocalOffset` through `_createOnRestPromise`. The canvas draws on demand, and drei's `CameraControls` asks for a frame only on `controlstart`, `control`, `transitionstart`, `update` and `wake`. So such a reset set the camera's end values and no frame was drawn. `resetView` in `RegionModel.tsx` now calls `invalidate()` after its camera calls. Once one frame runs, the controls' `update` sends `wake` and `update` and carry the glide on by themselves.
+
+### Commits
+
+| Commit | Change |
+| --- | --- |
+| c08f0bb | The fix in `resetView`, the unit test, the new e2e test and the stricter `restingPicture` |
+| cb6ee68 | The comment at `apps/web/e2e/stage.spec.ts:54` now names `whole-body-stage.spec.ts` |
+
+### Tests and how each was seen failing
+
+1. `apps/web/src/viewer/Viewer.test.tsx`, "resetView asks the canvas for a frame after moving the camera, even when the controls send no event". The canvas's `invalidate` is now a hoisted `vi.fn`, like the controls stand-in, and the stand-in sends no events. The test checks that `invalidate` is called, and called after `rotateTo` and `fitToBox`. Before the fix it failed with `expected "vi.fn()" to be called at least once` at the `toHaveBeenCalled` line.
+2. `apps/web/e2e/whole-body-stage.spec.ts`, "reset brings the first view back from a camera that rests very close to it", at all three sizes. It takes the resting first picture, drags 1 pixel sideways at 10 % of the stage's width and half its height, checks that the chip stays empty, checks that the resting picture differs from the first, presses reset and checks that the resting picture equals the first, byte for byte. The test records the turn of a 1 pixel drag (2 pi divided by the canvas height) as an annotation. Before the fix:
+   - desktop: **failed** at "reset shows the first view" (1 pixel = 0.0085 rad, below 0.01).
+   - phone: passed (1 pixel = 0.0182 rad).
+   - small-phone: passed (1 pixel = 0.0255 rad).
+   At both phone sizes one pixel is more than the threshold, so the reset there sends `transitionstart` and works without the fix. The test was kept at 1 pixel at every size and does not fake a smaller move. It guards the bug only at the desktop size.
+3. `restingPicture` in the same file now waits 1 s after its first picture before the first comparison, so the two pictures that count as resting are never taken back to back. This makes the helper stricter. No assertion and no timeout of the existing tests was changed.
+
+After the fix, the unit test and all 12 tests of `whole-body-stage.spec.ts` passed.
+
+### zoomBy
+
+`zoomBy` calls `dollyTo(distance * factor, true)` with the factors 0.8 and 1.25, and the distance is clamped to 0.15 to 4. A step changes the distance by at least 0.03, so it sends `transitionstart`, except when the clamp makes the step smaller than 0.01: zooming in from a distance between 0.15 and about 0.16, or out from between about 3.99 and 4. Then the same missing frame can happen. It was not changed, because the prompt allowed no other change in the app. See "Noticed, not done" below.
+
+### Five full e2e runs
+
+After the full check list (whose e2e run gave 60 passed, 8 skipped, 5.7m), at cb6ee68, each run's `test-results` kept:
+
+| Run | Result |
+| --- | --- |
+| 1 | 60 passed, 8 skipped (5.4m) |
+| 2 | 60 passed, 8 skipped (5.1m) |
+| 3 | 60 passed, 8 skipped (5.1m) |
+| 4 | 60 passed, 8 skipped (5.0m) |
+| 5 | 60 passed, 8 skipped (5.0m) |
+
+The zoom test's reset step passed in all six runs. 60 is the 57 from before plus the new test at three sizes.
+
+### Checks
+
+At cb6ee68, every command exit 0:
+
+```
+npm run validate                    data in data is valid
+npm run check-models                region body: 239292 triangles (budget 240000), every mesh maps to one of 312 structures
+npm test                            web: Test Files 48 passed (48), Tests 577 passed (577)
+                                    pipeline: Test Files 8 passed (8), Tests 167 passed (167)
+npm run build:review -w apps/web    exit 0
+npm run build                       exit 0
+npm run e2e -w apps/web             60 passed, 8 skipped (5.7m)
+node scripts/check-no-drafts.mjs    apps/web/dist/data: 7 bundle(s), no drafts
+node apps/web/scripts/perf-check.mjs   runs 3733, 3857, 4239, 3341, 3559 ms, median interactive ms: 3733
+node apps/web/scripts/error-check.mjs  ok decoder download fails (1156 ms), ok decoder never answers (20665 ms), ok model file missing (959 ms)
+npm run test:py                     36 passed in 3.38s
+```
+
+### Not verified
+
+- That this bug caused the one earlier failure of the zoom test's reset step. It is likely, since a pinch can leave a small offset, but that failure was never caught again and did not come back here.
+- At the two phone sizes the new e2e test cannot fail on this bug, because 1 pixel is already above the threshold there. The fix is checked there only by the unit test.
+- That the 1 pixel drag lands on empty space is checked by the empty chip, not by looking at the picture.
+- A real phone.
+
+### Noticed, not done
+
+- `zoomBy` has the same gap within 0.01 of the distance limits (see "zoomBy"). One `invalidate()` after `dollyTo` would close it.
+- Any other glide the app starts with a move below 0.01 would have the same gap, for example the search focus in `RegionModel.tsx` when the camera already rests almost on the structure. Not checked further.
+
+### For the owner
+
+1. **zoomBy** was left as it is, as the prompt asked. Decide whether it gets the same `invalidate()`.

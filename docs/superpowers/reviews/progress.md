@@ -25,6 +25,7 @@ Session of 2026-11-17:
 Session of 2026-11-18:
 
 - Fourteenth run: the whole body view review fixes (Fixes 1 to 5). Every load wait now checks that the model really loaded, the whole body's stage controls are tested at three sizes, the flaky turning test was traced to the view badge missing camera-controls' `rest` on long frames and fixed in the app, and the gap list has an App test. Fix 4 (the triangle caps) stopped at its own stop rule: the docs now call the caps targets and list the 17 meshes above 400. See "Review fixes" in `whole-body-view-build-report.md`.
+- Fifteenth run: the reset bug. A reset from a camera resting less than 0.01 from the first view drew nothing, because camera-controls asks for frames only above its restThreshold. `resetView` now asks for a frame itself. A unit test and a new e2e test at three sizes were seen failing first (the e2e test can fail only at the desktop size, see the report). All checks and five more full e2e runs are green. See "Reset from very close to the first view" in `whole-body-view-build-report.md`.
 
 | Plan | State | Report |
 | --- | --- | --- |
@@ -45,6 +46,7 @@ Session of 2026-11-18:
 | Three-column layout and stage controls, Tasks 1 to 14 | done (with deviations, German drafts and open choices for the owner) | `three-column-layout-build-report.md` |
 | Whole body view, design, plan and Tasks 1 to 6 | done (option B, with deviations in changed tests for the owner) | `whole-body-view-build-report.md` |
 | Whole body view review fixes, Fixes 1 to 5 | partly done (Fixes 1, 2, 3 and 5 done, Fix 3 fixed in the app, Fix 4 stopped for the owner) | `whole-body-view-build-report.md`, section "Review fixes" |
+| Whole body view, reset from very close to the first view | done (zoomBy left as it is for the owner) | `whole-body-view-build-report.md`, section "Reset from very close to the first view" |
 
 ## Waiting for the owner
 
@@ -83,6 +85,7 @@ Session of 2026-11-18:
 - Whole body view review: Fix 4 is stopped. 17 non-bone meshes in `body.glb` stay above 400 triangles (the three intercostals 5615 to 7105, the external oblique about 2000 each side, serratus anterior about 840 and ten more). Merging loose vertices before decimating brings 13 of them to 400 in a trial, the three intercostals and the thoracic rotator stop at about 2500, 1600, 1100 and 770. Decide whether the pipeline merges first and what cap these sheets get (item 3 of "Review fixes", "For the owner"). The docs now say "decimated to" and list them.
 - Whole body view review: confirm the four 20 s load waits that stay, now each followed by a check that the model loaded (item 1), and that Fix 3 was fixed in the app (the view is reported on `sleep` too) instead of in the test scheduling, with `workers` still 2 (item 2).
 - Whole body view review: the new zoom test's reset step failed once in the first five full e2e runs and could not be made to fail again. See "Five full e2e runs" in the report (item 4).
+- Whole body view, reset fix: `zoomBy` can miss its frame the same way when a zoom step is clamped within 0.01 of the distance limits (0.15 and 4). It was not changed. Decide whether it gets the same `invalidate()` (item 1 of "Reset from very close to the first view", "For the owner"). The zoom test's reset step passed in all six full runs of this session.
 
 ## Notes for the next session
 
