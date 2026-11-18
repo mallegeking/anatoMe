@@ -22,9 +22,12 @@ async function openModel(page: Page) {
 }
 
 // A picture of the stage once the camera has come to rest: two pictures in a row that are the same.
+// The two are never taken back to back. Right after a click or a drag no frame may have been drawn yet,
+// and two pictures taken before it would look like a camera at rest.
 async function restingPicture(page: Page): Promise<Buffer> {
   const canvas = page.locator(".stage canvas");
   let last = await canvas.screenshot();
+  await page.waitForTimeout(1_000);
   await expect(async () => {
     const next = await canvas.screenshot();
     const same = next.equals(last);
@@ -130,4 +133,33 @@ test("turning the whole body to the back swaps the markers and reset brings the 
   await page.getByRole("button", { name: texts["stage.reset"] }).click();
   await expect(badge).toHaveText(texts["view.front"], { timeout: 30_000 });
   await expect(page.locator(".stage-marker--left")).toHaveText(texts["stage.right"]);
+});
+
+// camera-controls starts a glide, and so asks the canvas for frames, only for a move larger than its restThreshold
+// (0.01). A reset from a camera that rests closer than that to the first view must still draw the first view.
+test("reset brings the first view back from a camera that rests very close to it", async ({ page }, info) => {
+  await openModel(page);
+  const first = await restingPicture(page);
+
+  // One full turn is a drag of the canvas's height, so one pixel turns the model by 2 pi / height.
+  const canvas = (await page.locator(".stage canvas").boundingBox())!;
+  const turn = (2 * Math.PI) / canvas.height;
+  info.annotations.push({ type: "turn of a 1 pixel drag", description: `${turn.toFixed(4)} rad, the restThreshold is 0.01` });
+
+  // A 1 pixel drag sideways on empty space, left of the model at half the stage's height.
+  const stage = (await page.locator(".stage").boundingBox())!;
+  const x = stage.x + 0.1 * stage.width;
+  const y = stage.y + 0.5 * stage.height;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 1, y);
+  await page.mouse.up();
+  await expect(page.locator(".stage-chip")).toBeEmpty();
+  const nudged = await restingPicture(page);
+  expect(nudged.equals(first), "the 1 pixel drag changes the view").toBe(false);
+
+  await page.getByRole("button", { name: texts["stage.reset"] }).click();
+  const afterReset = await restingPicture(page);
+  expect(afterReset.equals(first), "reset shows the first view").toBe(true);
+  await expect(page.locator(".stage-badge")).toHaveText(texts["view.front"]);
 });

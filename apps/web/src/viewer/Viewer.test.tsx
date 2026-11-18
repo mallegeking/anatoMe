@@ -35,6 +35,9 @@ const controls = vi.hoisted(() => {
   return stub;
 });
 
+// The canvas's request for a frame. The tests read it to see that a change asks to be drawn.
+const invalidate = vi.hoisted(() => vi.fn());
+
 const load = vi.hoisted(() => ({
   // A failed download stays failed until the loader's cache is cleared, like the real one.
   failed: false,
@@ -70,7 +73,7 @@ vi.mock("@react-three/fiber", async () => {
   camera.updateMatrixWorld();
   const state = {
     controls,
-    invalidate: () => {},
+    invalidate,
     clock: { getDelta: () => 0 },
     gl: { domElement: document.createElement("canvas") },
     size: { width: 400, height: 400 },
@@ -121,6 +124,7 @@ beforeEach(() => {
   controls.dollyTo.mockClear();
   controls.rotateTo.mockClear();
   controls.normalizeRotations.mockClear();
+  invalidate.mockClear();
   controls.distance = 2;
   controls.azimuthAngle = 0;
   controls.polarAngle = Math.PI / 2;
@@ -526,6 +530,18 @@ test("resetView turns the camera back to the first direction, the short way roun
   // The turn is asked for first, so the fit keeps the front direction instead of the nearest one to the back.
   expect(controls.normalizeRotations.mock.invocationCallOrder[0]).toBeLessThan(controls.rotateTo.mock.invocationCallOrder[0]);
   expect(controls.rotateTo.mock.invocationCallOrder[0]).toBeLessThan(controls.fitToBox.mock.invocationCallOrder.at(-1)!);
+});
+
+// The controls send "transitionstart", which asks the canvas for frames, only for a move larger than their
+// restThreshold (0.01). The stand-in sends no event at all, like a reset from a camera that rests very close to the first view.
+test("resetView asks the canvas for a frame after moving the camera, even when the controls send no event", async () => {
+  const { handle } = await showWithHandle();
+  invalidate.mockClear();
+  act(() => handle.current!.resetView());
+  expect(invalidate).toHaveBeenCalled();
+  // Asked for after the camera calls, so the frame draws the move.
+  expect(invalidate.mock.invocationCallOrder.at(-1)!).toBeGreaterThan(controls.fitToBox.mock.invocationCallOrder.at(-1)!);
+  expect(invalidate.mock.invocationCallOrder.at(-1)!).toBeGreaterThan(controls.rotateTo.mock.invocationCallOrder.at(-1)!);
 });
 
 test("zoomBy multiplies the distance", async () => {

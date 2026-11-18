@@ -221,12 +221,15 @@ export function RegionModel({ urls, selection, focus, isShown, highlights, onSel
           void controls.rotateTo(first.azimuth, first.polar, true);
         }
         void controls.fitToBox(wholeBox.current, true, FRAME_PADDING);
+        // The controls ask for frames only for a move larger than their restThreshold (0.01). A camera that rests
+        // closer than that to the first view would get its end values set and never be drawn there, so ask here.
+        invalidate();
       },
       zoomBy(factor: number) {
         if (controls) void controls.dollyTo(controls.distance * factor, true);
       },
     }),
-    [controls],
+    [controls, invalidate],
   );
 
   // Glide the camera to the structure a search chose. Hidden meshes still count for the box.
